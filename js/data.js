@@ -378,7 +378,7 @@ const heroesDatabase = [
     plaque: "right",
     category: "svo_memorial",
     specTag: "fire",
-    name: "Вечёрка Николай Анатольевич",
+    name: "Вечерка Николай Анатольевич",
     dates: { birth: "25.06.1996", death: "26.02.2022", years: "1996 — 2022" },
     education: {
       specialty: "Пожарная безопасность",
