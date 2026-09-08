@@ -1964,6 +1964,83 @@ body.large-text .section-title {
 }
 
 /* ==========================================================================
+   ИСПРАВЛЕНИЕ: МОБИЛЬНЫЙ ГАМБУРГЕР И ШТОРКА НАВИГАЦИИ
+   ========================================================================== */
+
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.mobile-menu-btn span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--gold-accent);
+  transition: all var(--duration) ease;
+}
+
+.mobile-menu-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.mobile-menu-btn.open span:nth-child(2) { opacity: 0; }
+.mobile-menu-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+@media (min-width: 901px) {
+  .mobile-nav-drawer,
+  .mobile-menu-btn {
+    display: none !important;
+  }
+}
+
+.mobile-nav-drawer {
+  display: none;
+  flex-direction: column;
+  background: rgba(10, 12, 16, 0.98);
+  border-bottom: 1px solid var(--border-gold);
+  padding: 16px 24px;
+  gap: 8px;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  z-index: 999;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.9);
+}
+
+.mobile-nav-drawer.active {
+  display: flex;
+}
+
+.mobile-nav-link {
+  color: var(--text-muted) !important;
+  text-decoration: none !important;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: color var(--duration) ease;
+  display: block;
+}
+
+.mobile-nav-link:hover, .mobile-nav-link.highlight {
+  color: var(--gold-accent) !important;
+}
+
+.mobile-btn-link {
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border-subtle);
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  width: 100%;
+}
+
+/* ==========================================================================
    17. АДАПТИВНОСТЬ ПОД УСТРОЙСТВА (RESPONSIVE BREAKPOINTS)
    ========================================================================== */
 @media (max-width: 1024px) {
