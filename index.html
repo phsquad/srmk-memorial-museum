@@ -4,6 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>Виртуальный музей ГБПОУ СРМК | «Быть воином — жить вечно»</title>
+
+  <!-- АВТООПРЕДЕЛЕНИЕ УСТРОЙСТВА И РЕДИРЕКТ НА МОБИЛЬНУЮ ВЕРСИЮ -->
+  <script>
+    (function() {
+      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
+      if (isMobile) {
+        const currentHash = window.location.hash;
+        window.location.replace('mobile.html' + currentHash);
+      }
+    })();
+  </script>
   
   <!-- Метатеги и SEO -->
   <meta name="description" content="Интерактивный цифровой мемориал памяти 20 выпускников ГБПОУ СРМК, павших при исполнении воинского долга. Всероссийская акция «Карта доблести: хранители подвигов».">
