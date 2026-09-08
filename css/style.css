@@ -2,14 +2,14 @@
    1. ДИЗАЙН-ТОКЕНЫ, ПЕРЕМЕННЫЕ И БАЗОВЫЙ СБРОС (RESET)
    ========================================================================== */
 :root {
-  /* Базовая темная гамма (Мрамор и обсидиан) */
-  --bg-deep: #080a0e;
-  --bg-surface: #10141d;
-  --bg-card: #151a26;
-  --bg-card-hover: #1e2536;
-  --bg-card-active: #242c3f;
-  --bg-glass: rgba(16, 20, 29, 0.92);
-  --bg-glass-modal: rgba(8, 10, 14, 0.95);
+  /* Базовая темная гамма (Обсидиан, гранит и благородная сталь) */
+  --bg-deep: #07090d;
+  --bg-surface: #0f131c;
+  --bg-card: #141924;
+  --bg-card-hover: #1c2333;
+  --bg-card-active: #242d42;
+  --bg-glass: rgba(15, 19, 28, 0.94);
+  --bg-glass-modal: rgba(7, 9, 13, 0.96);
 
   /* Акцентный красный (Кумач / Знамя Победы) */
   --primary-red: #9e1b20;
@@ -27,11 +27,11 @@
   --candle-color: #f59e0b;
   --candle-glow: rgba(245, 158, 11, 0.55);
 
-  /* Типографика и цвета текста */
+  /* Типографика и контраст текста */
   --text-main: #f0f3f8;
   --text-muted: #8e98a8;
   --text-dim: #5c6675;
-  --text-inverted: #080a0e;
+  --text-inverted: #07090d;
 
   /* Границы и тени */
   --border-subtle: rgba(255, 255, 255, 0.08);
@@ -44,10 +44,10 @@
   --shadow-red: 0 0 24px rgba(158, 27, 32, 0.35);
 
   /* Шрифтовые гарнитуры */
-  --font-serif: 'Cinzel', 'Times New Roman', serif;
+  --font-serif: 'Cinzel', 'Times New Roman', Georgia, serif;
   --font-sans: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   
-  /* Анимационные тайминги */
+  /* Тайминги анимаций */
   --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
   --duration: 0.28s;
@@ -94,7 +94,7 @@ main {
   background: var(--bg-deep);
 }
 ::-webkit-scrollbar-thumb {
-  background: #242c3b;
+  background: #202736;
   border-radius: 4px;
   border: 1px solid var(--border-gold);
 }
@@ -563,7 +563,7 @@ main {
 }
 
 /* ==========================================================================
-   6. ЗАЛ I: ИНТЕРАКТИВНЫЙ МЕМОРИАЛ «ЗВЕЗДА ПАМЯТИ»
+   6. ЗАЛ I: ИНТЕРАКТИВНЫЙ МЕМОРИАЛ «ЗВЕЗДА ПАМЯТИ» (2.5D СТЕНД)
    ========================================================================== */
 .plaque-view-toggle {
   display: flex;
@@ -613,6 +613,8 @@ main {
   align-items: stretch;
   padding: 24px;
   gap: 20px;
+  transform-style: preserve-3d;
+  will-change: transform;
 }
 
 .memorial-bg-img {
@@ -1392,6 +1394,28 @@ main {
   color: var(--gold-accent);
 }
 
+.dossier-poster-btn {
+  width: 100%;
+  background: rgba(212, 175, 55, 0.12);
+  color: var(--gold-accent);
+  border: 1px solid var(--border-gold);
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.dossier-poster-btn:hover {
+  background: var(--gold-accent);
+  color: #000;
+}
+
 .dossier-qr-box {
   background: #fff;
   padding: 12px;
@@ -1456,10 +1480,12 @@ main {
   background: rgba(212, 175, 55, 0.12);
   color: var(--gold-accent);
   border: 1px solid rgba(212, 175, 55, 0.35);
-  padding: 4px 10px;
-  border-radius: 4px;
+  padding: 5px 12px;
+  border-radius: 6px;
   font-size: 0.82rem;
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
 }
 
 .dossier-deed-text {
@@ -1532,52 +1558,7 @@ main {
 }
 
 /* ==========================================================================
-   11. СТИЛИ НОВЫХ ТЕХНИЧЕСКИХ МОДУЛЕЙ
-   ========================================================================== */
-
-.memorial-stand-canvas {
-  transform-style: preserve-3d;
-  will-change: transform;
-}
-
-.dossier-poster-btn {
-  width: 100%;
-  background: rgba(212, 175, 55, 0.12);
-  color: var(--gold-accent);
-  border: 1px solid var(--border-gold);
-  padding: 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.82rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.2s ease;
-}
-
-.dossier-poster-btn:hover {
-  background: var(--gold-accent);
-  color: #000;
-}
-
-.floating-flower-anim {
-  position: fixed;
-  font-size: 3rem;
-  z-index: 3000;
-  pointer-events: none;
-  animation: floatUpFlower 2.5s ease-out forwards;
-}
-
-@keyframes floatUpFlower {
-  0% { transform: translateY(0) scale(0.5); opacity: 0; }
-  20% { opacity: 1; transform: translateY(-40px) scale(1.2); }
-  100% { transform: translateY(-160px) scale(1); opacity: 0; }
-}
-
-/* ==========================================================================
-   12. СТИКИ-АУДИОПЛЕЕР
+   11. СТИКИ-АУДИОПЛЕЕР
    ========================================================================== */
 .audio-bar {
   position: fixed;
@@ -1694,10 +1675,106 @@ main {
 }
 
 /* ==========================================================================
-   12. ПОДВАЛ (FOOTER)
+   12. ВСТРОЕННАЯ АДМИН-ПАНЕЛЬ (ADMIN CMS)
+   ========================================================================== */
+.admin-dialog {
+  max-width: 960px;
+  background: #0f131a;
+  border: 1px solid var(--gold-accent);
+}
+
+.admin-header {
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 14px;
+  margin-bottom: 20px;
+}
+
+.admin-header h2 {
+  font-family: var(--font-serif);
+  color: var(--gold-accent);
+  font-size: 1.4rem;
+}
+
+.admin-header p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.admin-grid-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.admin-photo-preview-wrap {
+  width: 100%;
+  height: 320px;
+  border: 1px solid var(--border-gold);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.admin-photo-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.admin-field-group label {
+  font-size: 0.82rem;
+  color: var(--gold-light);
+}
+
+.admin-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.admin-input, .admin-select, .admin-textarea {
+  background: #181f2c;
+  border: 1px solid var(--border-subtle);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-family: var(--font-sans);
+  outline: none;
+}
+
+.admin-input:focus, .admin-select:focus, .admin-textarea:focus {
+  border-color: var(--gold-accent);
+}
+
+.admin-actions-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* ==========================================================================
+   13. ПОДВАЛ (FOOTER)
    ========================================================================== */
 .footer {
-  background: #06070a;
+  background: #050608;
   padding: 70px 0 45px;
   border-top: 1px solid var(--border-subtle);
   font-size: 0.88rem;
@@ -1731,7 +1808,7 @@ main {
 }
 
 /* ==========================================================================
-   13. АНИМАЦИИ И РЕЖИМЫ ДОСТУПНОСТИ
+   14. АНИМАЦИИ И РЕЖИМЫ ДОСТУПНОСТИ
    ========================================================================== */
 @keyframes candleFlicker {
   0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
@@ -1760,6 +1837,20 @@ main {
   to { transform: translateY(0); }
 }
 
+@keyframes floatUpFlower {
+  0% { transform: translateY(0) scale(0.5); opacity: 0; }
+  20% { opacity: 1; transform: translateY(-40px) scale(1.2); }
+  100% { transform: translateY(-160px) scale(1); opacity: 0; }
+}
+
+.floating-flower-anim {
+  position: fixed;
+  font-size: 3rem;
+  z-index: 3000;
+  pointer-events: none;
+  animation: floatUpFlower 2.5s ease-out forwards;
+}
+
 /* Режим высокой контрастности (ГОСТ) */
 body.high-contrast {
   --bg-deep: #000000;
@@ -1786,7 +1877,7 @@ body.large-text .section-title {
 }
 
 /* ==========================================================================
-   14. АДАПТИВНОСТЬ ПОД УСТРОЙСТВА (RESPONSIVE BREAKPOINTS)
+   15. АДАПТИВНОСТЬ ПОД УСТРОЙСТВА (RESPONSIVE)
    ========================================================================== */
 @media (max-width: 1024px) {
   .battle-timeline-grid {
@@ -1803,16 +1894,19 @@ body.large-text .section-title {
   .dossier-sources-grid { grid-template-columns: 1fr; }
   .memory-grid, .footer-container { grid-template-columns: 1fr; gap: 24px; }
   .audio-bar-inner { flex-direction: column; align-items: stretch; gap: 10px; }
+  .admin-grid-layout { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
   .hero-title { font-size: 1.8rem; }
   .modal-dialog { padding: 20px; }
   .dossier-name { font-size: 1.4rem; }
+  .hero-stats { gap: 12px; }
+  .stat-card { width: 100%; }
 }
 
 /* ==========================================================================
-   15. СТИЛИ ДЛЯ ПЕЧАТИ (РАЗДАТОЧНЫЙ МАТЕРИАЛ ДЛЯ УРОКОВ МУЖЕСТВА)
+   16. СТИЛИ ДЛЯ ПЕЧАТИ (РАЗДАТОЧНЫЙ ЛИСТ ДЛЯ УРОКОВ МУЖЕСТВА)
    ========================================================================== */
 @media print {
   body {
@@ -1822,7 +1916,8 @@ body.large-text .section-title {
   .accessibility-bar, .header, .footer, .hero-section, .memorial-section,
   .battle-section, .memory-section, .audio-bar, .ambient-glow,
   .dossier-nav-bar, .dossier-btn-audio, .dossier-candle-btn,
-  .dossier-action-btn, .modal-close, .dossier-sources-grid {
+  .dossier-action-btn, .modal-close, .dossier-sources-grid,
+  .dossier-poster-btn, .admin-modal {
     display: none !important;
   }
   .modal {
