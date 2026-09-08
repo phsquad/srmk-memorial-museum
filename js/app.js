@@ -481,7 +481,10 @@ const App = {
 
     // Фокус на карте при открытии
     if (hero.mapCoords && AppState.mapInstance) {
-      AppState.mapInstance.flyTo([hero.mapCoords.lat, hero.mapCoords.lng], 8, { duration: 1.2 });
+      AppState.mapInstance.setCenter([hero.mapCoords.lat, hero.mapCoords.lng], 8, {
+        duration: 800,
+        timingFunction: 'ease-in-out'
+      });
     }
   },
 
@@ -636,100 +639,92 @@ const App = {
   },
 
   /* ==========================================================================
-     8. ИНТЕРАКТИВНАЯ КАРТА LEAFLET: ВЕКТОРНЫЕ ТРЕКИ И ФОКУС
+     8. ИНТЕРАКТИВНАЯ КАРТА (YANDEX MAPS API - ОТЕЧЕСТВЕННЫЙ ДВИЖОК)
      ========================================================================== */
   initInteractiveMap() {
     const mapElement = document.getElementById('interactiveBattleMap');
-    if (!mapElement || typeof L === 'undefined') return;
+    if (!mapElement || typeof ymaps === 'undefined') return;
 
-    // Инициализация карты с центром на Юге России
-    AppState.mapInstance = L.map('interactiveBattleMap', {
-      scrollWheelZoom: false
-    }).setView([47.2, 38.5], 6);
-
-    // Подключение темных тайлов CARTO Dark Matter
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap &copy; CARTO',
-      subdomains: 'abcd',
-      maxZoom: 18
-    }).addTo(AppState.mapInstance);
-
-    // 1. Исходный пункт: ГБПОУ СРМК (Ставрополь)
-    const srmkCoords = MUSEUM_CONFIG.coords;
-    const srmkIcon = L.divIcon({
-      className: 'srmk-map-pin',
-      html: `<div style="background:#d4af37; color:#000; font-weight:900; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid #fff; box-shadow:0 0 16px #d4af37; font-size:11px;">СРМК</div>`,
-      iconSize: [28, 28]
-    });
-
-    L.marker(srmkCoords, { icon: srmkIcon }).addTo(AppState.mapInstance)
-      .bindPopup(`
-        <div style="font-family:sans-serif; padding:4px;">
-          <strong style="color:#9e1b20; font-size:14px;">ГБПОУ СРМК</strong><br>
-          <small>г. Ставрополь, пр. Юности, 3</small><br>
-          <span style="font-size:12px; color:#555;">Альма-матер всех 20 героев</span>
-        </div>
-      `);
-
-    // 2. Расстановка меток героев и пунктирных линий трека
-    const markers = MuseumAPI.getMapMarkers();
-    markers.forEach(m => {
-      const customIcon = L.divIcon({
-        className: 'custom-map-pin',
-        html: `<div style="background-color: ${m.badgeColor}; width:16px; height:16px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 12px ${m.badgeColor};"></div>`,
-        iconSize: [16, 16]
+    ymaps.ready(() => {
+      AppState.mapInstance = new ymaps.Map('interactiveBattleMap', {
+        center: [47.2, 38.5],
+        zoom: 6,
+        controls: ['zoomControl', 'fullscreenControl']
+      }, {
+        suppressMapOpenBlock: true
       });
 
-      const leafletMarker = L.marker(m.coords, { icon: customIcon }).addTo(AppState.mapInstance);
-      leafletMarker.bindPopup(`
-        <div style="color:#111; font-family:sans-serif; padding:4px;">
-          <strong style="color:#9e1b20; font-size:14px;">${m.name}</strong><br>
-          <small>${m.rank}</small><br>
-          <span>📍 ${m.location}</span><br>
-          <button onclick="App.openModal('${m.id}')" style="margin-top:8px; background:#9e1b20; color:#fff; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; font-size:12px; width:100%;">
-            Открыть архивное досье
-          </button>
-        </div>
-      `);
-      AppState.mapMarkers[m.id] = leafletMarker;
+      AppState.mapInstance.behaviors.disable('scrollZoom');
 
-      // Отрисовка луча подвига от СРМК к точке боевых действий
-      const line = L.polyline([srmkCoords, m.coords], {
-        color: '#d4af37',
-        weight: 1.5,
-        opacity: 0.35,
-        dashArray: '4, 8'
-      }).addTo(AppState.mapInstance);
-      AppState.mapLines.push(line);
-    });
+      const srmkCoords = MUSEUM_CONFIG.coords;
+      const srmkPlacemark = new ymaps.Placemark(srmkCoords, {
+        balloonContentHeader: '<strong style="color:#9e1b20; font-size:14px;">ГБПОУ СРМК</strong>',
+        balloonContentBody: '<small>г. Ставрополь, пр. Юности, 3</small><br><span style="font-size:12px; color:#555;">Альма-матер всех 20 героев</span>'
+      }, {
+        preset: 'islands#yellowDotIcon',
+        iconColor: '#d4af37'
+      });
+      AppState.mapInstance.geoObjects.add(srmkPlacemark);
 
-    // 3. Обработчик фильтров театров военных действий (ТВД)
-    document.querySelectorAll('.theatre-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.theatre-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const theatre = btn.dataset.theatre;
-
-        document.querySelectorAll('.timeline-theatre-card').forEach(card => {
-          if (theatre === 'all' || card.dataset.theatreCard === theatre) {
-            card.style.display = 'flex';
-          } else {
-            card.style.display = 'none';
-          }
+      const markers = MuseumAPI.getMapMarkers();
+      markers.forEach(m => {
+        const heroPlacemark = new ymaps.Placemark(m.coords, {
+          balloonContentHeader: `<strong style="color:#9e1b20; font-size:14px;">${m.name}</strong>`,
+          balloonContentBody: `
+            <small>${m.rank}</small><br>
+            <span>📍 ${m.location}</span><br>
+            <button onclick="App.openModal('${m.id}')" style="margin-top:8px; background:#9e1b20; color:#fff; border:none; padding:5px 8px; border-radius:4px; cursor:pointer; font-size:12px; width:100%;">
+              Открыть архивное досье
+            </button>
+          `
+        }, {
+          preset: 'islands#redCircleDotIcon',
+          iconColor: '#9e1b20'
         });
 
-        if (theatre === 'dnieper') App.focusMap([46.6, 32.7], 8);
-        if (theatre === 'zaporozhye') App.focusMap([47.45, 35.8], 8);
-        if (theatre === 'donbass') App.focusMap([48.1, 37.7], 8);
-        if (theatre === 'kursk') App.focusMap([51.3, 35.2], 9);
-        if (theatre === 'all') App.focusMap([47.5, 36.5], 6);
+        AppState.mapInstance.geoObjects.add(heroPlacemark);
+        AppState.mapMarkers[m.id] = heroPlacemark;
+
+        const polyline = new ymaps.Polyline([srmkCoords, m.coords], {}, {
+          strokeColor: '#d4af37',
+          strokeWidth: 2,
+          strokeStyle: 'shortdash',
+          strokeOpacity: 0.6
+        });
+        AppState.mapInstance.geoObjects.add(polyline);
+        AppState.mapLines.push(polyline);
+      });
+
+      document.querySelectorAll('.theatre-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.theatre-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const theatre = btn.dataset.theatre;
+
+          document.querySelectorAll('.timeline-theatre-card').forEach(card => {
+            if (theatre === 'all' || card.dataset.theatreCard === theatre) {
+              card.style.display = 'flex';
+            } else {
+              card.style.display = 'none';
+            }
+          });
+
+          if (theatre === 'dnieper') this.focusMap([46.6, 32.7], 8);
+          if (theatre === 'zaporozhye') this.focusMap([47.45, 35.8], 8);
+          if (theatre === 'donbass') this.focusMap([48.1, 37.7], 8);
+          if (theatre === 'kursk') this.focusMap([51.3, 35.2], 9);
+          if (theatre === 'all') this.focusMap([47.5, 36.5], 6);
+        });
       });
     });
   },
 
   focusMap(coords, zoom = 8) {
     if (AppState.mapInstance) {
-      AppState.mapInstance.flyTo(coords, zoom, { duration: 1.5 });
+      AppState.mapInstance.setCenter(coords, zoom, {
+        duration: 800,
+        timingFunction: 'ease-in-out'
+      });
       this.playChimeSound(500, 0.2);
     }
   },

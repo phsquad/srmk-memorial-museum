@@ -1877,6 +1877,28 @@ body.large-text .section-title {
 }
 
 /* ==========================================================================
+   АДАПТАЦИЯ ЯНДЕКС КАРТ ПОД ТЕМНЫЙ МЕМОРИАЛЬНЫЙ ДИЗАЙН
+   ========================================================================== */
+.battle-map-wrapper {
+  width: 100%;
+  height: 480px;
+  border-radius: 12px;
+  border: 1px solid var(--border-gold);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  background: #111;
+}
+
+.battle-map-wrapper ymaps[class$="-map"] {
+  filter: invert(90%) hue-rotate(180deg) grayscale(70%) contrast(110%);
+}
+
+.battle-map-wrapper ymaps[class$="-balloon"],
+.battle-map-wrapper ymaps[class$="-placemark-overlay"] {
+  filter: invert(100%) hue-rotate(180deg) grayscale(0%) contrast(100%);
+}
+
+/* ==========================================================================
    15. АДАПТИВНОСТЬ ПОД УСТРОЙСТВА (RESPONSIVE)
    ========================================================================== */
 @media (max-width: 1024px) {
