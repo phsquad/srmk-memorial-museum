@@ -1,0 +1,1844 @@
+/* ==========================================================================
+   1. ДИЗАЙН-ТОКЕНЫ, ПЕРЕМЕННЫЕ И БАЗОВЫЙ СБРОС (RESET)
+   ========================================================================== */
+:root {
+  /* Базовая темная гамма (Мрамор и обсидиан) */
+  --bg-deep: #080a0e;
+  --bg-surface: #10141d;
+  --bg-card: #151a26;
+  --bg-card-hover: #1e2536;
+  --bg-card-active: #242c3f;
+  --bg-glass: rgba(16, 20, 29, 0.92);
+  --bg-glass-modal: rgba(8, 10, 14, 0.95);
+
+  /* Акцентный красный (Кумач / Знамя Победы) */
+  --primary-red: #9e1b20;
+  --primary-red-hover: #bc2228;
+  --primary-red-dark: #6e1014;
+  --primary-red-glow: rgba(158, 27, 32, 0.45);
+
+  /* Акцентное золото (Орденская бронза / Звезда Славы) */
+  --gold-accent: #d4af37;
+  --gold-light: #f5e7b2;
+  --gold-dark: #9a7d20;
+  --gold-glow: rgba(212, 175, 55, 0.35);
+
+  /* Янтарное пламя свечи памяти */
+  --candle-color: #f59e0b;
+  --candle-glow: rgba(245, 158, 11, 0.55);
+
+  /* Типографика и цвета текста */
+  --text-main: #f0f3f8;
+  --text-muted: #8e98a8;
+  --text-dim: #5c6675;
+  --text-inverted: #080a0e;
+
+  /* Границы и тени */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.15);
+  --border-gold: rgba(212, 175, 55, 0.3);
+  --border-gold-bright: rgba(212, 175, 55, 0.7);
+  --shadow-card: 0 12px 32px -8px rgba(0, 0, 0, 0.75);
+  --shadow-card-hover: 0 16px 40px -6px rgba(0, 0, 0, 0.85);
+  --shadow-gold: 0 0 24px rgba(212, 175, 55, 0.15);
+  --shadow-red: 0 0 24px rgba(158, 27, 32, 0.35);
+
+  /* Шрифтовые гарнитуры */
+  --font-serif: 'Cinzel', 'Times New Roman', serif;
+  --font-sans: 'Montserrat', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  /* Анимационные тайминги */
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration: 0.28s;
+  --duration-slow: 0.5s;
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+  font-size: 16px;
+}
+
+body {
+  background-color: var(--bg-deep);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  line-height: 1.65;
+  overflow-x: hidden;
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: font-size 0.2s ease, filter 0.2s ease, background-color 0.3s ease;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+/* Кастомный темный скроллбар */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+::-webkit-scrollbar-thumb {
+  background: #242c3b;
+  border-radius: 4px;
+  border: 1px solid var(--border-gold);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gold-accent);
+}
+
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Фоновое мемориальное свечение */
+.ambient-glow {
+  position: fixed;
+  top: -150px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1200px;
+  height: 700px;
+  background: radial-gradient(ellipse at center, rgba(158, 27, 32, 0.14) 0%, rgba(212, 175, 55, 0.04) 45%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ==========================================================================
+   2. ПАНЕЛЬ ДОСТУПНОСТИ И СТАТУСА (ГОСТ РФ)
+   ========================================================================== */
+.accessibility-bar {
+  background: #040508;
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 6px 0;
+  font-size: 0.78rem;
+  z-index: 1001;
+  position: relative;
+}
+
+.accessibility-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.access-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.access-btn {
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--duration) ease;
+}
+
+.access-btn:hover, .access-btn:focus-visible {
+  color: var(--gold-accent);
+  border-color: var(--gold-accent);
+  outline: none;
+}
+
+.access-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-dim);
+}
+
+.pulse-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  animation: pulseLight 2s infinite;
+}
+
+/* ==========================================================================
+   3. ШАПКА САЙТА (HEADER & НАВИГАЦИЯ)
+   ========================================================================== */
+.header {
+  position: sticky;
+  top: 0;
+  background: rgba(10, 12, 16, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-subtle);
+  z-index: 1000;
+  padding: 12px 0;
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.logo-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.logo-badge {
+  background: linear-gradient(135deg, var(--primary-red), #540b0e);
+  color: #fff;
+  font-family: var(--font-serif);
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--gold-accent);
+  box-shadow: 0 0 12px var(--primary-red-glow);
+  letter-spacing: 1.5px;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.org-name {
+  font-size: 0.75rem;
+  color: var(--gold-accent);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.site-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-family: var(--font-serif);
+  letter-spacing: 0.5px;
+  color: #fff;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  position: relative;
+  padding: 4px 0;
+  transition: color var(--duration) ease;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background: var(--gold-accent);
+  transition: width var(--duration) var(--ease-smooth);
+}
+
+.nav-link:hover, .nav-link:focus-visible {
+  color: var(--text-main);
+  outline: none;
+}
+
+.nav-link:hover::after, .nav-link:focus-visible::after {
+  width: 100%;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.passport-btn {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+  padding: 7px 15px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--duration) ease;
+}
+
+.passport-btn:hover, .passport-btn:focus-visible {
+  border-color: var(--gold-accent);
+  color: var(--gold-accent);
+  background: rgba(212, 175, 55, 0.08);
+  outline: none;
+}
+
+.contest-badge {
+  background: rgba(212, 175, 55, 0.08);
+  color: var(--gold-accent);
+  border: 1px solid var(--gold-accent);
+  padding: 7px 16px;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: var(--duration) var(--ease-smooth);
+  box-shadow: var(--shadow-gold);
+}
+
+.contest-badge:hover, .contest-badge:focus-visible {
+  background: var(--gold-accent);
+  color: #000;
+  transform: translateY(-2px);
+  outline: none;
+}
+
+/* Мобильный гамбургер и шторка навигации */
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.mobile-menu-btn span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--gold-accent);
+  transition: all var(--duration) ease;
+}
+
+.mobile-menu-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.mobile-menu-btn.open span:nth-child(2) { opacity: 0; }
+.mobile-menu-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.mobile-nav-drawer {
+  display: none;
+  flex-direction: column;
+  background: rgba(10, 12, 16, 0.98);
+  border-bottom: 1px solid var(--border-gold);
+  padding: 16px 24px;
+  gap: 8px;
+}
+
+.mobile-nav-drawer.active {
+  display: flex;
+}
+
+.mobile-nav-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: color var(--duration) ease;
+}
+
+.mobile-nav-link:hover, .mobile-nav-link.highlight {
+  color: var(--gold-accent);
+  text-decoration: none;
+}
+
+.mobile-btn-link {
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--border-subtle);
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+
+/* ==========================================================================
+   4. ГЛАВНЫЙ ЭКРАН (HERO SECTION)
+   ========================================================================== */
+.hero-section {
+  position: relative;
+  padding: 100px 0 75px;
+  text-align: center;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(158, 27, 32, 0.18);
+  color: #ff8585;
+  border: 1px solid rgba(158, 27, 32, 0.5);
+  padding: 7px 18px;
+  border-radius: 40px;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+}
+
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  line-height: 1.18;
+  margin-bottom: 22px;
+  letter-spacing: 1px;
+}
+
+.hero-title .highlight {
+  background: linear-gradient(135deg, var(--gold-light), var(--gold-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.hero-subtitle {
+  max-width: 740px;
+  margin: 0 auto 40px;
+  color: var(--text-muted);
+  font-size: 1.12rem;
+  font-weight: 400;
+}
+
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: clamp(16px, 4vw, 50px);
+  margin-bottom: 44px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 16px 24px;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  min-width: 140px;
+  transition: border-color var(--duration) ease, transform var(--duration) ease;
+}
+
+.stat-card:hover {
+  border-color: var(--border-gold);
+  transform: translateY(-2px);
+}
+
+.stat-number {
+  font-size: 2.3rem;
+  font-weight: 700;
+  font-family: var(--font-serif);
+  color: var(--gold-accent);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.stat-label {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px 26px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  text-decoration: none;
+  transition: var(--duration) var(--ease-smooth);
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-red), #781014);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 24px var(--primary-red-glow);
+}
+
+.btn-primary:hover, .btn-primary:focus-visible {
+  background: linear-gradient(135deg, var(--primary-red-hover), #91151a);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px var(--primary-red-glow);
+  outline: none;
+}
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border-color: var(--border-subtle);
+}
+
+.btn-secondary:hover, .btn-secondary:focus-visible {
+  border-color: var(--gold-accent);
+  color: var(--gold-accent);
+  transform: translateY(-3px);
+  background: var(--bg-card-hover);
+  outline: none;
+}
+
+/* ==========================================================================
+   5. ОБЩИЕ СТИЛИ СЕКЦИЙ И ЗАГОЛОВКОВ
+   ========================================================================== */
+.section {
+  padding: 85px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  position: relative;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.hall-tag {
+  display: inline-block;
+  color: var(--gold-accent);
+  font-family: var(--font-serif);
+  font-size: 0.82rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.section-desc {
+  color: var(--text-muted);
+  max-width: 720px;
+  margin: 0 auto;
+  font-size: 0.98rem;
+}
+
+/* ==========================================================================
+   6. ЗАЛ I: ИНТЕРАКТИВНЫЙ МЕМОРИАЛ «ЗВЕЗДА ПАМЯТИ»
+   ========================================================================== */
+.plaque-view-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.plaque-toggle-btn {
+  background: var(--bg-card);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  padding: 7px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  transition: var(--duration) ease;
+}
+
+.plaque-toggle-btn.active, .plaque-toggle-btn:hover {
+  background: var(--gold-accent);
+  color: #000;
+  border-color: var(--gold-accent);
+  font-weight: 700;
+  box-shadow: var(--shadow-gold);
+}
+
+.memorial-stand-container {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow-card);
+}
+
+.memorial-stand-canvas {
+  position: relative;
+  width: 100%;
+  min-height: 520px;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  padding: 24px;
+  gap: 20px;
+}
+
+.memorial-bg-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.65) contrast(1.05);
+  z-index: 1;
+}
+
+.plaque-interactive-zone {
+  position: relative;
+  z-index: 2;
+  width: 380px;
+  background: rgba(12, 15, 22, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--gold-accent);
+  border-radius: 10px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.85);
+}
+
+.plaque-title {
+  font-family: var(--font-serif);
+  font-size: 0.92rem;
+  color: var(--gold-accent);
+  text-align: center;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.25);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.names-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.plaque-item {
+  padding: 9px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 0.84rem;
+  cursor: pointer;
+  transition: var(--duration) var(--ease-smooth);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  outline: none;
+}
+
+.plaque-item:hover, .plaque-item:focus-visible {
+  background: var(--primary-red);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateX(6px);
+}
+
+.plaque-arrow {
+  color: var(--gold-accent);
+  transition: transform var(--duration) ease;
+}
+
+.plaque-item:hover .plaque-arrow {
+  transform: translateX(4px);
+  color: #fff;
+}
+
+/* ==========================================================================
+   7. ЗАЛ II: КАРТОЧКИ ВЫПУСКНИКОВ И ПОИСКОВЫЙ ХАБ
+   ========================================================================== */
+.search-wrapper {
+  max-width: 560px;
+  margin: 24px auto 0;
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-gold);
+  border-radius: 30px;
+  padding: 13px 44px 13px 48px;
+  color: #fff;
+  font-size: 0.92rem;
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color var(--duration) ease, box-shadow var(--duration) ease;
+}
+
+.search-input:focus {
+  border-color: var(--gold-accent);
+  box-shadow: 0 0 16px var(--gold-glow);
+}
+
+.search-icon {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gold-accent);
+  pointer-events: none;
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.search-clear-btn:hover {
+  color: #fff;
+}
+
+/* Смарт-чипы быстрого отбора */
+.smart-chips-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.chip-label {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+
+.chip-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 0.75rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: var(--duration) ease;
+}
+
+.chip-btn:hover {
+  background: rgba(212, 175, 55, 0.15);
+  color: var(--gold-accent);
+  border-color: var(--gold-accent);
+}
+
+/* Фильтры специальностей */
+.specialty-filters-bar {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.spec-filter-btn {
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  transition: var(--duration) var(--ease-smooth);
+}
+
+.spec-filter-btn.active, .spec-filter-btn:hover {
+  background: var(--gold-accent);
+  color: #000;
+  border-color: var(--gold-accent);
+  font-weight: 700;
+  box-shadow: var(--shadow-gold);
+}
+
+/* Сетка карточек */
+.heroes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 26px;
+  margin-top: 36px;
+}
+
+.hero-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: var(--duration) var(--ease-smooth);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.hero-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--gold-accent);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.hero-card-img-wrap {
+  position: relative;
+  width: 100%;
+  height: 270px;
+  background: linear-gradient(180deg, #18202d 0%, #0e1219 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.hero-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s var(--ease-smooth);
+}
+
+.hero-card:hover .hero-card-img {
+  transform: scale(1.04);
+}
+
+.hero-card-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--primary-red);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px var(--primary-red-glow);
+}
+
+.hero-candle-badge {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: rgba(10, 12, 16, 0.88);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+.hero-card-body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.hero-card-name {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  line-height: 1.35;
+  margin-bottom: 8px;
+  color: #fff;
+}
+
+.hero-card-specialty {
+  color: var(--gold-accent);
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.hero-card-years {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 18px;
+}
+
+.hero-card-btn {
+  margin-top: auto;
+  width: 100%;
+  padding: 11px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--duration) var(--ease-smooth);
+}
+
+.hero-card-btn:hover, .hero-card-btn:focus-visible {
+  background: var(--primary-red);
+  color: #fff;
+  border-color: var(--primary-red);
+  box-shadow: 0 6px 18px var(--primary-red-glow);
+  outline: none;
+}
+
+/* ==========================================================================
+   8. ЗАЛ III: ХРОНИКА РАТНОГО ПОДВИГА И КАРТА
+   ========================================================================== */
+.theatre-nav-bar {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 34px;
+  flex-wrap: wrap;
+}
+
+.theatre-btn {
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  padding: 9px 18px;
+  border-radius: 24px;
+  font-size: 0.84rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--duration) var(--ease-smooth);
+}
+
+.theatre-btn.active, .theatre-btn:hover {
+  background: var(--primary-red);
+  color: #fff;
+  border-color: var(--primary-red);
+  box-shadow: 0 4px 16px var(--primary-red-glow);
+}
+
+.battle-timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+.timeline-theatre-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  transition: var(--duration) var(--ease-smooth);
+  position: relative;
+  overflow: hidden;
+}
+
+.timeline-theatre-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--gold-accent);
+}
+
+.timeline-theatre-card:hover {
+  border-color: var(--gold-accent);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card);
+}
+
+.theatre-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.theatre-badge {
+  background: rgba(158, 27, 32, 0.2);
+  color: #ff8e8e;
+  border: 1px solid rgba(158, 27, 32, 0.5);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+.theatre-geo {
+  font-size: 0.78rem;
+  color: var(--gold-accent);
+  font-weight: 500;
+}
+
+.theatre-card-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.theatre-card-desc {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  margin-bottom: 16px;
+  flex-grow: 1;
+}
+
+.theatre-heroes-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.hero-pill {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--duration) ease;
+}
+
+.hero-pill:hover, .hero-pill:focus-visible {
+  background: var(--gold-accent);
+  color: #000;
+  border-color: var(--gold-accent);
+  outline: none;
+}
+
+.theatre-map-focus-btn {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--gold-accent);
+  font-size: 0.84rem;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  padding: 0;
+  transition: var(--duration) ease;
+}
+
+.theatre-map-focus-btn:hover {
+  color: #fff;
+  transform: translateX(4px);
+}
+
+.map-section-wrapper {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-gold);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.map-header-bar {
+  background: rgba(10, 12, 16, 0.95);
+  padding: 14px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.map-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-serif);
+  color: var(--gold-accent);
+  font-size: 0.95rem;
+}
+
+.map-quick-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.map-quick-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--duration) ease;
+}
+
+.map-quick-btn:hover {
+  background: var(--gold-accent);
+  color: #000;
+}
+
+.battle-map-wrapper {
+  width: 100%;
+  height: 480px;
+}
+
+/* ==========================================================================
+   9. ЗАЛ IV: ЭСТАФЕТА МУЖЕСТВА И СВЕЧА ПАМЯТИ
+   ========================================================================== */
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+.memory-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 32px 24px;
+  text-align: center;
+  transition: var(--duration) var(--ease-smooth);
+}
+
+.memory-card:hover {
+  border-color: var(--gold-accent);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-card);
+}
+
+.memory-icon {
+  font-size: 2.6rem;
+  margin-bottom: 14px;
+  display: inline-block;
+}
+
+.memory-card h3 {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.memory-card p {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.total-candles-box {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(158, 27, 32, 0.08));
+  border: 1px solid var(--border-gold);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  text-align: left;
+}
+
+.candle-flame-anim {
+  font-size: 3rem;
+  animation: candleFlicker 2s infinite ease-in-out;
+}
+
+/* ==========================================================================
+   10. МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ
+   ========================================================================== */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(4, 6, 9, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: modalFadeIn var(--duration) ease;
+}
+
+.modal-dialog {
+  position: relative;
+  z-index: 2;
+  background: var(--bg-card);
+  border: 1px solid var(--gold-accent);
+  border-radius: 16px;
+  max-width: 920px;
+  width: 100%;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 36px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9);
+  animation: modalSlideUp var(--duration) var(--ease-smooth);
+}
+
+.modal-close {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 2.2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color var(--duration) ease;
+}
+
+.modal-close:hover {
+  color: var(--gold-accent);
+}
+
+.dossier-nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.dossier-nav-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--duration) ease;
+}
+
+.dossier-nav-btn:hover {
+  background: var(--primary-red);
+  border-color: var(--primary-red);
+}
+
+.dossier-nav-counter {
+  font-size: 0.85rem;
+  color: var(--gold-accent);
+  font-weight: 700;
+}
+
+.dossier-layout {
+  display: grid;
+  grid-template-columns: 290px 1fr;
+  gap: 34px;
+}
+
+.dossier-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dossier-img-frame {
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border-gold);
+  background: #111;
+}
+
+.dossier-img {
+  width: 100%;
+  display: block;
+}
+
+.dossier-candle-btn {
+  width: 100%;
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  padding: 10px;
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: var(--duration) ease;
+}
+
+.dossier-candle-btn:hover, .dossier-candle-btn.active {
+  background: #f59e0b;
+  color: #000;
+  box-shadow: 0 0 16px var(--candle-glow);
+}
+
+.dossier-btn-audio {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--primary-red);
+  color: #fff;
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.88rem;
+  transition: var(--duration) ease;
+}
+
+.dossier-btn-audio:hover:not(:disabled) {
+  background: var(--primary-red-hover);
+  box-shadow: 0 6px 18px var(--primary-red-glow);
+}
+
+.dossier-btn-audio.disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: #28303d;
+}
+
+.dossier-action-btn {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+  padding: 10px;
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: var(--duration) ease;
+}
+
+.dossier-action-btn:hover {
+  border-color: var(--gold-accent);
+  color: var(--gold-accent);
+}
+
+.dossier-qr-box {
+  background: #fff;
+  padding: 12px;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: 4px;
+  border: 1px solid var(--border-gold);
+}
+
+.dossier-qr-img {
+  width: 110px;
+  height: 110px;
+  margin: 0 auto 4px;
+  display: block;
+}
+
+.dossier-qr-label {
+  display: block;
+  font-size: 0.72rem;
+  color: #111;
+  font-weight: 700;
+}
+
+.dossier-name {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  line-height: 1.25;
+  color: var(--gold-accent);
+  margin-bottom: 12px;
+}
+
+.dossier-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.9rem;
+}
+
+.meta-label {
+  color: var(--text-muted);
+}
+
+.dossier-block-title {
+  font-size: 0.92rem;
+  color: var(--gold-accent);
+  margin: 18px 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.dossier-awards-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.award-tag {
+  background: rgba(212, 175, 55, 0.12);
+  color: var(--gold-accent);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.dossier-deed-text {
+  color: #d8deea;
+  font-size: 0.94rem;
+  line-height: 1.7;
+}
+
+.dossier-quote {
+  margin: 16px 0;
+  border-left: 3px solid var(--gold-accent);
+  padding: 10px 16px;
+  background: rgba(212, 175, 55, 0.05);
+  font-style: italic;
+  color: var(--gold-light);
+  border-radius: 0 8px 8px 0;
+}
+
+.dossier-docs-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.dossier-sources-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.source-link-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  padding: 10px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: var(--text-main);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: var(--duration) ease;
+}
+
+.source-link-card strong {
+  font-size: 0.82rem;
+  color: var(--gold-accent);
+}
+
+.source-link-card small {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.source-link-card:hover {
+  background: rgba(212, 175, 55, 0.1);
+  border-color: var(--gold-accent);
+}
+
+.dossier-memorial-box {
+  margin-top: 20px;
+  background: rgba(158, 27, 32, 0.15);
+  border: 1px solid var(--primary-red);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+}
+
+/* ==========================================================================
+   11. СТИЛИ НОВЫХ ТЕХНИЧЕСКИХ МОДУЛЕЙ
+   ========================================================================== */
+
+.memorial-stand-canvas {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.dossier-poster-btn {
+  width: 100%;
+  background: rgba(212, 175, 55, 0.12);
+  color: var(--gold-accent);
+  border: 1px solid var(--border-gold);
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.dossier-poster-btn:hover {
+  background: var(--gold-accent);
+  color: #000;
+}
+
+.floating-flower-anim {
+  position: fixed;
+  font-size: 3rem;
+  z-index: 3000;
+  pointer-events: none;
+  animation: floatUpFlower 2.5s ease-out forwards;
+}
+
+@keyframes floatUpFlower {
+  0% { transform: translateY(0) scale(0.5); opacity: 0; }
+  20% { opacity: 1; transform: translateY(-40px) scale(1.2); }
+  100% { transform: translateY(-160px) scale(1); opacity: 0; }
+}
+
+/* ==========================================================================
+   12. СТИКИ-АУДИОПЛЕЕР
+   ========================================================================== */
+.audio-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(14, 18, 25, 0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--gold-accent);
+  padding: 12px 0;
+  z-index: 1500;
+  display: none;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.8);
+}
+
+.audio-bar.active {
+  display: block;
+  animation: slideUpBar var(--duration) ease;
+}
+
+.audio-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.audio-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 220px;
+}
+
+.audio-icon {
+  font-size: 1.6rem;
+}
+
+.audio-track-title {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.audio-hero-name {
+  display: block;
+  font-size: 0.76rem;
+  color: var(--gold-accent);
+}
+
+.audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-grow: 1;
+  max-width: 580px;
+}
+
+.audio-btn {
+  background: var(--gold-accent);
+  color: #000;
+  border: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--duration) ease;
+}
+
+.audio-btn:hover {
+  transform: scale(1.08);
+}
+
+.audio-progress-container {
+  flex-grow: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.audio-progress {
+  width: 0%;
+  height: 100%;
+  background: var(--gold-accent);
+  border-radius: 4px;
+  box-shadow: 0 0 8px var(--gold-glow);
+}
+
+.audio-time {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  min-width: 80px;
+  font-variant-numeric: tabular-nums;
+}
+
+.audio-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+
+.audio-close:hover {
+  color: #fff;
+}
+
+/* ==========================================================================
+   12. ПОДВАЛ (FOOTER)
+   ========================================================================== */
+.footer {
+  background: #06070a;
+  padding: 70px 0 45px;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.footer-container {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 40px;
+}
+
+.footer-col h3 {
+  font-family: var(--font-serif);
+  color: #fff;
+  font-size: 1.05rem;
+  margin-bottom: 14px;
+}
+
+.team-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.copyright {
+  margin-top: 16px;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+/* ==========================================================================
+   13. АНИМАЦИИ И РЕЖИМЫ ДОСТУПНОСТИ
+   ========================================================================== */
+@keyframes candleFlicker {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  25% { transform: scale(1.06) rotate(-2deg); opacity: 0.9; }
+  50% { transform: scale(0.96) rotate(1deg); opacity: 0.95; }
+  75% { transform: scale(1.03) rotate(-1deg); opacity: 0.88; }
+}
+
+@keyframes pulseLight {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalSlideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideUpBar {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* Режим высокой контрастности (ГОСТ) */
+body.high-contrast {
+  --bg-deep: #000000;
+  --bg-surface: #111111;
+  --bg-card: #1c1c1c;
+  --bg-card-hover: #292929;
+  --text-main: #ffffff;
+  --text-muted: #e0e0e0;
+  --gold-accent: #ffd700;
+  --border-subtle: #ffffff;
+  --border-gold: #ffd700;
+  filter: contrast(125%);
+}
+
+/* Режим крупного шрифта (ГОСТ) */
+body.large-text {
+  font-size: 18px;
+}
+body.large-text .hero-title {
+  font-size: 3.6rem;
+}
+body.large-text .section-title {
+  font-size: 2.6rem;
+}
+
+/* ==========================================================================
+   14. АДАПТИВНОСТЬ ПОД УСТРОЙСТВА (RESPONSIVE BREAKPOINTS)
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .battle-timeline-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .nav { display: none !important; }
+  .mobile-menu-btn { display: flex; }
+  .memorial-stand-canvas { flex-direction: column; min-height: auto; }
+  .plaque-interactive-zone { width: 100%; }
+  .dossier-layout { grid-template-columns: 1fr; }
+  .dossier-sources-grid { grid-template-columns: 1fr; }
+  .memory-grid, .footer-container { grid-template-columns: 1fr; gap: 24px; }
+  .audio-bar-inner { flex-direction: column; align-items: stretch; gap: 10px; }
+}
+
+@media (max-width: 480px) {
+  .hero-title { font-size: 1.8rem; }
+  .modal-dialog { padding: 20px; }
+  .dossier-name { font-size: 1.4rem; }
+}
+
+/* ==========================================================================
+   15. СТИЛИ ДЛЯ ПЕЧАТИ (РАЗДАТОЧНЫЙ МАТЕРИАЛ ДЛЯ УРОКОВ МУЖЕСТВА)
+   ========================================================================== */
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .accessibility-bar, .header, .footer, .hero-section, .memorial-section,
+  .battle-section, .memory-section, .audio-bar, .ambient-glow,
+  .dossier-nav-bar, .dossier-btn-audio, .dossier-candle-btn,
+  .dossier-action-btn, .modal-close, .dossier-sources-grid {
+    display: none !important;
+  }
+  .modal {
+    position: static !important;
+    display: block !important;
+    padding: 0 !important;
+  }
+  .modal-dialog {
+    border: 2px solid #000 !important;
+    box-shadow: none !important;
+    max-width: 100% !important;
+    padding: 20px !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .dossier-name { color: #000 !important; font-size: 22pt !important; }
+  .award-tag { border: 1px solid #000 !important; color: #000 !important; background: none !important; }
+  .dossier-quote { background: #f5f5f5 !important; color: #000 !important; border-left: 3px solid #000 !important; }
+}
