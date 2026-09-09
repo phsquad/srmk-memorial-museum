@@ -1,209 +1,112 @@
 /**
  * ============================================================================
- * ВИРТУАЛЬНЫЙ МУЗЕЙ ГБПОУ СРМК: «БЫТЬ ВОИНОМ — ЖИТЬ ВЕЧНО»
- * Главный контроллер с защитным ядром AntiBotEngine v8.0 Enterprise
- * 
- * Разработчики: Андреев А. И., науч. рук. Генте А. В., Бледных Е. В.
+ * ВИРТУАЛЬНЫЙ МЕМОРИАЛЬНЫЙ КОМПЛЕКС ГБПОУ СРМК: «БЫТЬ ВОИНОМ — ЖИТЬ ВЕЧНО»
+ * Главный управляющий контроллер экспозиции (js/app.js v10.0 Enterprise)
  * ============================================================================
  */
 
 'use strict';
 
-// 1. Глобальное состояние приложения
+/**
+ * 1. ГЛОБАЛЬНОЕ СОСТОЯНИЕ ПРИЛОЖЕНИЯ (APP STATE)
+ */
 const AppState = {
-  activeFilter: 'all',
   activeSpecialty: 'all',
+  activePlaqueView: 'all',
+  activeTheatre: 'all',
   searchQuery: '',
   currentHeroId: null,
+
+  // Аудио и озвучка
   isAudioPlaying: false,
+  isTTSPlaying: false,
+  audioContext: null,
+
+  // Интерактивный режим «Урок Мужества»
   isPresentationRunning: false,
   presentationTimer: null,
+  presentationProgressInterval: null,
+
+  // Яндекс Карты
   mapInstance: null,
   mapMarkers: {},
   mapPolylines: [],
+
+  // Мемориальные хранилища
   candles: {},
-  audioContext: null
+  flowersCount: 0,
+
+  // Сенсорные жесты (Touch)
+  touchStartX: 0,
+  touchStartY: 0,
+  touchEndX: 0,
+  touchEndY: 0
 };
 
-// Резервный аватар
-const FALLBACK_HERO_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500' viewBox='0 0 400 500'%3E%3Crect width='400' height='500' fill='%2314171d'/%3E%3Cpath d='M200 190c33.1 0 60-26.9 60-60s-26.9-60-60-60-60 26.9-60 60 26.9 60 60 60zm0 30c-48 0-108 24-108 72v48h216v-48c0-48-60-72-108-72z' fill='%238a1c22' opacity='0.4'/%3E%3Cpolygon points='200,380 205,395 220,395 208,405 212,420 200,410 188,420 192,405 180,395 195,395' fill='%23c5a059'/%3E%3Ctext x='50%25' y='92%25' dominant-baseline='middle' text-anchor='middle' fill='%239da6b3' font-family='sans-serif' font-size='13'%3EГБПОУ СРМК • НАВЕЧНО В СТРОЮ%3C/text%3E%3C/svg%3E";
+// Векторный аватар-заглушка по умолчанию (SVG Data URI)
+const FALLBACK_HERO_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500' viewBox='0 0 400 500'%3E%3Crect width='400' height='500' fill='%2312151b'/%3E%3Ccircle cx='200' cy='180' r='64' fill='%23181d26' stroke='%23c5a059' stroke-width='2'/%3E%3Cpath d='M200 130 L208 155 L235 155 L213 172 L221 198 L200 182 L179 198 L187 172 L165 155 L192 155 Z' fill='%23c5a059'/%3E%3Cpath d='M100 360 C100 280, 300 280, 300 360 Z' fill='%238a1c22' opacity='0.7'/%3E%3Ctext x='50%25' y='82%25' dominant-baseline='middle' text-anchor='middle' fill='%23c5a059' font-family='sans-serif' font-weight='bold' font-size='14'%3EГБПОУ СРМК%3C/text%3E%3Ctext x='50%25' y='90%25' dominant-baseline='middle' text-anchor='middle' fill='%239da6b3' font-family='sans-serif' font-size='11'%3EНАВЕЧНО В СТРОЮ%3C/text%3E%3C/svg%3E";
 
-/* ==========================================================================
-   2. ЯДРО КЛИЕНТСКОЙ БЕЗОПАСНОСТИ И ЗАЩИТЫ ОТ БОТОВ (ANTIBOT ENGINE)
-   ========================================================================== */
-const AntiBotEngine = {
-  SALT: "SRMK_MUSEUM_SECURE_SALT_v8_2026",
-  COOLDOWN_MS: 24 * 60 * 60 * 1000, // 24 часа
-  MIN_CLICK_INTERVAL: 650,          // Минимальный интервал между действиями (мс)
-  _lastActionTimestamp: 0,
-  _humanMovementScore: 0,
-  _isBlacklisted: false,
+/**
+ * 2. ТОЧКА ВХОДА (BOOTSTRAP)
+ */
+document.addEventListener('DOMContentLoaded', () => {
+  App.init();
+});
 
-  init() {
-    this._trackHumanMetrics();
-    this._createHoneypot();
-  },
-
-  /**
-   * Отслеживание физического перемещения мыши или пальца (Human Jitter)
-   */
-  _trackHumanMetrics() {
-    const recordMovement = () => {
-      if (this._humanMovementScore < 100) this._humanMovementScore += 5;
-    };
-    window.addEventListener('mousemove', recordMovement, { passive: true });
-    window.addEventListener('touchmove', recordMovement, { passive: true });
-    window.addEventListener('scroll', recordMovement, { passive: true });
-  },
-
-  /**
-   * Создание ловушки для скрытых краулеров/ботов (Honeypot)
-   */
-  _createHoneypot() {
-    const pot = document.createElement('div');
-    pot.id = 'botHoneypotTrigger';
-    pot.style.cssText = 'position:absolute; left:-9999px; top:-9999px; opacity:0; pointer-events:none;';
-    pot.innerHTML = '<input type="text" name="tribute_bot_check" tabindex="-1" autocomplete="off">';
-    pot.addEventListener('click', () => { this._isBlacklisted = true; });
-    pot.querySelector('input').addEventListener('input', () => { this._isBlacklisted = true; });
-    document.body.appendChild(pot);
-  },
-
-  /**
-   * Комплексная проверка: человек или робот?
-   */
-  validateHumanAction(event) {
-    if (this._isBlacklisted) return { success: false, reason: "Сессия заблокирована." };
-
-    // 1. Проверка на подлинность браузерного события
-    if (event && !event.isTrusted) {
-      return { success: false, reason: "Программная эмуляция клика запрещена." };
-    }
-
-    // 2. Проверка троттлинга (защита от зажатия клавиши и автокликера)
-    const now = Date.now();
-    if (now - this._lastActionTimestamp < this.MIN_CLICK_INTERVAL) {
-      return { success: false, reason: "Слишком частые действия. Подождите секунду." };
-    }
-    this._lastActionTimestamp = now;
-
-    // 3. Проверка на наличие базовой физической активности
-    if (this._humanMovementScore < 5 && !('ontouchstart' in window)) {
-      return { success: false, reason: "Нетипичная активность браузера." };
-    }
-
-    return { success: true };
-  },
-
-  /**
-   * Криптографическая хеш-подпись данных (SHA-256)
-   */
-  async generateSignature(dataObj) {
-    const text = JSON.stringify(dataObj) + this.SALT;
-    const msgBuffer = new TextEncoder().encode(text);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  },
-
-  /**
-   * Проверка тайм-лока на 24 часа для конкретного героя
-   */
-  canLightCandle(heroId) {
-    try {
-      const history = JSON.parse(localStorage.getItem('srmk_candle_history') || '{}');
-      const lastTime = history[heroId];
-      if (!lastTime) return { allowed: true };
-
-      const timePassed = Date.now() - lastTime;
-      if (timePassed < this.COOLDOWN_MS) {
-        const remainingHours = Math.ceil((this.COOLDOWN_MS - timePassed) / (1000 * 60 * 60));
-        return { allowed: false, remainingHours };
-      }
-      return { allowed: true };
-    } catch (e) {
-      return { allowed: true };
-    }
-  },
-
-  /**
-   * Безопасная запись зажженной свечи в хранилище с криптоподписью
-   */
-  async recordCandleSuccess(heroId) {
-    const history = JSON.parse(localStorage.getItem('srmk_candle_history') || '{}');
-    history[heroId] = Date.now();
-    localStorage.setItem('srmk_candle_history', JSON.stringify(history));
-
-    const currentCandles = AppState.candles;
-    const signature = await this.generateSignature(currentCandles);
-    const secureVault = {
-      payload: currentCandles,
-      signature: signature,
-      timestamp: Date.now()
-    };
-    localStorage.setItem('srmk_verified_candles_vault', JSON.stringify(secureVault));
-  },
-
-  /**
-   * Загрузка проверенных счетчиков (самовосстановление при взломе)
-   */
-  async loadSecureCandles() {
-    try {
-      const raw = localStorage.getItem('srmk_verified_candles_vault');
-      if (!raw) return {};
-      const vault = JSON.parse(raw);
-      const expectedSig = await this.generateSignature(vault.payload);
-
-      if (vault.signature === expectedSig) {
-        return vault.payload || {};
-      } else {
-        console.warn("[AntiBot] Обнаружена модификация хранилища. Неверифицированные данные сброшены.");
-        localStorage.removeItem('srmk_verified_candles_vault');
-        return {};
-      }
-    } catch (e) {
-      return {};
-    }
-  }
-};
-
-/* ==========================================================================
-   3. ГЛАВНЫЙ КОНТРОЛЛЕР ИНТЕРФЕЙСА (APP ENGINE)
-   ========================================================================== */
 const App = {
-  async init() {
-    AntiBotEngine.init();
-    AppState.candles = await AntiBotEngine.loadSecureCandles();
-
+  /**
+   * Инициализация всех подсистем
+   */
+  init() {
     this.cacheDOM();
-    this.bindEvents();
-    this.initAmbientParticles();
+    this.loadStorageData();
+
+    // 1. Мгновенная отрисовка базового контента
     this.renderMemorialPlaques();
     this.renderSpecialtyFilters();
     this.renderCardsGrid();
-    this.initInteractiveMap();
-    this.updateCandlesStats();
+    this.updateMemorialStats();
+
+    // 2. Привязка обработчиков событий и жестов
+    this.bindEvents();
+    this.initTouchGestures();
     this.checkDeepLink();
-    console.log(`[Музей СРМК] Защищенный запуск завершен. В строю: ${heroesDatabase.length} героев.`);
+
+    // 3. Асинхронная инициализация тяжелых модулей
+    setTimeout(() => {
+      this.initInteractiveMapSafe();
+      this.initAmbientParticles();
+    }, 150);
+
+    console.log(`[Музей СРМК] Ядро v10.0 запущено. Героев в строю: ${typeof heroesDatabase !== 'undefined' ? heroesDatabase.length : 0}`);
   },
 
   cacheDOM() {
     this.dom = {
+      // Зал I: Мемориал
       leftPlaque: document.getElementById('leftPlaqueNames'),
       rightPlaque: document.getElementById('rightPlaqueNames'),
+      leftPlaqueZone: document.getElementById('leftPlaqueZone'),
+      rightPlaqueZone: document.getElementById('rightPlaqueZone'),
+
+      // Зал II: Карточки и поиск
       cardsContainer: document.getElementById('heroesCardsContainer'),
       searchInput: document.getElementById('heroSearchInput'),
       searchClearBtn: document.getElementById('searchClearBtn'),
       specialtyContainer: document.getElementById('specialtyFiltersContainer'),
+
+      // Счетчики
       totalCandlesDisplay: document.getElementById('totalCandlesCount'),
       statHeroCandles: document.getElementById('heroTotalCandlesStat'),
 
+      // Модальные окна
       heroModal: document.getElementById('heroModal'),
       modalOverlay: document.getElementById('modalOverlay'),
       modalCloseBtn: document.getElementById('modalCloseBtn'),
       modalBody: document.getElementById('modalHeroContent'),
       passportModal: document.getElementById('passportModal'),
 
+      // Аудиоплеер
       audioBar: document.getElementById('audioPlayerBar'),
       audioElement: document.getElementById('mainAudioElement'),
       audioPlayBtn: document.getElementById('audioPlayPauseBtn'),
@@ -217,22 +120,32 @@ const App = {
     };
   },
 
+  loadStorageData() {
+    try {
+      AppState.candles = JSON.parse(localStorage.getItem('srmk_museum_candles') || '{}');
+    } catch (e) {
+      AppState.candles = {};
+    }
+  },
+
   bindEvents() {
-    // Живой поиск с защитой от флуда
+    // Живой дебаунс-поиск (100 мс)
     if (this.dom.searchInput) {
-      let debounceTimeout;
+      let debounceTimer;
       this.dom.searchInput.addEventListener('input', (e) => {
-        clearTimeout(debounceTimeout);
-        debounceTimeout = setTimeout(() => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
           AppState.searchQuery = e.target.value.toLowerCase().trim();
           this.renderCardsGrid();
-        }, 120);
+        }, 100);
       });
     }
 
+    // Закрытие модального окна
     if (this.dom.modalCloseBtn) this.dom.modalCloseBtn.addEventListener('click', () => this.closeModal());
     if (this.dom.modalOverlay) this.dom.modalOverlay.addEventListener('click', () => this.closeModal());
 
+    // Клавиатурное управление (Esc, Стрелки, P - печать)
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         if (this.dom.heroModal?.classList.contains('active')) this.closeModal();
@@ -241,9 +154,15 @@ const App = {
         if (e.key === 'ArrowRight') this.navigateHero(1);
         if (e.key === 'ArrowLeft') this.navigateHero(-1);
         if (e.key === 'p' || e.key === 'P' || e.key === 'з' || e.key === 'З') this.printHeroDossier();
+        if (e.key === ' ') {
+          // Пробел переключает TTS или воспроизведение
+          e.preventDefault();
+          this.toggleHeroTTS(AppState.currentHeroId);
+        }
       }
     });
 
+    // Аудиоэкскурсия
     this.initAudioPlayerEvents();
 
     if (this.dom.btnGeneralTour) {
@@ -252,47 +171,24 @@ const App = {
       });
     }
 
+    // Слушатель хэша URL
     window.addEventListener('hashchange', () => this.checkDeepLink());
   },
 
   /* ==========================================================================
-     4. ЗВУКОВОЙ СИНТЕЗАТОР (WEB AUDIO API)
-     ========================================================================== */
-  playChimeSound(freq = 480, duration = 0.3) {
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      if (!AppState.audioContext) AppState.audioContext = new AudioCtx();
-      
-      const ctx = AppState.audioContext;
-      if (ctx.state === 'suspended') ctx.resume();
-
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(freq * 1.3, ctx.currentTime + duration);
-
-      gain.gain.setValueAtTime(0.1, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc.start();
-      osc.stop(ctx.currentTime + duration);
-    } catch (e) {}
-  },
-
-  /* ==========================================================================
-     5. ЗАЛ I: МЕМОРИАЛ «ЗВЕЗДА ПАМЯТИ»
+     3. ЗАЛ I: ОТРИСОВКА ПЛИТ МЕМОРИАЛА
      ========================================================================== */
   renderMemorialPlaques() {
-    if (!this.dom.leftPlaque || !this.dom.rightPlaque) return;
+    const { leftPlaque, rightPlaque } = this.dom;
+    if (!leftPlaque || !rightPlaque) return;
 
-    this.dom.leftPlaque.innerHTML = '';
-    this.dom.rightPlaque.innerHTML = '';
+    if (typeof heroesDatabase === 'undefined' || !Array.isArray(heroesDatabase)) {
+      leftPlaque.innerHTML = '<div style="color:#ef4444; padding:10px; font-size:12px;">База данных не подключена</div>';
+      return;
+    }
+
+    leftPlaque.innerHTML = '';
+    rightPlaque.innerHTML = '';
 
     heroesDatabase.forEach(hero => {
       if (hero.plaque === 'none') return;
@@ -301,33 +197,40 @@ const App = {
       item.className = 'plaque-item';
       item.setAttribute('role', 'button');
       item.setAttribute('tabindex', '0');
+      item.setAttribute('aria-label', `Герой ${hero.name}`);
 
-      const hasCandle = AppState.candles[hero.id] ? '🕯 ' : '';
+      const candleBadge = AppState.candles[hero.id] ? `<span title="Зажжена свеча">🕯</span> ` : '';
       item.innerHTML = `
-        <span class="plaque-hero-name">${hasCandle}${hero.name}</span>
+        <span class="plaque-hero-name">${candleBadge}${hero.name}</span>
         <span class="plaque-arrow">→</span>
       `;
 
-      item.addEventListener('click', (e) => {
-        const check = AntiBotEngine.validateHumanAction(e);
-        if (!check.success) return;
+      item.addEventListener('click', () => {
         this.playChimeSound(440, 0.2);
         this.openModal(hero.id);
       });
 
+      item.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.openModal(hero.id);
+        }
+      });
+
       if (hero.plaque === 'left') {
-        this.dom.leftPlaque.appendChild(item);
+        leftPlaque.appendChild(item);
       } else if (hero.plaque === 'right') {
-        this.dom.rightPlaque.appendChild(item);
+        rightPlaque.appendChild(item);
       }
     });
   },
 
   /* ==========================================================================
-     6. ЗАЛ II: КАРТОЧКИ И СПЕЦИАЛЬНОСТИ
+     4. ЗАЛ II: ФИЛЬТРЫ СПЕЦИАЛЬНОСТЕЙ И СЕТКА КАРТОЧЕК
      ========================================================================== */
   renderSpecialtyFilters() {
-    if (!this.dom.specialtyContainer) return;
+    const container = this.dom.specialtyContainer;
+    if (!container) return;
 
     const specialties = [
       { id: 'all', label: 'Все направления' },
@@ -339,15 +242,15 @@ const App = {
       { id: 'mech', label: 'Машиностроение' }
     ];
 
-    this.dom.specialtyContainer.innerHTML = specialties.map(s => `
+    container.innerHTML = specialties.map(s => `
       <button class="spec-filter-btn ${AppState.activeSpecialty === s.id ? 'active' : ''}" data-spec="${s.id}" type="button">
         ${s.label}
       </button>
     `).join('');
 
-    this.dom.specialtyContainer.querySelectorAll('.spec-filter-btn').forEach(btn => {
+    container.querySelectorAll('.spec-filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        this.dom.specialtyContainer.querySelectorAll('.spec-filter-btn').forEach(b => b.classList.remove('active'));
+        container.querySelectorAll('.spec-filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         AppState.activeSpecialty = btn.dataset.spec;
         this.playChimeSound(560, 0.15);
@@ -357,8 +260,15 @@ const App = {
   },
 
   renderCardsGrid() {
-    if (!this.dom.cardsContainer) return;
-    this.dom.cardsContainer.innerHTML = '';
+    const container = this.dom.cardsContainer;
+    if (!container) return;
+
+    if (typeof heroesDatabase === 'undefined' || !Array.isArray(heroesDatabase)) {
+      container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:40px; color:#ef4444;">База данных не загружена.</div>';
+      return;
+    }
+
+    container.innerHTML = '';
 
     const filtered = heroesDatabase.filter(hero => {
       let matchesSearch = true;
@@ -368,6 +278,7 @@ const App = {
           (hero.education?.specialty && hero.education.specialty.toLowerCase().includes(q)) ||
           (hero.deed && hero.deed.toLowerCase().includes(q)) ||
           (hero.military?.unit && hero.military.unit.toLowerCase().includes(q)) ||
+          (hero.military?.rank && hero.military.rank.toLowerCase().includes(q)) ||
           (hero.awards && hero.awards.some(a => a.toLowerCase().includes(q)));
       }
 
@@ -375,22 +286,22 @@ const App = {
       if (AppState.activeSpecialty !== 'all') {
         const spec = (hero.education?.specialty || '').toLowerCase();
         const tag = hero.specTag || '';
-        if (AppState.activeSpecialty === 'fire') matchesSpec = tag === 'fire' || spec.includes('пожарн') || spec.includes('мчс');
+        if (AppState.activeSpecialty === 'fire') matchesSpec = tag === 'fire' || spec.includes('пожарн') || spec.includes('мчс') || spec.includes('спасател');
         if (AppState.activeSpecialty === 'weld') matchesSpec = tag === 'weld' || spec.includes('свар');
-        if (AppState.activeSpecialty === 'electro') matchesSpec = tag === 'electro' || spec.includes('электр');
-        if (AppState.activeSpecialty === 'auto') matchesSpec = tag === 'auto' || spec.includes('авто') || spec.includes('ремонт');
-        if (AppState.activeSpecialty === 'it') matchesSpec = tag === 'it' || spec.includes('сетей') || spec.includes('компьютер');
-        if (AppState.activeSpecialty === 'mech') matchesSpec = tag === 'mech' || spec.includes('оборудован') || spec.includes('металло');
+        if (AppState.activeSpecialty === 'electro') matchesSpec = tag === 'electro' || spec.includes('электр') || spec.includes('энергет');
+        if (AppState.activeSpecialty === 'auto') matchesSpec = tag === 'auto' || spec.includes('авто') || spec.includes('транспорт');
+        if (AppState.activeSpecialty === 'it') matchesSpec = tag === 'it' || spec.includes('сетей') || spec.includes('компьютер') || spec.includes('программ');
+        if (AppState.activeSpecialty === 'mech') matchesSpec = tag === 'mech' || spec.includes('оборудован') || spec.includes('металло') || spec.includes('машин');
       }
 
       return matchesSearch && matchesSpec;
     });
 
     if (filtered.length === 0) {
-      this.dom.cardsContainer.innerHTML = `
-        <div style="grid-column: 1/-1; text-align:center; padding: 48px 20px; color: var(--text-tertiary);">
-          <p style="font-size: 1.1rem; margin-bottom: 6px;">По вашему запросу записи не найдены</p>
-          <small>Попробуйте сбросить поисковую строку или выбрать другое направление</small>
+      container.innerHTML = `
+        <div style="grid-column: 1/-1; text-align:center; padding: 50px 20px; color: var(--text-tertiary);">
+          <p style="font-size: 1.1rem; margin-bottom: 6px; color: #fff;">По вашему запросу записи не найдены</p>
+          <small>Попробуйте сбросить поисковую строку или выбрать другое направление подготовки</small>
         </div>
       `;
       return;
@@ -409,7 +320,7 @@ const App = {
       card.className = 'hero-card';
       card.innerHTML = `
         <div class="hero-card-img-wrap">
-          <img src="${photoSrc}" alt="${hero.name}" class="hero-card-img" loading="lazy">
+          <img src="${photoSrc}" alt="${hero.name}" class="hero-card-img" loading="lazy" onerror="this.src='${FALLBACK_HERO_AVATAR}'">
           <span class="hero-card-badge">СВО</span>
           ${candleCount > 0 ? `<span class="hero-candle-badge" title="Зажжено свечей памяти">🕯 ${candleCount}</span>` : ''}
         </div>
@@ -423,21 +334,19 @@ const App = {
         </div>
       `;
 
-      const imgEl = card.querySelector('.hero-card-img');
-      if (typeof ArchiveService !== 'undefined') {
-        ArchiveService.attachSmartImageFallback(imgEl, hero);
-      }
-
-      this.dom.cardsContainer.appendChild(card);
+      container.appendChild(card);
     });
   },
 
   /* ==========================================================================
-     7. ДОСЬЕ ГЕРОЯ С МУЛЬТИМЕДИЙНОЙ ГАЛЕРЕЕЙ
+     5. МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ С ПОЛНЫМ СТЕКОМ
      ========================================================================== */
-  openModal(id) {
+  async openModal(id) {
     const hero = heroesDatabase.find(h => h.id === id);
     if (!hero) return;
+
+    // Останавливаем предыдущую озвучку при переключении
+    if (window.TTSNarrator) TTSNarrator.stop();
 
     AppState.currentHeroId = id;
     window.location.hash = `hero-${id}`;
@@ -452,36 +361,42 @@ const App = {
 
     const audioSrc = hero.media?.audioGuide || "";
     const yearsText = hero.dates?.years || `${hero.dates?.birth || ''} — ${hero.dates?.death || ''}`;
-    const rankText = hero.military ? `${hero.military.rank || ''} ${hero.military.unit ? `• ${hero.military.unit}` : ''}` : "Воин ВС РФ";
-    const deedText = hero.deed || "Сведения о боевом пути и подвиге уточняются в архивах колледжа.";
+    const rankText = hero.military ? `${hero.military.rank || 'Воин ВС РФ'} ${hero.military.unit ? `• ${hero.military.unit}` : ''}` : "Воин ВС РФ";
+    const deedText = hero.deed || "Сведения о боевом пути и ратном подвиге уточняются в архивах колледжа.";
     const candleCount = AppState.candles[hero.id] || 0;
 
-    // Сборка фотогалереи (Фотографии + Медали + Планки)
+    // Сборка динамической мультимедийной галереи
     const galleryItems = (typeof ArchiveService !== 'undefined')
       ? ArchiveService.buildDynamicGallery(hero)
       : [{ url: mainPhoto, caption: "Основной портрет", desc: "", type: "portrait" }];
 
-    const awardsHTML = (hero.awards || []).map(awardTitle => {
-      if (typeof ArchiveService !== 'undefined') {
-        const visual = ArchiveService.getAwardVisual(awardTitle);
-        return `
-          <div class="award-tag" title="${visual.criteria || ''}">
-            ${visual.badge ? `<img src="${visual.badge}" alt="" class="award-badge-mini">` : ''}
-            <span>${visual.name}</span>
-          </div>
-        `;
-      }
-      return `<span class="award-tag">${awardTitle}</span>`;
-    }).join('');
+    // Асинхронное построение знаков наград (через HeraldryResolver или fallback)
+    let awardsHTML = '';
+    if (hero.awards && Array.isArray(hero.awards)) {
+      awardsHTML = (await Promise.all(hero.awards.map(async (awardTitle) => {
+        if (typeof HeraldryResolver !== 'undefined') {
+          const awardData = await HeraldryResolver.resolveAwardImages(awardTitle);
+          return `
+            <div class="award-tag" title="${awardData.established ? `Учреждена: ${awardData.established}` : ''}">
+              ${awardData.badgeUrl ? `<img src="${awardData.badgeUrl}" alt="" class="award-badge-mini" onerror="this.style.display='none'">` : ''}
+              <span>${awardData.name}</span>
+            </div>
+          `;
+        } else if (typeof ArchiveService !== 'undefined') {
+          const visual = ArchiveService.getAwardVisual(awardTitle);
+          return `
+            <div class="award-tag" title="${visual.criteria || ''}">
+              ${visual.badge ? `<img src="${visual.badge}" alt="" class="award-badge-mini">` : ''}
+              <span>${visual.name}</span>
+            </div>
+          `;
+        }
+        return `<span class="award-tag">${awardTitle}</span>`;
+      }))).join('');
+    }
 
     const qrTargetUrl = `${window.location.origin}${window.location.pathname}#hero-${hero.id}`;
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(qrTargetUrl)}`;
-
-    // Проверка статуса свечи через AntiBotEngine
-    const candleCheck = AntiBotEngine.canLightCandle(hero.id);
-    const candleBtnText = candleCheck.allowed 
-      ? `Зажечь Свечу Памяти (<span id="candleCountDisplay">${candleCount}</span>)` 
-      : `🕯 Свеча зажжена вами сегодня (${candleCount})`;
 
     this.dom.modalBody.innerHTML = `
       <div class="dossier-nav-bar">
@@ -491,6 +406,7 @@ const App = {
       </div>
 
       <div class="dossier-layout">
+        <!-- ЛЕВАЯ КОЛОНКА: ГАЛЕРЕЯ И ДЕЙСТВИЯ -->
         <div class="dossier-sidebar">
           <div class="dossier-gallery-main">
             <img src="${galleryItems[0].url}" alt="${hero.name}" id="dossierMainImage" class="dossier-img" onerror="this.src='${FALLBACK_HERO_AVATAR}'">
@@ -503,7 +419,7 @@ const App = {
           ${galleryItems.length > 1 ? `
             <div class="dossier-thumbnails-track">
               ${galleryItems.map((item, idx) => `
-                <button class="dossier-thumb-btn ${idx === 0 ? 'active' : ''} ${item.type}" 
+                <button class="dossier-thumb-btn ${idx === 0 ? 'active' : ''} ${item.type || ''}" 
                         onclick="App.switchGalleryPhoto('${item.url}', '${item.caption.replace(/'/g, "\\'")}', '${(item.desc || '').replace(/'/g, "\\'")}', this)" 
                         type="button" 
                         title="${item.caption}">
@@ -514,13 +430,24 @@ const App = {
           ` : ''}
 
           <div class="dossier-actions-stack">
-            <button class="dossier-candle-btn ${!candleCheck.allowed ? 'active locked' : ''}" onclick="App.lightCandle('${hero.id}', event)" type="button">
-              ${candleBtnText}
+            <!-- КНОПКА ОНЛАЙН-ДИКТОРА TTS С КАРАОКЕ -->
+            <button class="dossier-btn-tts" id="dossierTTSPlayBtn" onclick="App.toggleHeroTTS('${hero.id}')" type="button">
+              <span class="tts-icon">🔊</span> Слушать диктора онлайн
+            </button>
+
+            <!-- ЗАЩИЩЕННАЯ СВЕЧА ПАМЯТИ (PROOF-OF-WORK) -->
+            <button class="dossier-candle-btn" onclick="App.lightCandleSafe('${hero.id}', event)" type="button">
+              Зажечь Свечу Памяти (<span id="candleCountDisplay">${candleCount}</span>)
+            </button>
+
+            <!-- ЗАЩИЩЕННОЕ ВОЗЛОЖЕНИЕ ГВОЗДИК -->
+            <button class="dossier-action-btn" onclick="App.layFlowerSafe('${hero.id}', event)" type="button">
+              💐 Возложить живые гвоздики
             </button>
 
             ${audioSrc ? `
               <button class="dossier-btn-audio" onclick="App.playAudio('${audioSrc}', '${hero.name.replace(/'/g, "\\'")}', 'Аудиоэкскурсия')" type="button">
-                Слушать аудиогид
+                Слушать аудиогид (MP3)
               </button>
             ` : ''}
 
@@ -531,11 +458,6 @@ const App = {
             <button class="dossier-action-btn" onclick="if(typeof TechModules !== 'undefined') TechModules.generateSocialPoster('${hero.id}')" type="button">
               Скачать карточку для стенда
             </button>
-
-            <label class="dossier-action-btn" style="text-align:center; cursor:pointer;">
-              Прикрепить фото из архива
-              <input type="file" accept="image/*" style="display:none;" onchange="if(typeof ArchiveService !== 'undefined') ArchiveService.uploadFamilyPhoto('${hero.id}', this, () => App.openModal('${hero.id}'))">
-            </label>
           </div>
 
           <div class="dossier-qr-box">
@@ -544,6 +466,7 @@ const App = {
           </div>
         </div>
 
+        <!-- ПРАВАЯ КОЛОНКА: БИОГРАФИЯ И ПОДВИГ -->
         <div class="dossier-main">
           <h2 class="dossier-name">${hero.name}</h2>
           <div class="dossier-years-badge">${yearsText}</div>
@@ -603,8 +526,11 @@ const App = {
     this.dom.heroModal.classList.add('active');
     document.body.style.overflow = 'hidden';
 
+    // Центрирование Яндекс Карты на месте подвига
     if (hero.mapCoords && AppState.mapInstance) {
-      AppState.mapInstance.setCenter([hero.mapCoords.lat, hero.mapCoords.lng], 8);
+      try {
+        AppState.mapInstance.setCenter([hero.mapCoords.lat, hero.mapCoords.lng], 8, { duration: 600 });
+      } catch (e) {}
     }
   },
 
@@ -621,44 +547,86 @@ const App = {
   },
 
   /* ==========================================================================
-     8. ЗАЩИЩЕННОЕ ЗАЖЖЕНИЕ СВЕЧИ ПАМЯТИ
+     6. ИНТЕЛЛЕКТУАЛЬНЫЙ ДИКТОР TTS С КАРАОКЕ
      ========================================================================== */
-  async lightCandle(heroId, event) {
-    // 1. Проверка через ядро безопасности AntiBotEngine
-    const validation = AntiBotEngine.validateHumanAction(event);
-    if (!validation.success) {
-      alert(validation.reason);
+  toggleHeroTTS(heroId) {
+    const hero = heroesDatabase.find(h => h.id === heroId);
+    if (!hero) return;
+
+    if (!window.TTSNarrator) {
+      alert("Модуль диктора загружается или не поддерживается вашим браузером.");
       return;
     }
 
-    // 2. Проверка тайм-лока (24 часа)
-    const status = AntiBotEngine.canLightCandle(heroId);
-    if (!status.allowed) {
-      alert(`Вы уже почтили память этого героя сегодня. Зажечь свечу повторно можно будет через ${status.remainingHours} ч.`);
-      return;
+    if (TTSNarrator.isSpeaking && !TTSNarrator.isPaused) {
+      TTSNarrator.pause();
+    } else if (TTSNarrator.isPaused) {
+      TTSNarrator.resume();
+    } else {
+      const textToRead = `${hero.name}. Годы жизни: ${hero.dates?.years || ''}. Специальность в колледже: ${hero.education?.specialty || ''}. Воинское подразделение: ${hero.military?.rank || ''} ${hero.military?.unit || ''}. Описание подвига: ${hero.deed}. ${hero.quote ? `Памятная цитата: ${hero.quote}` : ''}`;
+      const deedElement = document.querySelector('.dossier-deed-text');
+      TTSNarrator.speakText(textToRead, deedElement);
     }
-
-    // 3. Запись значения и криптоподпись
-    AppState.candles[heroId] = (AppState.candles[heroId] || 0) + 1;
-    await AntiBotEngine.recordCandleSuccess(heroId);
-
-    this.playChimeSound(880, 0.35);
-
-    const countDisplay = document.getElementById('candleCountDisplay');
-    if (countDisplay) countDisplay.textContent = AppState.candles[heroId];
-    
-    const candleBtn = document.querySelector('.dossier-candle-btn');
-    if (candleBtn) {
-      candleBtn.classList.add('active', 'locked');
-      candleBtn.innerHTML = `🕯 Свеча зажжена вами сегодня (${AppState.candles[heroId]})`;
-    }
-
-    this.updateCandlesStats();
-    this.renderCardsGrid();
-    this.renderMemorialPlaques();
   },
 
-  updateCandlesStats() {
+  /* ==========================================================================
+     7. ЗАЩИЩЕННЫЕ ДЕЙСТВИЯ (СВЕЧИ И ЦВЕТЫ)
+     ========================================================================== */
+  lightCandleSafe(heroId, event) {
+    if (typeof TributeSecurity !== 'undefined') {
+      TributeSecurity.verifyAndExecuteTribute('candle', heroId, event, (newCount) => {
+        this.onTributeSuccess('candle', heroId, newCount);
+      });
+    } else {
+      // Fallback
+      if (event && !event.isTrusted) return;
+      AppState.candles[heroId] = (AppState.candles[heroId] || 0) + 1;
+      localStorage.setItem('srmk_museum_candles', JSON.stringify(AppState.candles));
+      this.onTributeSuccess('candle', heroId, AppState.candles[heroId]);
+    }
+  },
+
+  layFlowerSafe(heroId, event) {
+    if (typeof TributeSecurity !== 'undefined') {
+      TributeSecurity.verifyAndExecuteTribute('flowers', heroId, event, (newCount) => {
+        this.onTributeSuccess('flowers', heroId, newCount);
+      });
+    } else {
+      if (typeof TechModules !== 'undefined') {
+        TechModules.layCarnationFlower(event);
+      }
+    }
+  },
+
+  onTributeSuccess(type, heroId, newCount) {
+    if (type === 'candle') {
+      AppState.candles[heroId] = newCount;
+      localStorage.setItem('srmk_museum_candles', JSON.stringify(AppState.candles));
+
+      const countDisplay = document.getElementById('candleCountDisplay');
+      if (countDisplay) countDisplay.textContent = newCount;
+
+      this.updateMemorialStats();
+      this.renderCardsGrid();
+      this.renderMemorialPlaques();
+      this.playChimeSound(880, 0.35);
+    }
+
+    if (type === 'flowers') {
+      this.playMemorialBellSynthesizer();
+
+      // Анимация летящих цветов
+      const flower = document.createElement('div');
+      flower.className = 'floating-flower-anim';
+      flower.textContent = '💐';
+      flower.style.left = '50%';
+      flower.style.top = '65%';
+      document.body.appendChild(flower);
+      setTimeout(() => flower.remove(), 2400);
+    }
+  },
+
+  updateMemorialStats() {
     const total = Object.values(AppState.candles).reduce((a, b) => a + b, 0);
     if (this.dom.totalCandlesDisplay) this.dom.totalCandlesDisplay.textContent = total;
     if (this.dom.statHeroCandles) this.dom.statHeroCandles.textContent = total;
@@ -678,9 +646,8 @@ const App = {
   },
 
   closeModal() {
-    if (this.dom.heroModal) {
-      this.dom.heroModal.classList.remove('active');
-    }
+    if (window.TTSNarrator) TTSNarrator.stop();
+    if (this.dom.heroModal) this.dom.heroModal.classList.remove('active');
     document.body.style.overflow = 'auto';
     AppState.currentHeroId = null;
     history.replaceState(null, null, ' ');
@@ -695,7 +662,45 @@ const App = {
   },
 
   /* ==========================================================================
-     9. РЕЖИМ «УРОК МУЖЕСТВА» (ПРЕЗЕНТАЦИЯ)
+     8. СЕНСОРНЫЙ ДВИЖОК ЖЕСТОВ (TOUCH SWIPES ДЛЯ СМАРТФОНОВ)
+     ========================================================================== */
+  initTouchGestures() {
+    const modal = this.dom.heroModal;
+    if (!modal) return;
+
+    modal.addEventListener('touchstart', (e) => {
+      AppState.touchStartX = e.changedTouches[0].screenX;
+      AppState.touchStartY = e.changedTouches[0].screenY;
+    }, { passive: true });
+
+    modal.addEventListener('touchend', (e) => {
+      AppState.touchEndX = e.changedTouches[0].screenX;
+      AppState.touchEndY = e.changedTouches[0].screenY;
+      this.handleTouchGesture();
+    }, { passive: true });
+  },
+
+  handleTouchGesture() {
+    const deltaX = AppState.touchEndX - AppState.touchStartX;
+    const deltaY = AppState.touchEndY - AppState.touchStartY;
+
+    // Горизонтальный свайп для смены героя (> 70px)
+    if (Math.abs(deltaX) > 70 && Math.abs(deltaY) < 60) {
+      if (deltaX < 0) {
+        this.navigateHero(1);  // Свайп влево -> Следующий
+      } else {
+        this.navigateHero(-1); // Свайп вправо -> Предыдущий
+      }
+    }
+
+    // Свайп вниз из верхней части для закрытия (> 120px)
+    if (deltaY > 120 && AppState.touchStartY < 150) {
+      this.closeModal();
+    }
+  },
+
+  /* ==========================================================================
+     9. РЕЖИМ ПРЕЗЕНТАЦИИ «УРОК МУЖЕСТВА»
      ========================================================================== */
   startPresentationMode() {
     if (AppState.isPresentationRunning) {
@@ -712,18 +717,113 @@ const App = {
       index = (index + 1) % heroesDatabase.length;
       this.openModal(heroesDatabase[index].id);
     }, 12000);
-
-    console.log("[Урок Мужества] Полноэкранная смена слайдов активирована.");
   },
 
   stopPresentationMode() {
     AppState.isPresentationRunning = false;
     clearInterval(AppState.presentationTimer);
-    console.log("[Урок Мужества] Презентация остановлена.");
   },
 
   /* ==========================================================================
-     10. АУДИОПЛЕЕР С ИНДИКАТОРОМ
+     10. ИНТЕРАКТИВНАЯ КАРТА (ЯНДЕКС КАРТЫ API v2.1)
+     ========================================================================== */
+  initInteractiveMapSafe() {
+    const mapElement = document.getElementById('interactiveBattleMap');
+    if (!mapElement || typeof ymaps === 'undefined') return;
+
+    ymaps.ready(() => {
+      try {
+        AppState.mapInstance = new ymaps.Map('interactiveBattleMap', {
+          center: [47.5, 36.5],
+          zoom: 6,
+          controls: ['zoomControl', 'fullscreenControl']
+        }, {
+          suppressMapOpenBlock: true
+        });
+
+        AppState.mapInstance.behaviors.disable('scrollZoom');
+
+        // Точка колледжа в Ставрополе (Альма-матер)
+        const srmkCoords = typeof MUSEUM_CONFIG !== 'undefined' ? MUSEUM_CONFIG.coords : [45.0448, 41.9691];
+        const srmkPlacemark = new ymaps.Placemark(srmkCoords, {
+          balloonContentHeader: '<strong style="color:#8a1c22; font-size:14px;">ГБПОУ СРМК</strong>',
+          balloonContentBody: '<small>г. Ставрополь, пр. Юности, 3</small><br><span style="font-size:12px; color:#555;">Альма-матер всех 20 героев</span>'
+        }, {
+          preset: 'islands#yellowDotIcon',
+          iconColor: '#c5a059'
+        });
+        AppState.mapInstance.geoObjects.add(srmkPlacemark);
+
+        // Метки 20 героев
+        if (typeof MuseumAPI !== 'undefined') {
+          const markers = MuseumAPI.getMapMarkers();
+          markers.forEach(m => {
+            const heroPlacemark = new ymaps.Placemark(m.coords, {
+              balloonContentHeader: `<strong style="color:#8a1c22; font-size:14px;">${m.name}</strong>`,
+              balloonContentBody: `
+                <small>${m.rank}</small><br>
+                <span>📍 ${m.location}</span><br>
+                <button onclick="App.openModal('${m.id}')" style="margin-top:8px; background:#8a1c22; color:#fff; border:none; padding:6px 10px; border-radius:2px; cursor:pointer; font-size:12px; width:100%;">
+                  Открыть архивное досье
+                </button>
+              `
+            }, {
+              preset: 'islands#redCircleDotIcon',
+              iconColor: '#8a1c22'
+            });
+
+            AppState.mapInstance.geoObjects.add(heroPlacemark);
+            AppState.mapMarkers[m.id] = heroPlacemark;
+
+            // Золотой пунктирный луч от колледжа к рубежу подвига
+            const polyline = new ymaps.Polyline([srmkCoords, m.coords], {}, {
+              strokeColor: '#c5a059',
+              strokeWidth: 2,
+              strokeStyle: 'shortdash',
+              strokeOpacity: 0.55
+            });
+            AppState.mapInstance.geoObjects.add(polyline);
+            AppState.mapPolylines.push(polyline);
+          });
+        }
+
+        // Фильтры секторов боевых действий (ТВД)
+        document.querySelectorAll('.theatre-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.theatre-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const theatre = btn.dataset.theatre;
+
+            document.querySelectorAll('.timeline-theatre-card').forEach(card => {
+              card.style.display = (theatre === 'all' || card.dataset.theatreCard === theatre) ? 'flex' : 'none';
+            });
+
+            if (theatre === 'dnieper') App.focusMap([46.6, 32.7], 8);
+            if (theatre === 'zaporozhye') App.focusMap([47.45, 35.8], 8);
+            if (theatre === 'donbass') App.focusMap([48.1, 37.7], 8);
+            if (theatre === 'kursk') App.focusMap([51.3, 35.2], 9);
+            if (theatre === 'all') App.focusMap([47.5, 36.5], 6);
+          });
+        });
+
+      } catch (err) {
+        console.warn("[Музей] Яндекс Карты API инициализирован в ограниченном режиме:", err);
+      }
+    });
+  },
+
+  focusMap(coords, zoom = 8) {
+    if (AppState.mapInstance) {
+      AppState.mapInstance.setCenter(coords, zoom, {
+        checkZoomRange: true,
+        duration: 700
+      });
+      this.playChimeSound(480, 0.2);
+    }
+  },
+
+  /* ==========================================================================
+     11. АУДИОПЛЕЕР ЭКСКУРСИИ (MP3)
      ========================================================================== */
   initAudioPlayerEvents() {
     const { audioElement, audioPlayBtn, audioProgressBar, audioProgressContainer, audioTimeDisplay, audioCloseBtn } = this.dom;
@@ -787,103 +887,79 @@ const App = {
   },
 
   /* ==========================================================================
-     11. ИНТЕРАКТИВНАЯ КАРТА (YANDEX MAPS API)
+     12. ПРОЦЕДУРНЫЙ АУДИОСИНТЕЗАТОР (WEB AUDIO API)
      ========================================================================== */
-  initInteractiveMap() {
-    const mapElement = document.getElementById('interactiveBattleMap');
-    if (!mapElement || typeof ymaps === 'undefined') return;
+  playChimeSound(freq = 480, duration = 0.3) {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!AppState.audioContext) AppState.audioContext = new AudioCtx();
+      
+      const ctx = AppState.audioContext;
+      if (ctx.state === 'suspended') ctx.resume();
 
-    ymaps.ready(() => {
-      AppState.mapInstance = new ymaps.Map('interactiveBattleMap', {
-        center: [47.2, 38.5],
-        zoom: 6,
-        controls: ['zoomControl', 'fullscreenControl']
-      }, {
-        suppressMapOpenBlock: true
-      });
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
 
-      AppState.mapInstance.behaviors.disable('scrollZoom');
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(freq * 1.25, ctx.currentTime + duration);
 
-      const srmkCoords = MUSEUM_CONFIG.coords;
-      const srmkPlacemark = new ymaps.Placemark(srmkCoords, {
-        balloonContentHeader: '<strong style="color:#8a1c22; font-size:14px;">ГБПОУ СРМК</strong>',
-        balloonContentBody: '<small>г. Ставрополь, пр. Юности, 3</small><br><span style="font-size:12px; color:#555;">Альма-матер всех 20 героев</span>'
-      }, {
-        preset: 'islands#yellowDotIcon',
-        iconColor: '#c5a059'
-      });
-      AppState.mapInstance.geoObjects.add(srmkPlacemark);
+      gain.gain.setValueAtTime(0.1, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
 
-      const markers = MuseumAPI.getMapMarkers();
-      markers.forEach(m => {
-        const heroPlacemark = new ymaps.Placemark(m.coords, {
-          balloonContentHeader: `<strong style="color:#8a1c22; font-size:14px;">${m.name}</strong>`,
-          balloonContentBody: `
-            <small>${m.rank}</small><br>
-            <span>📍 ${m.location}</span><br>
-            <button onclick="App.openModal('${m.id}')" style="margin-top:8px; background:#8a1c22; color:#fff; border:none; padding:5px 8px; border-radius:2px; cursor:pointer; font-size:12px; width:100%;">
-              Открыть архивное досье
-            </button>
-          `
-        }, {
-          preset: 'islands#redCircleDotIcon',
-          iconColor: '#8a1c22'
-        });
+      osc.connect(gain);
+      gain.connect(ctx.destination);
 
-        AppState.mapInstance.geoObjects.add(heroPlacemark);
-        AppState.mapMarkers[m.id] = heroPlacemark;
-
-        const polyline = new ymaps.Polyline([srmkCoords, m.coords], {}, {
-          strokeColor: '#c5a059',
-          strokeWidth: 2,
-          strokeStyle: 'shortdash',
-          strokeOpacity: 0.6
-        });
-        AppState.mapInstance.geoObjects.add(polyline);
-        AppState.mapPolylines.push(polyline);
-      });
-
-      document.querySelectorAll('.theatre-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.theatre-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          const theatre = btn.dataset.theatre;
-
-          document.querySelectorAll('.timeline-theatre-card').forEach(card => {
-            if (theatre === 'all' || card.dataset.theatreCard === theatre) {
-              card.style.display = 'flex';
-            } else {
-              card.style.display = 'none';
-            }
-          });
-
-          if (theatre === 'dnieper') this.focusMap([46.6, 32.7], 8);
-          if (theatre === 'zaporozhye') this.focusMap([47.45, 35.8], 8);
-          if (theatre === 'donbass') this.focusMap([48.1, 37.7], 8);
-          if (theatre === 'kursk') this.focusMap([51.3, 35.2], 9);
-          if (theatre === 'all') this.focusMap([47.5, 36.5], 6);
-        });
-      });
-    });
+      osc.start();
+      osc.stop(ctx.currentTime + duration);
+    } catch (e) {}
   },
 
-  focusMap(coords, zoom = 8) {
-    if (AppState.mapInstance) {
-      AppState.mapInstance.setCenter(coords, zoom, {
-        checkZoomRange: true,
-        duration: 700
+  playMemorialBellSynthesizer() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      if (!AppState.audioContext) AppState.audioContext = new AudioCtx();
+      
+      const ctx = AppState.audioContext;
+      if (ctx.state === 'suspended') ctx.resume();
+
+      // Обертоны колокольного звона: 220Hz, 330Hz, 440Hz, 554Hz
+      const overtones = [220, 330, 440, 554];
+      const now = ctx.currentTime;
+
+      overtones.forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = idx === 0 ? 'sine' : 'triangle';
+        osc.frequency.setValueAtTime(freq, now);
+
+        const decay = 2.8 + idx * 0.4;
+        const volume = 0.2 / (idx + 1);
+
+        gain.gain.setValueAtTime(volume, now);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + decay);
       });
-      this.playChimeSound(480, 0.2);
-    }
+    } catch (e) {}
   },
 
   /* ==========================================================================
-     12. ФОНОВЫЕ ИСКРЫ ПАМЯТИ (CANVAS PARTICLES)
+     13. ФОНОВЫЕ ЗОЛОТЫЕ ИСКРЫ ПАМЯТИ (CANVAS)
      ========================================================================== */
   initAmbientParticles() {
+    if (document.getElementById('ambientSparksCanvas')) return;
+
     const canvas = document.createElement('canvas');
     canvas.id = 'ambientSparksCanvas';
-    canvas.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; opacity:0.35;';
+    canvas.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; opacity:0.32;';
     document.body.prepend(canvas);
 
     const ctx = canvas.getContext('2d');
@@ -893,13 +969,13 @@ const App = {
     window.addEventListener('resize', () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
-    });
+    }, { passive: true });
 
-    const particles = Array.from({ length: 24 }, () => ({
+    const particles = Array.from({ length: 26 }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
       size: Math.random() * 2 + 1,
-      speedY: Math.random() * 0.45 + 0.15,
+      speedY: Math.random() * 0.4 + 0.15,
       speedX: (Math.random() - 0.5) * 0.25,
       opacity: Math.random() * 0.5 + 0.2
     }));
