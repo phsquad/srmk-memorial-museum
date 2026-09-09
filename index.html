@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>Виртуальный музей ГБПОУ СРМК | «Быть воином — жить вечно»</title>
   <meta name="description" content="Интерактивный цифровой мемориал памяти 20 выпускников ГБПОУ СРМК, павших при исполнении воинского долга. Всероссийская акция «Карта доблести: хранители подвигов».">
-  <meta name="theme-color" content="#0e1013">
+  <meta name="theme-color" content="#0a0c0f">
 
   <!-- УМНЫЙ ШЛЮЗ АВТООПРЕДЕЛЕНИЯ УСТРОЙСТВА -->
   <script>
@@ -27,7 +27,7 @@
   <!-- Шрифтовые гарнитуры -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Стили -->
   <link rel="stylesheet" href="css/desktop.css">
@@ -67,12 +67,8 @@
       </nav>
 
       <div class="header-actions">
-        <button class="passport-btn" id="btnOpenPassport" type="button">
-          Паспорт проекта
-        </button>
-        <a href="https://карта-доблести.рф" target="_blank" rel="noopener noreferrer" class="contest-badge">
-          Карта Доблести РФ
-        </a>
+        <button class="passport-btn" id="btnOpenPassport" type="button">Паспорт проекта</button>
+        <a href="https://карта-доблести.рф" target="_blank" rel="noopener noreferrer" class="contest-badge">Карта Доблести РФ</a>
       </div>
     </div>
   </header>
@@ -97,29 +93,19 @@
             <span class="stat-label">Героев на Мемориале</span>
           </div>
           <div class="stat-card">
-            <span class="stat-number">100%</span>
-            <span class="stat-label">Оцифрованные архивы</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-number">50</span>
-            <span class="stat-label">Лет истории колледжа</span>
-          </div>
-          <div class="stat-card">
             <span class="stat-number" id="heroTotalCandlesStat">0</span>
             <span class="stat-label">Свечей памяти</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" id="flowersCountDisplay">0</span>
+            <span class="stat-label">Возложено гвоздик</span>
           </div>
         </div>
 
         <div class="hero-actions">
-          <a href="#memorial" class="btn btn-primary">
-            К Мемориалу Памяти
-          </a>
-          <button class="btn btn-secondary" id="btnOpenGeneralTour" type="button">
-            Аудиоэкскурсия музея
-          </button>
-          <button class="btn btn-secondary" onclick="App.startPresentationMode()" type="button">
-            Режим «Урок Мужества»
-          </button>
+          <a href="#memorial" class="btn btn-primary">К Мемориалу Памяти</a>
+          <button class="btn btn-secondary" id="btnOpenGeneralTour" type="button">Аудиоэкскурсия музея</button>
+          <button class="btn btn-secondary" onclick="App.startPresentationMode()" type="button">Режим «Урок Мужества»</button>
         </div>
       </div>
     </section>
@@ -255,7 +241,7 @@
             </div>
             <h3 class="theatre-card-title">Огненная дуга Донбасса</h3>
             <p class="theatre-card-desc">
-              Командирский подвиг <strong>Станислава Мартынова</strong> под Угледаром; штурмовые действия <strong>Максима Ярышева</strong>; оборона опорных пунктов <strong>Ильи Чупина</strong>; героизм <strong>Александра Григорьева</strong> (медаль Суворова), <strong>Владислава Петухова</strong>, <strong>Сергея Белова</strong>, <strong>Павла Шартова</strong>, <strong>Игоря Лукьяненко</strong>, <strong>Никиты Брынзы</strong> и <strong>Виктора Бутова</strong>.
+              Командирский подвиг <strong>Станислава Мартынова</strong> под Угледаром; штурмовые действия <strong>Максима Ярышева</strong>; оборона опорных пунктов <strong>Ильи Чупина</strong>; героизм <strong>Александра Григорьева</strong>, <strong>Владислава Петухова</strong>, <strong>Сергея Белова</strong>, <strong>Павла Шартова</strong>, <strong>Игоря Лукьяненко</strong>, <strong>Никиты Брынзы</strong> и <strong>Виктора Бутова</strong>.
             </p>
             <div class="theatre-heroes-pills">
               <span class="hero-pill" onclick="App.openModal('martynov-s-k')">С. Мартынов</span>
@@ -351,7 +337,7 @@
     </section>
   </main>
 
-  <!-- МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ -->
+  <!-- МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ (Контент генерируется в app.js) -->
   <div class="modal" id="heroModal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-overlay" id="modalOverlay"></div>
     <div class="modal-dialog">
@@ -436,10 +422,23 @@
     </div>
   </footer>
 
-  <!-- СКРИПТЫ -->
+  <!-- ==========================================================================
+       ПОДКЛЮЧЕНИЕ СКРИПТОВ (СТРОГИЙ ПОРЯДОК ЗАГРУЗКИ)
+       ========================================================================== -->
+  
+  <!-- 1. Внешние API -->
   <script src="https://api-maps.yandex.ru/2.1/?apikey=ваш_ключ&lang=ru_RU" type="text/javascript"></script>
+  
+  <!-- 2. Базы данных и источники -->
   <script src="js/data.js"></script>
   <script src="js/sources.js"></script>
+
+  <!-- 3. НОВЫЕ ИНЖЕНЕРНЫЕ МОДУЛИ (TTS, AntiBot, Heraldry) -->
+  <script src="js/tts-narrator.js"></script>
+  <script src="js/anti-cheat-tribute.js"></script>
+  <script src="js/heraldry-resolver.js"></script>
+
+  <!-- 4. Главные контроллеры -->
   <script src="js/app.js"></script>
   <script src="js/admin.js"></script>
   <script src="js/tech-modules.js"></script>
@@ -512,7 +511,7 @@
       });
     });
 
-    // Доступность
+    // Доступность (ГОСТ)
     const contrastBtn = document.getElementById('toggleContrastBtn');
     if (contrastBtn) {
       contrastBtn.addEventListener('click', () => {
