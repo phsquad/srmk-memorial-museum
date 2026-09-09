@@ -1,47 +1,37 @@
 @charset "UTF-8";
 
 /* ==========================================================================
-   1. ДИЗАЙН-ТОКЕНЫ, ПЕРЕМЕННЫЕ И БАЗОВЫЙ СБРОС (RESET)
+   1. ДИЗАЙН-ТОКЕНЫ, ПЕРЕМЕННЫЕ И СБРОС (DESKTOP)
    ========================================================================== */
 :root {
-  /* Спокойная музейная палитра: натуральный гранит, матовый графит, обсидиан */
   --bg-main: #0e1013;
   --bg-surface: #14171d;
   --bg-elevated: #1a1e26;
   --bg-card: #151a24;
   --bg-card-hover: #1c2230;
   --bg-overlay: rgba(10, 12, 16, 0.94);
-  --bg-modal: #11141b;
 
-  /* Благородные металлы и гранит */
-  --accent-brass: #c5a059;          /* Патинированная латунь */
+  --accent-brass: #c5a059;
   --accent-brass-hover: #d8b46e;
   --accent-brass-dim: rgba(197, 160, 89, 0.15);
-  --accent-granite: #8a1c22;        /* Темно-вишневый гранит */
+  --accent-granite: #8a1c22;
   --accent-granite-hover: #a1232a;
   --accent-granite-dim: rgba(138, 28, 34, 0.12);
 
-  /* Янтарное пламя свечи памяти */
   --candle-color: #f59e0b;
   --candle-glow: rgba(245, 158, 11, 0.45);
 
-  /* Строгая книжная типографика */
   --text-primary: #f1f3f7;
   --text-secondary: #9da6b3;
   --text-tertiary: #606875;
-  --text-inverted: #0e1013;
 
-  /* Тонкая штриховая графика */
   --border-hairline: rgba(255, 255, 255, 0.08);
   --border-medium: rgba(255, 255, 255, 0.16);
   --border-accent: rgba(197, 160, 89, 0.3);
-  --border-accent-solid: #c5a059;
 
-  /* Тени */
   --shadow-subtle: 0 4px 16px rgba(0, 0, 0, 0.5);
   --shadow-elevated: 0 16px 40px rgba(0, 0, 0, 0.75);
 
-  /* Шрифтовые гарнитуры */
   --font-serif: 'Cinzel', 'Times New Roman', Georgia, serif;
   --font-sans: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   
@@ -70,20 +60,12 @@ body {
   display: flex;
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  transition: font-size 0.2s ease, filter 0.2s ease, background-color 0.3s ease;
 }
 
 main {
   flex: 1 0 auto;
 }
 
-/* Скрытие фоновых пятен */
-.ambient-glow {
-  display: none !important;
-}
-
-/* Кастомный темный скроллбар */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -107,23 +89,19 @@ main {
 }
 
 /* ==========================================================================
-   2. ПАНЕЛЬ ДОСТУПНОСТИ И СТАТУСА (ГОСТ РФ)
+   2. ПАНЕЛЬ ДОСТУПНОСТИ И ШАПКА САЙТА (HEADER)
    ========================================================================== */
 .accessibility-bar {
   background: #08090b;
   border-bottom: 1px solid var(--border-hairline);
   padding: 8px 0;
   font-size: 0.75rem;
-  z-index: 1001;
-  position: relative;
 }
 
 .accessibility-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
 }
 
 .access-controls {
@@ -138,15 +116,13 @@ main {
   padding: 4px 12px;
   border-radius: 2px;
   font-size: 0.72rem;
-  font-family: var(--font-sans);
   cursor: pointer;
   transition: var(--transition);
 }
 
-.access-btn:hover, .access-btn[aria-pressed="true"] {
+.access-btn:hover {
   color: var(--text-primary);
   border-color: var(--accent-brass);
-  background: var(--accent-brass-dim);
 }
 
 .access-meta {
@@ -162,18 +138,13 @@ main {
   height: 6px;
   border-radius: 50%;
   background-color: var(--accent-brass);
-  animation: pulseLight 2s infinite;
 }
 
-/* ==========================================================================
-   3. ШАПКА САЙТА (HEADER & НАВИГАЦИЯ)
-   ========================================================================== */
 .header {
   position: sticky;
   top: 0;
   background: rgba(14, 16, 19, 0.95);
   backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-hairline);
   z-index: 1000;
   padding: 14px 0;
@@ -273,7 +244,6 @@ main {
   padding: 7px 16px;
   border-radius: 2px;
   font-size: 0.78rem;
-  font-family: var(--font-sans);
   cursor: pointer;
   font-weight: 500;
   transition: var(--transition);
@@ -302,79 +272,8 @@ main {
   color: var(--bg-main);
 }
 
-/* Мобильный гамбургер и шторка */
-.mobile-menu-btn {
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.mobile-menu-btn span {
-  display: block;
-  width: 22px;
-  height: 2px;
-  background: var(--text-primary);
-  transition: var(--transition);
-}
-
-.mobile-menu-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.mobile-menu-btn.open span:nth-child(2) { opacity: 0; }
-.mobile-menu-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-.mobile-nav-drawer {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 100%;
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--border-hairline);
-  padding: 16px 24px;
-  flex-direction: column;
-  gap: 8px;
-  box-shadow: var(--shadow-elevated);
-  z-index: 999;
-}
-
-.mobile-nav-drawer.active {
-  display: flex;
-}
-
-.mobile-nav-link {
-  color: var(--text-secondary) !important;
-  text-decoration: none !important;
-  font-size: 0.9rem;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border-hairline);
-  display: block;
-}
-
-.mobile-nav-link:hover, .mobile-nav-link.highlight {
-  color: var(--accent-brass) !important;
-}
-
-.mobile-btn-link {
-  background: none;
-  border: none;
-  border-bottom: 1px solid var(--border-hairline);
-  text-align: left;
-  cursor: pointer;
-  font-family: var(--font-sans);
-  width: 100%;
-}
-
-@media (min-width: 901px) {
-  .mobile-nav-drawer, .mobile-menu-btn {
-    display: none !important;
-  }
-}
-
 /* ==========================================================================
-   4. ГЛАВНЫЙ ЭКРАН (HERO) — АРХИТЕКТУРНЫЙ МИНИМАЛИЗМ
+   3. ГЛАВНЫЙ ЭКРАН (HERO)
    ========================================================================== */
 .hero-section {
   padding: 95px 0 75px;
@@ -397,7 +296,7 @@ main {
 
 .hero-title {
   font-family: var(--font-serif);
-  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+  font-size: 3.2rem;
   line-height: 1.2;
   margin-bottom: 20px;
   font-weight: 700;
@@ -421,7 +320,6 @@ main {
   justify-content: center;
   gap: 44px;
   margin-bottom: 40px;
-  flex-wrap: wrap;
 }
 
 .stat-card {
@@ -457,19 +355,16 @@ main {
   display: flex;
   justify-content: center;
   gap: 14px;
-  flex-wrap: wrap;
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
   padding: 12px 26px;
   border-radius: 2px;
   font-weight: 600;
   font-size: 0.88rem;
-  font-family: var(--font-sans);
   cursor: pointer;
   text-decoration: none;
   transition: var(--transition);
@@ -482,9 +377,8 @@ main {
   border-color: rgba(255, 255, 255, 0.1);
 }
 
-.btn-primary:hover, .btn-primary:focus-visible {
+.btn-primary:hover {
   background: var(--accent-granite-hover);
-  outline: none;
 }
 
 .btn-secondary {
@@ -493,15 +387,14 @@ main {
   border-color: var(--border-medium);
 }
 
-.btn-secondary:hover, .btn-secondary:focus-visible {
+.btn-secondary:hover {
   border-color: var(--accent-brass);
   color: var(--accent-brass);
   background: var(--accent-brass-dim);
-  outline: none;
 }
 
 /* ==========================================================================
-   5. ОБЩИЕ СТИЛИ СЕКЦИЙ И ЗАГОЛОВКОВ
+   4. ЗАЛЫ МУЗЕЯ (I, II, III, IV)
    ========================================================================== */
 .section {
   padding: 80px 0;
@@ -526,7 +419,7 @@ main {
 
 .section-title {
   font-family: var(--font-serif);
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-size: 2.2rem;
   color: var(--text-primary);
   margin-bottom: 10px;
 }
@@ -538,9 +431,7 @@ main {
   font-size: 0.95rem;
 }
 
-/* ==========================================================================
-   6. ЗАЛ I: ИНТЕРАКТИВНЫЙ МЕМОРИАЛ «ЗВЕЗДА ПАМЯТИ»
-   ========================================================================== */
+/* Зал I: Мемориал */
 .plaque-view-toggle {
   display: flex;
   justify-content: center;
@@ -556,8 +447,6 @@ main {
   border-radius: 2px;
   cursor: pointer;
   font-size: 0.8rem;
-  font-family: var(--font-sans);
-  font-weight: 500;
   transition: var(--transition);
 }
 
@@ -579,23 +468,17 @@ main {
   position: relative;
   width: 100%;
   min-height: 520px;
-  border-radius: 2px;
-  overflow: hidden;
   display: flex;
   justify-content: space-between;
   align-items: stretch;
   padding: 24px;
   gap: 20px;
   transform-style: preserve-3d;
-  will-change: transform;
 }
 
 .memorial-bg-img {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0; width: 100%; height: 100%;
   object-fit: cover;
   filter: brightness(0.65) contrast(1.05);
   z-index: 1;
@@ -607,7 +490,6 @@ main {
   width: 380px;
   background: rgba(14, 16, 19, 0.94);
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   border: 1px solid var(--border-accent);
   border-radius: 2px;
   padding: 16px;
@@ -646,11 +528,10 @@ main {
   justify-content: space-between;
 }
 
-.plaque-item:hover, .plaque-item:focus-visible {
+.plaque-item:hover {
   background: var(--bg-elevated);
   border-left-color: var(--accent-granite);
   color: #fff;
-  outline: none;
 }
 
 .plaque-arrow {
@@ -658,9 +539,7 @@ main {
   font-size: 0.8rem;
 }
 
-/* ==========================================================================
-   7. ЗАЛ II: ПОИСК И СТУДЕНЧЕСКИЕ КАРТОЧКИ
-   ========================================================================== */
+/* Зал II: Поиск и карточки */
 .search-wrapper {
   max-width: 520px;
   margin: 20px auto 0;
@@ -675,7 +554,6 @@ main {
   padding: 12px 40px 12px 42px;
   color: #fff;
   font-size: 0.88rem;
-  font-family: var(--font-sans);
   outline: none;
   transition: var(--transition);
 }
@@ -710,7 +588,6 @@ main {
   align-items: center;
   gap: 6px;
   margin-top: 12px;
-  flex-wrap: wrap;
 }
 
 .chip-label {
@@ -739,7 +616,6 @@ main {
   justify-content: center;
   gap: 8px;
   margin-top: 18px;
-  flex-wrap: wrap;
 }
 
 .spec-filter-btn {
@@ -751,7 +627,6 @@ main {
   cursor: pointer;
   font-size: 0.78rem;
   font-weight: 500;
-  font-family: var(--font-sans);
   transition: var(--transition);
 }
 
@@ -763,7 +638,7 @@ main {
 
 .heroes-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 24px;
   margin-top: 32px;
 }
@@ -817,7 +692,6 @@ main {
   font-weight: 600;
   padding: 3px 8px;
   border-radius: 2px;
-  letter-spacing: 0.5px;
 }
 
 .hero-candle-badge {
@@ -881,15 +755,12 @@ main {
   border-color: var(--accent-granite);
 }
 
-/* ==========================================================================
-   8. ЗАЛ III: ХРОНИКА И ЯНДЕКС КАРТА
-   ========================================================================== */
+/* Зал III: Хроника и Карта */
 .theatre-nav-bar {
   display: flex;
   justify-content: center;
   gap: 8px;
   margin-bottom: 28px;
-  flex-wrap: wrap;
 }
 
 .theatre-btn {
@@ -932,8 +803,6 @@ main {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
-  flex-wrap: wrap;
-  gap: 8px;
 }
 
 .theatre-badge {
@@ -1051,7 +920,6 @@ main {
   background: #090a0c;
 }
 
-/* Инверсия Яндекс Карт */
 .battle-map-wrapper ymaps[class$="-map"] {
   filter: invert(90%) hue-rotate(180deg) grayscale(70%) contrast(110%);
 }
@@ -1060,9 +928,7 @@ main {
   filter: invert(100%) hue-rotate(180deg) grayscale(0%) contrast(100%);
 }
 
-/* ==========================================================================
-   9. ЗАЛ IV: ЭСТАФЕТА МУЖЕСТВА И СВЕЧА
-   ========================================================================== */
+/* Зал IV: Эстафета мужества */
 .memory-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -1117,14 +983,11 @@ main {
 }
 
 /* ==========================================================================
-   10. МОДАЛЬНОЕ ОКНО ДОСЬЕ, ГАЛЕРЕЯ И ПАСПОРТ
+   5. МОДАЛЬНОЕ ОКНО ДОСЬЕ И ГАЛЕРЕЯ
    ========================================================================== */
 .modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0; width: 100%; height: 100%;
   z-index: 2000;
   display: none;
   align-items: center;
@@ -1138,10 +1001,7 @@ main {
 
 .modal-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(8, 9, 11, 0.92);
   backdrop-filter: blur(6px);
   animation: modalFadeIn var(--transition) ease;
@@ -1223,7 +1083,6 @@ main {
   gap: 10px;
 }
 
-/* Галерея */
 .dossier-gallery-main {
   position: relative;
   width: 100%;
@@ -1243,9 +1102,7 @@ main {
 
 .dossier-gallery-caption {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
+  bottom: 0; left: 0; width: 100%;
   background: rgba(14, 16, 19, 0.9);
   color: var(--text-secondary);
   font-size: 0.74rem;
@@ -1360,7 +1217,6 @@ main {
   font-weight: 700;
 }
 
-/* Правая колонка досье */
 .dossier-name {
   font-family: var(--font-serif);
   font-size: 1.5rem;
@@ -1470,13 +1326,11 @@ main {
 }
 
 /* ==========================================================================
-   11. АУДИОПЛЕЕР И АДМИН-ПАНЕЛЬ (CMS v2.0)
+   6. АУДИОПЛЕЕР, АДМИНКА И ПОДВАЛ
    ========================================================================== */
 .audio-bar {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
+  bottom: 0; left: 0; width: 100%;
   background: var(--bg-surface);
   border-top: 1px solid var(--border-accent);
   padding: 10px 0;
@@ -1502,10 +1356,6 @@ main {
   align-items: center;
   gap: 10px;
   min-width: 200px;
-}
-
-.audio-icon {
-  font-size: 1.4rem;
 }
 
 .audio-track-title {
@@ -1568,7 +1418,7 @@ main {
   cursor: pointer;
 }
 
-/* Админка (Dashboard CMS) */
+/* Админка (Dashboard) */
 .admin-dashboard {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
@@ -1576,7 +1426,6 @@ main {
   z-index: 9999;
   display: none;
   flex-direction: row;
-  font-family: var(--font-sans);
 }
 
 .admin-dashboard.active {
@@ -1608,7 +1457,7 @@ main {
 
 .admin-icon-btn {
   background: none; border: none; color: var(--text-tertiary);
-  font-size: 1.6rem; cursor: pointer; line-height: 1;
+  font-size: 1.6rem; cursor: pointer;
 }
 
 .admin-sidebar-actions { padding: 14px; }
@@ -1685,11 +1534,6 @@ main {
   padding: 24px;
 }
 
-.admin-empty-state {
-  flex-grow: 1; display: flex; align-items: center; justify-content: center;
-  color: var(--text-tertiary); font-size: 1rem;
-}
-
 .admin-grid {
   display: grid;
   grid-template-columns: 280px 1fr;
@@ -1713,7 +1557,6 @@ main {
   border-bottom: 1px solid var(--border-hairline);
   padding-bottom: 6px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .admin-photo-wrap {
@@ -1728,11 +1571,9 @@ main {
   width: 100%; background: var(--bg-main); color: #fff;
   border: 1px solid var(--border-hairline);
   padding: 8px 10px; border-radius: 2px;
-  margin-bottom: 10px; font-family: var(--font-sans);
-  font-size: 0.82rem;
+  margin-bottom: 10px; font-size: 0.82rem;
 }
 .admin-input:focus { border-color: var(--accent-brass); outline: none; }
-.admin-input:disabled { opacity: 0.4; cursor: not-allowed; }
 
 .admin-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
@@ -1750,9 +1591,7 @@ main {
   padding: 0 12px; border-radius: 2px; cursor: pointer; font-size: 0.75rem;
 }
 
-/* ==========================================================================
-   12. ПОДВАЛ (FOOTER)
-   ========================================================================== */
+/* Подвал */
 .footer {
   background: #08090b;
   padding: 60px 0 40px;
@@ -1788,18 +1627,13 @@ main {
 }
 
 /* ==========================================================================
-   13. АНИМАЦИИ
+   7. АНИМАЦИИ И РЕЖИМЫ ДОСТУПНОСТИ (ГОСТ)
    ========================================================================== */
 @keyframes candleFlicker {
   0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
   25% { transform: scale(1.04) rotate(-1deg); opacity: 0.92; }
   50% { transform: scale(0.98) rotate(1deg); opacity: 0.96; }
   75% { transform: scale(1.02) rotate(-0.5deg); opacity: 0.9; }
-}
-
-@keyframes pulseLight {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
 }
 
 @keyframes modalFadeIn {
@@ -1817,9 +1651,6 @@ main {
   to { transform: translateY(0); }
 }
 
-/* ==========================================================================
-   14. РЕЖИМЫ ДОСТУПНОСТИ (ГОСТ РФ)
-   ========================================================================== */
 body.high-contrast {
   --bg-main: #000000;
   --bg-surface: #121212;
@@ -1838,63 +1669,23 @@ body.large-text {
   font-size: 18px;
 }
 body.large-text .hero-title {
-  font-size: 3.4rem;
+  font-size: 3.6rem;
 }
 body.large-text .section-title {
-  font-size: 2.4rem;
+  font-size: 2.6rem;
 }
 
 /* ==========================================================================
-   15. АДАПТИВНОСТЬ ПОД УСТРОЙСТВА (RESPONSIVE)
-   ========================================================================== */
-@media (max-width: 900px) {
-  .nav { display: none !important; }
-  .mobile-menu-btn { display: flex; }
-  .memorial-stand-canvas { flex-direction: column; min-height: auto; }
-  .plaque-interactive-zone { width: 100%; }
-  .battle-timeline-grid { grid-template-columns: 1fr; }
-  .dossier-layout { grid-template-columns: 1fr; }
-  .memory-grid, .footer-container { grid-template-columns: 1fr; gap: 24px; }
-  .hero-stats { gap: 24px; }
-  .stat-card { border-left: none; padding-left: 0; }
-  .admin-grid { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 480px) {
-  .hero-title { font-size: 1.8rem; }
-  .modal-dialog { padding: 20px; }
-  .dossier-name { font-size: 1.35rem; }
-  .dossier-student-grid { grid-template-columns: 1fr; }
-  .stat-card { width: 100%; }
-}
-
-/* ==========================================================================
-   16. СТИЛИ ДЛЯ ПЕЧАТИ (УРОК МУЖЕСТВА)
+   8. ПЕЧАТЬ (РАЗДАТОЧНЫЙ ЛИСТ ДЛЯ УРОКА МУЖЕСТВА)
    ========================================================================== */
 @media print {
-  body {
-    background: #fff !important;
-    color: #000 !important;
-  }
+  body { background: #fff !important; color: #000 !important; }
   .accessibility-bar, .header, .footer, .hero-section, .memorial-section,
   .battle-section, .memory-section, .audio-bar, .modal-close,
   .dossier-nav-bar, .dossier-btn-audio, .dossier-candle-btn, .dossier-action-btn,
-  .admin-dashboard, .dossier-thumbnails-track {
-    display: none !important;
-  }
-  .modal {
-    position: static !important;
-    display: block !important;
-    padding: 0 !important;
-  }
-  .modal-dialog {
-    border: 1px solid #000 !important;
-    box-shadow: none !important;
-    max-width: 100% !important;
-    padding: 20px !important;
-    background: #fff !important;
-    color: #000 !important;
-  }
+  .admin-dashboard, .dossier-thumbnails-track { display: none !important; }
+  .modal { position: static !important; display: block !important; padding: 0 !important; }
+  .modal-dialog { border: 1px solid #000 !important; box-shadow: none !important; max-width: 100% !important; padding: 20px !important; background: #fff !important; color: #000 !important; }
   .dossier-name { color: #000 !important; font-size: 20pt !important; }
   .award-tag { border: 1px solid #000 !important; color: #000 !important; background: none !important; }
   .dossier-quote { background: #f5f5f5 !important; color: #000 !important; border-left: 2px solid #000 !important; }
