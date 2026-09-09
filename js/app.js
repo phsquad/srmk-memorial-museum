@@ -1,7 +1,7 @@
 /**
  * ============================================================================
  * ВИРТУАЛЬНЫЙ МУЗЕЙ ГБПОУ СРМК: «БЫТЬ ВОИНОМ — ЖИТЬ ВЕЧНО»
- * Главный логический контроллер интерфейса (js/app.js v7.0 Master)
+ * Главный контроллер с защитным ядром AntiBotEngine v8.0 Enterprise
  * 
  * Разработчики: Андреев А. И., науч. рук. Генте А. В., Бледных Е. В.
  * ============================================================================
@@ -9,7 +9,7 @@
 
 'use strict';
 
-// 1. Единое глобальное состояние приложения
+// 1. Глобальное состояние приложения
 const AppState = {
   activeFilter: 'all',
   activeSpecialty: 'all',
@@ -21,22 +21,160 @@ const AppState = {
   mapInstance: null,
   mapMarkers: {},
   mapPolylines: [],
-  candles: JSON.parse(localStorage.getItem('srmk_museum_candles') || '{}'),
+  candles: {},
   audioContext: null
 };
 
 // Резервный аватар
 const FALLBACK_HERO_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500' viewBox='0 0 400 500'%3E%3Crect width='400' height='500' fill='%2314171d'/%3E%3Cpath d='M200 190c33.1 0 60-26.9 60-60s-26.9-60-60-60-60 26.9-60 60 26.9 60 60 60zm0 30c-48 0-108 24-108 72v48h216v-48c0-48-60-72-108-72z' fill='%238a1c22' opacity='0.4'/%3E%3Cpolygon points='200,380 205,395 220,395 208,405 212,420 200,410 188,420 192,405 180,395 195,395' fill='%23c5a059'/%3E%3Ctext x='50%25' y='92%25' dominant-baseline='middle' text-anchor='middle' fill='%239da6b3' font-family='sans-serif' font-size='13'%3EГБПОУ СРМК • НАВЕЧНО В СТРОЮ%3C/text%3E%3C/svg%3E";
 
-document.addEventListener('DOMContentLoaded', () => {
-  App.init();
-});
+/* ==========================================================================
+   2. ЯДРО КЛИЕНТСКОЙ БЕЗОПАСНОСТИ И ЗАЩИТЫ ОТ БОТОВ (ANTIBOT ENGINE)
+   ========================================================================== */
+const AntiBotEngine = {
+  SALT: "SRMK_MUSEUM_SECURE_SALT_v8_2026",
+  COOLDOWN_MS: 24 * 60 * 60 * 1000, // 24 часа
+  MIN_CLICK_INTERVAL: 650,          // Минимальный интервал между действиями (мс)
+  _lastActionTimestamp: 0,
+  _humanMovementScore: 0,
+  _isBlacklisted: false,
 
-const App = {
-  /**
-   * Инициализация приложения
-   */
   init() {
+    this._trackHumanMetrics();
+    this._createHoneypot();
+  },
+
+  /**
+   * Отслеживание физического перемещения мыши или пальца (Human Jitter)
+   */
+  _trackHumanMetrics() {
+    const recordMovement = () => {
+      if (this._humanMovementScore < 100) this._humanMovementScore += 5;
+    };
+    window.addEventListener('mousemove', recordMovement, { passive: true });
+    window.addEventListener('touchmove', recordMovement, { passive: true });
+    window.addEventListener('scroll', recordMovement, { passive: true });
+  },
+
+  /**
+   * Создание ловушки для скрытых краулеров/ботов (Honeypot)
+   */
+  _createHoneypot() {
+    const pot = document.createElement('div');
+    pot.id = 'botHoneypotTrigger';
+    pot.style.cssText = 'position:absolute; left:-9999px; top:-9999px; opacity:0; pointer-events:none;';
+    pot.innerHTML = '<input type="text" name="tribute_bot_check" tabindex="-1" autocomplete="off">';
+    pot.addEventListener('click', () => { this._isBlacklisted = true; });
+    pot.querySelector('input').addEventListener('input', () => { this._isBlacklisted = true; });
+    document.body.appendChild(pot);
+  },
+
+  /**
+   * Комплексная проверка: человек или робот?
+   */
+  validateHumanAction(event) {
+    if (this._isBlacklisted) return { success: false, reason: "Сессия заблокирована." };
+
+    // 1. Проверка на подлинность браузерного события
+    if (event && !event.isTrusted) {
+      return { success: false, reason: "Программная эмуляция клика запрещена." };
+    }
+
+    // 2. Проверка троттлинга (защита от зажатия клавиши и автокликера)
+    const now = Date.now();
+    if (now - this._lastActionTimestamp < this.MIN_CLICK_INTERVAL) {
+      return { success: false, reason: "Слишком частые действия. Подождите секунду." };
+    }
+    this._lastActionTimestamp = now;
+
+    // 3. Проверка на наличие базовой физической активности
+    if (this._humanMovementScore < 5 && !('ontouchstart' in window)) {
+      return { success: false, reason: "Нетипичная активность браузера." };
+    }
+
+    return { success: true };
+  },
+
+  /**
+   * Криптографическая хеш-подпись данных (SHA-256)
+   */
+  async generateSignature(dataObj) {
+    const text = JSON.stringify(dataObj) + this.SALT;
+    const msgBuffer = new TextEncoder().encode(text);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  },
+
+  /**
+   * Проверка тайм-лока на 24 часа для конкретного героя
+   */
+  canLightCandle(heroId) {
+    try {
+      const history = JSON.parse(localStorage.getItem('srmk_candle_history') || '{}');
+      const lastTime = history[heroId];
+      if (!lastTime) return { allowed: true };
+
+      const timePassed = Date.now() - lastTime;
+      if (timePassed < this.COOLDOWN_MS) {
+        const remainingHours = Math.ceil((this.COOLDOWN_MS - timePassed) / (1000 * 60 * 60));
+        return { allowed: false, remainingHours };
+      }
+      return { allowed: true };
+    } catch (e) {
+      return { allowed: true };
+    }
+  },
+
+  /**
+   * Безопасная запись зажженной свечи в хранилище с криптоподписью
+   */
+  async recordCandleSuccess(heroId) {
+    const history = JSON.parse(localStorage.getItem('srmk_candle_history') || '{}');
+    history[heroId] = Date.now();
+    localStorage.setItem('srmk_candle_history', JSON.stringify(history));
+
+    const currentCandles = AppState.candles;
+    const signature = await this.generateSignature(currentCandles);
+    const secureVault = {
+      payload: currentCandles,
+      signature: signature,
+      timestamp: Date.now()
+    };
+    localStorage.setItem('srmk_verified_candles_vault', JSON.stringify(secureVault));
+  },
+
+  /**
+   * Загрузка проверенных счетчиков (самовосстановление при взломе)
+   */
+  async loadSecureCandles() {
+    try {
+      const raw = localStorage.getItem('srmk_verified_candles_vault');
+      if (!raw) return {};
+      const vault = JSON.parse(raw);
+      const expectedSig = await this.generateSignature(vault.payload);
+
+      if (vault.signature === expectedSig) {
+        return vault.payload || {};
+      } else {
+        console.warn("[AntiBot] Обнаружена модификация хранилища. Неверифицированные данные сброшены.");
+        localStorage.removeItem('srmk_verified_candles_vault');
+        return {};
+      }
+    } catch (e) {
+      return {};
+    }
+  }
+};
+
+/* ==========================================================================
+   3. ГЛАВНЫЙ КОНТРОЛЛЕР ИНТЕРФЕЙСА (APP ENGINE)
+   ========================================================================== */
+const App = {
+  async init() {
+    AntiBotEngine.init();
+    AppState.candles = await AntiBotEngine.loadSecureCandles();
+
     this.cacheDOM();
     this.bindEvents();
     this.initAmbientParticles();
@@ -46,12 +184,9 @@ const App = {
     this.initInteractiveMap();
     this.updateCandlesStats();
     this.checkDeepLink();
-    console.log(`[Музей СРМК] Логическое ядро активно. Загружено героев: ${heroesDatabase.length}`);
+    console.log(`[Музей СРМК] Защищенный запуск завершен. В строю: ${heroesDatabase.length} героев.`);
   },
 
-  /**
-   * Кеширование элементов интерфейса
-   */
   cacheDOM() {
     this.dom = {
       leftPlaque: document.getElementById('leftPlaqueNames'),
@@ -63,14 +198,12 @@ const App = {
       totalCandlesDisplay: document.getElementById('totalCandlesCount'),
       statHeroCandles: document.getElementById('heroTotalCandlesStat'),
 
-      // Модальные окна
       heroModal: document.getElementById('heroModal'),
       modalOverlay: document.getElementById('modalOverlay'),
       modalCloseBtn: document.getElementById('modalCloseBtn'),
       modalBody: document.getElementById('modalHeroContent'),
       passportModal: document.getElementById('passportModal'),
 
-      // Аудиоплеер
       audioBar: document.getElementById('audioPlayerBar'),
       audioElement: document.getElementById('mainAudioElement'),
       audioPlayBtn: document.getElementById('audioPlayPauseBtn'),
@@ -84,11 +217,8 @@ const App = {
     };
   },
 
-  /**
-   * Привязка событий
-   */
   bindEvents() {
-    // Живой поиск
+    // Живой поиск с защитой от флуда
     if (this.dom.searchInput) {
       let debounceTimeout;
       this.dom.searchInput.addEventListener('input', (e) => {
@@ -100,11 +230,9 @@ const App = {
       });
     }
 
-    // Модальное окно
     if (this.dom.modalCloseBtn) this.dom.modalCloseBtn.addEventListener('click', () => this.closeModal());
     if (this.dom.modalOverlay) this.dom.modalOverlay.addEventListener('click', () => this.closeModal());
 
-    // Горячие клавиши
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         if (this.dom.heroModal?.classList.contains('active')) this.closeModal();
@@ -116,31 +244,19 @@ const App = {
       }
     });
 
-    // Аудиоплеер
     this.initAudioPlayerEvents();
 
-    // Кнопка общей экскурсии
     if (this.dom.btnGeneralTour) {
       this.dom.btnGeneralTour.addEventListener('click', () => {
         this.playAudio('assets/audio/guides/general-tour.mp3', 'Вводная экскурсия музея СРМК', 'Обзор экспозиции');
       });
     }
 
-    // Синхронизация свечей между вкладками
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'srmk_museum_candles') {
-        AppState.candles = JSON.parse(e.newValue || '{}');
-        this.updateCandlesStats();
-        this.renderCardsGrid();
-        this.renderMemorialPlaques();
-      }
-    });
-
     window.addEventListener('hashchange', () => this.checkDeepLink());
   },
 
   /* ==========================================================================
-     1. ЗВУКОВОЙ СИНТЕЗАТОР (WEB AUDIO API — 0 КБ НАГРУЗКИ)
+     4. ЗВУКОВОЙ СИНТЕЗАТОР (WEB AUDIO API)
      ========================================================================== */
   playChimeSound(freq = 480, duration = 0.3) {
     try {
@@ -170,7 +286,7 @@ const App = {
   },
 
   /* ==========================================================================
-     2. ИНТЕРАКТИВНЫЙ МЕМОРИАЛ «ЗВЕЗДА ПАМЯТИ» (ЗАЛ I)
+     5. ЗАЛ I: МЕМОРИАЛ «ЗВЕЗДА ПАМЯТИ»
      ========================================================================== */
   renderMemorialPlaques() {
     if (!this.dom.leftPlaque || !this.dom.rightPlaque) return;
@@ -192,16 +308,11 @@ const App = {
         <span class="plaque-arrow">→</span>
       `;
 
-      item.addEventListener('click', () => {
+      item.addEventListener('click', (e) => {
+        const check = AntiBotEngine.validateHumanAction(e);
+        if (!check.success) return;
         this.playChimeSound(440, 0.2);
         this.openModal(hero.id);
-      });
-
-      item.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          this.openModal(hero.id);
-        }
       });
 
       if (hero.plaque === 'left') {
@@ -213,7 +324,7 @@ const App = {
   },
 
   /* ==========================================================================
-     3. ФИЛЬТРАЦИЯ ПО СПЕЦИАЛЬНОСТЯМ КОЛЛЕДЖА
+     6. ЗАЛ II: КАРТОЧКИ И СПЕЦИАЛЬНОСТИ
      ========================================================================== */
   renderSpecialtyFilters() {
     if (!this.dom.specialtyContainer) return;
@@ -245,15 +356,11 @@ const App = {
     });
   },
 
-  /* ==========================================================================
-     4. СЕТКА КАРТОЧЕК ВЫПУСКНИКОВ (ЗАЛ II)
-     ========================================================================== */
   renderCardsGrid() {
     if (!this.dom.cardsContainer) return;
     this.dom.cardsContainer.innerHTML = '';
 
     const filtered = heroesDatabase.filter(hero => {
-      // Поисковая фильтрация
       let matchesSearch = true;
       if (AppState.searchQuery) {
         const q = AppState.searchQuery;
@@ -264,7 +371,6 @@ const App = {
           (hero.awards && hero.awards.some(a => a.toLowerCase().includes(q)));
       }
 
-      // Фильтрация по специальности
       let matchesSpec = true;
       if (AppState.activeSpecialty !== 'all') {
         const spec = (hero.education?.specialty || '').toLowerCase();
@@ -284,7 +390,7 @@ const App = {
       this.dom.cardsContainer.innerHTML = `
         <div style="grid-column: 1/-1; text-align:center; padding: 48px 20px; color: var(--text-tertiary);">
           <p style="font-size: 1.1rem; margin-bottom: 6px;">По вашему запросу записи не найдены</p>
-          <small>Попробуйте сбросить поисковую строку или выбрать другое направление подготовки</small>
+          <small>Попробуйте сбросить поисковую строку или выбрать другое направление</small>
         </div>
       `;
       return;
@@ -327,7 +433,7 @@ const App = {
   },
 
   /* ==========================================================================
-     5. ДОСЬЕ ГЕРОЯ: СТУДЕНЧЕСКИЙ ПРОФИЛЬ И МУЛЬТИМЕДИЙНАЯ ГАЛЕРЕЯ
+     7. ДОСЬЕ ГЕРОЯ С МУЛЬТИМЕДИЙНОЙ ГАЛЕРЕЕЙ
      ========================================================================== */
   openModal(id) {
     const hero = heroesDatabase.find(h => h.id === id);
@@ -340,18 +446,21 @@ const App = {
     const prevHero = heroesDatabase[currentIndex - 1] || heroesDatabase[heroesDatabase.length - 1];
     const nextHero = heroesDatabase[currentIndex + 1] || heroesDatabase[0];
 
+    const mainPhoto = (typeof ArchiveService !== 'undefined')
+      ? (hero.media?.photo || ArchiveService.generateFallbackAvatar(hero))
+      : (hero.media?.photo || FALLBACK_HERO_AVATAR);
+
     const audioSrc = hero.media?.audioGuide || "";
     const yearsText = hero.dates?.years || `${hero.dates?.birth || ''} — ${hero.dates?.death || ''}`;
     const rankText = hero.military ? `${hero.military.rank || ''} ${hero.military.unit ? `• ${hero.military.unit}` : ''}` : "Воин ВС РФ";
     const deedText = hero.deed || "Сведения о боевом пути и подвиге уточняются в архивах колледжа.";
     const candleCount = AppState.candles[hero.id] || 0;
 
-    // Автоматическая сборка мультимедийной галереи (Фото + Награды из открытого реестра)
+    // Сборка фотогалереи (Фотографии + Медали + Планки)
     const galleryItems = (typeof ArchiveService !== 'undefined')
       ? ArchiveService.buildDynamicGallery(hero)
-      : [{ url: hero.media?.photo || FALLBACK_HERO_AVATAR, caption: "Основной портрет", desc: "", type: "portrait" }];
+      : [{ url: mainPhoto, caption: "Основной портрет", desc: "", type: "portrait" }];
 
-    // Награды с визуальными знаками
     const awardsHTML = (hero.awards || []).map(awardTitle => {
       if (typeof ArchiveService !== 'undefined') {
         const visual = ArchiveService.getAwardVisual(awardTitle);
@@ -368,8 +477,13 @@ const App = {
     const qrTargetUrl = `${window.location.origin}${window.location.pathname}#hero-${hero.id}`;
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(qrTargetUrl)}`;
 
+    // Проверка статуса свечи через AntiBotEngine
+    const candleCheck = AntiBotEngine.canLightCandle(hero.id);
+    const candleBtnText = candleCheck.allowed 
+      ? `Зажечь Свечу Памяти (<span id="candleCountDisplay">${candleCount}</span>)` 
+      : `🕯 Свеча зажжена вами сегодня (${candleCount})`;
+
     this.dom.modalBody.innerHTML = `
-      <!-- Навигация между анкетами -->
       <div class="dossier-nav-bar">
         <button class="dossier-nav-btn" onclick="App.openModal('${prevHero.id}')" title="${prevHero.name}" type="button">← Предыдущий герой</button>
         <span class="dossier-nav-counter">${currentIndex + 1} / ${heroesDatabase.length}</span>
@@ -377,7 +491,6 @@ const App = {
       </div>
 
       <div class="dossier-layout">
-        <!-- ЛЕВАЯ КОЛОНКА: МУЛЬТИМЕДИЙНАЯ ГАЛЕРЕЯ И ДЕЙСТВИЯ -->
         <div class="dossier-sidebar">
           <div class="dossier-gallery-main">
             <img src="${galleryItems[0].url}" alt="${hero.name}" id="dossierMainImage" class="dossier-img" onerror="this.src='${FALLBACK_HERO_AVATAR}'">
@@ -387,7 +500,6 @@ const App = {
             </div>
           </div>
 
-          <!-- Лента миниатюр (Фотографии + Медали + Планки) -->
           ${galleryItems.length > 1 ? `
             <div class="dossier-thumbnails-track">
               ${galleryItems.map((item, idx) => `
@@ -402,8 +514,8 @@ const App = {
           ` : ''}
 
           <div class="dossier-actions-stack">
-            <button class="dossier-candle-btn ${candleCount > 0 ? 'active' : ''}" onclick="App.lightCandle('${hero.id}')" type="button">
-              Зажечь Свечу Памяти (<span id="candleCountDisplay">${candleCount}</span>)
+            <button class="dossier-candle-btn ${!candleCheck.allowed ? 'active locked' : ''}" onclick="App.lightCandle('${hero.id}', event)" type="button">
+              ${candleBtnText}
             </button>
 
             ${audioSrc ? `
@@ -420,7 +532,6 @@ const App = {
               Скачать карточку для стенда
             </button>
 
-            <!-- Локальный загрузчик фото из семейного архива -->
             <label class="dossier-action-btn" style="text-align:center; cursor:pointer;">
               Прикрепить фото из архива
               <input type="file" accept="image/*" style="display:none;" onchange="if(typeof ArchiveService !== 'undefined') ArchiveService.uploadFamilyPhoto('${hero.id}', this, () => App.openModal('${hero.id}'))">
@@ -433,12 +544,10 @@ const App = {
           </div>
         </div>
 
-        <!-- ПРАВАЯ КОЛОНКА: СТУДЕНЧЕСКИЙ ПАСПОРТ И ПОДВИГ -->
         <div class="dossier-main">
           <h2 class="dossier-name">${hero.name}</h2>
           <div class="dossier-years-badge">${yearsText}</div>
 
-          <!-- Студенческий паспорт -->
           <div class="dossier-section-block">
             <h4 class="dossier-block-title">Студенческие годы в СРМК</h4>
             <div class="dossier-student-grid">
@@ -459,7 +568,6 @@ const App = {
             </div>
           </div>
 
-          <!-- Воинская служба и подвиг -->
           <div class="dossier-section-block">
             <h4 class="dossier-block-title">Ратный подвиг и воинский долг</h4>
             <div class="student-info-item" style="margin-bottom: 10px;">
@@ -469,14 +577,12 @@ const App = {
             <p class="dossier-deed-text">${deedText}</p>
           </div>
 
-          <!-- Цитата -->
           ${hero.quote ? `
             <blockquote class="dossier-quote">
               «${hero.quote}»
             </blockquote>
           ` : ''}
 
-          <!-- Награды -->
           <div class="dossier-section-block">
             <h4 class="dossier-block-title">Государственные награды</h4>
             <div class="dossier-awards-list">
@@ -484,7 +590,6 @@ const App = {
             </div>
           </div>
 
-          <!-- Память в колледже -->
           ${hero.memorialStatus ? `
             <div class="dossier-memorial-status">
               <span class="meta-label">Память в колледже:</span>
@@ -498,15 +603,11 @@ const App = {
     this.dom.heroModal.classList.add('active');
     document.body.style.overflow = 'hidden';
 
-    // Центрирование карты при открытии
     if (hero.mapCoords && AppState.mapInstance) {
       AppState.mapInstance.setCenter([hero.mapCoords.lat, hero.mapCoords.lng], 8);
     }
   },
 
-  /**
-   * Переключение фото внутри галереи досье
-   */
   switchGalleryPhoto(url, caption, desc, btnEl) {
     const mainImg = document.getElementById('dossierMainImage');
     const capEl = document.getElementById('dossierImageCaption');
@@ -519,18 +620,39 @@ const App = {
     if (btnEl) btnEl.classList.add('active');
   },
 
-  /**
-   * Зажжение свечи памяти
-   */
-  lightCandle(heroId) {
+  /* ==========================================================================
+     8. ЗАЩИЩЕННОЕ ЗАЖЖЕНИЕ СВЕЧИ ПАМЯТИ
+     ========================================================================== */
+  async lightCandle(heroId, event) {
+    // 1. Проверка через ядро безопасности AntiBotEngine
+    const validation = AntiBotEngine.validateHumanAction(event);
+    if (!validation.success) {
+      alert(validation.reason);
+      return;
+    }
+
+    // 2. Проверка тайм-лока (24 часа)
+    const status = AntiBotEngine.canLightCandle(heroId);
+    if (!status.allowed) {
+      alert(`Вы уже почтили память этого героя сегодня. Зажечь свечу повторно можно будет через ${status.remainingHours} ч.`);
+      return;
+    }
+
+    // 3. Запись значения и криптоподпись
     AppState.candles[heroId] = (AppState.candles[heroId] || 0) + 1;
-    localStorage.setItem('srmk_museum_candles', JSON.stringify(AppState.candles));
-    
+    await AntiBotEngine.recordCandleSuccess(heroId);
+
     this.playChimeSound(880, 0.35);
 
     const countDisplay = document.getElementById('candleCountDisplay');
     if (countDisplay) countDisplay.textContent = AppState.candles[heroId];
     
+    const candleBtn = document.querySelector('.dossier-candle-btn');
+    if (candleBtn) {
+      candleBtn.classList.add('active', 'locked');
+      candleBtn.innerHTML = `🕯 Свеча зажжена вами сегодня (${AppState.candles[heroId]})`;
+    }
+
     this.updateCandlesStats();
     this.renderCardsGrid();
     this.renderMemorialPlaques();
@@ -538,12 +660,8 @@ const App = {
 
   updateCandlesStats() {
     const total = Object.values(AppState.candles).reduce((a, b) => a + b, 0);
-    if (this.dom.totalCandlesDisplay) {
-      this.dom.totalCandlesDisplay.textContent = total;
-    }
-    if (this.dom.statHeroCandles) {
-      this.dom.statHeroCandles.textContent = total;
-    }
+    if (this.dom.totalCandlesDisplay) this.dom.totalCandlesDisplay.textContent = total;
+    if (this.dom.statHeroCandles) this.dom.statHeroCandles.textContent = total;
   },
 
   printHeroDossier() {
@@ -577,7 +695,7 @@ const App = {
   },
 
   /* ==========================================================================
-     6. РЕЖИМ «УРОК МУЖЕСТВА» (ПОЛНОЭКРАННАЯ ПРЕЗЕНТАЦИЯ)
+     9. РЕЖИМ «УРОК МУЖЕСТВА» (ПРЕЗЕНТАЦИЯ)
      ========================================================================== */
   startPresentationMode() {
     if (AppState.isPresentationRunning) {
@@ -595,7 +713,7 @@ const App = {
       this.openModal(heroesDatabase[index].id);
     }, 12000);
 
-    console.log("[Урок Мужества] Полноэкранный режим запущен (12с на героя).");
+    console.log("[Урок Мужества] Полноэкранная смена слайдов активирована.");
   },
 
   stopPresentationMode() {
@@ -605,7 +723,7 @@ const App = {
   },
 
   /* ==========================================================================
-     7. АУДИОПЛЕЕР С ПЕРЕМОТКОЙ
+     10. АУДИОПЛЕЕР С ИНДИКАТОРОМ
      ========================================================================== */
   initAudioPlayerEvents() {
     const { audioElement, audioPlayBtn, audioProgressBar, audioProgressContainer, audioTimeDisplay, audioCloseBtn } = this.dom;
@@ -669,7 +787,7 @@ const App = {
   },
 
   /* ==========================================================================
-     8. ИНТЕРАКТИВНАЯ КАРТА (YANDEX MAPS API)
+     11. ИНТЕРАКТИВНАЯ КАРТА (YANDEX MAPS API)
      ========================================================================== */
   initInteractiveMap() {
     const mapElement = document.getElementById('interactiveBattleMap');
@@ -686,7 +804,6 @@ const App = {
 
       AppState.mapInstance.behaviors.disable('scrollZoom');
 
-      // Исходная точка: ГБПОУ СРМК в Ставрополе
       const srmkCoords = MUSEUM_CONFIG.coords;
       const srmkPlacemark = new ymaps.Placemark(srmkCoords, {
         balloonContentHeader: '<strong style="color:#8a1c22; font-size:14px;">ГБПОУ СРМК</strong>',
@@ -697,7 +814,6 @@ const App = {
       });
       AppState.mapInstance.geoObjects.add(srmkPlacemark);
 
-      // Метки героев и золотые линии боевого пути
       const markers = MuseumAPI.getMapMarkers();
       markers.forEach(m => {
         const heroPlacemark = new ymaps.Placemark(m.coords, {
@@ -717,7 +833,6 @@ const App = {
         AppState.mapInstance.geoObjects.add(heroPlacemark);
         AppState.mapMarkers[m.id] = heroPlacemark;
 
-        // Векторная пунктирная линия подвига
         const polyline = new ymaps.Polyline([srmkCoords, m.coords], {}, {
           strokeColor: '#c5a059',
           strokeWidth: 2,
@@ -728,7 +843,6 @@ const App = {
         AppState.mapPolylines.push(polyline);
       });
 
-      // Фильтры театров военных действий
       document.querySelectorAll('.theatre-btn').forEach(btn => {
         btn.addEventListener('click', () => {
           document.querySelectorAll('.theatre-btn').forEach(b => b.classList.remove('active'));
@@ -764,19 +878,12 @@ const App = {
   },
 
   /* ==========================================================================
-     9. ФОНОВЫЕ ИСКРЫ ПАМЯТИ (HTML5 CANVAS)
+     12. ФОНОВЫЕ ИСКРЫ ПАМЯТИ (CANVAS PARTICLES)
      ========================================================================== */
   initAmbientParticles() {
     const canvas = document.createElement('canvas');
     canvas.id = 'ambientSparksCanvas';
-    canvas.style.position = 'fixed';
-    canvas.style.top = '0';
-    canvas.style.left = '0';
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-    canvas.style.pointerEvents = 'none';
-    canvas.style.zIndex = '0';
-    canvas.style.opacity = '0.35';
+    canvas.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; opacity:0.35;';
     document.body.prepend(canvas);
 
     const ctx = canvas.getContext('2d');
