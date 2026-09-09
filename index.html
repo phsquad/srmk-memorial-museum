@@ -4,68 +4,51 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>Виртуальный музей ГБПОУ СРМК | «Быть воином — жить вечно»</title>
+  <meta name="description" content="Интерактивный цифровой мемориал памяти 20 выпускников ГБПОУ СРМК, павших при исполнении воинского долга. Всероссийская акция «Карта доблести: хранители подвигов».">
+  <meta name="theme-color" content="#0e1013">
 
-  <!-- АВТООПРЕДЕЛЕНИЕ УСТРОЙСТВА И РЕДИРЕКТ НА МОБИЛЬНУЮ ВЕРСИЮ -->
+  <!-- УМНЫЙ ШЛЮЗ АВТООПРЕДЕЛЕНИЯ УСТРОЙСТВА -->
   <script>
     (function() {
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-
-      if (isMobile) {
-        const currentHash = window.location.hash;
-        window.location.replace('mobile.html' + currentHash);
+      if (isMobile && window.location.pathname.indexOf('mobile.html') === -1) {
+        window.location.replace('mobile.html' + window.location.hash);
       }
     })();
   </script>
-  
-  <!-- Метатеги и SEO -->
-  <meta name="description" content="Интерактивный цифровой мемориал памяти 20 выпускников ГБПОУ СРМК, павших при исполнении воинского долга. Всероссийская акция «Карта доблести: хранители подвигов».">
-  <meta name="keywords" content="СРМК, Ставропольский колледж, виртуальный музей, Быть воином жить вечно, Карта доблести, Парта Героя, герои СВО">
-  <meta name="author" content="ГБПОУ СРМК, Андреев А.И., Генте А.В., Бледных Е.В.">
-  <meta name="theme-color" content="#080a0e">
 
-  <!-- Open Graph для социальных сетей и мессенджеров -->
+  <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ru_RU">
-  <meta property="og:site_name" content="Виртуальный музей ГБПОУ СРМК">
-  <meta property="og:title" content="«Быть воином — жить вечно» | Цифровой мемориал ГБПОУ СРМК">
-  <meta property="og:description" content="Они учились здесь. Они шагнули в вечность. Интерактивная экспозиция памяти 20 выпускников колледжа.">
+  <meta property="og:title" content="Виртуальный музей ГБПОУ СРМК: «Быть воином — жить вечно»">
+  <meta property="og:description" content="Мемориальная экспозиция и оцифрованные архивы 20 выпускников Ставропольского регионального многопрофильного колледжа.">
   <meta property="og:image" content="assets/images/memorial-bg.jpg">
 
-  <!-- Иконки и фавикон -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎖️</text></svg>">
-
-  <!-- Типографика Google Fonts -->
+  <!-- Шрифтовые гарнитуры -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- Основная таблица стилей проекта -->
+  <!-- Стили -->
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="dark-theme">
 
-  <!-- Фоновое мемориальное свечение и частицы -->
-  <div class="ambient-glow" aria-hidden="true"></div>
-
   <!-- 1. ПАНЕЛЬ ДОСТУПНОСТИ И СТАТУСА (ГОСТ РФ) -->
-  <aside class="accessibility-bar" aria-label="Панель специальных возможностей и статуса проекта">
+  <aside class="accessibility-bar" aria-label="Панель специальных возможностей">
     <div class="container accessibility-container">
       <div class="access-controls">
-        <button id="toggleContrastBtn" class="access-btn" type="button" aria-pressed="false" title="Переключить высококонтрастный режим">
-          👁 Версия для слабовидящих
-        </button>
-        <button id="toggleFontSizeBtn" class="access-btn" type="button" aria-pressed="false" title="Увеличить размер шрифта">
-          A+ Размер шрифта
-        </button>
+        <button id="toggleContrastBtn" class="access-btn" type="button">Контрастный режим</button>
+        <button id="toggleFontSizeBtn" class="access-btn" type="button">Увеличить шрифт</button>
       </div>
       <div class="access-meta">
         <span class="pulse-indicator" aria-hidden="true"></span>
-        <span class="access-status-text">Федеральный проект «Карта доблести: хранители подвигов»</span>
+        <span>Федеральный проект «Карта доблести: хранители подвигов»</span>
       </div>
     </div>
   </aside>
 
-  <!-- 2. ШАПКА САЙТА (HEADER & НАВИГАЦИЯ) -->
+  <!-- 2. ШАПКА САЙТА (HEADER) -->
   <header class="header" id="siteHeader">
     <div class="container header-container">
       <a href="#heroIntro" class="logo-group" aria-label="На главную страницу музея">
@@ -76,48 +59,31 @@
         </div>
       </a>
 
-      <!-- Десктопное меню -->
-      <nav class="nav" id="desktopNav" aria-label="Главная навигация">
+      <nav class="nav" id="desktopNav" aria-label="Навигация по разделам">
         <a href="#memorial" class="nav-link">Мемориал Славы</a>
         <a href="#heroes-grid" class="nav-link">За партой Героя</a>
         <a href="#battle-path" class="nav-link">Хроника и Карта</a>
         <a href="#memory-hall" class="nav-link">Эстафета памяти</a>
       </nav>
 
-      <!-- Интерактивные действия в шапке -->
       <div class="header-actions">
-        <button class="passport-btn" id="btnOpenPassport" type="button" title="Официальный паспорт экспозиции для жюри конкурса">
-          📋 Паспорт проекта
+        <button class="passport-btn" id="btnOpenPassport" type="button">
+          Паспорт проекта
         </button>
-        <a href="https://карта-доблести.рф" target="_blank" rel="noopener noreferrer" class="contest-badge" title="Всероссийская акция «Карта доблести»">
-          ★ Карта Доблести
+        <a href="https://карта-доблести.рф" target="_blank" rel="noopener noreferrer" class="contest-badge">
+          Карта Доблести РФ
         </a>
-        <!-- Кнопка гамбургер -->
-        <button class="mobile-menu-btn" id="mobileMenuToggle" type="button" aria-label="Открыть мобильное меню" aria-expanded="false">
-          <span></span><span></span><span></span>
-        </button>
       </div>
-    </div>
-
-    <!-- Мобильная шторка навигации -->
-    <div class="mobile-nav-drawer" id="mobileNavDrawer" aria-hidden="true">
-      <a href="#memorial" class="mobile-nav-link">Мемориал Славы</a>
-      <a href="#heroes-grid" class="mobile-nav-link">За партой Героя</a>
-      <a href="#battle-path" class="mobile-nav-link">Хроника и Карта</a>
-      <a href="#memory-hall" class="mobile-nav-link">Эстафета памяти</a>
-      <button class="mobile-nav-link mobile-btn-link" id="btnOpenPassportMobile" type="button">📋 Паспорт музея (для экспертов)</button>
-      <a href="https://карта-доблести.рф" target="_blank" rel="noopener noreferrer" class="mobile-nav-link highlight">★ Портал «Карта Доблести РФ»</a>
     </div>
   </header>
 
-  <!-- ОСНОВНОЙ КОНТЕНТ МУЗЕЯ -->
   <main id="mainContent">
 
-    <!-- ВВОДНЫЙ ЭКРАН (HERO SECTION) -->
-    <section class="hero-section" id="heroIntro" aria-labelledby="heroMainHeading">
+    <!-- ГЛАВНЫЙ ЭКРАН (HERO) -->
+    <section class="hero-section" id="heroIntro">
       <div class="container hero-content">
         <div class="hero-badge">Цифровой мемориально-образовательный комплекс</div>
-        <h1 class="hero-title" id="heroMainHeading">
+        <h1 class="hero-title">
           ОНИ УЧИЛИСЬ ЗДЕСЬ.<br>
           <span class="highlight">ОНИ ШАГНУЛИ В ВЕЧНОСТЬ.</span>
         </h1>
@@ -125,8 +91,7 @@
           Интерактивная музейная экспозиция памяти 20 выпускников Ставропольского регионального многопрофильного колледжа, совершивших бессмертный ратный подвиг при защите Отечества.
         </p>
         
-        <!-- Счетчики музейного фонда -->
-        <div class="hero-stats" role="region" aria-label="Статистика экспозиции">
+        <div class="hero-stats" role="region" aria-label="Фонд экспозиции">
           <div class="stat-card">
             <span class="stat-number">20</span>
             <span class="stat-label">Героев на Мемориале</span>
@@ -141,36 +106,34 @@
           </div>
           <div class="stat-card">
             <span class="stat-number" id="heroTotalCandlesStat">0</span>
-            <span class="stat-label">Свечей памяти зажжено</span>
+            <span class="stat-label">Свечей памяти</span>
           </div>
         </div>
 
-        <!-- Кнопки управления и сценариев -->
         <div class="hero-actions">
           <a href="#memorial" class="btn btn-primary">
-            <span>🏛</span> К Мемориалу Памяти
+            К Мемориалу Памяти
           </a>
           <button class="btn btn-secondary" id="btnOpenGeneralTour" type="button">
-            <span>🎧</span> Аудиоэкскурсия музея
+            Аудиоэкскурсия музея
           </button>
-          <button class="btn btn-secondary" onclick="App.startPresentationMode()" type="button" title="Полноэкранный показ для интерактивных досок и уроков истории">
-            <span>📽</span> Режим «Урок Мужества»
+          <button class="btn btn-secondary" onclick="App.startPresentationMode()" type="button">
+            Режим «Урок Мужества»
           </button>
         </div>
       </div>
     </section>
 
     <!-- ЗАЛ I: ИНТЕРАКТИВНЫЙ МЕМОРИАЛ «ЗВЕЗДА ПАМЯТИ» -->
-    <section id="memorial" class="section memorial-section" aria-labelledby="hall1Heading">
+    <section id="memorial" class="section memorial-section">
       <div class="container">
         <div class="section-header">
           <div class="hall-tag">Зал I музея</div>
-          <h2 class="section-title" id="hall1Heading">Мемориал Славы «Звезда Памяти»</h2>
+          <h2 class="section-title">Мемориал Славы «Звезда Памяти»</h2>
           <p class="section-desc">
-            Интерактивная 2.5D-витрина памятника во дворе колледжа. Выберите имя на гранитной плите, чтобы открыть персональное архивное досье, наградной лист и аудиогид.
+            Интерактивная 2.5D-витрина монумента во дворе колледжа. Выберите имя на гранитной плите для открытия персонального архивного досье и аудиогида.
           </p>
 
-          <!-- Фильтр переключения плит -->
           <div class="plaque-view-toggle" role="group" aria-label="Выбор мемориальной плиты">
             <button class="plaque-toggle-btn active" data-plaque-view="all" type="button">Все плиты (20)</button>
             <button class="plaque-toggle-btn" data-plaque-view="left" type="button">Левая плита (10)</button>
@@ -180,16 +143,13 @@
 
         <div class="memorial-stand-container">
           <div class="memorial-stand-canvas" id="memorialStand">
-            <!-- Фоновое изображение памятника со звездой -->
             <img src="assets/images/memorial-bg.jpg" alt="Памятник выпускникам СРМК" class="memorial-bg-img" onerror="this.src='https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1600&q=80'">
 
-            <!-- Левая плита -->
             <div class="plaque-interactive-zone left-zone" id="leftPlaqueZone">
               <div class="plaque-title">Левая плита мемориала</div>
               <div class="names-list" id="leftPlaqueNames" role="list"></div>
             </div>
 
-            <!-- Правая плита -->
             <div class="plaque-interactive-zone right-zone" id="rightPlaqueZone">
               <div class="plaque-title">Правая плита мемориала</div>
               <div class="names-list" id="rightPlaqueNames" role="list"></div>
@@ -200,65 +160,57 @@
     </section>
 
     <!-- ЗАЛ II: СТУДЕНЧЕСКАЯ ЮНОСТЬ («ЗА ПАРТОЙ ГЕРОЯ») -->
-    <section id="heroes-grid" class="section heroes-section" aria-labelledby="hall2Heading">
+    <section id="heroes-grid" class="section heroes-section">
       <div class="container">
         <div class="section-header">
           <div class="hall-tag">Зал II музея</div>
-          <h2 class="section-title" id="hall2Heading">За партой Героя</h2>
+          <h2 class="section-title">За партой Героя</h2>
           <p class="section-desc">
             Студенческие годы защитников Отечества: учебные мастерские, зачетные книжки, фотографии из аудиторий и воспоминания наставников.
           </p>
           
-          <!-- Интеллектуальная строка поиска -->
           <div class="search-wrapper">
-            <span class="search-icon" aria-hidden="true">🔍</span>
-            <input type="text" id="heroSearchInput" class="search-input" placeholder="Поиск по фамилии, специальности, части или награде..." autocomplete="off" aria-label="Поиск по каталогу героев">
-            <button class="search-clear-btn" id="searchClearBtn" type="button" title="Очистить поисковый запрос" style="display:none;" aria-label="Очистить поиск">&times;</button>
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="heroSearchInput" class="search-input" placeholder="Поиск по фамилии, специальности, части или награде..." autocomplete="off">
+            <button class="search-clear-btn" id="searchClearBtn" type="button" style="display:none;">&times;</button>
           </div>
 
-          <!-- Смарт-чипы быстрого отбора -->
-          <div class="smart-chips-bar" role="group" aria-label="Быстрый тематический фильтр">
+          <div class="smart-chips-bar" role="group" aria-label="Быстрый фильтр">
             <span class="chip-label">Быстрый отбор:</span>
-            <button class="chip-btn" data-query="Орден Мужества" type="button">🎖️ Орден Мужества</button>
-            <button class="chip-btn" data-query="247" type="button">🦅 247 ДШП ВДВ</button>
-            <button class="chip-btn" data-query="Пожарная" type="button">🚒 МЧС / Спасатели</button>
-            <button class="chip-btn" data-query="Свар" type="button">⚡ Сварщики</button>
-            <button class="chip-btn" data-query="отличием" type="button">📜 Красный диплом</button>
+            <button class="chip-btn" data-query="Орден Мужества" type="button">Орден Мужества</button>
+            <button class="chip-btn" data-query="247" type="button">247 ДШП ВДВ</button>
+            <button class="chip-btn" data-query="Пожарная" type="button">МЧС и спасатели</button>
+            <button class="chip-btn" data-query="Свар" type="button">Сварочное дело</button>
+            <button class="chip-btn" data-query="отличием" type="button">Красный диплом</button>
           </div>
 
-          <!-- Фильтры по специальностям колледжа -->
-          <div class="specialty-filters-bar" id="specialtyFiltersContainer" role="group" aria-label="Фильтр по отделениям колледжа"></div>
+          <div class="specialty-filters-bar" id="specialtyFiltersContainer"></div>
         </div>
 
-        <!-- Сетка интерактивных карточек выпускников -->
-        <div class="heroes-grid" id="heroesCardsContainer" role="feed" aria-busy="false"></div>
+        <div class="heroes-grid" id="heroesCardsContainer"></div>
       </div>
     </section>
 
-    <!-- ЗАЛ III: ХРОНИКА ПОДВИГА И КАРТА БОЕВОГО ПУТИ -->
-    <section id="battle-path" class="section battle-section" aria-labelledby="hall3Heading">
+    <!-- ЗАЛ III: ХРОНИКА ПОДВИГА И КАРТА -->
+    <section id="battle-path" class="section battle-section">
       <div class="container">
         <div class="section-header">
           <div class="hall-tag">Зал III музея</div>
-          <h2 class="section-title" id="hall3Heading">Хроника ратного подвига и География боев</h2>
+          <h2 class="section-title">Хроника ратного подвига и География боев</h2>
           <p class="section-desc">
             Интерактивная топография доблести: от аудиторий и мастерских колледжа в Ставрополе до рубежей защиты суверенитета Отечества.
           </p>
         </div>
 
-        <!-- Переключатели ТВД -->
-        <div class="theatre-nav-bar" role="group" aria-label="Фильтр по театрам военных действий">
+        <div class="theatre-nav-bar" role="group" aria-label="Фильтр рубежей">
           <button class="theatre-btn active" data-theatre="all" type="button">Все рубежи (20 героев)</button>
-          <button class="theatre-btn" data-theatre="dnieper" type="button">🌊 Днепровский плацдарм (5)</button>
-          <button class="theatre-btn" data-theatre="zaporozhye" type="button">🛡️ Запорожский щит (4)</button>
-          <button class="theatre-btn" data-theatre="donbass" type="button">⚔️ Огненная дуга Донбасса (10)</button>
-          <button class="theatre-btn" data-theatre="kursk" type="button">🌲 Курское приграничье (1)</button>
+          <button class="theatre-btn" data-theatre="dnieper" type="button">Днепровский плацдарм (5)</button>
+          <button class="theatre-btn" data-theatre="zaporozhye" type="button">Запорожский щит (4)</button>
+          <button class="theatre-btn" data-theatre="donbass" type="button">Огненная дуга Донбасса (10)</button>
+          <button class="theatre-btn" data-theatre="kursk" type="button">Курское приграничье (1)</button>
         </div>
 
-        <!-- 4 Оперативно-тактических рубежа -->
         <div class="battle-timeline-grid">
-          
-          <!-- Рубеж 1: Днепр -->
           <article class="timeline-theatre-card" data-theatre-card="dnieper">
             <div class="theatre-card-header">
               <span class="theatre-badge">Рубеж I • 2022–2024</span>
@@ -266,19 +218,18 @@
             </div>
             <h3 class="theatre-card-title">Днепровский плацдарм и Таврия</h3>
             <p class="theatre-card-desc">
-              Ожесточенные встречные бои десанта в феврале 2022 года. Подвиг разведчика-санитара 247-го ДШП <strong>Николая Вечёрки</strong> и стрелка <strong>Максима Елагина</strong>; бесстрашные рейсы «Машины жизни» <strong>Шамиля Назырова</strong>; мужество десантника <strong>Никиты Горлова</strong> и морпеха <strong>Ивана Сербиенко</strong>.
+              Ожесточенные встречные бои десанта в феврале 2022 года. Подвиг разведчика-санитара 247-го ДШП <strong>Николая Вечёрки</strong> и стрелка <strong>Максима Елагина</strong>; рейсы «Машины жизни» <strong>Шамиля Назырова</strong>; стойкость <strong>Никиты Горлова</strong> и <strong>Ивана Сербиенко</strong>.
             </p>
             <div class="theatre-heroes-pills">
-              <span class="hero-pill" onclick="App.openModal('vecherka-n-a')" role="button" tabindex="0">Н. Вечёрка</span>
-              <span class="hero-pill" onclick="App.openModal('elagin-m-n')" role="button" tabindex="0">М. Елагин</span>
-              <span class="hero-pill" onclick="App.openModal('gorlov-n-a')" role="button" tabindex="0">Н. Горлов</span>
-              <span class="hero-pill" onclick="App.openModal('nazyrov-sh-r')" role="button" tabindex="0">Ш. Назыров</span>
-              <span class="hero-pill" onclick="App.openModal('serbienko-i-p')" role="button" tabindex="0">И. Сербиенко</span>
+              <span class="hero-pill" onclick="App.openModal('vecherka-n-a')">Н. Вечёрка</span>
+              <span class="hero-pill" onclick="App.openModal('elagin-m-n')">М. Елагин</span>
+              <span class="hero-pill" onclick="App.openModal('gorlov-n-a')">Н. Горлов</span>
+              <span class="hero-pill" onclick="App.openModal('nazyrov-sh-r')">Ш. Назыров</span>
+              <span class="hero-pill" onclick="App.openModal('serbienko-i-p')">И. Сербиенко</span>
             </div>
-            <button class="theatre-map-focus-btn" onclick="App.focusMap([46.6, 32.7], 8)" type="button">Показать сектор на карте ➔</button>
+            <button class="theatre-map-focus-btn" onclick="App.focusMap([46.6, 32.7], 8)" type="button">Показать сектор на карте →</button>
           </article>
 
-          <!-- Рубеж 2: Запорожье -->
           <article class="timeline-theatre-card" data-theatre-card="zaporozhye">
             <div class="theatre-card-header">
               <span class="theatre-badge">Рубеж II • 2022–2024</span>
@@ -286,18 +237,17 @@
             </div>
             <h3 class="theatre-card-title">Запорожский щит и Ореховская дуга</h3>
             <p class="theatre-card-desc">
-              Отражение танковых атак электромехаником <strong>Дмитрием Самохиным</strong> (Орден Мужества № 83029); спасение раненых из-под артобстрелов техником <strong>Николаем Сополевым</strong>; инженерная разведка сапера <strong>Константина Луценко</strong>; стойкость стрелка <strong>Ивана Пономарчука</strong>.
+              Отражение бронетанковых атак электромехаником <strong>Дмитрием Самохиным</strong> (Орден Мужества № 83029); спасение раненых техником <strong>Николаем Сополевым</strong>; инженерная разведка сапера <strong>Константина Луценко</strong>; стойкость десантника <strong>Ивана Пономарчука</strong>.
             </p>
             <div class="theatre-heroes-pills">
-              <span class="hero-pill" onclick="App.openModal('samokhin-d-a')" role="button" tabindex="0">Д. Самохин</span>
-              <span class="hero-pill" onclick="App.openModal('sopolev-n-s')" role="button" tabindex="0">Н. Сополев</span>
-              <span class="hero-pill" onclick="App.openModal('lutsenko-k-a')" role="button" tabindex="0">К. Луценко</span>
-              <span class="hero-pill" onclick="App.openModal('ponomarchuk-i-s')" role="button" tabindex="0">И. Пономарчук</span>
+              <span class="hero-pill" onclick="App.openModal('samokhin-d-a')">Д. Самохин</span>
+              <span class="hero-pill" onclick="App.openModal('sopolev-n-s')">Н. Сополев</span>
+              <span class="hero-pill" onclick="App.openModal('lutsenko-k-a')">К. Луценко</span>
+              <span class="hero-pill" onclick="App.openModal('ponomarchuk-i-s')">И. Пономарчук</span>
             </div>
-            <button class="theatre-map-focus-btn" onclick="App.focusMap([47.45, 35.8], 8)" type="button">Показать сектор на карте ➔</button>
+            <button class="theatre-map-focus-btn" onclick="App.focusMap([47.45, 35.8], 8)" type="button">Показать сектор на карте →</button>
           </article>
 
-          <!-- Рубеж 3: Донбасс -->
           <article class="timeline-theatre-card" data-theatre-card="donbass">
             <div class="theatre-card-header">
               <span class="theatre-badge">Рубеж III • 2022–2024</span>
@@ -305,24 +255,23 @@
             </div>
             <h3 class="theatre-card-title">Огненная дуга Донбасса</h3>
             <p class="theatre-card-desc">
-              Решающие сражения на рубежах ДНР. Командирский подвиг <strong>Станислава Мартынова</strong> под Угледаром; штурмы <strong>Максима Ярышева</strong>; оборона <strong>Ильи Чупина</strong>; пулеметный огонь <strong>Никиты Брынзы</strong>; подвиги <strong>Александра Григорьева</strong> (медаль Суворова), <strong>Владислава Петухова</strong>, <strong>Сергея Белова</strong>, <strong>Павла Шартова</strong>, <strong>Игоря Лукьяненко</strong> и прапорщика <strong>Виктора Бутова</strong>.
+              Командирский подвиг <strong>Станислава Мартынова</strong> под Угледаром; штурмовые действия <strong>Максима Ярышева</strong>; оборона опорных пунктов <strong>Ильи Чупина</strong>; героизм <strong>Александра Григорьева</strong> (медаль Суворова), <strong>Владислава Петухова</strong>, <strong>Сергея Белова</strong>, <strong>Павла Шартова</strong>, <strong>Игоря Лукьяненко</strong>, <strong>Никиты Брынзы</strong> и <strong>Виктора Бутова</strong>.
             </p>
             <div class="theatre-heroes-pills">
-              <span class="hero-pill" onclick="App.openModal('martynov-s-k')" role="button" tabindex="0">С. Мартынов</span>
-              <span class="hero-pill" onclick="App.openModal('yaryshev-m-v')" role="button" tabindex="0">М. Ярышев</span>
-              <span class="hero-pill" onclick="App.openModal('chupin-i-v')" role="button" tabindex="0">И. Чупин</span>
-              <span class="hero-pill" onclick="App.openModal('grigoriev-a-n')" role="button" tabindex="0">А. Григорьев</span>
-              <span class="hero-pill" onclick="App.openModal('brynza-n-d')" role="button" tabindex="0">Н. Брынза</span>
-              <span class="hero-pill" onclick="App.openModal('petukhov-v-v')" role="button" tabindex="0">В. Петухов</span>
-              <span class="hero-pill" onclick="App.openModal('belov-s-a')" role="button" tabindex="0">С. Белов</span>
-              <span class="hero-pill" onclick="App.openModal('shartov-p-n')" role="button" tabindex="0">П. Шартов</span>
-              <span class="hero-pill" onclick="App.openModal('lukyanenko-i-v')" role="button" tabindex="0">И. Лукьяненко</span>
-              <span class="hero-pill" onclick="App.openModal('butov-v-e')" role="button" tabindex="0">В. Бутов</span>
+              <span class="hero-pill" onclick="App.openModal('martynov-s-k')">С. Мартынов</span>
+              <span class="hero-pill" onclick="App.openModal('yaryshev-m-v')">М. Ярышев</span>
+              <span class="hero-pill" onclick="App.openModal('chupin-i-v')">И. Чупин</span>
+              <span class="hero-pill" onclick="App.openModal('grigoriev-a-n')">А. Григорьев</span>
+              <span class="hero-pill" onclick="App.openModal('brynza-n-d')">Н. Брынза</span>
+              <span class="hero-pill" onclick="App.openModal('petukhov-v-v')">В. Петухов</span>
+              <span class="hero-pill" onclick="App.openModal('belov-s-a')">С. Белов</span>
+              <span class="hero-pill" onclick="App.openModal('shartov-p-n')">П. Шартов</span>
+              <span class="hero-pill" onclick="App.openModal('lukyanenko-i-v')">И. Лукьяненко</span>
+              <span class="hero-pill" onclick="App.openModal('butov-v-e')">В. Бутов</span>
             </div>
-            <button class="theatre-map-focus-btn" onclick="App.focusMap([48.1, 37.7], 8)" type="button">Показать сектор на карте ➔</button>
+            <button class="theatre-map-focus-btn" onclick="App.focusMap([48.1, 37.7], 8)" type="button">Показать сектор на карте →</button>
           </article>
 
-          <!-- Рубеж 4: Курск -->
           <article class="timeline-theatre-card" data-theatre-card="kursk">
             <div class="theatre-card-header">
               <span class="theatre-badge">Рубеж IV • Август 2024</span>
@@ -330,40 +279,38 @@
             </div>
             <h3 class="theatre-card-title">Курский приграничный рубеж</h3>
             <p class="theatre-card-desc">
-              Отражение вторжения в приграничную зону. Выпускник IT-отделения колледжа 2024 года <strong>Никита Назаренко</strong> под непрерывным огневым воздействием обеспечивал надежную связь штабов и боевых групп. Погиб 13 августа 2024 года.
+              Отражение вторжения в приграничную зону. Выпускник IT-отделения колледжа 2024 года <strong>Никита Назаренко</strong> под огнем противника обеспечивал надежную связь штабов и боевых групп. Героически погиб 13 августа 2024 года.
             </p>
             <div class="theatre-heroes-pills">
-              <span class="hero-pill" onclick="App.openModal('nazarenko-n-s')" role="button" tabindex="0">Н. Назаренко</span>
+              <span class="hero-pill" onclick="App.openModal('nazarenko-n-s')">Н. Назаренко</span>
             </div>
-            <button class="theatre-map-focus-btn" onclick="App.focusMap([51.3, 35.2], 9)" type="button">Показать сектор на карте ➔</button>
+            <button class="theatre-map-focus-btn" onclick="App.focusMap([51.3, 35.2], 9)" type="button">Показать сектор на карте →</button>
           </article>
-
         </div>
 
-        <!-- Интерактивный спутниковый картографический блок -->
+        <!-- Интерактивная карта Яндекс -->
         <div class="map-section-wrapper">
           <div class="map-header-bar">
             <div class="map-title-group">
-              <span class="map-icon" aria-hidden="true">🛰️</span>
-              <strong>Интерактивная карта боевой славы СРМК</strong>
+              <span>Интерактивная карта боевой славы СРМК</span>
             </div>
             <div class="map-quick-actions">
-              <button class="map-quick-btn" onclick="App.focusMap([45.0448, 41.9691], 13)" type="button">📍 Колледж (Ставрополь)</button>
-              <button class="map-quick-btn" onclick="App.focusMap([47.5, 36.5], 6)" type="button">🗺️ Общий план ТВД</button>
+              <button class="map-quick-btn" onclick="App.focusMap([45.0448, 41.9691], 13)" type="button">Колледж (Ставрополь)</button>
+              <button class="map-quick-btn" onclick="App.focusMap([47.5, 36.5], 6)" type="button">Общий план ТВД</button>
             </div>
           </div>
-          <div id="interactiveBattleMap" class="battle-map-wrapper" role="region" aria-label="Интерактивная карта боев"></div>
+          <div id="interactiveBattleMap" class="battle-map-wrapper" role="region" aria-label="Карта боевого пути"></div>
         </div>
 
       </div>
     </section>
 
-    <!-- ЗАЛ IV: ЭСТАФЕТА МУЖЕСТВА (МЕМОРИАЛ СЕГОДНЯ) -->
-    <section id="memory-hall" class="section memory-section" aria-labelledby="hall4Heading">
+    <!-- ЗАЛ IV: ЭСТАФЕТА МУЖЕСТВА -->
+    <section id="memory-hall" class="section memory-section">
       <div class="container">
         <div class="section-header">
           <div class="hall-tag">Зал IV музея</div>
-          <h2 class="section-title" id="hall4Heading">Эстафета мужества: Память в сердцах</h2>
+          <h2 class="section-title">Эстафета мужества: Память в сердцах</h2>
           <p class="section-desc">
             Как колледж хранит память о выпускниках-героях: именные парты, исследовательские проекты и музейные уроки мужества.
           </p>
@@ -371,75 +318,72 @@
 
         <div class="memory-grid">
           <div class="memory-card">
-            <div class="memory-icon" aria-hidden="true">🎖</div>
+            <div class="memory-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
             <h3>Именные «Парты Героя»</h3>
             <p>В мастерских и учебных аудиториях СРМК открыты парты с QR-кодами, ведущими на страницы электронного архива выпускников.</p>
           </div>
           <div class="memory-card">
-            <div class="memory-icon" aria-hidden="true">📖</div>
+            <div class="memory-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            </div>
             <h3>Музейные уроки истории</h3>
             <p>Интеграция оцифрованных архивных свидетельств в курс «История России» и цикл занятий «Разговоры о важном».</p>
           </div>
           <div class="memory-card">
-            <div class="memory-icon" aria-hidden="true">🕯</div>
+            <div class="memory-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            </div>
             <h3>Традиционная Вахта Памяти</h3>
             <p>Ежегодные памятные митинги и возложение цветов у Мемориала Славы с участием преподавателей, студентов и родителей героев.</p>
           </div>
         </div>
 
-        <!-- Виджет общей свечи памяти -->
         <div class="total-candles-box" role="status">
-          <div class="candle-flame-anim" aria-hidden="true">🕯️</div>
+          <div class="candle-flame-anim">🕯</div>
           <div>
-            <h3 style="font-family: var(--font-serif); color: var(--gold-accent); margin-bottom: 4px;">Общественная Свеча Памяти</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">В виртуальном музее зажжено <strong id="totalCandlesCount" style="color:#fff;">0</strong> свечей в память о наших ребятах.</p>
+            <h3 style="font-family: var(--font-serif); color: var(--accent-brass); margin-bottom: 2px;">Общественная Свеча Памяти</h3>
+            <p style="color: var(--text-secondary); font-size: 0.88rem;">В виртуальном музее зажжено <strong id="totalCandlesCount" style="color:#fff;">0</strong> свечей в память о наших ребятах.</p>
           </div>
-        </div>
-
-        <div class="memory-tribute-actions" style="margin-top: 22px; display: flex; flex-wrap: wrap; align-items: center; gap: 16px;">
-          <button class="btn btn-primary" onclick="TechModules.layCarnationFlower()" type="button">
-            <span>💐</span> Возложить цветы к Мемориалу
-          </button>
-          <span id="flowersCountDisplay" style="color: var(--gold-accent); font-weight: 700; font-size: 0.95rem;">0</span>
         </div>
       </div>
     </section>
   </main>
 
   <!-- МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ -->
-  <div class="modal" id="heroModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modalHeroTitle">
+  <div class="modal" id="heroModal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-overlay" id="modalOverlay"></div>
     <div class="modal-dialog">
-      <button class="modal-close" id="modalCloseBtn" type="button" aria-label="Закрыть окно досье">&times;</button>
+      <button class="modal-close" id="modalCloseBtn" type="button" aria-label="Закрыть">&times;</button>
       <div class="modal-body" id="modalHeroContent"></div>
     </div>
   </div>
 
-  <!-- МОДАЛЬНОЕ ОКНО: ПАСПОРТ МУЗЕЯ (ДЛЯ ЖЮРИ) -->
-  <div class="modal" id="passportModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="passportModalTitle">
+  <!-- МОДАЛЬНОЕ ОКНО ПАСПОРТА МУЗЕЯ -->
+  <div class="modal" id="passportModal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-overlay" id="passportModalOverlay"></div>
     <div class="modal-dialog" style="max-width: 760px;">
-      <button class="modal-close" id="passportModalCloseBtn" type="button" aria-label="Закрыть паспорт музея">&times;</button>
+      <button class="modal-close" id="passportModalCloseBtn" type="button" aria-label="Закрыть">&times;</button>
       <div class="modal-body">
-        <h2 id="passportModalTitle" style="font-family: var(--font-serif); color: var(--gold-accent); margin-bottom: 16px;">Паспорт виртуального музея</h2>
-        <table style="width:100%; border-collapse: collapse; font-size: 0.9rem; color: #d8deea;">
-          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);"><td style="padding: 10px 8px; font-weight: bold; color: var(--gold-accent); width: 35%;">Проект:</td><td style="padding: 10px 8px;">«Быть воином — жить вечно»</td></tr>
-          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);"><td style="padding: 10px 8px; font-weight: bold; color: var(--gold-accent);">Организация:</td><td style="padding: 10px 8px;">ГБПОУ «Ставропольский региональный многопрофильный колледж»</td></tr>
-          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);"><td style="padding: 10px 8px; font-weight: bold; color: var(--gold-accent);">Номинация:</td><td style="padding: 10px 8px;">«За партой героя» (Всероссийская акция «Карта доблести»)</td></tr>
-          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);"><td style="padding: 10px 8px; font-weight: bold; color: var(--gold-accent);">Руководитель:</td><td style="padding: 10px 8px;">Е. В. Бледных, директор ГБПОУ СРМК, канд. ист. наук</td></tr>
-          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);"><td style="padding: 10px 8px; font-weight: bold; color: var(--gold-accent);">Куратор:</td><td style="padding: 10px 8px;">А. В. Генте, преподаватель истории высшей кат.</td></tr>
-          <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);"><td style="padding: 10px 8px; font-weight: bold; color: var(--gold-accent);">Разработчик:</td><td style="padding: 10px 8px;">А. И. Андреев, студент 2 курса специальности «ИСиП»</td></tr>
-          <tr><td style="padding: 10px 8px; font-weight: bold; color: var(--gold-accent);">Фонд памяти:</td><td style="padding: 10px 8px;">20 выпускников колледжа, увековеченных на Мемориале Славы</td></tr>
+        <h2 style="font-family: var(--font-serif); color: var(--accent-brass); margin-bottom: 16px;">Паспорт виртуального музея</h2>
+        <table style="width:100%; border-collapse: collapse; font-size: 0.88rem; color: #d8deea;">
+          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass); width: 35%;">Проект:</td><td style="padding: 10px 8px;">«Быть воином — жить вечно»</td></tr>
+          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Организация:</td><td style="padding: 10px 8px;">ГБПОУ «Ставропольский региональный многопрофильный колледж»</td></tr>
+          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Номинация:</td><td style="padding: 10px 8px;">«За партой героя» (Всероссийская акция «Карта доблести»)</td></tr>
+          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Руководитель:</td><td style="padding: 10px 8px;">Е. В. Бледных, директор ГБПОУ СРМК, канд. ист. наук</td></tr>
+          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Куратор:</td><td style="padding: 10px 8px;">А. В. Генте, преподаватель истории высшей кат.</td></tr>
+          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Разработчик:</td><td style="padding: 10px 8px;">А. И. Андреев, студент 2 курса «ИСиП»</td></tr>
+          <tr><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Фонд памяти:</td><td style="padding: 10px 8px;">20 выпускников колледжа, увековеченных на Мемориале Славы</td></tr>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- СТИКИ-АУДИОПЛЕЕР (STICKY BOTTOM BAR) -->
-  <div class="audio-bar" id="audioPlayerBar" role="region" aria-label="Интерактивный аудиоплеер музея">
+  <!-- СТИКИ-АУДИОПЛЕЕР -->
+  <div class="audio-bar" id="audioPlayerBar" role="region" aria-label="Аудиоплеер">
     <div class="container audio-bar-inner">
       <div class="audio-info">
-        <span class="audio-icon" aria-hidden="true">🎧</span>
         <div class="audio-titles">
           <span class="audio-track-title" id="audioTrackTitle">Аудиогид музея</span>
           <span class="audio-hero-name" id="audioHeroName">ГБПОУ СРМК</span>
@@ -449,14 +393,14 @@
       <audio id="mainAudioElement" preload="metadata"></audio>
 
       <div class="audio-controls">
-        <button class="audio-btn" id="audioPlayPauseBtn" type="button" aria-label="Воспроизвести / Приостановить">▶</button>
-        <div class="audio-progress-container" id="audioProgressContainer" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <button class="audio-btn" id="audioPlayPauseBtn" type="button" aria-label="Воспроизвести">▶</button>
+        <div class="audio-progress-container" id="audioProgressContainer">
           <div class="audio-progress" id="audioProgressBar"></div>
         </div>
         <span class="audio-time" id="audioTimeDisplay">0:00 / 0:00</span>
       </div>
 
-      <button class="audio-close" id="audioCloseBtn" type="button" aria-label="Закрыть аудиоплеер">&times;</button>
+      <button class="audio-close" id="audioCloseBtn" type="button" aria-label="Закрыть">&times;</button>
     </div>
   </div>
 
@@ -467,8 +411,8 @@
         <h3>ГБПОУ СРМК</h3>
         <p>Ставропольский региональный многопрофильный колледж</p>
         <p>г. Ставрополь, пр. Юности, д. 3</p>
-        <p style="margin-top: 10px; color: var(--gold-accent);">
-          Официальный сайт: <a href="https://srmk26.gosuslugi.ru" target="_blank" rel="noopener noreferrer" style="color: var(--gold-accent); text-decoration: underline;">srmk26.gosuslugi.ru/</a>
+        <p style="margin-top: 8px;">
+          <a href="https://rmk.stavedu.ru" target="_blank" rel="noopener noreferrer" style="color: var(--accent-brass); text-decoration: none;">rmk.stavedu.ru</a>
         </p>
       </div>
 
@@ -485,68 +429,41 @@
         <h3>Конкурсный статус</h3>
         <p>Проект разработан для Всероссийской акции «Имя в истории образовательной организации» (номинация «За партой героя»).</p>
         <p class="copyright">© 2026 ГБПОУ СРМК. «Быть воином — жить вечно».</p>
-        <button onclick="AdminCMS.open()" style="background:none; border:none; color:#333; font-size:11px; cursor:pointer; margin-top:8px; padding:0;">
+        <button onclick="if(typeof AdminCMS !== 'undefined') AdminCMS.open()" style="background:none; border:none; color:var(--text-tertiary); font-size:11px; cursor:pointer; margin-top:8px;">
           [ Панель управления ]
         </button>
       </div>
     </div>
   </footer>
 
-  <!-- ПОДКЛЮЧЕНИЕ СКРИПТОВ -->
-  <!-- 1. Картографический движок Яндекс.Карты -->
-  <script src="https://api-maps.yandex.ru/2.1/?apikey=c59ae0e5-26d8-4664-9b44-bb6c489eb99b&lang=ru_RU" type="text/javascript"></script>
-  <!-- 2. База данных 20 героев СРМК -->
+  <!-- СКРИПТЫ -->
+  <script src="https://api-maps.yandex.ru/2.1/?apikey=ваш_ключ&lang=ru_RU" type="text/javascript"></script>
   <script src="js/data.js"></script>
-  <!-- 3. Модуль верификации источников и fallback-графики -->
   <script src="js/sources.js"></script>
-  <!-- 4. Основной логический контроллер музея -->
-  <script src="js/tech-modules.js"></script>
   <script src="js/app.js"></script>
   <script src="js/admin.js"></script>
+  <script src="js/tech-modules.js"></script>
 
   <!-- Интерактивные триггеры страницы -->
   <script>
-    // 1. Мобильное меню
-    const mobileToggle = document.getElementById('mobileMenuToggle');
-    const mobileDrawer = document.getElementById('mobileNavDrawer');
-    if (mobileToggle && mobileDrawer) {
-      mobileToggle.addEventListener('click', () => {
-        const isOpen = mobileDrawer.classList.toggle('active');
-        mobileToggle.classList.toggle('open');
-        mobileToggle.setAttribute('aria-expanded', isOpen);
-        mobileDrawer.setAttribute('aria-hidden', !isOpen);
-      });
-      document.querySelectorAll('.mobile-nav-link').forEach(link => {
-        link.addEventListener('click', () => {
-          mobileDrawer.classList.remove('active');
-          mobileToggle.classList.remove('open');
-          mobileToggle.setAttribute('aria-expanded', 'false');
-          mobileDrawer.setAttribute('aria-hidden', 'true');
-        });
-      });
-    }
-
-    // 2. Модальное окно паспорта музея
+    // Паспорт проекта
     const passportModal = document.getElementById('passportModal');
     const btnPassport = document.getElementById('btnOpenPassport');
-    const btnPassportMob = document.getElementById('btnOpenPassportMobile');
     const btnPassportClose = document.getElementById('passportModalCloseBtn');
     const passportOverlay = document.getElementById('passportModalOverlay');
 
     function togglePassport(show) {
       if (passportModal) {
         passportModal.classList.toggle('active', show);
-        passportModal.setAttribute('aria-hidden', !show);
         document.body.style.overflow = show ? 'hidden' : 'auto';
       }
     }
 
     if (btnPassport) btnPassport.addEventListener('click', () => togglePassport(true));
-    if (btnPassportMob) btnPassportMob.addEventListener('click', () => togglePassport(true));
     if (btnPassportClose) btnPassportClose.addEventListener('click', () => togglePassport(false));
     if (passportOverlay) passportOverlay.addEventListener('click', () => togglePassport(false));
 
-    // 3. Быстрые смарт-теги поиска
+    // Смарт-чипы поиска
     document.querySelectorAll('.chip-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const query = btn.dataset.query;
@@ -559,7 +476,7 @@
       });
     });
 
-    // 4. Очистка поиска
+    // Очистка поиска
     const searchInput = document.getElementById('heroSearchInput');
     const searchClearBtn = document.getElementById('searchClearBtn');
     if (searchInput && searchClearBtn) {
@@ -573,7 +490,7 @@
       });
     }
 
-    // 5. Переключение вида плит мемориала
+    // Переключение плит мемориала
     document.querySelectorAll('.plaque-toggle-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.plaque-toggle-btn').forEach(b => b.classList.remove('active'));
@@ -595,31 +512,17 @@
       });
     });
 
-    // 6. Подсчет общего количества зажженных свечей
-    function updateTotalCandles() {
-      const candles = JSON.parse(localStorage.getItem('srmk_museum_candles') || '{}');
-      const total = Object.values(candles).reduce((a, b) => a + b, 0);
-      const display = document.getElementById('totalCandlesCount');
-      const statDisplay = document.getElementById('heroTotalCandlesStat');
-      if (display) display.textContent = total;
-      if (statDisplay) statDisplay.textContent = total;
-    }
-    updateTotalCandles();
-    window.addEventListener('storage', updateTotalCandles);
-
-    // 7. Режимы доступности (ГОСТ)
+    // Доступность
     const contrastBtn = document.getElementById('toggleContrastBtn');
     if (contrastBtn) {
       contrastBtn.addEventListener('click', () => {
-        const isHigh = document.body.classList.toggle('high-contrast');
-        contrastBtn.setAttribute('aria-pressed', isHigh);
+        document.body.classList.toggle('high-contrast');
       });
     }
     const fontBtn = document.getElementById('toggleFontSizeBtn');
     if (fontBtn) {
       fontBtn.addEventListener('click', () => {
-        const isLarge = document.body.classList.toggle('large-text');
-        fontBtn.setAttribute('aria-pressed', isLarge);
+        document.body.classList.toggle('large-text');
       });
     }
   </script>
