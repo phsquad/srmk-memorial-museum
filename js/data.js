@@ -123,7 +123,7 @@ const heroesDatabase = [
     category: "svo_memorial",
     specTag: "electro",
     name: "Белов Сергей Александрович",
-    dates: { birth: "05.01.1995", death: "2023", years: "1995 — 2023" },
+    dates: { birth: "05.01.1995", death: "2025", years: "1995 — 2025" },
     education: {
       specialty: "Электрооборудование и электроэнергетика",
       period: "2011 — 2015 гг.",
