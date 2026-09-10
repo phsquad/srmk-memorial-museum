@@ -27,6 +27,7 @@ const GuestbookEngine = {
 
   init() {
     this.loadStorage();
+    this.loadCloudStorage();
     this.populateHeroDropdowns();
     this.bindDOMEvents();
     this.restoreDraft();
@@ -48,6 +49,16 @@ const GuestbookEngine = {
       this.tributes = [];
       this.userFlames = {};
     }
+  },
+
+  async loadCloudStorage() {
+    if (!window.CloudSync?.isLive) return;
+    const cloudTributes = await CloudSync.fetchTributes();
+    if (!cloudTributes) return;
+    this.tributes = cloudTributes;
+    this.saveStorage();
+    this.renderWall();
+    this.updateStats();
   },
 
   saveStorage() {
@@ -240,6 +251,16 @@ const GuestbookEngine = {
     this.saveFlames();
     this.renderWall();
     this.updateStats();
+
+    if (window.CloudSync?.isLive) {
+      CloudSync.toggleFlame(tributeId, this.userFlames[tributeId] ? 1 : -1).then(cloudFlames => {
+        if (!Number.isFinite(cloudFlames)) return;
+        tribute.flames = cloudFlames;
+        this.saveStorage();
+        this.renderWall();
+        this.updateStats();
+      });
+    }
   },
 
   /**
@@ -306,6 +327,7 @@ const GuestbookEngine = {
 
     this.saveStorage();
     this.saveFlames();
+    if (window.CloudSync?.isLive) CloudSync.sendTribute(newTribute);
     this.closeModal();
     this.renderWall();
     this.updateStats();

@@ -60,6 +60,7 @@ const App = {
   init() {
     this.cacheDOM();
     this.loadStorageData();
+    this.loadCloudData();
 
     // 1. Мгновенная отрисовка базового контента
     this.renderMemorialPlaques();
@@ -126,6 +127,19 @@ const App = {
     } catch (e) {
       AppState.candles = {};
     }
+  },
+
+  async loadCloudData() {
+    if (!window.CloudSync?.isLive) return;
+    const cloudData = await CloudSync.fetchAllCounters();
+    if (!cloudData) return;
+
+    AppState.candles = { ...AppState.candles, ...cloudData.candles };
+    AppState.flowersCount = cloudData.flowers;
+    localStorage.setItem('srmk_museum_candles', JSON.stringify(AppState.candles));
+    this.updateMemorialStats();
+    this.renderCardsGrid();
+    this.renderMemorialPlaques();
   },
 
   bindEvents() {
@@ -603,6 +617,17 @@ const App = {
       AppState.candles[heroId] = newCount;
       localStorage.setItem('srmk_museum_candles', JSON.stringify(AppState.candles));
 
+      if (window.CloudSync?.isLive) {
+        CloudSync.pushCandle(heroId).then(cloudCount => {
+          if (!Number.isFinite(cloudCount)) return;
+          AppState.candles[heroId] = cloudCount;
+          localStorage.setItem('srmk_museum_candles', JSON.stringify(AppState.candles));
+          this.updateMemorialStats();
+          this.renderCardsGrid();
+          this.renderMemorialPlaques();
+        });
+      }
+
       const countDisplay = document.getElementById('candleCountDisplay');
       if (countDisplay) countDisplay.textContent = newCount;
 
@@ -613,6 +638,7 @@ const App = {
     }
 
     if (type === 'flowers') {
+      if (window.CloudSync?.isLive) CloudSync.pushFlower(heroId);
       this.playMemorialBellSynthesizer();
 
       // Анимация летящих цветов
