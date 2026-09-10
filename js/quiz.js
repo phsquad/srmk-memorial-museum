@@ -346,9 +346,20 @@ const QuizEngine = {
   },
 
   /**
-   * 7. Перенаправление на certificate.html с автозаполнением
+   * 7. Перенаправление на certificate.html с автозаполнением и записью в БД
    */
-  claimCertificate() {
+  async claimCertificate() {
+    const btn = document.getElementById('btnClaimCert');
+    if (btn) {
+      btn.innerHTML = '⏳ Сохранение результата в облаке...';
+      btn.style.pointerEvents = 'none';
+    }
+
+    // Сохраняем результат в глобальную таблицу лидеров Supabase
+    if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
+      await CloudSync.saveQuizResult(this.participant.name, this.score);
+    }
+
     const params = new URLSearchParams({
       role: 'student',
       name: this.participant.name,

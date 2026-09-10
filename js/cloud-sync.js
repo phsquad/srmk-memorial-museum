@@ -1,13 +1,13 @@
 /**
  * ============================================================================
- * ГЛОБАЛЬНАЯ СИНХРОНИЗАЦИЯ OMNI-SYNC: js/cloud-sync.js (v3.0)
+ * ГЛОБАЛЬНАЯ СИНХРОНИЗАЦИЯ OMNI-SYNC: js/cloud-sync.js (v4.0 Master)
  * ============================================================================
  */
 
 'use strict';
 
 const CloudConfig = {
-  // ❗️ ВСТАВЬТЕ ВАШИ КЛЮЧИ SUPABASE СЮДА:
+  // Реальные ключи проекта Supabase.
   SUPABASE_URL: "https://qtafcczydgyrganrpkof.supabase.co",
   SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0YWZjY3p5ZGd5cmdhbnJwa29mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwNTg5MDEsImV4cCI6MjEwNDYzNDkwMX0.i_hFegr6BHix6eFEasgyICDE6Lcy5wbwbU6dArG-wFg"
 };
@@ -32,15 +32,15 @@ const CloudSync = {
       id: tribute.id,
       author: tribute.author,
       role: tribute.role,
-      role_label: tribute.roleLabel,
-      dedication_id: tribute.dedicationId,
-      dedication_name: tribute.dedicationName,
+      role_label: tribute.roleLabel ?? tribute.role_label,
+      dedication_id: tribute.dedicationId ?? tribute.dedication_id,
+      dedication_name: tribute.dedicationName ?? tribute.dedication_name,
       message: tribute.message,
       theme: tribute.theme,
       date: tribute.date,
       flames: tribute.flames || 0,
-      is_pinned: Boolean(tribute.isPinned),
-      is_verified: Boolean(tribute.isVerified)
+      is_pinned: Boolean(tribute.isPinned ?? tribute.is_pinned),
+      is_verified: Boolean(tribute.isVerified ?? tribute.is_verified)
     };
   },
 
@@ -52,7 +52,7 @@ const CloudSync = {
         this.subscribeRealtime();
         console.log("[CloudSync] 🌐 OMNI-SYNC подключен. Все модули работают в реальном времени.");
       } catch (err) {
-        console.warn("[CloudSync] Ошибка подключения к облаку.");
+        console.warn("[CloudSync] Ошибка подключения к облаку:", err);
       }
     }
   },
@@ -75,7 +75,10 @@ const CloudSync = {
             if (candleDisplay && AppState.currentHeroId === row.hero_id) candleDisplay.textContent = row.candles;
           }
         }
-        if (typeof TechModules !== 'undefined') TechModules.syncFlowerCounters();
+        this.fetchAllCounters().then(data => {
+          const flowersDisplay = document.getElementById('flowersCountDisplay');
+          if (data && flowersDisplay) flowersDisplay.textContent = data.flowers;
+        });
       }).subscribe();
 
     // Слушатель Стены Памяти
@@ -128,13 +131,24 @@ const CloudSync = {
   },
   async toggleFlame(tributeId, delta) {
     if (!this.isLive) return null;
-    await this.client.rpc('toggle_tribute_flame', { target_tribute_id: tributeId, delta: delta });
+    const { data, error } = await this.client.rpc('toggle_tribute_flame', {
+      target_tribute_id: tributeId,
+      delta: delta
+    });
+    if (error) return null;
+    return data;
   },
 
   // --- МЕТОДЫ СЕРТИФИКАТОВ (НОВОЕ) ---
   async registerCertificate(certObj) {
     if (!this.isLive) return false;
     const { error } = await this.client.from('certificates_registry').insert([certObj]);
+    return !error;
+  },
+  async registerCertificatesBatch(certArray) {
+    if (!this.isLive) return false;
+    const { error } = await this.client.from('certificates_registry').insert(certArray);
+    if (error) console.error("Ошибка регистрации сертификатов:", error);
     return !error;
   },
   async verifyCertificate(serial) {

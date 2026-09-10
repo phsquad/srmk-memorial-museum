@@ -381,10 +381,10 @@
     </div>
   </footer>
 
-  <!-- SUPABASE REALTIME CLOUD SDK -->
+  <!-- ПОДКЛЮЧЕНИЕ ОБЛАКА -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/cloud-sync.js"></script>
-  <script src="js/certificate-verifier.js"></script>
+
   <script>
     'use strict';
 
@@ -406,7 +406,7 @@
       document.getElementById('cardSerial').textContent = serial;
       statusTitle.textContent = "ПОИСК В ГЛОБАЛЬНОМ РЕЕСТРЕ SUPABASE...";
 
-      // Ждем загрузки CloudSync
+      // Ждем 1 секунду для подключения CloudSync
       setTimeout(async () => {
         if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
           const certData = await CloudSync.verifyCertificate(serial);
@@ -431,6 +431,8 @@
             document.getElementById('cardDate').textContent = "НЕИЗВЕСТНО";
             document.getElementById('cardCryptoHash').textContent = "ОТКАЗ ВЕРИФИКАЦИИ";
           }
+        } else {
+          statusTitle.textContent = "ОБЛАКО НЕДОСТУПНО. ПРОВЕРЬТЕ ПОДКЛЮЧЕНИЕ.";
         }
       }, 1000);
 

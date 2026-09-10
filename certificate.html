@@ -720,7 +720,55 @@
           if (el) el.addEventListener('input', () => this.renderPreview());
         });
 
-        document.getElementById('btnPrintPDF').addEventListener('click', () => window.print());
+        // Печать и запись в БД
+        document.getElementById('btnPrintPDF').addEventListener('click', async () => {
+          const btn = document.getElementById('btnPrintPDF');
+          btn.innerHTML = '⏳ Регистрация в базе...';
+          btn.style.pointerEvents = 'none';
+
+          // Собираем данные всех сгенерированных сертификатов с экрана
+          const sheets = document.querySelectorAll('.certificate-sheet');
+          const certsToRegister = [];
+
+          for (const sheet of sheets) {
+            const serialText = sheet.querySelector('.cert-serial-meta')?.textContent || '';
+            const serialMatch = serialText.match(/№ (СРМК-УМ-2026-\d+)/);
+            if (!serialMatch) continue;
+
+            const serial = serialMatch[1];
+            const name = sheet.querySelector('.cert-recipient-name')?.textContent.trim() || '';
+            const metaText = sheet.querySelector('.cert-recipient-meta')?.textContent || '';
+            const dateText = sheet.querySelector('.cert-sign-col.right div:last-child')?.textContent
+              .replace('Дата: ', '').trim() || '';
+
+            // Генерируем криптографический хэш
+            const buffer = new TextEncoder().encode(serial + name + dateText + 'SRMK_VERIFY_SALT_2026');
+            const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+            const hashHex = Array.from(new Uint8Array(hashBuffer))
+              .map(byte => byte.toString(16).padStart(2, '0'))
+              .join('');
+
+            certsToRegister.push({
+              serial,
+              student_name: name,
+              group_name: metaText.split('•')[0].replace('Обучающийся группы', '').trim() || null,
+              specialty: metaText.split('•')[1]?.replace('Специальность:', '').trim() || null,
+              nomination: document.getElementById('selectNomination').value,
+              issue_date: dateText,
+              crypto_hash: hashHex
+            });
+          }
+
+          // Отправляем пакет сертификатов в глобальное облако Supabase
+          if (typeof CloudSync !== 'undefined' && CloudSync.isLive && certsToRegister.length > 0) {
+            await CloudSync.registerCertificatesBatch(certsToRegister);
+          }
+
+          // Возвращаем кнопку в исходное состояние и запускаем печать
+          btn.innerHTML = '<span>🖨️</span> Распечатать / Сохранить в PDF';
+          btn.style.pointerEvents = 'auto';
+          window.print();
+        });
 
         document.getElementById('btnQuickFill').addEventListener('click', () => {
           if (this.role === 'student') {
