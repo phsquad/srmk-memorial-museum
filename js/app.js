@@ -617,7 +617,7 @@ const App = {
       AppState.candles[heroId] = newCount;
       localStorage.setItem('srmk_museum_candles', JSON.stringify(AppState.candles));
 
-      if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
+      if (window.CloudSync?.isLive) {
         const cloudCount = await CloudSync.pushCandle(heroId);
         if (Number.isFinite(cloudCount)) {
           AppState.candles[heroId] = cloudCount;
