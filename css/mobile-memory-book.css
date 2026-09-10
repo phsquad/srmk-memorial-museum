@@ -1,0 +1,172 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   МОБИЛЬНЫЕ СТИЛИ КНИГИ ПАМЯТИ: css/mobile-memory-book.css
+   ========================================================================== */
+@media (max-width: 900px) {
+
+  .book-header {
+    padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
+  }
+
+  .header-container {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .btn-header {
+    padding: 6px 12px;
+    font-size: 0.74rem;
+    flex-shrink: 0;
+  }
+
+  .book-hero {
+    padding: 45px 0 35px;
+  }
+
+  .hero-title {
+    font-size: 1.65rem;
+  }
+
+  .hero-quote {
+    font-size: 0.92rem;
+    padding: 0 10px;
+  }
+
+  .hero-stats-row {
+    gap: 8px;
+  }
+
+  .stat-badge {
+    font-size: 0.75rem;
+    padding: 5px 12px;
+  }
+
+  /* Панель поиска */
+  .book-controls-bar {
+    position: static;
+    padding: 12px 0;
+  }
+
+  .controls-inner {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .search-box {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .filters-pills {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+  }
+
+  .filter-pill {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Сетка летописи */
+  .book-layout {
+    grid-template-columns: 1fr;
+    padding: 20px 16px calc(70px + env(safe-area-inset-bottom, 0px));
+    gap: 20px;
+  }
+
+  .book-toc-sidebar {
+    display: none; /* Скрываем боковую панель на мобильных */
+  }
+
+  .hero-chapter-card {
+    padding: 18px 16px;
+  }
+
+  .chapter-hero-header {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 14px;
+  }
+
+  .chapter-photo-wrap {
+    margin: 0 auto;
+    width: 130px;
+    height: 170px;
+  }
+
+  .chapter-hero-titles h3 {
+    font-size: 1.25rem;
+  }
+
+  .chapter-actions-bar {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .btn-chapter {
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+  }
+
+  /* Полноэкранный ридер на смартфоне */
+  .reader-modal {
+    padding: 0;
+  }
+
+  .reader-dialog {
+    height: 100%;
+    max-width: 100%;
+    border-radius: 0;
+    border: none;
+  }
+
+  .reader-topbar {
+    padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px;
+  }
+
+  .markdown-body {
+    padding: 20px 16px 80px;
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  .markdown-body h1 {
+    font-size: 1.4rem;
+  }
+
+  .markdown-body h2 {
+    font-size: 1.15rem;
+  }
+
+  /* Плавающий аудиоплеер */
+  .book-audio-bar {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .audio-bar-content {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .audio-info {
+    min-width: 140px;
+    max-width: calc(100vw - 120px);
+  }
+
+  .audio-timer {
+    display: none;
+  }
+}

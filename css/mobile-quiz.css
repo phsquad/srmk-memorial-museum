@@ -1,0 +1,111 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   МОБИЛЬНЫЕ СТИЛИ КВЕСТ-ВИКТОРИНЫ: css/mobile-quiz.css
+   ========================================================================== */
+@media (max-width: 768px) {
+
+  .quiz-header {
+    padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
+  }
+
+  .header-actions {
+    display: none; /* На экране квеста скрываем лишнее */
+  }
+
+  .quiz-main-wrapper {
+    padding: 20px 12px calc(40px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .quiz-card {
+    padding: 20px 16px;
+  }
+
+  .quest-title {
+    font-size: 1.35rem;
+  }
+
+  .criteria-callout {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .student-reg-form {
+    padding: 16px 12px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .btn-start-quest {
+    padding: 13px;
+    font-size: 0.88rem;
+  }
+
+  /* Вопрос */
+  .question-text {
+    font-size: 1.05rem;
+    line-height: 1.35;
+    margin-bottom: 18px;
+  }
+
+  .option-btn {
+    padding: 12px;
+    font-size: 0.82rem;
+    gap: 10px;
+  }
+
+  .option-letter {
+    width: 22px;
+    height: 22px;
+    font-size: 0.75rem;
+  }
+
+  .explanation-box {
+    padding: 14px;
+    margin-top: 18px;
+  }
+
+  .btn-next-question {
+    width: 100%;
+    padding: 12px;
+  }
+
+  /* Результаты */
+  .result-title {
+    font-size: 1.35rem;
+  }
+
+  .result-score-circle {
+    width: 110px;
+    height: 110px;
+  }
+
+  .score-digit {
+    font-size: 1.7rem;
+  }
+
+  .winner-actions-box {
+    padding: 18px 14px;
+  }
+
+  .btn-claim-cert {
+    width: 100%;
+    padding: 14px;
+  }
+
+  .retry-btn-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .btn-secondary-action {
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+  }
+}

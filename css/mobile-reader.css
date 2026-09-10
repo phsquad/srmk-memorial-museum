@@ -1,0 +1,133 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   МОБИЛЬНЫЕ СТИЛИ 3D-ЧИТАЛКИ И ПОЛКИ: css/mobile-reader.css
+   ========================================================================== */
+@media (max-width: 900px) {
+
+  .reader-header {
+    padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
+  }
+
+  .header-container {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .shelf-hero-banner {
+    padding: 36px 0 24px;
+  }
+
+  .hero-title {
+    font-size: 1.65rem;
+  }
+
+  .shelf-toolbar {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .shelf-filters {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .shelf-filter-btn {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Книжная полка на мобильном (2 колонки) */
+  .bookshelf-tier {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    padding: 12px 10px;
+  }
+
+  .book-spine-card {
+    height: 300px;
+    padding: 14px 10px;
+  }
+
+  .book-spine-portrait {
+    width: 70px;
+    height: 95px;
+  }
+
+  .book-spine-title {
+    font-size: 0.88rem;
+  }
+
+  .book-spine-spec {
+    font-size: 0.68rem;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* 3D-читалка: 1 страница вместо 2 */
+  .reader-control-panel {
+    padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px;
+  }
+
+  .meta-hero-name {
+    font-size: 0.88rem;
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .book-stage-wrapper {
+    padding: 10px;
+  }
+
+  .folio-book-3d {
+    width: 100%;
+    height: calc(100vh - 160px);
+    grid-template-columns: 1fr;
+    box-shadow: none;
+  }
+
+  .page-left {
+    display: none; /* Скрываем левую страницу, листаем по одной */
+  }
+
+  .page-right {
+    border-radius: 4px;
+    padding: 20px 16px;
+  }
+
+  .book-spine-crease, .ribbon-bookmark {
+    display: none;
+  }
+
+  .flip-nav-btn {
+    width: 42px;
+    height: 42px;
+    font-size: 1.1rem;
+    background: rgba(14, 16, 22, 0.92);
+  }
+  .prev-btn { left: 8px; }
+  .next-btn { right: 8px; }
+
+  .shortcut-tip {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .bookshelf-tier {
+    grid-template-columns: 1fr;
+  }
+}

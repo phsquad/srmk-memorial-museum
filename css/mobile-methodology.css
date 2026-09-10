@@ -1,0 +1,139 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   МОБИЛЬНЫЕ СТИЛИ МЕТОДИЧЕСКОГО КАБИНЕТА: css/mobile-methodology.css
+   ========================================================================== */
+@media (max-width: 900px) {
+  
+  .method-header {
+    padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  .header-nav {
+    width: 100%;
+    display: flex;
+    gap: 6px;
+  }
+
+  .nav-btn {
+    flex: 1;
+    text-align: center;
+    padding: 8px 6px;
+    font-size: 0.74rem;
+  }
+
+  .method-hero {
+    padding: 36px 0 28px;
+  }
+
+  .hero-title {
+    font-size: 1.5rem;
+    line-height: 1.25;
+  }
+
+  .hero-desc {
+    font-size: 0.86rem;
+    margin-bottom: 20px;
+  }
+
+  .hero-quick-stats {
+    gap: 8px;
+  }
+
+  .stat-pill {
+    padding: 5px 12px;
+    font-size: 0.74rem;
+  }
+
+  /* Горизонтальная свайп-лента вкладок */
+  .tabs-nav-wrapper {
+    top: 0;
+  }
+
+  .tabs-container {
+    padding: 8px 16px;
+    gap: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tab-btn {
+    padding: 8px 14px;
+    font-size: 0.78rem;
+    flex-shrink: 0;
+  }
+
+  .method-main {
+    padding: 24px 16px 60px;
+  }
+
+  .section-topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .action-btn {
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+  }
+
+  .paper-card {
+    padding: 16px;
+  }
+
+  .meta-doc-header {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 12px;
+    font-size: 0.78rem;
+  }
+
+  /* Адаптивные карточки микрогрупп */
+  .cards-grid-layout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .task-card {
+    padding: 16px;
+  }
+
+  .task-card-footer {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mini-btn {
+    width: 100%;
+    padding: 10px;
+  }
+
+  /* Спецкурсы и компетенции */
+  .integration-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .competence-box {
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .comp-badge {
+    align-self: flex-start;
+  }
+}
