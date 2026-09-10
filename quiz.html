@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Исторический квест «Дорогами мужества» | ГБПОУ СРМК</title>
+  <meta name="description" content="Интерактивная викторина по экспозиции виртуального музея «Быть воином — жить вечно». Проверьте знания о подвигах 20 героев колледжа и получите именной сертификат.">
+  <meta name="theme-color" content="#0a0c0f">
+
+  <!-- Шрифты Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+
+  <!-- Стили -->
+  <link rel="stylesheet" href="css/quiz.css">
+</head>
+<body class="dark-theme">
+
+  <!-- ШАПКА -->
+  <header class="quiz-header">
+    <div class="container header-container">
+      <div class="header-left">
+        <a href="index.html" class="logo-badge">СРМК</a>
+        <div class="header-titles">
+          <span class="sub-title">Интерактивный практикум</span>
+          <h1 class="main-title">Квест-викторина «Дорогами мужества»</h1>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a href="memory-book.html" class="btn-header">📖 Книга Памяти</a>
+        <a href="reader.html" class="btn-header">📚 Фолиант 3D</a>
+        <a href="index.html" class="btn-header btn-primary">← В 3D-музей</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ИНДИКАТОР ПРОГРЕССА ТЕСТА -->
+  <div class="quiz-progress-track">
+    <div class="quiz-progress-bar" id="quizProgressBar"></div>
+  </div>
+
+  <main class="container quiz-main-wrapper">
+    
+    <!-- ==========================================================================
+         ЭКРАН 1: СТАРТОВЫЙ БРИФИНГ И ВВОД ДАННЫХ СТУДЕНТА
+         ========================================================================== -->
+    <section class="quiz-card start-card" id="startScreen">
+      
+      <div class="quest-crest">⭐️</div>
+      <div class="quest-badge">Всероссийская акция «Карта доблести» • Модуль контроля</div>
+      <h2 class="quest-title">ИСПЫТАНИЕ ПАМЯТЬЮ И СЛАВОЙ</h2>
+      <p class="quest-desc">
+        Вам предстоит ответить на <strong>10 вопросов</strong> по экспозиции Мемориала Славы, биографиям 20 героев-выпускников, их воинским специальностям и рубежам боевых действий.
+      </p>
+
+      <div class="criteria-callout">
+        <div class="criteria-icon">📜</div>
+        <div class="criteria-text">
+          <strong>Критерий победы:</strong> Наберите <strong>80% и выше</strong> (от 8 правильных ответов), и система автоматически выпишет официальный именной <strong>Сертификат Победителя</strong> с верификацией в реестре СРМК.
+        </div>
+      </div>
+
+      <!-- Форма участника для автозаполнения сертификата -->
+      <div class="student-reg-form">
+        <h3 class="form-title">Данные участника для внесения в наградной реестр:</h3>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">ФИО обучающегося (Дательный падеж):</label>
+            <input type="text" id="participantName" class="form-input" placeholder="Иванову Даниле Денисовичу" value="">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Учебная группа:</label>
+            <input type="text" id="participantGroup" class="form-input" placeholder="Например: ИС-241, СП-232" value="">
+          </div>
+
+          <div class="form-group full-width">
+            <label class="form-label">Специальность (Код и наименование):</label>
+            <select id="participantSpecialty" class="form-select">
+              <option value="09.02.11 Разработка и управление программным обеспечением" selected>09.02.11 Разработка и управление программным обеспечением</option>
+              <option value="15.02.19 Сварочное производство">15.02.19 Сварочное производство</option>
+              <option value="13.02.13 Эксплуатация и обслуживание электрического и электромеханического оборудования (по отраслям)">13.02.13 Эксплуатация и обслуживание электрического и электромеханического оборудования</option>
+              <option value="09.02.06 Сетевое и системное администрирование">09.02.06 Сетевое и системное администрирование</option>
+              <option value="15.02.16 Технология машиностроения">15.02.16 Технология машиностроения</option>
+              <option value="20.02.04 Пожарная безопасность">20.02.04 Пожарная безопасность</option>
+              <option value="23.02.07 Техническое обслуживание и ремонт автотранспортных средств">23.02.07 Техническое обслуживание и ремонт автотранспортных средств</option>
+              <option value="40.02.02 Правоохранительная деятельность">40.02.02 Правоохранительная деятельность</option>
+              <option value="38.02.01 Экономика и бухгалтерский учет (по отраслям)">38.02.01 Экономика и бухгалтерский учет (по отраслям)</option>
+              <option value="29.02.10 Конструирование, моделирование и технология изготовления изделий легкой промышленности (по видам)">29.02.10 Конструирование, моделирование и технология изделий легкой промышленности</option>
+              <option value="40.02.04 Юриспруденция">40.02.04 Юриспруденция</option>
+              <option value="15.01.05 Сварщик (ручной и частично механизированной сварки (наплавки))">15.01.05 Сварщик (ручной и частично механизированной сварки)</option>
+              <option value="13.01.10 Электромонтер по ремонту и обслуживанию электрооборудования (по отраслям)">13.01.10 Электромонтер по ремонту и обслуживанию электрооборудования</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn-start-quest" id="btnStartQuest" onclick="QuizEngine.startQuest()" type="button">
+          ⚔️ Начать прохождение квеста
+        </button>
+      </div>
+
+    </section>
+
+    <!-- ==========================================================================
+         ЭКРАН 2: ИНТЕРАКТИВНЫЙ ВОПРОС
+         ========================================================================== -->
+    <section class="quiz-card question-card" id="questionScreen" style="display:none;">
+      
+      <div class="question-header-meta">
+        <span class="q-number" id="qNumberDisplay">Вопрос 1 из 10</span>
+        <span class="q-theme-badge" id="qThemeBadge">Специальности СРМК</span>
+        <span class="q-score-live" id="qScoreDisplay">Баллы: 0</span>
+      </div>
+
+      <h3 class="question-text" id="questionTextDisplay">Текст вопроса...</h3>
+
+      <!-- Варианты ответов -->
+      <div class="options-list" id="optionsContainer">
+        <!-- Генерируются через JS -->
+      </div>
+
+      <!-- Блок обратной связи с исторической справкой -->
+      <div class="explanation-box" id="explanationBox" style="display:none;">
+        <div class="exp-status" id="expStatusText">Верно!</div>
+        <p class="exp-desc" id="expDescriptionText">Историческая справка...</p>
+        <button class="btn-next-question" id="btnNextQuestion" onclick="QuizEngine.nextQuestion()" type="button">
+          Следующий вопрос →
+        </button>
+      </div>
+
+    </section>
+
+    <!-- ==========================================================================
+         ЭКРАН 3: ФИНАЛЬНЫЙ РЕЗУЛЬТАТ И НАГРАЖДЕНИЕ
+         ========================================================================== -->
+    <section class="quiz-card result-card" id="resultScreen" style="display:none;">
+      
+      <div class="result-crest" id="resultCrest">🏆</div>
+      <h2 class="result-title" id="resultTitle">ИСПЫТАНИЕ ЗАВЕРШЕНО</h2>
+      <div class="result-score-circle">
+        <span class="score-digit" id="finalScoreDigits">9/10</span>
+        <span class="score-percent" id="finalPercentDigits">90%</span>
+      </div>
+      
+      <p class="result-message" id="resultMessageText">
+        Поздравляем! Вы продемонстрировали глубокие знания истории колледжа и ратного подвига 20 выпускников.
+      </p>
+
+      <!-- Блок победителя (≥ 80%) -->
+      <div class="winner-actions-box" id="winnerBox" style="display:none;">
+        <div class="winner-badge-ribbon">🎖 ВЫПОЛНЕН НОРМАТИВ ПОБЕДИТЕЛЯ</div>
+        <p style="font-size:0.88rem; color:#d1d7e0; margin-bottom:16px;">
+          Ваш результат внесен в электронный реестр. Нажмите кнопку ниже, чтобы сгенерировать именной наградной Сертификат с подписью директора и защитным QR-кодом.
+        </p>
+        <button class="btn-claim-cert" id="btnClaimCert" onclick="QuizEngine.claimCertificate()" type="button">
+          📜 Оформить Сертификат Победителя
+        </button>
+      </div>
+
+      <!-- Блок повторной попытки (< 80%) -->
+      <div class="retry-actions-box" id="retryBox" style="display:none;">
+        <p style="font-size:0.88rem; color:#9da6b3; margin-bottom:16px;">
+          Для получения Сертификата Победителя необходимо набрать не менее 8 правильных ответов (80%). Рекомендуем изучить очерки в Книге Памяти и повторить попытку.
+        </p>
+        <div class="retry-btn-group">
+          <button class="btn-secondary-action" onclick="QuizEngine.restartQuest()" type="button">
+            🔄 Пройти квест заново
+          </button>
+          <a href="memory-book.html" class="btn-secondary-action">
+            📖 Читать Книгу Памяти
+          </a>
+        </div>
+      </div>
+
+      <div class="result-footer-nav">
+        <a href="index.html" class="back-link">← Вернуться на главную страницу музея</a>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ПОДВАЛ -->
+  <footer class="quiz-footer">
+    <div class="container">
+      <p>© 2026 ГБПОУ СРМК. Интерактивный образовательный модуль Всероссийской акции «Карта доблести: хранители подвигов».</p>
+    </div>
+  </footer>
+
+  <div id="quizToast" class="quiz-toast"></div>
+
+  <!-- СКРИПТЫ -->
+  <script src="js/quiz.js"></script>
+</body>
+</html>
