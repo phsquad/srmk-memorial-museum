@@ -72,6 +72,18 @@
     padding: 24px 16px 60px;
   }
 
+  .table-responsive {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .method-table {
+    min-width: 720px;
+  }
+
   .section-topbar {
     flex-direction: column;
     align-items: flex-start;

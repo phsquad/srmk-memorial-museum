@@ -462,6 +462,8 @@ body {
 /* Инерционная горизонтальная лента специальностей */
 .specialty-filters-bar {
   display: flex;
+  width: 100%;
+  min-width: 0;
   gap: 8px;
   overflow-x: auto;
   padding: 4px 0 14px;

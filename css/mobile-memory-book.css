@@ -13,10 +13,23 @@
     flex-direction: column;
     gap: 10px;
     align-items: flex-start;
+    min-width: 0;
+  }
+
+  .header-left,
+  .header-titles {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .header-titles .main-title {
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   .header-actions {
     width: 100%;
+    min-width: 0;
     overflow-x: auto;
     padding-bottom: 4px;
     -webkit-overflow-scrolling: touch;
