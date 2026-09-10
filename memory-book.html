@@ -18,24 +18,37 @@
 </head>
 <body class="dark-theme">
 
-  <!-- ВЕРХНЯЯ ШАПКА -->
+  <!-- ЕДИНАЯ ОЧИЩЕННАЯ ШАПКА -->
   <header class="book-header">
     <div class="container header-container">
+      
+      <!-- ЛОГОТИП И НАЗВАНИЕ -->
       <div class="header-left">
-        <a href="index.html" class="logo-badge">СРМК</a>
+        <a href="index.html" class="logo-badge" title="На главную музея">СРМК</a>
         <div class="header-titles">
           <span class="sub-title">Историко-мемориальный архив</span>
           <h1 class="main-title">Электронная Книга Памяти и Славы</h1>
         </div>
       </div>
-      <div class="header-actions">
-        <a href="reader.html" class="btn-header">Интерактивная читалка</a>
-        <a href="quiz.html" class="btn-header">Викторина</a>
-        <a href="certificate.html" class="btn-header">Генератор сертификатов</a>
-          <p><a href="methodology.html" class="footer-link">Методический кабинет</a> · <a href="quiz.html" class="footer-link">Викторина</a> · <a href="certificate.html" class="footer-link">Сертификаты</a> · <a href="verify.html" class="footer-link">Проверка</a></p>
-        <a href="methodology.html" class="btn-header">Методический кабинет</a>
-        <a href="index.html" class="btn-header btn-primary">← В виртуальный музей</a>
-      </div>
+
+      <!-- НАВИГАЦИОННОЕ МЕНЮ БЕЗ ДУБЛЕЙ И СЫРЫХ ССЫЛОК -->
+      <nav class="header-actions" aria-label="Навигация по разделам">
+        <a href="reader.html" class="btn-header" title="3D Фолиант с перелистыванием">
+          📚 Читалка 3D
+        </a>
+        <a href="quiz.html" class="btn-header" title="Интерактивная викторина">
+          ⚔️ Квест-квиз
+        </a>
+        <a href="certificate.html" class="btn-header" title="Генератор наградных документов">
+          📜 Сертификаты
+        </a>
+        <a href="methodology.html" class="btn-header" title="Банк уроков для преподавателей">
+          📑 Методкабинет
+        </a>
+        <a href="index.html" class="btn-header btn-primary" title="Вернуться в виртуальный 3D-музей">
+          ← В 3D-музей
+        </a>
+      </nav>
     </div>
   </header>
 
