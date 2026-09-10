@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Генератор сертификатов | Мемориальный комплекс СРМК</title>
+  <meta name="theme-color" content="#0a0c0f">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #0a0c0f;
+      --bg-surface: #14171e;
+      --bg-panel: #1a1f29;
+      --accent-brass: #c5a059;
+      --accent-brass-hover: #e0b86a;
+      --accent-granite: #8a1c22;
+      --text-main: #f1f3f7;
+      --text-muted: #9da6b3;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --font-serif: 'Cinzel', serif;
+      --font-sans: 'Montserrat', sans-serif;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0; padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-header {
+      background: rgba(14, 17, 23, 0.95);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .app-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .app-badge {
+      background: var(--accent-granite);
+      color: #fff;
+      font-family: var(--font-serif);
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 6px 12px;
+      border-radius: 2px;
+    }
+
+    .app-title {
+      font-size: 1.05rem;
+      font-family: var(--font-serif);
+      color: var(--accent-brass);
+    }
+
+    .btn-back-museum {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+    .btn-back-museum:hover { color: #fff; }
+
+    .generator-workspace {
+      display: grid;
+      grid-template-columns: 440px 1fr;
+      flex-grow: 1;
+      height: calc(100vh - 65px);
+    }
+
+    .controls-sidebar {
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-color);
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .control-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--accent-brass);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      padding: 10px 12px;
+      border-radius: 4px;
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--accent-brass);
+    }
+
+    .segmented-control {
+      display: flex;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .segment-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .segment-btn.active {
+      background: var(--accent-brass);
+      color: #000;
+      font-weight: 700;
+    }
+
+    .action-buttons-group {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .btn-action-primary {
+      background: var(--accent-granite);
+      color: #fff;
+      border: none;
+      padding: 13px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+    .btn-action-primary:hover { background: #a8232b; }
+
+    .btn-action-secondary {
+      background: var(--bg-panel);
+      color: var(--accent-brass);
+      border: 1px solid var(--accent-brass);
+      padding: 11px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .preview-canvas-wrapper {
+      background: #06080a;
+      padding: 30px;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .preview-scale-box {
+      transform-origin: top center;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    /* БЛАНК А4 */
+    .certificate-sheet {
+      width: 297mm;
+      height: 210mm;
+      min-width: 297mm;
+      min-height: 210mm;
+      padding: 14mm;
+      position: relative;
+      box-shadow: 0 16px 50px rgba(0, 0, 0, 0.9);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      background-color: #fff;
+      color: #111;
+      page-break-after: always;
+    }
+
+    .certificate-sheet.theme-parchment {
+      background: radial-gradient(circle at 50% 50%, #fdfaf0 0%, #f4ebd2 100%);
+      color: #1a1714;
+    }
+
+    .certificate-sheet.theme-clean {
+      background: #ffffff;
+      color: #111111;
+    }
+
+    .cert-frame-outer {
+      position: absolute;
+      top: 8mm; left: 8mm; right: 8mm; bottom: 8mm;
+      border: 3px solid #8a1c22;
+      pointer-events: none;
+    }
+
+    .cert-frame-inner {
+      position: absolute;
+      top: 10mm; left: 10mm; right: 10mm; bottom: 10mm;
+      border: 1px solid #c5a059;
+      pointer-events: none;
+    }
+
+    .cert-frame-corner {
+      position: absolute;
+      width: 16mm; height: 16mm;
+      border: 2px solid #c5a059;
+    }
+    .corner-tl { top: 6mm; left: 6mm; border-right: none; border-bottom: none; }
+    .corner-tr { top: 6mm; right: 6mm; border-left: none; border-bottom: none; }
+    .corner-bl { bottom: 6mm; left: 6mm; border-right: none; border-top: none; }
+    .corner-br { bottom: 6mm; right: 6mm; border-left: none; border-top: none; }
+
+    .cert-header {
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .cert-ministry {
+      font-size: 8.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #8a1c22;
+      margin-bottom: 2mm;
+    }
+
+    .cert-college {
+      font-size: 11pt;
+      font-weight: 800;
+      color: #111;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2mm;
+    }
+
+    .cert-project-badge {
+      display: inline-block;
+      font-size: 8pt;
+      font-weight: 700;
+      color: #8a1c22;
+      background: rgba(138, 28, 34, 0.08);
+      padding: 1mm 4mm;
+      border: 1px solid rgba(138, 28, 34, 0.2);
+      border-radius: 2px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .cert-body-title {
+      text-align: center;
+      margin-top: 3mm;
+    }
+
+    .cert-main-word {
+      font-family: var(--font-serif);
+      font-size: 32pt;
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: #8a1c22;
+      line-height: 1;
+    }
+
+    .cert-sub-word {
+      font-size: 9.5pt;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #555;
+      margin-top: 1.5mm;
+    }
+
+    .cert-recipient-block {
+      text-align: center;
+      margin: 3mm 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    .cert-recipient-name {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 24pt;
+      font-weight: 700;
+      color: #111;
+      border-bottom: 2px solid #c5a059;
+      display: inline-block;
+      padding: 0 10mm 1mm;
+      min-width: 140mm;
+    }
+
+    .cert-recipient-meta {
+      font-size: 9.5pt;
+      font-weight: 600;
+      color: #444;
+      margin-top: 2.5mm;
+    }
+
+    .cert-recipient-meta span {
+      color: #8a1c22;
+      font-weight: 700;
+    }
+
+    .cert-reason-text {
+      text-align: center;
+      font-size: 9.5pt;
+      line-height: 1.5;
+      color: #2b2b2b;
+      max-width: 225mm;
+      margin: 0 auto;
+      font-style: italic;
+    }
+
+    .cert-reason-text strong {
+      font-style: normal;
+      color: #8a1c22;
+      font-weight: 700;
+    }
+
+    .cert-footer {
+      display: grid;
+      grid-template-columns: 1fr 95px 1fr;
+      align-items: flex-end;
+      position: relative;
+      z-index: 2;
+      padding-top: 2mm;
+    }
+
+    .cert-sign-col {
+      font-size: 8.5pt;
+      line-height: 1.35;
+    }
+
+    .cert-sign-col.left { text-align: left; }
+    .cert-sign-col.right { text-align: right; }
+    .cert-sign-role { font-weight: 700; color: #111; }
+    .cert-sign-name { font-weight: 600; color: #555; }
+
+    .cert-qr-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cert-qr-img {
+      width: 20mm;
+      height: 20mm;
+      border: 1px solid #c5a059;
+      padding: 1mm;
+      background: #fff;
+    }
+
+    .cert-qr-label {
+      font-size: 6pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #777;
+      margin-top: 1mm;
+    }
+
+    .cert-serial-meta {
+      position: absolute;
+      bottom: -6mm;
+      left: 0; right: 0;
+      text-align: center;
+      font-size: 7pt;
+      color: #888;
+      letter-spacing: 0.5px;
+    }
+
+    @page {
+      size: A4 landscape;
+      margin: 0;
+    }
+
+    @media print {
+      body { background: none !important; color: #000 !important; }
+      .app-header, .controls-sidebar, .preview-canvas-wrapper > :not(.preview-scale-box) { display: none !important; }
+      .generator-workspace { display: block !important; height: auto !important; }
+      .preview-canvas-wrapper { background: none !important; padding: 0 !important; display: block !important; }
+      .preview-scale-box { transform: none !important; gap: 0 !important; }
+      .certificate-sheet {
+        box-shadow: none !important; margin: 0 !important;
+        width: 297mm !important; height: 210mm !important;
+        page-break-after: always !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .generator-workspace { grid-template-columns: 1fr; height: auto; }
+      .controls-sidebar { border-right: none; border-bottom: 1px solid var(--border-color); }
+      .preview-scale-box { transform: scale(0.65); }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="app-title-group">
+      <div class="app-badge">СРМК</div>
+      <h1 class="app-title">Генератор наградных сертификатов Мемориального комплекса</h1>
+    </div>
+    <a href="index.html" class="btn-back-museum">← Вернуться в Музей</a>
+  </header>
+
+  <main class="generator-workspace">
+    
+    <!-- ЛЕВАЯ ПАНЕЛЬ: НАСТРОЙКИ И ВВОД -->
+    <aside class="controls-sidebar">
+      
+      <!-- Выбор роли: Студент vs Преподаватель -->
+      <div class="control-group">
+        <label class="control-label">Категория награждаемого:</label>
+        <div class="segmented-control">
+          <button class="segment-btn active" id="roleStudentBtn" type="button">🎓 Студент</button>
+          <button class="segment-btn" id="roleTeacherBtn" type="button">👨‍🏫 Преподаватель</button>
+        </div>
+      </div>
+
+      <!-- Режим генерации: Одиночный / Групповой -->
+      <div class="control-group" id="batchControlGroup">
+        <label class="control-label">Режим генерации:</label>
+        <div class="segmented-control">
+          <button class="segment-btn active" id="modeSingleBtn" type="button">Один бланк</button>
+          <button class="segment-btn" id="modeBatchBtn" type="button">Список группы (Пакет)</button>
+        </div>
+      </div>
+
+      <!-- Стиль оформления -->
+      <div class="control-group">
+        <label class="control-label">Стиль оформления:</label>
+        <div class="segmented-control">
+          <button class="segment-btn active" id="themeParchmentBtn" type="button">📜 Пергамент</button>
+          <button class="segment-btn" id="themeCleanBtn" type="button">📄 Белый А4</button>
+        </div>
+      </div>
+
+      <!-- ПОЛЯ ДЛЯ СТУДЕНТА (Одиночный режим) -->
+      <div id="studentSingleFields">
+        <div class="control-group">
+          <label class="control-label">ФИО обучающегося (Дательный падеж):</label>
+          <input type="text" id="inputStudentName" class="form-input" value="Иванову Даниле Денисовичу">
+        </div>
+
+        <div class="control-group" style="margin-top: 10px;">
+          <label class="control-label">Учебная группа:</label>
+          <input type="text" id="inputStudentGroup" class="form-input" value="ИС-241">
+        </div>
+
+        <div class="control-group" style="margin-top: 10px;">
+          <label class="control-label">Специальность СРМК:</label>
+          <select id="selectStudentSpecialty" class="form-select">
+            <option value="09.02.11 Разработка и управление программным обеспечением" selected>09.02.11 Разработка и управление программным обеспечением</option>
+            <option value="15.02.19 Сварочное производство">15.02.19 Сварочное производство</option>
+            <option value="13.02.13 Эксплуатация и обслуживание электрического и электромеханического оборудования (по отраслям)">13.02.13 Эксплуатация и обслуживание электрического и электромеханического оборудования</option>
+            <option value="09.02.06 Сетевое и системное администрирование">09.02.06 Сетевое и системное администрирование</option>
+            <option value="15.02.16 Технология машиностроения">15.02.16 Технология машиностроения</option>
+            <option value="20.02.04 Пожарная безопасность">20.02.04 Пожарная безопасность</option>
+            <option value="23.02.07 Техническое обслуживание и ремонт автотранспортных средств">23.02.07 Техническое обслуживание и ремонт автотранспортных средств</option>
+            <option value="40.02.02 Правоохранительная деятельность">40.02.02 Правоохранительная деятельность</option>
+            <option value="38.02.01 Экономика и бухгалтерский учет (по отраслям)">38.02.01 Экономика и бухгалтерский учет (по отраслям)</option>
+            <option value="29.02.10 Конструирование, моделирование и технология изготовления изделий легкой промышленности (по видам)">29.02.10 Конструирование, моделирование и технология изделий легкой промышленности</option>
+            <option value="40.02.04 Юриспруденция">40.02.04 Юриспруденция</option>
+            <option value="15.01.05 Сварщик (ручной и частично механизированной сварки (наплавки))">15.01.05 Сварщик (ручной и частично механизированной сварки)</option>
+            <option value="13.01.10 Электромонтер по ремонту и обслуживанию электрооборудования (по отраслям)">13.01.10 Электромонтер по ремонту и обслуживанию электрооборудования</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ПОЛЯ ДЛЯ СТУДЕНТА (Пакетный режим) -->
+      <div id="studentBatchFields" style="display: none;">
+        <div class="control-group">
+          <label class="control-label">Список студентов (По одному на строку):</label>
+          <textarea id="inputBatchList" class="form-textarea" rows="6">Иванову Даниле Денисовичу
+Смирновой Алине Викторовне
+Кузнецову Артему Павловичу
+Васильеву Дмитрию Олеговичу</textarea>
+        </div>
+        <div class="control-group" style="margin-top: 10px;">
+          <label class="control-label">Общая группа для списка:</label>
+          <input type="text" id="inputBatchGroup" class="form-input" value="СП-231">
+        </div>
+        <div class="control-group" style="margin-top: 10px;">
+          <label class="control-label">Специальность для всей группы:</label>
+          <select id="selectBatchSpecialty" class="form-select">
+            <option value="09.02.11 Разработка и управление программным обеспечением">09.02.11 Разработка и управление программным обеспечением</option>
+            <option value="15.02.19 Сварочное производство" selected>15.02.19 Сварочное производство</option>
+            <option value="13.02.13 Эксплуатация и обслуживание электрического и электромеханического оборудования (по отраслям)">13.02.13 Эксплуатация и обслуживание электрического и электромеханического оборудования</option>
+            <option value="09.02.06 Сетевое и системное администрирование">09.02.06 Сетевое и системное администрирование</option>
+            <option value="15.02.16 Технология машиностроения">15.02.16 Технология машиностроения</option>
+            <option value="20.02.04 Пожарная безопасность">20.02.04 Пожарная безопасность</option>
+            <option value="23.02.07 Техническое обслуживание и ремонт автотранспортных средств">23.02.07 Техническое обслуживание и ремонт автотранспортных средств</option>
+            <option value="40.02.02 Правоохранительная деятельность">40.02.02 Правоохранительная деятельность</option>
+            <option value="38.02.01 Экономика и бухгалтерский учет (по отраслям)">38.02.01 Экономика и бухгалтерский учет (по отраслям)</option>
+            <option value="29.02.10 Конструирование, моделирование и технология изготовления изделий легкой промышленности (по видам)">29.02.10 Конструирование, моделирование и технология изделий легкой промышленности</option>
+            <option value="40.02.04 Юриспруденция">40.02.04 Юриспруденция</option>
+            <option value="15.01.05 Сварщик (ручной и частично механизированной сварки (наплавки))">15.01.05 Сварщик (ручной и частично механизированной сварки)</option>
+            <option value="13.01.10 Электромонтер по ремонту и обслуживанию электрооборудования (по отраслям)">13.01.10 Электромонтер по ремонту и обслуживанию электрооборудования</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ПОЛЯ ДЛЯ ПРЕПОДАВАТЕЛЯ / НАСТАВНИКА -->
+      <div id="teacherFields" style="display: none;">
+        <div class="control-group">
+          <label class="control-label">ФИО преподавателя (Дательный падеж):</label>
+          <input type="text" id="inputTeacherName" class="form-input" value="Генте Александре Владимировне">
+        </div>
+
+        <div class="control-group" style="margin-top: 10px;">
+          <label class="control-label">Должность и квалификация:</label>
+          <input type="text" id="inputTeacherRole" class="form-input" value="Преподаватель истории высшей квалификационной категории">
+        </div>
+
+        <div class="control-group" style="margin-top: 10px;">
+          <label class="control-label">Кафедра / Отделение:</label>
+          <input type="text" id="inputTeacherDept" class="form-input" value="Кафедра социально-гуманитарных дисциплин">
+        </div>
+      </div>
+
+      <!-- Основание награждения (Динамически меняется в зависимости от роли) -->
+      <div class="control-group">
+        <label class="control-label">Основание награждения (Активность музея):</label>
+        <select id="selectNomination" class="form-select"></select>
+      </div>
+
+      <!-- Дата выдачи -->
+      <div class="control-group">
+        <label class="control-label">Дата выдачи:</label>
+        <input type="text" id="inputDate" class="form-input" value="10 сентября 2026 г.">
+      </div>
+
+      <!-- Кнопки действий -->
+      <div class="action-buttons-group">
+        <button id="btnPrintPDF" class="btn-action-primary" type="button">
+          <span>🖨️</span> Распечатать / Сохранить в PDF
+        </button>
+        <button id="btnQuickFill" class="btn-action-secondary" type="button">
+          ⚡ Заполнить образцом
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- ПРАВАЯ ПАНЕЛЬ: ПРЕДПРОСМОТР БЛАНКА А4 -->
+    <section class="preview-canvas-wrapper">
+      <div class="preview-scale-box" id="previewContainer"></div>
+    </section>
+
+  </main>
+
+  <script>
+    'use strict';
+
+    const CertEngine = {
+      role: 'student',         // 'student' | 'teacher'
+      mode: 'single',          // 'single' | 'batch'
+      theme: 'theme-parchment', // 'theme-parchment' | 'theme-clean'
+
+      // Номинации для студентов (строго по функционалу нашего музея)
+      studentNominations: {
+        'student_lesson': {
+          title: 'Участие во Всероссийском Уроке Мужества',
+          text: 'за активное участие во Всероссийском Уроке Мужества и исследовательскую работу в залах цифрового мемориального комплекса <strong>«Быть воином — жить вечно»</strong>, посвященного памяти 20 выпускников колледжа — защитников Отечества, кавалеров Орденов Мужества.'
+        },
+        'student_camo_archive': {
+          title: 'Поисково-исследовательская работа (Оцифровка архивов)',
+          text: 'за успешную научно-исследовательскую работу по поиску, оцифровке и верификации архивных документов, наградных листов и студенческих дел выпускников СРМК в рамках проекта <strong>«Карта доблести: хранители подвигов»</strong>.'
+        },
+        'student_guide_tts': {
+          title: 'Музейный экскурсовод и медиа-активист',
+          text: 'за личный вклад в патриотическое просвещение молодежи, проведение интерактивных экскурсий по залам Мемориала Славы «Звезда Памяти» и работу с системой цифрового аудиогида музея.'
+        },
+        'student_memory_watch': {
+          title: 'Несение почетной Вахты Памяти',
+          text: 'за образцовое несение почетной Вахты Памяти у Мемориала Славы колледжа, проведение мемориальных митингов и верность традициям студенческого братства СРМК.'
+        },
+        'student_map_tvd': {
+          title: 'Топографический анализ рубежей боевой славы',
+          text: 'за глубокий анализ картографических и архивных первоисточников при реконструкции боевого пути выпускников колледжа на интерактивной карте ТВД (Днепр, Запорожье, Донбасс, Курск).'
+        }
+      },
+
+      // Номинации для преподавателей и наставников
+      teacherNominations: {
+        'teacher_mentor': {
+          title: 'Наставничество и кураторство проекта',
+          text: 'за высокое педагогическое мастерство, организацию научно-исследовательской деятельности студентов и успешное руководство проектом в рамках Всероссийской акции <strong>«Имя в истории образовательной организации»</strong>.'
+        },
+        'teacher_tech_map': {
+          title: 'Разработка инновационной технологической карты',
+          text: 'за разработку, методическое сопровождение и внедрение инновационной технологической карты Урока Мужества на базе интерактивного цифрового комплекса <strong>«Быть воином — жить вечно»</strong>.'
+        },
+        'teacher_patriot_upbringing': {
+          title: 'Личный вклад в патриотическое воспитание',
+          text: 'за многолетний добросовестный труд, личный вклад в гражданско-патриотическое воспитание молодежи Ставрополья, сохранение исторической правды и увековечение подвига героев-выпускников СПО.'
+        },
+        'teacher_history_integration': {
+          title: 'Интеграция музейных архивов в учебный процесс',
+          text: 'за активное внедрение оцифрованных архивных свидетельств Мемориала Славы СРМК в учебный курс «История России» и цикл занятий «Разговоры о важном».'
+        }
+      },
+
+      init() {
+        this.bindControls();
+        this.updateNominationOptions();
+        this.renderPreview();
+      },
+
+      bindControls() {
+        // Переключение роли (Студент / Преподаватель)
+        document.getElementById('roleStudentBtn').addEventListener('click', () => this.setRole('student'));
+        document.getElementById('roleTeacherBtn').addEventListener('click', () => this.setRole('teacher'));
+
+        // Переключение тем
+        document.getElementById('themeParchmentBtn').addEventListener('click', (e) => this.setTheme('theme-parchment', e.target));
+        document.getElementById('themeCleanBtn').addEventListener('click', (e) => this.setTheme('theme-clean', e.target));
+
+        // Переключение режимов
+        document.getElementById('modeSingleBtn').addEventListener('click', (e) => this.setMode('single', e.target));
+        document.getElementById('modeBatchBtn').addEventListener('click', (e) => this.setMode('batch', e.target));
+
+        // Живые слушатели
+        const inputs = [
+          'inputStudentName', 'inputStudentGroup', 'selectStudentSpecialty',
+          'inputBatchList', 'inputBatchGroup', 'selectBatchSpecialty',
+          'inputTeacherName', 'inputTeacherRole', 'inputTeacherDept',
+          'selectNomination', 'inputDate'
+        ];
+        inputs.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.addEventListener('input', () => this.renderPreview());
+        });
+
+        document.getElementById('btnPrintPDF').addEventListener('click', () => window.print());
+
+        document.getElementById('btnQuickFill').addEventListener('click', () => {
+          if (this.role === 'student') {
+            document.getElementById('inputStudentName').value = 'Смирнову Никите Александровичу';
+            document.getElementById('inputStudentGroup').value = 'ИСиП-242';
+          } else {
+            document.getElementById('inputTeacherName').value = 'Генте Александре Владимировне';
+            document.getElementById('inputTeacherRole').value = 'Преподаватель истории высшей категории';
+          }
+          this.renderPreview();
+        });
+      },
+
+      setRole(newRole) {
+        this.role = newRole;
+        document.getElementById('roleStudentBtn').classList.toggle('active', newRole === 'student');
+        document.getElementById('roleTeacherBtn').classList.toggle('active', newRole === 'teacher');
+
+        document.getElementById('batchControlGroup').style.display = newRole === 'student' ? 'flex' : 'none';
+        document.getElementById('studentSingleFields').style.display = (newRole === 'student' && this.mode === 'single') ? 'block' : 'none';
+        document.getElementById('studentBatchFields').style.display = (newRole === 'student' && this.mode === 'batch') ? 'block' : 'none';
+        document.getElementById('teacherFields').style.display = newRole === 'teacher' ? 'block' : 'none';
+
+        this.updateNominationOptions();
+        this.renderPreview();
+      },
+
+      setTheme(newTheme, btn) {
+        this.theme = newTheme;
+        document.querySelectorAll('#themeParchmentBtn, #themeCleanBtn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.renderPreview();
+      },
+
+      setMode(newMode, btn) {
+        this.mode = newMode;
+        document.querySelectorAll('#modeSingleBtn, #modeBatchBtn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        document.getElementById('studentSingleFields').style.display = (this.role === 'student' && newMode === 'single') ? 'block' : 'none';
+        document.getElementById('studentBatchFields').style.display = (this.role === 'student' && newMode === 'batch') ? 'block' : 'none';
+        this.renderPreview();
+      },
+
+      updateNominationOptions() {
+        const select = document.getElementById('selectNomination');
+        select.innerHTML = '';
+        const dict = this.role === 'student' ? this.studentNominations : this.teacherNominations;
+
+        Object.keys(dict).forEach(key => {
+          const opt = document.createElement('option');
+          opt.value = key;
+          opt.textContent = dict[key].title;
+          select.appendChild(opt);
+        });
+      },
+
+      renderPreview() {
+        const container = document.getElementById('previewContainer');
+        container.innerHTML = '';
+
+        const nominationKey = document.getElementById('selectNomination').value;
+        const dict = this.role === 'student' ? this.studentNominations : this.teacherNominations;
+        const reasonHTML = dict[nominationKey] ? dict[nominationKey].text : '';
+        const dateStr = document.getElementById('inputDate').value;
+
+        if (this.role === 'teacher') {
+          const name = document.getElementById('inputTeacherName').value || 'ФИО Преподавателя';
+          const role = document.getElementById('inputTeacherRole').value || 'Должность';
+          const dept = document.getElementById('inputTeacherDept').value || 'Кафедра';
+          const metaHTML = `${role} • <span>${dept}</span>`;
+          container.appendChild(this.createSheetDOM(name, metaHTML, reasonHTML, dateStr, 'НАГРАДНОЙ СЕРТИФИКАТ НАСТАВНИКА', 1));
+          return;
+        }
+
+        // Режим студента
+        if (this.mode === 'single') {
+          const name = document.getElementById('inputStudentName').value || 'ФИО Обучающегося';
+          const group = document.getElementById('inputStudentGroup').value || 'Группа';
+          const spec = document.getElementById('selectStudentSpecialty').value;
+          const metaHTML = `Обучающийся группы <span>${group}</span> • Специальность: <span>${spec}</span>`;
+          container.appendChild(this.createSheetDOM(name, metaHTML, reasonHTML, dateStr, 'СЕРТИФИКАТ УЧАСТНИКА', 1));
+        } else {
+          // Пакетный режим
+          const rawText = document.getElementById('inputBatchList').value;
+          const names = rawText.split('\n').map(n => n.trim()).filter(n => n.length > 0);
+          const group = document.getElementById('inputBatchGroup').value || 'Группа';
+          const spec = document.getElementById('selectBatchSpecialty').value;
+          const metaHTML = `Обучающийся группы <span>${group}</span> • Специальность: <span>${spec}</span>`;
+
+          if (names.length === 0) {
+            container.appendChild(this.createSheetDOM('Список студентов пуст', metaHTML, reasonHTML, dateStr, 'СЕРТИФИКАТ УЧАСТНИКА', 1));
+          } else {
+            names.forEach((name, idx) => {
+              container.appendChild(this.createSheetDOM(name, metaHTML, reasonHTML, dateStr, 'СЕРТИФИКАТ УЧАСТНИКА', idx + 1));
+            });
+          }
+        }
+      },
+
+      createSheetDOM(name, metaHTML, reasonHTML, dateStr, subWord, serialNumber) {
+        const sheet = document.createElement('article');
+        sheet.className = `certificate-sheet ${this.theme}`;
+
+        const serialFormatted = `СРМК-УМ-2026-${String(serialNumber).padStart(4, '0')}`;
+        // Прямая ссылка на наш новый портал верификации
+        const qrVerificationUrl = `https://phsquad.github.io/srmkmuseum/verify.html?cert=${encodeURIComponent(serialFormatted)}&name=${encodeURIComponent(name)}&date=${encodeURIComponent(dateStr)}`;
+        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrVerificationUrl)}`;
+
+        sheet.innerHTML = `
+          <div class="cert-frame-outer"></div>
+          <div class="cert-frame-inner"></div>
+          <div class="cert-frame-corner corner-tl"></div>
+          <div class="cert-frame-corner corner-tr"></div>
+          <div class="cert-frame-corner corner-bl"></div>
+          <div class="cert-frame-corner corner-br"></div>
+
+          <header class="cert-header">
+            <div class="cert-ministry">Министерство образования Ставропольского края</div>
+            <div class="cert-college">ГБПОУ «Ставропольский региональный многопрофильный колледж»</div>
+            <div class="cert-project-badge">Всероссийская акция «Карта доблести» • Проект «Музей в цифре»</div>
+          </header>
+
+          <div class="cert-body-title">
+            <div class="cert-main-word">СЕРТИФИКАТ</div>
+            <div class="cert-sub-word">${subWord}</div>
+          </div>
+
+          <div class="cert-recipient-block">
+            <div class="cert-recipient-name">${name}</div>
+            <div class="cert-recipient-meta">${metaHTML}</div>
+          </div>
+
+          <div class="cert-reason-text">${reasonHTML}</div>
+
+          <footer class="cert-footer">
+            <div class="cert-sign-col left">
+              <div class="cert-sign-role">Директор ГБПОУ СРМК, к.и.н.</div>
+              <div class="cert-sign-name">Е. В. Бледных / ________________ /</div>
+              <div style="font-size: 7pt; color:#666; margin-top:1mm;">г. Ставрополь, пр. Юности, 3</div>
+            </div>
+
+            <div class="cert-qr-center">
+              <img src="${qrApiUrl}" alt="QR" class="cert-qr-img">
+              <span class="cert-qr-label">Проверить подлинность</span>
+            </div>
+
+            <div class="cert-sign-col right">
+              <div class="cert-sign-role">Куратор музея, преп. высшей кат.</div>
+              <div class="cert-sign-name">А. В. Генте / ________________ /</div>
+              <div style="font-size: 7pt; color:#666; margin-top:1mm;">Дата: ${dateStr}</div>
+            </div>
+
+            <div class="cert-serial-meta">
+              Электронный реестр Мемориального комплекса СРМК • № ${serialFormatted} • Документ верифицирован в реестре
+            </div>
+          </footer>
+        `;
+
+        return sheet;
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => CertEngine.init());
+  </script>
+</body>
+</html>
