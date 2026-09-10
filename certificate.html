@@ -603,6 +603,7 @@
 
   </main>
 
+  <script src="js/certificate-verifier.js"></script>
   <script>
     'use strict';
 
@@ -792,8 +793,11 @@
         sheet.className = `certificate-sheet ${this.theme}`;
 
         const serialFormatted = `СРМК-УМ-2026-${String(serialNumber).padStart(4, '0')}`;
-        // Прямая ссылка на наш новый портал верификации
-        const qrVerificationUrl = `https://phsquad.github.io/srmkmuseum/verify.html?cert=${encodeURIComponent(serialFormatted)}&name=${encodeURIComponent(name)}&date=${encodeURIComponent(dateStr)}`;
+        const qrVerificationUrl = CertificateVerifier.buildVerificationUrl({
+          serial: serialFormatted,
+          name,
+          date: dateStr
+        });
         const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrVerificationUrl)}`;
 
         sheet.innerHTML = `

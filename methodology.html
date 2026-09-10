@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Методический кабинет педагога | Мемориальный комплекс СРМК</title>
+  <meta name="description" content="Цифровой методический кабинет преподавателя: технологические карты Уроков Мужества, карточки заданий для микрогрупп, рекомендации по интеграции в спецдисциплины СПО.">
+  <meta name="theme-color" content="#0a0c0f">
+
+  <!-- Шрифты -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+
+  <!-- Стили -->
+  <link rel="stylesheet" href="css/methodology.css">
+</head>
+<body class="dark-theme">
+
+  <!-- ШАПКА -->
+  <header class="method-header">
+    <div class="container header-content">
+      <div class="logo-group">
+        <a href="index.html" class="logo-badge">СРМК</a>
+        <div class="header-titles">
+          <span class="sub-title">Педагогический банк данных</span>
+          <h1 class="main-title">Цифровой методический кабинет</h1>
+        </div>
+      </div>
+      <div class="header-nav">
+        <a href="certificate.html" class="nav-btn">Генератор сертификатов</a>
+        <a href="index.html" class="nav-btn btn-primary">← В виртуальный музей</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ГЛАВНЫЙ БАННЕР -->
+  <section class="method-hero">
+    <div class="container hero-content">
+      <div class="hero-badge">ФГОС СПО • Патриотическое воспитание • Модуль «Музей в цифре»</div>
+      <h2 class="hero-title">МЕТОДИЧЕСКОЕ СОПРОВОЖДЕНИЕ<br><span class="highlight">УРОКОВ МУЖЕСТВА И ВОСПИТАТЕЛЬНЫХ ПРАКТИК</span></h2>
+      <p class="hero-desc">
+        Готовые сценарии, интерактивные технологические карты, дифференцированные карточки заданий и методические матрицы интеграции цифрового мемориала «Быть воином — жить вечно» в учебный процесс колледжа.
+      </p>
+
+      <div class="hero-quick-stats">
+        <div class="stat-pill"><strong>4</strong> Технологические карты</div>
+        <div class="stat-pill"><strong>4</strong> Поисковые карточки ТВД</div>
+        <div class="stat-pill"><strong>13</strong> Специальностей СПО</div>
+        <div class="stat-pill"><strong>100%</strong> Соответствие ФГОС</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- НАВИГАЦИОННЫЕ ВКЛАДКИ -->
+  <nav class="tabs-nav-wrapper">
+    <div class="container tabs-container">
+      <button class="tab-btn active" data-tab="tech-maps" type="button">
+        <span class="tab-icon">📑</span> Технологические карты
+      </button>
+      <button class="tab-btn" data-tab="group-cards" type="button">
+        <span class="tab-icon">📋</span> Карточки микрогрупп
+      </button>
+      <button class="tab-btn" data-tab="integration" type="button">
+        <span class="tab-icon">🛠</span> Интеграция в спецкурсы
+      </button>
+      <button class="tab-btn" data-tab="recommendations" type="button">
+        <span class="tab-icon">📖</span> Рекомендации и ФГОС
+      </button>
+    </div>
+  </nav>
+
+  <!-- ОСНОВНОЙ КОНТЕНТ -->
+  <main class="container method-main">
+
+    <!-- ==========================================================================
+         ВКЛАДКА 1: ТЕХНОЛОГИЧЕСКИЕ КАРТЫ
+         ========================================================================== -->
+    <section class="tab-content active" id="tab-tech-maps">
+      
+      <div class="section-topbar">
+        <div>
+          <h3 class="block-title">Технологическая карта базового Урока Мужества</h3>
+          <p class="block-subtitle">Для дисциплин «История России», «ОБЗР» и внеурочного цикла «Разговоры о важном»</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="action-btn" onclick="Methodology.copyText('techMapFullText', 'Технологическая карта скопирована!')" type="button">
+            📋 Копировать текст
+          </button>
+          <button class="action-btn btn-export" onclick="Methodology.exportToWord('techMapContainer', 'Технологическая_карта_Урок_Мужества_СРМК')" type="button">
+            📥 Экспорт в Word (.doc)
+          </button>
+        </div>
+      </div>
+
+      <div class="paper-card" id="techMapContainer">
+        <div class="meta-doc-header">
+          <div><strong>Организация:</strong> ГБПОУ «Ставропольский региональный многопрофильный колледж»</div>
+          <div><strong>Тема занятия:</strong> «Они учились здесь. Они шагнули в вечность: ратный подвиг 20 выпускников СРМК»</div>
+          <div><strong>Хронометраж:</strong> 45 минут (1 академический час)</div>
+          <div><strong>Формируемые компетенции:</strong> ОК 01, ОК 04, ОК 06</div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="method-table" id="techMapTable">
+            <thead>
+              <tr>
+                <th style="width: 14%;">Этап и время</th>
+                <th style="width: 28%;">Деятельность преподавателя</th>
+                <th style="width: 25%;">Деятельность студентов</th>
+                <th style="width: 20%;">Интеграция модулей музея</th>
+                <th style="width: 13%;">Компетенции</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>1. Организационный</strong><br><small>3 мин</small></td>
+                <td>Включение синтезатора Колокола Памяти. Вступительное слово о 50-летней истории колледжа и цене мирной жизни.</td>
+                <td>Настраиваются на восприятие темы. Считывают вводный QR-код с экрана проектора.</td>
+                <td>Web Audio Synthesizer (220–554 Гц). Открытие <code>index.html</code>.</td>
+                <td><strong>Личностные:</strong> эмпатия, уважение к памяти.</td>
+              </tr>
+              <tr>
+                <td><strong>2. Вводная экскурсия</strong><br><small>7 мин</small></td>
+                <td>Демонстрация 2.5D-модели монумента колледжа. Рассказ о Левой и Правой плитах. Запуск обзорного аудиогида.</td>
+                <td>Слушают аудиогид. На смартфонах переключают плиты, находят выпускников своих отделений.</td>
+                <td>Модуль <code>memorialStand</code> и аудиогид <code>general-tour.mp3</code>.</td>
+                <td><strong>ОК 06:</strong> историческая преемственность.</td>
+              </tr>
+              <tr>
+                <td><strong>3. Исследование в группах</strong><br><small>18 мин</small></td>
+                <td>Делит группу на 4 исследовательских сектора (Днепр, Запорожье, Донбасс, Курск). Выдает карточки заданий.</td>
+                <td>Работают с досье: включают TTS-диктора, изучают наградные листы, зачетные книжки, выписки приказов.</td>
+                <td>Онлайн-диктор <code>TTSNarrator</code> с караоке-подсветкой и автоподгрузка наград.</td>
+                <td><strong>ОК 04, ОК 01:</strong> работа с цифровыми первоисточниками.</td>
+              </tr>
+              <tr>
+                <td><strong>4. Топография подвига</strong><br><small>7 мин</small></td>
+                <td>Модерирует защиту результатов группами. Активирует сектора ТВД на интерактивной карте.</td>
+                <td>Спикеры групп показывают траекторию подвига от Ставрополя до точек боев на Яндекс Карте.</td>
+                <td>Яндекс Карты API v2.1: переключение ТВД, лучи боевой славы, зум к координатам.</td>
+                <td><strong>Метапредметные:</strong> пространственное мышление.</td>
+              </tr>
+              <tr>
+                <td><strong>5. Цифровой трибьют</strong><br><small>5 мин</small></td>
+                <td>Организует Вахту Памяти: объясняет работу криптографической защиты свечей (Proof-of-Work).</td>
+                <td>Нажимают «Зажечь Свечу Памяти» и «Возложить живые гвоздики». Наблюдают рост общего счетчика.</td>
+                <td>Модуль <code>TributeSecurity</code> (SHA-256 хэш, колокол Web Audio, анимация цветов).</td>
+                <td><strong>Личностные:</strong> деятельностное сопереживание.</td>
+              </tr>
+              <tr>
+                <td><strong>6. Рефлексия и сертификация</strong><br><small>5 мин</small></td>
+                <td>Объявляет Минуту молчания. Подводит итог цитатой «Быть воином — жить вечно». Направляет на генерацию сертификатов.</td>
+                <td>Чтят память Минутой молчания. Вводят свои данные в генератор, получают именной наградной лист.</td>
+                <td>Модуль <code>certificate.html</code> и верификатор <code>verify.html</code>.</td>
+                <td><strong>ОК 06:</strong> гражданская зрелость.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display:none;" id="techMapFullText">
+ТЕХНОЛОГИЧЕСКАЯ КАРТА УРОКА МУЖЕСТВА В ГБПОУ СРМК
+Тема: «Они учились здесь. Они шагнули в вечность: ратный подвиг 20 выпускников СРМК»
+Цель: Воспитание патриотизма и гражданской ответственности на примере подвига 20 выпускников колледжа.
+Продолжительность: 45 минут.
+Оборудование: Цифровой мемориальный комплекс phsquad.github.io/srmkmuseum, проектор, смартфоны обучающихся.
+
+ЭТАПЫ ЗАНЯТИЯ:
+1. Организационный этап (3 мин): Синтез колокола памяти, вступительное слово преподавателя, сканирование вводного QR-кода.
+2. Вводная экскурсия (7 мин): Исследование 2.5D стенда Мемориала Славы, прослушивание аудиоэкскурсии.
+3. Исследовательская работа в микрогруппах (18 мин): Работа с 4 секторами ТВД, запуск TTS-диктора, анализ наградных листов.
+4. Топографическая проекция подвига (7 мин): Выступление спикеров у Яндекс Карты, демонстрация векторов от Ставрополя до точек боев.
+5. Практический цифровой трибьют «Вахта Памяти» (5 мин): Зажжение свечей памяти и возложение цветов с защитой Proof-of-Work.
+6. Рефлексия и сертификация (5 мин): Минута молчания под метроном, генерация сертификатов участников на certificate.html.
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==========================================================================
+         ВКЛАДКА 2: КАРТОЧКИ МИКРОГРУПП (ПЕЧАТЬ И КОПИРОВАНИЕ)
+         ========================================================================== -->
+    <section class="tab-content" id="tab-group-cards">
+      
+      <div class="section-topbar">
+        <div>
+          <h3 class="block-title">Дифференцированные карточки поисковых заданий</h3>
+          <p class="block-subtitle">Каждая карточка содержит объекты исследования, цифровой маршрут и контрольные вопросы</p>
+        </div>
+        <button class="action-btn btn-primary" onclick="window.print()" type="button">
+          🖨 Распечатать все карточки (А4)
+        </button>
+      </div>
+
+      <div class="cards-grid-layout">
+        
+        <!-- КАРТОЧКА 1 -->
+        <article class="task-card" id="cardGroup1">
+          <div class="task-card-header">
+            <span class="group-tag">Группа №1</span>
+            <span class="tvd-tag">Днепровский плацдарм и Таврия</span>
+          </div>
+          <div class="task-card-body">
+            <div class="task-block">
+              <span class="task-label">Объекты исследования:</span>
+              <p>• <strong>Шамиль Назыров</strong> (электромонтер, красный диплом);<br>
+                 • <strong>Николай Вечёрка</strong> (спасатель МЧС);<br>
+                 • <strong>Максим Елагин</strong> (мастер сварочного дела).</p>
+            </div>
+            <div class="task-block">
+              <span class="task-label">Цифровой маршрут:</span>
+              <p>Откройте досье <code>#hero-nazyrov-sh-r</code>, включите кнопку <strong>«🔊 Слушать диктора онлайн»</strong>. В Зале III включите сектор «Днепровский плацдарм» на карте.</p>
+            </div>
+            <div class="task-block">
+              <span class="task-label">Поисковые вопросы:</span>
+              <ol class="task-questions">
+                <li>Почему водовоз Шамиля Назырова бойцы называли «Машиной жизни»?</li>
+                <li>Какой подвиг совершил разведчик-санитар Николай Вечёрка у Антоновского моста 26.02.2022?</li>
+              </ol>
+            </div>
+          </div>
+          <div class="task-card-footer">
+            <button class="mini-btn" onclick="Methodology.copyCardText('cardGroup1')">📋 Копировать карточку</button>
+            <button class="mini-btn" onclick="Methodology.printSingleCard('cardGroup1')">🖨 Печать А4</button>
+          </div>
+        </article>
+
+        <!-- КАРТОЧКА 2 -->
+        <article class="task-card" id="cardGroup2">
+          <div class="task-card-header">
+            <span class="group-tag">Группа №2</span>
+            <span class="tvd-tag">Запорожский щит и Ореховская дуга</span>
+          </div>
+          <div class="task-card-body">
+            <div class="task-block">
+              <span class="task-label">Объекты исследования:</span>
+              <p>• <strong>Дмитрий Самохин</strong> (электромеханик);<br>
+                 • <strong>Николай Сополев</strong> (техник-спасатель);<br>
+                 • <strong>Константин Луценко</strong> (сапер инженерных войск).</p>
+            </div>
+            <div class="task-block">
+              <span class="task-label">Цифровой маршрут:</span>
+              <p>Откройте досье <code>#hero-samokhin-d-a</code>, найдите скан орденской книжки № 83029. На карте выберите рубеж «Запорожский щит».</p>
+            </div>
+            <div class="task-block">
+              <span class="task-label">Поисковые вопросы:</span>
+              <ol class="task-questions">
+                <li>Как навыки сапера Константина Луценко обеспечивали безопасность экипажей танков?</li>
+                <li>Какую роль сыграл спасатель Николай Сополев при эвакуации раненых под Ореховом?</li>
+              </ol>
+            </div>
+          </div>
+          <div class="task-card-footer">
+            <button class="mini-btn" onclick="Methodology.copyCardText('cardGroup2')">📋 Копировать карточку</button>
+            <button class="mini-btn" onclick="Methodology.printSingleCard('cardGroup2')">🖨 Печать А4</button>
+          </div>
+        </article>
+
+        <!-- КАРТОЧКА 3 -->
+        <article class="task-card" id="cardGroup3">
+          <div class="task-card-header">
+            <span class="group-tag">Группа №3</span>
+            <span class="tvd-tag">Огненная дуга Донбасса</span>
+          </div>
+          <div class="task-card-body">
+            <div class="task-block">
+              <span class="task-label">Объекты исследования:</span>
+              <p>• <strong>Станислав Мартынов</strong> (МЧС, командир отделения);<br>
+                 • <strong>Максим Ярышев</strong> (сварщик, штурмовик);<br>
+                 • <strong>Александр Григорьев</strong> (электрик, медаль Суворова);<br>
+                 • <strong>Никита Брынза</strong> (автомеханик, пулеметчик).</p>
+            </div>
+            <div class="task-block">
+              <span class="task-label">Цифровой маршрут:</span>
+              <p>Откройте досье <code>#hero-martynov-s-k</code>. На карте активируйте сектор Донбасса (Угледар, Авдеевка, Марьинка).</p>
+            </div>
+            <div class="task-block">
+              <span class="task-label">Поисковые вопросы:</span>
+              <ol class="task-questions">
+                <li>Какое решение принял младший сержант Мартынов после ранения офицера под Угледаром?</li>
+                <li>За какой личный боевой подвиг Александр Григорьев был награжден медалью Суворова?</li>
+              </ol>
+            </div>
+          </div>
+          <div class="task-card-footer">
+            <button class="mini-btn" onclick="Methodology.copyCardText('cardGroup3')">📋 Копировать карточку</button>
+            <button class="mini-btn" onclick="Methodology.printSingleCard('cardGroup3')">🖨 Печать А4</button>
+          </div>
+        </article>
+
+        <!-- КАРТОЧКА 4 -->
+        <article class="task-card" id="cardGroup4">
+          <div class="task-card-header">
+            <span class="group-tag">Группа №4</span>
+            <span class="tvd-tag">Курский приграничный рубеж</span>
+          </div>
+          <div class="task-card-body">
+            <div class="task-block">
+              <span class="task-label">Объекты исследования:</span>
+              <p>• <strong>Никита Назаренко</strong> (наладчик компьютерных сетей, выпуск 2024 года, связист).</p>
+            </div>
+            <div class="task-block">
+              <span class="task-label">Цифровой маршрут:</span>
+              <p>Откройте досье <code>#hero-nazarenko-n-s</code>. Включите онлайн-диктора для прослушивания событий 13 августа 2024 года.</p>
+            </div>
+            <div class="task-block">
+              <span class="task-label">Поисковые вопросы:</span>
+              <ol class="task-questions">
+                <li>Почему Никита Назаренко является самым юным героем на Мемориале Славы СРМК?</li>
+                <li>Какую задачу под шквальным огнем выполнял связист Назаренко в Курском приграничье?</li>
+              </ol>
+            </div>
+          </div>
+          <div class="task-card-footer">
+            <button class="mini-btn" onclick="Methodology.copyCardText('cardGroup4')">📋 Копировать карточку</button>
+            <button class="mini-btn" onclick="Methodology.printSingleCard('cardGroup4')">🖨 Печать А4</button>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         ВКЛАДКА 3: ИНТЕГРАЦИЯ В СПЕЦДИСЦИПЛИНЫ СПО
+         ========================================================================== */ -->
+    <section class="tab-content" id="tab-integration">
+      
+      <div class="section-topbar">
+        <div>
+          <h3 class="block-title">Матрица интеграции в учебные дисциплины и ПМ</h3>
+          <p class="block-subtitle">Как использовать материалы виртуального музея на профильных предметах</p>
+        </div>
+      </div>
+
+      <div class="integration-grid">
+        
+        <div class="integ-card">
+          <div class="integ-head">
+            <span class="integ-icon">🚒</span>
+            <h4>Пожарная безопасность и Защита в ЧС</h4>
+          </div>
+          <p class="integ-heroes"><strong>Герои-ориентиры:</strong> Н. Сополев, С. Мартынов, Н. Вечёрка, И. Пономарчук, И. Сербиенко</p>
+          <ul class="integ-list">
+            <li><strong>Дисциплина:</strong> Тактика аварийно-спасательных работ, Медицина катастроф.</li>
+            <li><strong>Тема занятия:</strong> «Оказание первой помощи под огнем: опыт санитара-разведчика Николая Вечёрки».</li>
+            <li><strong>Практикум:</strong> Моделирование эвакуации раненых в условиях ограниченного времени.</li>
+          </ul>
+        </div>
+
+        <div class="integ-card">
+          <div class="integ-head">
+            <span class="integ-icon">⚡</span>
+            <h4>Сварочное производство</h4>
+          </div>
+          <p class="integ-heroes"><strong>Герои-ориентиры:</strong> М. Ярышев, М. Елагин, К. Луценко</p>
+          <ul class="integ-list">
+            <li><strong>Дисциплина:</strong> Технология сварочных работ, Основы материаловедения.</li>
+            <li><strong>Тема занятия:</strong> «Мастерство в профессии — стойкость в бою: путь штурмовика Максима Ярышева».</li>
+            <li><strong>Практикум:</strong> Изготовление печей-буржуек и защитных экранов для нужд фронта в мастерских колледжа.</li>
+          </ul>
+        </div>
+
+        <div class="integ-card">
+          <div class="integ-head">
+            <span class="integ-icon">💡</span>
+            <h4>Электрооборудование и энергетика</h4>
+          </div>
+          <p class="integ-heroes"><strong>Герои-ориентиры:</strong> Ш. Назыров (красный диплом), Д. Самохин, С. Белов, А. Григорьев</p>
+          <ul class="integ-list">
+            <li><strong>Дисциплина:</strong> Эксплуатация электрооборудования, Электротехника.</li>
+            <li><strong>Тема занятия:</strong> «Надежность и точность: как отличник учебы Шамиль Назыров спасал жизни на передовой».</li>
+            <li><strong>Практикум:</strong> Расчет полевых схем электропитания и автономных узлов связи.</li>
+          </ul>
+        </div>
+
+        <div class="integ-card">
+          <div class="integ-head">
+            <span class="integ-icon">💻</span>
+            <h4>Информационные системы и сети (IT)</h4>
+          </div>
+          <p class="integ-heroes"><strong>Герои-ориентиры:</strong> Н. Назаренко (выпуск 2024 г.), В. Бутов (ПУ ФСБ)</p>
+          <ul class="integ-list">
+            <li><strong>Дисциплина:</strong> Информационная безопасность, Сетевые протоколы, Веб-разработка.</li>
+            <li><strong>Тема занятия:</strong> «Бесперебойная связь под огнем: подвиг 20-летнего связиста Никиты Назаренко».</li>
+            <li><strong>Практикум:</strong> Разработка криптографических модулей (Proof-of-Work) и оцифровка реликвий для музея.</li>
+          </ul>
+        </div>
+
+        <div class="integ-card">
+          <div class="integ-head">
+            <span class="integ-icon">🚗</span>
+            <h4>Техническое обслуживание автотранспорта</h4>
+          </div>
+          <p class="integ-heroes"><strong>Герои-ориентиры:</strong> П. Шартов, Н. Горлов, Н. Брынза</p>
+          <ul class="integ-list">
+            <li><strong>Дисциплина:</strong> Устройство автотранспортных средств, Техническая эксплуатация.</li>
+            <li><strong>Тема занятия:</strong> «Рейсы сквозь огонь: подвоз боеприпасов водителем Павлом Шартовым в Марьинке».</li>
+            <li><strong>Практикум:</strong> Экспресс-диагностика и ремонт узлов техники в экстремальных условиях.</li>
+          </ul>
+        </div>
+
+        <div class="integ-card">
+          <div class="integ-head">
+            <span class="integ-icon">⚙️</span>
+            <h4>Технология машиностроения</h4>
+          </div>
+          <p class="integ-heroes"><strong>Герои-ориентиры:</strong> В. Петухов, И. Лукьяненко, И. Чупин</p>
+          <ul class="integ-list">
+            <li><strong>Дисциплина:</strong> Процессы формообразования, Технологическая оснастка.</li>
+            <li><strong>Тема занятия:</strong> «Броня крепка стойкостью экипажа: подвиг танкиста Игоря Лукьяненко».</li>
+            <li><strong>Практикум:</strong> Проектирование деталей ремонтных комплектов бронетехники на станках с ЧПУ.</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         ВКЛАДКА 4: РЕКОМЕНДАЦИИ И ФГОС
+         ========================================================================== -->
+    <section class="tab-content" id="tab-recommendations">
+      
+      <div class="paper-card">
+        <h3 class="doc-section-title">Методические рекомендации по оценке результатов (ФГОС СПО)</h3>
+        <p class="doc-lead">
+          Интерактивный цифровой мемориал выступает сквозным дидактическим средством для формирования ключевых общих компетенций выпускника системы среднего профессионального образования.
+        </p>
+
+        <div class="competence-box">
+          <div class="comp-badge">ОК 01</div>
+          <div>
+            <strong>Понимание сущности и социальной значимости будущей профессии:</strong>
+            <p>Обучающийся видит, как профессиональные навыки (сварщика, спасателя, электромонтера, связиста) спасают жизни людей на передовой и определяют успех выполнения боевых задач.</p>
+          </div>
+        </div>
+
+        <div class="competence-box">
+          <div class="comp-badge">ОК 04</div>
+          <div>
+            <strong>Работа с цифровой информацией и информационно-коммуникационными технологиями:</strong>
+            <p>Студенты осваивают методы поиска в цифровых базах данных, работу с геоинформационными слоями Яндекс Карт, генерацию криптографических сертификатов и анализ первоисточников ЦАМО.</p>
+          </div>
+        </div>
+
+        <div class="competence-box">
+          <div class="comp-badge">ОК 06</div>
+          <div>
+            <strong>Проявление осознанной гражданско-патриотической позиции:</strong>
+            <p>Личное участие во Всероссийской цифровой Вахте Памяти, несение караула у Парт Героев в аудиториях и эмоциональное сопереживание подвигу сокурсников формируют зрелую личность гражданина РФ.</p>
+          </div>
+        </div>
+
+        <h4 style="color: var(--accent-brass); margin: 24px 0 12px; font-family: var(--font-serif);">Формула оценивания на уроке («Лист результативности»):</h4>
+        <table class="method-table">
+          <thead>
+            <tr>
+              <th>Критерий</th>
+              <th>Показатель успешности (100-балльная шкала)</th>
+              <th>Форма фиксации</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Предметно-исторический</strong></td>
+              <td>Знание биографий и обстоятельств подвига героев своего отделения подготовки (85–100%)</td>
+              <td>Фронтальный опрос / Защита карточки ТВД</td>
+            </tr>
+            <tr>
+              <td><strong>Цифровой исследовательский</strong></td>
+              <td>Успешная работа с интерактивной картой и досье ЦАМО (100%)</td>
+              <td>Заполнение карточки поискового задания</td>
+            </tr>
+            <tr>
+              <td><strong>Деятельностный трибьют</strong></td>
+              <td>Зажжение Свечи Памяти и генерация именного сертификата (100%)</td>
+              <td>Реестровая запись в <code>verify.html</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ВСПЛЫВАЮЩИЕ УВЕДОМЛЕНИЯ (TOAST) -->
+  <div id="methodToast" class="method-toast"></div>
+
+  <!-- ПОДВАЛ -->
+  <footer class="method-footer">
+    <div class="container">
+      <p>© 2026 ГБПОУ СРМК. Методический банк данных Всероссийской акции «Карта доблести: хранители подвигов».</p>
+    </div>
+  </footer>
+
+  <!-- СКРИПТЫ -->
+  <script src="js/methodology.js"></script>
+</body>
+</html>

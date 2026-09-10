@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Электронная Книга Памяти | «Быть воином — жить вечно» ГБПОУ СРМК</title>
+  <meta name="description" content="Электронная Книга Памяти Ставропольского регионального многопрофильного колледжа. Подробные биографические очерки и хроника подвига 20 выпускников — защитников Отечества.">
+  <meta name="theme-color" content="#0a0c0f">
+
+  <!-- Шрифтовые гарнитуры -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,400;1,600&display=swap" rel="stylesheet">
+
+  <!-- Стили -->
+  <link rel="stylesheet" href="css/memory-book.css">
+</head>
+<body class="dark-theme">
+
+  <!-- ВЕРХНИЙ ИНТЕРФЕЙСНЫЙ БАР -->
+  <header class="book-header">
+    <div class="container header-container">
+      <div class="header-left">
+        <a href="index.html" class="logo-badge">СРМК</a>
+        <div class="header-titles">
+          <span class="sub-title">Историко-мемориальный архив</span>
+          <h1 class="main-title">Электронная Книга Памяти и Славы</h1>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a href="certificate.html" class="btn-header">Генератор сертификатов</a>
+        <a href="methodology.html" class="btn-header">Методический кабинет</a>
+        <a href="index.html" class="btn-header btn-primary">← В виртуальный музей</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ИНДИКАТОР ПРОГРЕССА ЧТЕНИЯ -->
+  <div class="reading-progress-bar" id="readingProgressBar"></div>
+
+  <!-- ГЛАВНЫЙ ТИТУЛЬНЫЙ ЭКРАН КНИГИ -->
+  <section class="book-hero">
+    <div class="container hero-content">
+      <div class="hero-crest">⭐️</div>
+      <div class="hero-badge">Летопись мужества • 1973 — 2026</div>
+      <h2 class="hero-title">ИМЕНА, ВПИСАННЫЕ В ВЕЧНОСТЬ</h2>
+      <p class="hero-quote">
+        «Подвиг воина — это не мгновение слепой ярости. Это вершина человеческого духа, где соединяются любовь к родной земле, верность студенческому братству и готовность отдать жизнь за други своя.»
+      </p>
+      
+      <div class="hero-stats-row">
+        <div class="stat-badge"><strong>20</strong> Павших героев СВО</div>
+        <div class="stat-badge"><strong>100%</strong> Кавалеры госнаград</div>
+        <div class="stat-badge"><strong>4</strong> Рубежа боевой славы</div>
+        <div class="stat-badge"><strong>50+</strong> Лет истории колледжа</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ПАНЕЛЬ ПОИСКА И НАВИГАЦИИ ПО ГЛАВАМ -->
+  <nav class="book-controls-bar">
+    <div class="container controls-inner">
+      
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="bookSearchInput" class="search-input" placeholder="Поиск по имени героя, специальности, награде или месту подвига...">
+        <button id="clearSearchBtn" class="clear-btn" style="display:none;">&times;</button>
+      </div>
+
+      <div class="filters-pills" role="group" aria-label="Фильтры глав книги">
+        <button class="filter-pill active" data-filter="all" type="button">Все главы (20)</button>
+        <button class="filter-pill" data-filter="left" type="button">Левая плита Мемориала (10)</button>
+        <button class="filter-pill" data-filter="right" type="button">Правая плита Мемориала (10)</button>
+        <button class="filter-pill" data-filter="legacy" type="button">Преемственность (ВОВ и локальные войны)</button>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- ОСНОВНОЙ КОРПУС ЛЕТОПИСИ -->
+  <main class="container book-layout">
+    
+    <!-- БОКОВОЕ ИНТЕРАКТИВНОЕ ОГЛАВЛЕНИЕ (STICKY TOC) -->
+    <aside class="book-toc-sidebar">
+      <div class="toc-card">
+        <h3 class="toc-title">Оглавление летописи</h3>
+        <div class="toc-scroll-list" id="tocList">
+          <!-- Генерируется динамически через JS -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- КОНТЕНТНАЯ ОБЛАСТЬ: СЮЖЕТНЫЕ ИСТОРИИ ГЕРОЕВ -->
+    <section class="book-stories-feed" id="storiesFeed">
+      <!-- 20 детальных глав рендерятся из js/memory-book.js -->
+    </section>
+
+  </main>
+
+  <!-- ПЛАВАЮЩИЕ УВЕДОМЛЕНИЯ -->
+  <div id="bookToast" class="book-toast"></div>
+
+  <!-- ПОДВАЛ -->
+  <footer class="book-footer">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h4>ГБПОУ СРМК</h4>
+        <p>Ставропольский региональный многопрофильный колледж</p>
+        <p>355044, г. Ставрополь, проспект Юности, д. 3</p>
+      </div>
+      <div class="footer-col text-center">
+        <div class="memorial-crest-mini">⭐️</div>
+        <p class="footer-quote">«Быть воином — жить вечно»</p>
+      </div>
+      <div class="footer-col text-right">
+        <p>© 2026 Электронный фонд Мемориала Славы СРМК.</p>
+        <p>Всероссийская акция «Карта доблести: хранители подвигов».</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- СКРИПТЫ -->
+  <script src="js/data.js"></script>
+  <script src="js/sources.js"></script>
+  <script src="js/tts-narrator.js"></script>
+  <script src="js/memory-book.js"></script>
+</body>
+</html>

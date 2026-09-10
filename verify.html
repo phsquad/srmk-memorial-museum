@@ -119,6 +119,21 @@
       text-transform: uppercase;
     }
 
+    .status-badge-wrapper.invalid {
+      background: rgba(185, 28, 28, 0.12);
+      border-color: #ef4444;
+    }
+
+    .status-badge-wrapper.invalid .status-pulse {
+      background: #ef4444;
+      box-shadow: 0 0 12px rgba(239, 68, 68, 0.65);
+      animation: none;
+    }
+
+    .status-badge-wrapper.invalid .status-title {
+      color: #f87171;
+    }
+
     .cert-heading {
       font-family: var(--font-serif);
       font-size: 1.6rem;
@@ -286,9 +301,9 @@
       <div class="verify-card">
         
         <!-- СТАТУС ВЕРИФИКАЦИИ -->
-        <div class="status-badge-wrapper">
+        <div class="status-badge-wrapper" id="verificationStatus">
           <div class="status-pulse"></div>
-          <div class="status-title">ПОДЛИННОСТЬ ДОКУМЕНТА ПОДТВЕРЖДЕНА В ЭЛЕКТРОННОМ РЕЕСТРЕ</div>
+          <div class="status-title" id="verificationStatusTitle">ПОДЛИННОСТЬ ДОКУМЕНТА ПОДТВЕРЖДЕНА В ЭЛЕКТРОННОМ РЕЕСТРЕ</div>
         </div>
 
         <h1 class="cert-heading" id="cardDocTitle">Сертификат участника Урока Мужества</h1>
@@ -338,6 +353,7 @@
         <!-- ДЕЙСТВИЯ -->
         <div class="verify-actions">
           <a href="index.html#heroes-grid" class="btn-verify btn-verify-primary">Перейти к архивам Мемориала Славы</a>
+          <a href="certificate.html" class="btn-verify btn-verify-secondary">Открыть генератор сертификатов</a>
           <button onclick="window.print()" class="btn-verify btn-verify-secondary">Распечатать подтверждение</button>
         </div>
 
@@ -358,34 +374,39 @@
     </div>
   </footer>
 
+  <script src="js/certificate-verifier.js"></script>
   <script>
     'use strict';
 
-    async function computeSHA256(str) {
-      const buffer = new TextEncoder().encode(str + "SRMK_VERIFY_SALT_2026");
-      const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
     async function initVerification() {
       const params = new URLSearchParams(window.location.search);
-      const serial = params.get('cert') || 'СРМК-УМ-2026-0001';
-      const name = params.get('name') || 'Иванову Даниле Денисовичу';
-      const date = params.get('date') || new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+      const serial = CertificateVerifier.normalize(params.get('cert'));
+      const name = CertificateVerifier.normalize(params.get('name'));
+      const date = CertificateVerifier.normalize(params.get('date'));
+      const hasCertificateData = CertificateVerifier.isValidSerial(serial) && Boolean(name && date);
+      const status = document.getElementById('verificationStatus');
+      const statusTitle = document.getElementById('verificationStatusTitle');
 
-      document.getElementById('cardSerial').textContent = serial;
-      document.getElementById('cardName').textContent = name;
-      document.getElementById('cardDate').textContent = date;
+      if (!hasCertificateData) {
+        status.classList.add('invalid');
+        statusTitle.textContent = 'ДОКУМЕНТ НЕ НАЙДЕН В ЭЛЕКТРОННОМ РЕЕСТРЕ';
+      }
 
-      // Генерация криптографического отпечатка
-      const hash = await computeSHA256(serial + name + date);
+      document.getElementById('cardSerial').textContent = serial || 'Номер не указан';
+      document.getElementById('cardName').textContent = name || 'Данные отсутствуют';
+      document.getElementById('cardDate').textContent = date || 'Дата не указана';
+
+      const hash = await CertificateVerifier.computeHash(serial + name + date);
       document.getElementById('cardCryptoHash').textContent = `SHA256:${hash.toUpperCase()}`;
 
       // Ручной поиск
       const searchInput = document.getElementById('manualSearchInput');
       searchInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && searchInput.value.trim()) {
-          window.location.search = `?cert=${encodeURIComponent(searchInput.value.trim())}&name=Верифицированный+Студент`;
+          const url = new URL(window.location.href);
+          url.search = '';
+          url.searchParams.set('cert', searchInput.value.trim());
+          window.location.href = url.href;
         }
       });
     }
