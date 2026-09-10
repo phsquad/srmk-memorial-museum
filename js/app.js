@@ -612,20 +612,20 @@ const App = {
     }
   },
 
-  onTributeSuccess(type, heroId, newCount) {
+  async onTributeSuccess(type, heroId, newCount) {
     if (type === 'candle') {
       AppState.candles[heroId] = newCount;
       localStorage.setItem('srmk_museum_candles', JSON.stringify(AppState.candles));
 
-      if (window.CloudSync?.isLive) {
-        CloudSync.pushCandle(heroId).then(cloudCount => {
-          if (!Number.isFinite(cloudCount)) return;
+      if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
+        const cloudCount = await CloudSync.pushCandle(heroId);
+        if (Number.isFinite(cloudCount)) {
           AppState.candles[heroId] = cloudCount;
           localStorage.setItem('srmk_museum_candles', JSON.stringify(AppState.candles));
           this.updateMemorialStats();
           this.renderCardsGrid();
           this.renderMemorialPlaques();
-        });
+        }
       }
 
       const countDisplay = document.getElementById('candleCountDisplay');
