@@ -49,9 +49,11 @@
     </div>
   </aside>
 
-  <!-- 2. ШАПКА САЙТА (HEADER) -->
+  <!-- 2. ГЛАВНАЯ ЭРГОНОМИЧНАЯ ШАПКА -->
   <header class="header" id="siteHeader">
     <div class="container header-container">
+      
+      <!-- ЛОГОТИП И НАЗВАНИЕ (БЕЗ РАЗРЫВОВ СТРОК) -->
       <a href="#heroIntro" class="logo-group" aria-label="На главную страницу музея">
         <div class="logo-badge">СРМК</div>
         <div class="logo-text">
@@ -60,20 +62,83 @@
         </div>
       </a>
 
-      <nav class="nav" id="desktopNav" aria-label="Навигация по разделам">
-        <a href="#memorial" class="nav-link">Мемориал Славы</a>
+      <!-- ОСНОВНАЯ НАВИГАЦИЯ ПО 4 ЗАЛАМ ЭКСПОЗИЦИИ -->
+      <nav class="nav" id="desktopNav" aria-label="Навигация по залам">
+        <a href="#memorial" class="nav-link">Мемориал</a>
         <a href="#heroes-grid" class="nav-link">За партой Героя</a>
         <a href="#battle-path" class="nav-link">Хроника и Карта</a>
-        <a href="#memory-hall" class="nav-link">Эстафета памяти</a>
-        <a href="memory-book.html" class="nav-link">Книга Памяти</a>
-        <a href="reader.html" class="nav-link">Читалка</a>
-        <a href="quiz.html" class="nav-link">Викторина</a>
+        <a href="#memory-hall" class="nav-link">Эстафета</a>
       </nav>
 
+      <!-- ПАНЕЛЬ ДЕЙСТВИЙ И ЦИФРОВЫХ МОДУЛЕЙ -->
       <div class="header-actions">
+        <!-- ВЫПАДАЮЩЕЕ МЕНЮ ЦИФРОВЫХ МОДУЛЕЙ -->
+        <div class="modules-dropdown" id="modulesDropdown">
+          <button class="btn-dropdown-toggle" id="btnDropdownToggle" type="button" aria-expanded="false" aria-controls="dropdownMenu">
+            <span>🏛 Модули</span>
+            <span class="arrow-icon" aria-hidden="true">▾</span>
+          </button>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="memory-book.html" class="dropdown-item">
+              <span class="item-icon">📖</span>
+              <div><strong>Книга Памяти</strong><small>Летопись 20 героев</small></div>
+            </a>
+            <a href="reader.html" class="dropdown-item">
+              <span class="item-icon">📚</span>
+              <div><strong>3D Фолиант</strong><small>Читалка с перелистыванием</small></div>
+            </a>
+            <a href="quiz.html" class="dropdown-item">
+              <span class="item-icon">⚔️</span>
+              <div><strong>Квест-викторина</strong><small>10 интерактивных вопросов</small></div>
+            </a>
+            <a href="methodology.html" class="dropdown-item">
+              <span class="item-icon">📑</span>
+              <div><strong>Методкабинет</strong><small>Банк уроков для педагогов</small></div>
+            </a>
+            <a href="verify.html" class="dropdown-item">
+              <span class="item-icon">🛡</span>
+              <div><strong>Реестр верификации</strong><small>Проверка сертификатов</small></div>
+            </a>
+          </div>
+        </div>
+
+        <!-- КНОПКА СЕРТИФИКАТА -->
+        <a href="certificate.html" class="btn-header-cert" title="Оформить наградной лист">
+          <span>📜</span> Сертификат
+        </a>
+
+        <!-- ПАСПОРТ И КАРТА ДОБЛЕСТИ -->
         <button class="passport-btn" id="btnOpenPassport" type="button">Паспорт проекта</button>
-        <a href="certificate.html" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📜 Оформить Сертификат участника</a>
         <a href="https://карта-доблести.рф" target="_blank" rel="noopener noreferrer" class="contest-badge">Карта Доблести РФ</a>
+
+        <!-- КНОПКА МОБИЛЬНОГО МЕНЮ (БУРГЕР) -->
+        <button class="mobile-burger-btn" id="mobileBurgerBtn" aria-label="Открыть мобильное меню" aria-expanded="false" aria-controls="mobileDrawer" type="button">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ВЫДВИЖНАЯ МОБИЛЬНАЯ ПАНЕЛЬ МЕНЮ -->
+    <div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+      <div class="drawer-content">
+        <div class="drawer-section-label">Залы экспозиции</div>
+        <a href="#memorial" class="drawer-link">🏛 Мемориал Славы</a>
+        <a href="#heroes-grid" class="drawer-link">🎓 За партой Героя</a>
+        <a href="#battle-path" class="drawer-link">🗺 Хроника и Карта</a>
+        <a href="#memory-hall" class="drawer-link">🕯 Эстафета памяти</a>
+
+        <div class="drawer-section-label">Цифровые модули и сервисы</div>
+        <a href="memory-book.html" class="drawer-link">📖 Электронная Книга Памяти</a>
+        <a href="reader.html" class="drawer-link">📚 3D Фолиант-читалка</a>
+        <a href="quiz.html" class="drawer-link">⚔️ Квест-викторина «Дорогами мужества»</a>
+        <a href="certificate.html" class="drawer-link highlight">📜 Оформить Сертификат участника</a>
+        <a href="methodology.html" class="drawer-link">📑 Методический кабинет педагога</a>
+        <a href="verify.html" class="drawer-link">🛡 Реестр верификации</a>
+
+        <div class="drawer-buttons-row">
+          <button class="drawer-btn" id="drawerPassportBtn" type="button">Паспорт проекта</button>
+          <a href="https://карта-доблести.рф" target="_blank" rel="noopener noreferrer" class="drawer-btn gold">Карта Доблести РФ</a>
+        </div>
       </div>
     </div>
   </header>
@@ -451,6 +516,75 @@
 
   <!-- Интерактивные триггеры страницы -->
   <script>
+    // Навигация модулей и мобильная панель
+    const modulesDropdown = document.getElementById('modulesDropdown');
+    const dropdownToggle = document.getElementById('btnDropdownToggle');
+    const mobileBurgerBtn = document.getElementById('mobileBurgerBtn');
+    const mobileDrawer = document.getElementById('mobileDrawer');
+    const drawerPassportBtn = document.getElementById('drawerPassportBtn');
+
+    function setModulesDropdown(open) {
+      if (!modulesDropdown || !dropdownToggle) return;
+      modulesDropdown.classList.toggle('active', open);
+      dropdownToggle.setAttribute('aria-expanded', String(open));
+    }
+
+    function setMobileDrawer(open) {
+      if (!mobileDrawer || !mobileBurgerBtn) return;
+      mobileDrawer.classList.toggle('active', open);
+      mobileDrawer.setAttribute('aria-hidden', String(!open));
+      mobileBurgerBtn.setAttribute('aria-expanded', String(open));
+      mobileBurgerBtn.setAttribute('aria-label', open ? 'Закрыть мобильное меню' : 'Открыть мобильное меню');
+    }
+
+    function closeMobileDrawer() {
+      setMobileDrawer(false);
+    }
+
+    if (dropdownToggle) {
+      dropdownToggle.addEventListener('click', (event) => {
+        event.stopPropagation();
+        setModulesDropdown(!modulesDropdown.classList.contains('active'));
+      });
+    }
+
+    if (modulesDropdown) {
+      modulesDropdown.querySelectorAll('.dropdown-item').forEach(item => {
+        item.addEventListener('click', () => setModulesDropdown(false));
+      });
+    }
+
+    if (mobileBurgerBtn) {
+      mobileBurgerBtn.addEventListener('click', () => {
+        setModulesDropdown(false);
+        setMobileDrawer(!mobileDrawer.classList.contains('active'));
+      });
+    }
+
+    if (mobileDrawer) {
+      mobileDrawer.querySelectorAll('.drawer-link').forEach(link => {
+        link.addEventListener('click', closeMobileDrawer);
+      });
+    }
+
+    if (drawerPassportBtn) {
+      drawerPassportBtn.addEventListener('click', () => {
+        closeMobileDrawer();
+        togglePassport(true);
+      });
+    }
+
+    document.addEventListener('click', (event) => {
+      if (modulesDropdown && !modulesDropdown.contains(event.target)) setModulesDropdown(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        setModulesDropdown(false);
+        closeMobileDrawer();
+      }
+    });
+
     // Паспорт проекта
     const passportModal = document.getElementById('passportModal');
     const btnPassport = document.getElementById('btnOpenPassport');

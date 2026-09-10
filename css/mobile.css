@@ -95,10 +95,15 @@ body {
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-hairline);
   z-index: 1000;
-  padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
+  padding: calc(8px + env(safe-area-inset-top, 0px)) 16px 8px;
+}
+
+.mobile-header-inner {
+  min-height: 42px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 }
 
 .logo-group {
@@ -106,6 +111,7 @@ body {
   align-items: center;
   gap: 10px;
   text-decoration: none;
+  min-width: 0;
 }
 
 .logo-badge {
@@ -123,6 +129,17 @@ body {
 .logo-text {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+}
+
+.org-name {
+  color: var(--text-tertiary);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  line-height: 1;
+  text-transform: uppercase;
+  margin-bottom: 3px;
 }
 
 .site-title {
@@ -135,6 +152,80 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 230px;
+}
+
+.mobile-menu-toggle {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  padding: 8px;
+  border: 1px solid var(--border-accent);
+  border-radius: 2px;
+  background: var(--bg-elevated);
+  cursor: pointer;
+}
+
+.mobile-menu-toggle span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--accent-brass);
+  transition: transform var(--transition), opacity var(--transition);
+}
+
+.mobile-modules-panel {
+  display: none;
+  margin-top: 10px;
+  padding: 10px 0 4px;
+  border-top: 1px solid var(--border-hairline);
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+}
+
+.mobile-modules-panel.active {
+  display: block;
+}
+
+.mobile-panel-label {
+  color: var(--accent-brass);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  padding: 4px 0 8px;
+  text-transform: uppercase;
+}
+
+.mobile-module-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 8px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  font-size: 1.15rem;
+  text-decoration: none;
+}
+
+.mobile-module-link span {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.mobile-module-link strong {
+  color: var(--text-primary);
+  font-size: 0.82rem;
+}
+
+.mobile-module-link small {
+  color: var(--text-tertiary);
+  font-size: 0.68rem;
 }
 
 /* ==========================================================================
@@ -171,6 +262,7 @@ body {
 .hero-title .highlight {
   color: var(--accent-brass);
   background: linear-gradient(180deg, #ffffff 10%, var(--accent-brass) 100%);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

@@ -24,11 +24,27 @@
 
   <!-- ШАПКА -->
   <header class="header">
-    <div class="logo-group">
-      <div class="logo-badge">СРМК</div>
-      <div class="logo-text">
-        <span class="site-title">«Быть воином — жить вечно»</span>
-      </div>
+    <div class="mobile-header-inner">
+      <a href="#heroIntro" class="logo-group" aria-label="На главную страницу музея">
+        <div class="logo-badge">СРМК</div>
+        <div class="logo-text">
+          <span class="org-name">ГБПОУ СРМК</span>
+          <span class="site-title">«Быть воином — жить вечно»</span>
+        </div>
+      </a>
+      <button class="mobile-menu-toggle" id="mobileModulesToggle" type="button" aria-expanded="false" aria-controls="mobileModulesPanel" aria-label="Открыть меню модулей">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <div class="mobile-modules-panel" id="mobileModulesPanel" aria-hidden="true">
+      <div class="mobile-panel-label">Цифровые модули</div>
+      <a href="memory-book.html" class="mobile-module-link">📖 <span><strong>Книга Памяти</strong><small>Летопись героев</small></span></a>
+      <a href="reader.html" class="mobile-module-link">📚 <span><strong>3D Фолиант</strong><small>Интерактивная читалка</small></span></a>
+      <a href="quiz.html" class="mobile-module-link">⚔️ <span><strong>Квест-викторина</strong><small>Проверьте знания</small></span></a>
+      <a href="methodology.html" class="mobile-module-link">📑 <span><strong>Методический кабинет</strong><small>Материалы для педагогов</small></span></a>
+      <a href="certificate.html" class="mobile-module-link">📜 <span><strong>Сертификаты</strong><small>Оформить документ</small></span></a>
+      <a href="verify.html" class="mobile-module-link">🛡 <span><strong>Проверка сертификата</strong><small>Реестр документов</small></span></a>
     </div>
   </header>
 
@@ -144,11 +160,17 @@
       </span>
       <span>Карта</span>
     </a>
-    <a href="https://карта-доблести.рф" target="_blank" class="app-tab">
+    <a href="quiz.html" class="app-tab">
       <span class="app-tab-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.2 5.9-.9L12 3z"></path></svg>
       </span>
-      <span>Проект</span>
+      <span>Квиз</span>
+    </a>
+    <a href="memory-book.html" class="app-tab">
+      <span class="app-tab-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5v-17z"></path><path d="M4 4.5v17A2.5 2.5 0 0 1 6.5 19H20"></path></svg>
+      </span>
+      <span>Книга</span>
     </a>
   </nav>
 
@@ -170,8 +192,42 @@
 
   <!-- 4. Главные контроллеры -->
   <script src="js/app.js"></script>
+  <script src="js/tech-modules.js"></script>
   
   <script>
+    const modulesToggle = document.getElementById('mobileModulesToggle');
+    const modulesPanel = document.getElementById('mobileModulesPanel');
+
+    function setModulesPanel(open) {
+      if (!modulesToggle || !modulesPanel) return;
+      modulesPanel.classList.toggle('active', open);
+      modulesPanel.setAttribute('aria-hidden', String(!open));
+      modulesToggle.setAttribute('aria-expanded', String(open));
+      modulesToggle.setAttribute('aria-label', open ? 'Закрыть меню модулей' : 'Открыть меню модулей');
+    }
+
+    if (modulesToggle) {
+      modulesToggle.addEventListener('click', () => {
+        setModulesPanel(!modulesPanel.classList.contains('active'));
+      });
+    }
+
+    if (modulesPanel) {
+      modulesPanel.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => setModulesPanel(false));
+      });
+    }
+
+    document.addEventListener('click', (event) => {
+      if (modulesPanel && modulesToggle && !modulesPanel.contains(event.target) && !modulesToggle.contains(event.target)) {
+        setModulesPanel(false);
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') setModulesPanel(false);
+    });
+
     function setActiveTab(el) {
       document.querySelectorAll('.app-tab').forEach(t => t.classList.remove('active'));
       el.classList.add('active');
