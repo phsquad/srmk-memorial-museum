@@ -104,16 +104,15 @@ const GuestbookEngine = {
     };
 
     // 1. Отправляем в глобальное облако Supabase
+    let savedToCloud = false;
     if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
-      await CloudSync.sendTribute(newTribute);
-    } else {
-      // Если облако недоступно, сохраняем локально
-      localStorage.setItem('srmk_guestbook_entries_v2', JSON.stringify(this.tributes));
+      savedToCloud = await CloudSync.sendTribute(newTribute);
     }
 
     // 2. Добавляем себе на экран
     this.tributes.unshift(newTribute);
     this.userFlames[newTribute.id] = true;
+    localStorage.setItem('srmk_guestbook_entries_v2', JSON.stringify(this.tributes));
     localStorage.setItem('srmk_user_flames_v2', JSON.stringify(this.userFlames));
 
     this.closeModal();
@@ -122,7 +121,9 @@ const GuestbookEngine = {
     document.getElementById('tributeForm').reset();
     
     this.playChime(880);
-    this.showToast("Ваше послание отправлено в глобальную Книгу Памяти!");
+    this.showToast(savedToCloud || typeof CloudSync === 'undefined' || !CloudSync.isLive
+      ? "Ваше послание опубликовано в глобальной Книге Памяти!"
+      : "Облако не приняло послание. Оно сохранено только на этом устройстве.");
   },
 
   /**

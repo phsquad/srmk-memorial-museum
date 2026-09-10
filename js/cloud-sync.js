@@ -121,12 +121,16 @@ const CloudSync = {
   async fetchTributes() {
     if (!this.isLive) return null;
     const { data, error } = await this.client.from('guestbook_tributes').select('*').order('is_pinned', { ascending: false }).order('created_at', { ascending: false });
-    if (error) return null;
+    if (error) {
+      console.error('[CloudSync] Ошибка загрузки Стены Памяти:', error);
+      return null;
+    }
     return data ? data.map(row => this.normalizeTribute(row)) : [];
   },
   async sendTribute(tributeObj) {
     if (!this.isLive) return false;
     const { error } = await this.client.from('guestbook_tributes').insert([this.serializeTribute(tributeObj)]);
+    if (error) console.error('[CloudSync] Ошибка публикации послания:', error);
     return !error;
   },
   async toggleFlame(tributeId, delta) {
