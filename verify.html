@@ -390,33 +390,55 @@
 
     async function initVerification() {
       const params = new URLSearchParams(window.location.search);
-      const serial = CertificateVerifier.normalize(params.get('cert'));
-      const name = CertificateVerifier.normalize(params.get('name'));
-      const date = CertificateVerifier.normalize(params.get('date'));
-      const hasCertificateData = CertificateVerifier.isValidSerial(serial) && Boolean(name && date);
-      const status = document.getElementById('verificationStatus');
-      const statusTitle = document.getElementById('verificationStatusTitle');
+      const serial = params.get('cert');
+      
+      const statusWrapper = document.querySelector('.status-badge-wrapper');
+      const statusTitle = document.querySelector('.status-title');
+      const statusPulse = document.querySelector('.status-pulse');
 
-      if (!hasCertificateData) {
-        status.classList.add('invalid');
-        statusTitle.textContent = 'ДОКУМЕНТ НЕ НАЙДЕН В ЭЛЕКТРОННОМ РЕЕСТРЕ';
+      if (!serial) {
+        statusTitle.textContent = "ОЖИДАНИЕ ВВОДА НОМЕРА СЕРТИФИКАТА";
+        statusPulse.style.background = "#f59e0b";
+        statusWrapper.style.borderColor = "#f59e0b";
+        return;
       }
 
-      document.getElementById('cardSerial').textContent = serial || 'Номер не указан';
-      document.getElementById('cardName').textContent = name || 'Данные отсутствуют';
-      document.getElementById('cardDate').textContent = date || 'Дата не указана';
+      document.getElementById('cardSerial').textContent = serial;
+      statusTitle.textContent = "ПОИСК В ГЛОБАЛЬНОМ РЕЕСТРЕ SUPABASE...";
 
-      const hash = await CertificateVerifier.computeHash(serial + name + date);
-      document.getElementById('cardCryptoHash').textContent = `SHA256:${hash.toUpperCase()}`;
+      // Ждем загрузки CloudSync
+      setTimeout(async () => {
+        if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
+          const certData = await CloudSync.verifyCertificate(serial);
+          
+          if (certData) {
+            // СЕРТИФИКАТ НАЙДЕН В БАЗЕ!
+            statusTitle.textContent = "ПОДЛИННОСТЬ ПОДТВЕРЖДЕНА В ЭЛЕКТРОННОМ РЕЕСТРЕ";
+            statusPulse.style.background = "var(--status-green)";
+            statusWrapper.style.borderColor = "var(--status-green)";
+            
+            document.getElementById('cardName').textContent = certData.student_name;
+            document.getElementById('cardDate').textContent = certData.issue_date;
+            document.getElementById('cardCryptoHash').textContent = `SHA256:${certData.crypto_hash.toUpperCase()}`;
+          } else {
+            // СЕРТИФИКАТ НЕ НАЙДЕН (ПОДДЕЛКА)
+            statusTitle.textContent = "ОШИБКА: СЕРТИФИКАТ НЕ НАЙДЕН В БАЗЕ ДАННЫХ";
+            statusPulse.style.background = "var(--status-red)";
+            statusWrapper.style.borderColor = "var(--status-red)";
+            statusPulse.style.animation = "none";
+            
+            document.getElementById('cardName').textContent = "НЕИЗВЕСТНО";
+            document.getElementById('cardDate').textContent = "НЕИЗВЕСТНО";
+            document.getElementById('cardCryptoHash').textContent = "ОТКАЗ ВЕРИФИКАЦИИ";
+          }
+        }
+      }, 1000);
 
       // Ручной поиск
       const searchInput = document.getElementById('manualSearchInput');
       searchInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && searchInput.value.trim()) {
-          const url = new URL(window.location.href);
-          url.search = '';
-          url.searchParams.set('cert', searchInput.value.trim());
-          window.location.href = url.href;
+          window.location.search = `?cert=${encodeURIComponent(searchInput.value.trim())}`;
         }
       });
     }
