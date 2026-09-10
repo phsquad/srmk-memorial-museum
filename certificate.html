@@ -455,6 +455,7 @@
       <h1 class="app-title">Генератор наградных сертификатов Мемориального комплекса</h1>
     </div>
     <a href="reader.html" class="btn-back-museum">📚 Читалка</a>
+    <a href="quiz.html" class="btn-back-museum">⚔️ Викторина</a>
     <a href="memory-book.html" class="btn-back-museum">📖 Книга Памяти</a>
     <a href="index.html" class="btn-back-museum">← Вернуться в Музей</a>
   </header>
@@ -661,7 +662,30 @@
       init() {
         this.bindControls();
         this.updateNominationOptions();
+        this.applyQueryParams();
         this.renderPreview();
+      },
+
+      applyQueryParams() {
+        const params = new URLSearchParams(window.location.search);
+        const name = params.get('name');
+        const group = params.get('group');
+        const specialty = params.get('spec');
+        const nomination = params.get('nom');
+        const date = params.get('date');
+
+        if (name) document.getElementById('inputStudentName').value = name;
+        if (group) document.getElementById('inputStudentGroup').value = group;
+        if (specialty) {
+          const specialtySelect = document.getElementById('selectStudentSpecialty');
+          if ([...specialtySelect.options].some(option => option.value === specialty)) {
+            specialtySelect.value = specialty;
+          }
+        }
+        if (nomination && this.studentNominations[nomination]) {
+          document.getElementById('selectNomination').value = nomination;
+        }
+        if (date) document.getElementById('inputDate').value = date;
       },
 
       bindControls() {
