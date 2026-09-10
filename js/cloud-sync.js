@@ -15,6 +15,7 @@ const CloudConfig = {
 const CloudSync = {
   client: null,
   isLive: false,
+  channels: [],
 
   normalizeTribute(row) {
     return {
@@ -45,6 +46,7 @@ const CloudSync = {
   },
 
   init() {
+    if (this.isLive) return;
     if (typeof supabase !== 'undefined' && CloudConfig.SUPABASE_URL.indexOf('ВАШ_PROJECT_ID') === -1) {
       try {
         this.client = supabase.createClient(CloudConfig.SUPABASE_URL, CloudConfig.SUPABASE_ANON_KEY);
@@ -60,8 +62,11 @@ const CloudSync = {
   subscribeRealtime() {
     if (!this.client) return;
 
+    this.channels.forEach(channel => this.client.removeChannel(channel));
+    this.channels = [];
+
     // Слушатель счетчиков (Свечи и Цветы)
-    this.client.channel('realtime_counters')
+    const countersChannel = this.client.channel('realtime_counters')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'memorial_counters' }, (payload) => {
         const row = payload.new;
         if (!row) return;
@@ -80,9 +85,10 @@ const CloudSync = {
           if (data && flowersDisplay) flowersDisplay.textContent = data.flowers;
         });
       }).subscribe();
+    this.channels.push(countersChannel);
 
     // Слушатель Стены Памяти
-    this.client.channel('realtime_guestbook')
+    const guestbookChannel = this.client.channel('realtime_guestbook')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'guestbook_tributes' }, (payload) => {
         if (typeof GuestbookEngine !== 'undefined') {
           if (payload.eventType === 'INSERT') GuestbookEngine.receiveRealtimeTribute(payload.new);
@@ -95,6 +101,12 @@ const CloudSync = {
           }
         }
       }).subscribe();
+    this.channels.push(guestbookChannel);
+  },
+
+  reconnect() {
+    if (!this.client) return;
+    this.subscribeRealtime();
   },
 
   // --- МЕТОДЫ СВЕЧЕЙ И ЦВЕТОВ ---
@@ -171,3 +183,7 @@ const CloudSync = {
 
 window.CloudSync = CloudSync;
 document.addEventListener('DOMContentLoaded', () => CloudSync.init());
+window.addEventListener('online', () => CloudSync.reconnect());
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') CloudSync.reconnect();
+});

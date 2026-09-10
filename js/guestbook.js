@@ -248,4 +248,6 @@ const GuestbookEngine = {
   }
 };
 
+window.GuestbookEngine = GuestbookEngine;
+
 document.addEventListener('DOMContentLoaded', () => GuestbookEngine.init());

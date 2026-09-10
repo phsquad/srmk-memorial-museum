@@ -1030,4 +1030,5 @@ const App = {
   }
 };
 
+window.AppState = AppState;
 window.App = App;
