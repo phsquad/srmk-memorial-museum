@@ -1,0 +1,620 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   3D-ЧИТАЛКА И КНИЖНАЯ ПОЛКА: css/reader.css
+   ========================================================================== */
+:root {
+  --bg-main: #0a0c0f;
+  --bg-shelf-wall: #0e1118;
+  --bg-shelf-wood: #181512;
+  --accent-brass: #c5a059;
+  --accent-brass-hover: #dfba6d;
+  --accent-brass-glow: rgba(197, 160, 89, 0.4);
+  --accent-granite: #8a1c22;
+  --accent-granite-hover: #a8232b;
+  
+  --text-primary: #f1f3f7;
+  --text-secondary: #9da6b3;
+  --text-tertiary: #626a78;
+  --border-hairline: rgba(255, 255, 255, 0.08);
+  --border-accent: rgba(197, 160, 89, 0.3);
+
+  --font-serif: 'Cinzel', Georgia, serif;
+  --font-book: 'Lora', 'Times New Roman', serif;
+  --font-sans: 'Montserrat', sans-serif;
+  --transition: 0.25s cubic-bezier(0.2, 0, 0, 1);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0; padding: 0;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.container {
+  width: 100%;
+  max-width: 1260px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Шапка */
+.reader-header {
+  background: rgba(10, 12, 16, 0.96);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border-hairline);
+  padding: 12px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-badge {
+  background: var(--accent-granite);
+  color: #fff;
+  font-family: var(--font-serif);
+  font-weight: 900;
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  border-radius: 2px;
+  text-decoration: none;
+}
+
+.header-titles .sub-title {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+}
+
+.header-titles .main-title {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  color: var(--accent-brass);
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.header-btn {
+  background: var(--bg-shelf-wall);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-secondary);
+  padding: 7px 14px;
+  border-radius: 2px;
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.header-btn:hover {
+  color: #fff;
+  border-color: var(--accent-brass);
+}
+
+.header-btn.btn-primary {
+  background: var(--accent-granite);
+  color: #fff;
+  border-color: var(--accent-granite);
+}
+
+/* ==========================================================================
+   1. КНИЖНАЯ ПОЛКА (BOOKSHELF)
+   ========================================================================== */
+.shelf-view-section {
+  padding-bottom: 80px;
+}
+
+.shelf-hero-banner {
+  padding: 60px 0 40px;
+  text-align: center;
+  background: radial-gradient(circle at 50% 20%, rgba(24, 29, 40, 0.8) 0%, var(--bg-main) 75%);
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.hero-crest { font-size: 2rem; color: var(--accent-brass); margin-bottom: 8px; }
+.hero-badge {
+  display: inline-block;
+  color: var(--accent-brass);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border-bottom: 1px solid var(--border-accent);
+  padding-bottom: 3px;
+  margin-bottom: 14px;
+}
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: #ffffff;
+  margin-bottom: 12px;
+}
+.hero-desc {
+  max-width: 680px;
+  margin: 0 auto 28px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.shelf-toolbar {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.shelf-search {
+  position: relative;
+  flex: 1;
+  min-width: 280px;
+}
+.shelf-search span {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--text-tertiary);
+}
+.shelf-search input {
+  width: 100%;
+  background: var(--bg-shelf-wall);
+  border: 1px solid var(--border-hairline);
+  color: #fff;
+  padding: 10px 14px 10px 38px;
+  border-radius: 2px;
+  font-size: 0.86rem;
+  outline: none;
+}
+.shelf-search input:focus { border-color: var(--accent-brass); }
+
+.shelf-filters { display: flex; gap: 6px; }
+.shelf-filter-btn {
+  background: var(--bg-shelf-wall);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-secondary);
+  padding: 8px 14px;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.shelf-filter-btn.active, .shelf-filter-btn:hover {
+  background: var(--accent-brass);
+  color: #000;
+  font-weight: 700;
+}
+
+/* Сетка книг на полке */
+.shelf-display-container {
+  margin-top: 40px;
+}
+
+.bookshelf-tier {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+  padding: 20px;
+  background: linear-gradient(180deg, #10141d 0%, #0c0e14 100%);
+  border: 1px solid var(--border-hairline);
+  border-bottom: 12px solid #2b1f17; /* Деревянная полка */
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9);
+  border-radius: 4px;
+}
+
+/* 3D-Том героя на полке */
+.book-spine-card {
+  height: 380px;
+  background: linear-gradient(135deg, #181c26 0%, #10131a 100%);
+  border: 1px solid var(--border-accent);
+  border-left: 12px solid var(--accent-granite);
+  border-radius: 2px 6px 6px 2px;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: transform 0.3s var(--transition), box-shadow 0.3s var(--transition);
+  box-shadow: 6px 8px 20px rgba(0, 0, 0, 0.7);
+  position: relative;
+  overflow: hidden;
+}
+
+.book-spine-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(90deg, rgba(255,255,255,0.08) 0%, transparent 20%);
+  pointer-events: none;
+}
+
+.book-spine-card:hover {
+  transform: translateY(-12px) rotate(-1deg);
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.9), 0 0 20px var(--accent-brass-glow);
+  border-color: var(--accent-brass);
+}
+
+.book-spine-vol {
+  font-family: var(--font-serif);
+  font-size: 0.72rem;
+  color: var(--accent-brass);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+}
+
+.book-spine-portrait {
+  width: 90px;
+  height: 120px;
+  margin: 10px auto;
+  border: 2px solid var(--accent-brass);
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+}
+.book-spine-portrait img { width: 100%; height: 100%; object-fit: cover; }
+
+.book-spine-title {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  color: #fff;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.book-spine-spec {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: 4px;
+}
+
+.book-spine-btn {
+  width: 100%;
+  background: var(--bg-shelf-wall);
+  border: 1px solid var(--border-accent);
+  color: var(--accent-brass);
+  padding: 8px;
+  border-radius: 2px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 10px;
+}
+.book-spine-card:hover .book-spine-btn {
+  background: var(--accent-brass);
+  color: #000;
+}
+
+/* ==========================================================================
+   2. 3D-ЧИТАЛКА (BOOK FLIPBOOK)
+   ========================================================================== */
+.book-reader-section {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: #060709;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+}
+
+.reader-control-panel {
+  background: rgba(14, 17, 23, 0.98);
+  border-bottom: 1px solid var(--border-hairline);
+  padding: 10px 0;
+  z-index: 10;
+}
+
+.control-panel-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.current-book-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.meta-vol {
+  background: var(--accent-granite);
+  color: #fff;
+  font-family: var(--font-serif);
+  font-size: 0.74rem;
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+.meta-hero-name {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  color: var(--accent-brass);
+}
+
+.reader-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tool-btn {
+  background: var(--bg-shelf-wall);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-primary);
+  padding: 7px 12px;
+  border-radius: 2px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.tool-btn:hover { border-color: var(--accent-brass); color: var(--accent-brass); }
+.tool-btn.playing { background: var(--accent-brass); color: #000; }
+
+.theme-selector {
+  display: flex;
+  gap: 6px;
+  background: var(--bg-shelf-wall);
+  padding: 4px 8px;
+  border-radius: 20px;
+  border: 1px solid var(--border-hairline);
+}
+.theme-dot {
+  width: 16px; height: 16px; border-radius: 50%; border: 1px solid #fff; cursor: pointer;
+}
+.theme-dot[data-theme="theme-parchment"] { background: #fdfaf0; border-color: #c5a059; }
+.theme-dot[data-theme="theme-dark"] { background: #12151d; border-color: #444; }
+.theme-dot[data-theme="theme-archive"] { background: #ffffff; border-color: #8a1c22; }
+.theme-dot.active { transform: scale(1.2); }
+
+.btn-close-reader { font-size: 1.1rem; padding: 4px 10px; }
+
+/* 3D Сцена */
+.book-stage-wrapper {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  position: relative;
+  perspective: 2500px;
+}
+
+.flip-nav-btn {
+  background: rgba(18, 21, 29, 0.85);
+  border: 1px solid var(--border-accent);
+  color: var(--accent-brass);
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  cursor: pointer;
+  z-index: 100;
+  transition: transform 0.2s, background 0.2s;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.8);
+}
+.flip-nav-btn:hover { background: var(--accent-brass); color: #000; transform: scale(1.1); }
+.prev-btn { position: absolute; left: 30px; }
+.next-btn { position: absolute; right: 30px; }
+
+/* 3D Книга */
+.folio-book-3d {
+  width: 1000px;
+  height: 640px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  position: relative;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95);
+  border-radius: 4px;
+  transition: transform 0.4s ease;
+}
+
+/* Темы страниц */
+.folio-book-3d.theme-parchment .book-page {
+  background: radial-gradient(circle at 50% 50%, #fdfaf2 0%, #f3ebd4 100%);
+  color: #1a1714;
+}
+.folio-book-3d.theme-dark .book-page {
+  background: #141720;
+  color: #d8deea;
+}
+.folio-book-3d.theme-archive .book-page {
+  background: #ffffff;
+  color: #111111;
+}
+
+.book-page {
+  padding: 36px 40px;
+  overflow-y: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.page-left {
+  border-right: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 4px 0 0 4px;
+}
+.page-right {
+  border-radius: 0 4px 4px 0;
+}
+
+/* Центральный сгиб корешка */
+.book-spine-crease {
+  position: absolute;
+  top: 0; left: 50%; transform: translateX(-50%);
+  width: 40px; height: 100%;
+  background: linear-gradient(90deg, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.02) 40%, rgba(0,0,0,0.02) 60%, rgba(0,0,0,0.18) 100%);
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* Ляссе (Закладка) */
+.ribbon-bookmark {
+  position: absolute;
+  top: -6px; left: 49.5%;
+  width: 14px; height: 95%;
+  background: linear-gradient(180deg, var(--accent-granite), #550f14);
+  box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.5);
+  border-radius: 0 0 4px 4px;
+  z-index: 25;
+  pointer-events: none;
+}
+
+/* Типографика разворота */
+.page-header-meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-serif);
+  font-size: 0.72rem;
+  color: #8a1c22;
+  border-bottom: 1px solid rgba(138, 28, 34, 0.2);
+  padding-bottom: 6px;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.page-visual-frame {
+  width: 100%;
+  height: 250px;
+  border: 1px solid rgba(197, 160, 89, 0.5);
+  padding: 4px;
+  background: #fff;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.page-visual-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+.page-quote-box {
+  background: rgba(138, 28, 34, 0.06);
+  border-left: 3px solid #8a1c22;
+  padding: 10px 14px;
+  font-family: var(--font-book);
+  font-style: italic;
+  font-size: 0.95rem;
+  margin-bottom: 14px;
+}
+
+.page-chapter-title {
+  font-family: var(--font-serif);
+  font-size: 1.45rem;
+  color: #8a1c22;
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+
+.page-story-text {
+  font-family: var(--font-book);
+  font-size: 0.98rem;
+  line-height: 1.75;
+  text-align: justify;
+}
+
+/* Буквица (Drop Cap) */
+.drop-cap {
+  float: left;
+  font-family: var(--font-serif);
+  font-size: 3.4rem;
+  line-height: 0.8;
+  font-weight: 900;
+  color: #8a1c22;
+  margin-right: 10px;
+  padding-top: 4px;
+}
+
+.page-number-footer {
+  text-align: center;
+  font-family: var(--font-serif);
+  font-size: 0.78rem;
+  color: #777;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding-top: 6px;
+  margin-top: 14px;
+}
+
+/* Нижний статус-бар */
+.reader-bottom-bar {
+  background: rgba(14, 17, 23, 0.98);
+  border-top: 1px solid var(--border-hairline);
+  padding: 10px 0;
+}
+.bottom-bar-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pagination-info { font-family: var(--font-serif); color: var(--accent-brass); font-size: 0.82rem; }
+.shortcut-tip { font-size: 0.74rem; color: var(--text-tertiary); }
+
+.page-dots-track { display: flex; gap: 6px; }
+.page-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: #333; cursor: pointer;
+}
+.page-dot.active { background: var(--accent-brass); transform: scale(1.3); }
+
+/* Всплывающий тост */
+.reader-toast {
+  position: fixed;
+  bottom: 30px; right: 30px;
+  background: rgba(14, 16, 22, 0.96);
+  border: 1px solid var(--accent-brass);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  z-index: 3000;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.25s ease;
+}
+.reader-toast.active { opacity: 1; transform: translateY(0); }
+
+/* Адаптивность для смартфонов (1 страница) */
+@media (max-width: 900px) {
+  .bookshelf-tier { grid-template-columns: repeat(2, 1fr); }
+  .folio-book-3d {
+    width: 100%; height: 80vh;
+    grid-template-columns: 1fr;
+  }
+  .page-left { display: none; } /* На смартфонах листается по одной странице */
+  .book-spine-crease, .ribbon-bookmark { display: none; }
+  .prev-btn { left: 10px; }
+  .next-btn { right: 10px; }
+  .shortcut-tip { display: none; }
+}
+
+@media (max-width: 550px) {
+  .bookshelf-tier { grid-template-columns: 1fr; }
+}

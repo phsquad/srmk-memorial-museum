@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Книга Памяти: 20 страниц бессмертия | ГБПОУ СРМК</title>
+  <meta name="description" content="Интерактивная 3D-библиотека и читалка повестей о 20 героях-выпускниках Ставропольского регионального многопрофильного колледжа.">
+  <meta name="theme-color" content="#0a0c0f">
+
+  <!-- Шрифты -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,400&display=swap" rel="stylesheet">
+
+  <!-- Стили -->
+  <link rel="stylesheet" href="css/reader.css">
+</head>
+<body class="dark-theme">
+
+  <!-- ШАПКА -->
+  <header class="reader-header" id="readerHeader">
+    <div class="container header-container">
+      <div class="header-left">
+        <a href="index.html" class="logo-badge">СРМК</a>
+        <div class="header-titles">
+          <span class="sub-title">Историко-биографический архив</span>
+          <h1 class="main-title">Интерактивный Фолиант Памяти</h1>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="btnReturnToShelf" class="header-btn" style="display:none;" onclick="ReaderEngine.closeBook()">
+          📚 На книжную полку
+        </button>
+        <a href="memory-book.html" class="header-btn">Книга Памяти</a>
+        <a href="certificate.html" class="header-btn">Сертификаты</a>
+        <a href="methodology.html" class="header-btn">Методкабинет</a>
+        <a href="index.html" class="header-btn btn-primary">← В 3D-музей</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       ВИД 1: ВИРТУАЛЬНАЯ КНИЖНАЯ ПОЛКА (BOOKSHELF VIEW)
+       ========================================================================== -->
+  <section class="shelf-view-section" id="shelfView">
+    
+    <div class="shelf-hero-banner">
+      <div class="container">
+        <div class="hero-crest">⭐️</div>
+        <div class="hero-badge">Летопись славы выпускников СРМК</div>
+        <h2 class="hero-title">БИБЛИОТЕКА МУЖЕСТВА</h2>
+        <p class="hero-desc">
+          Выберите фолиант любого из 20 героев, чтобы открыть персональную иллюстрированную книгу с архивными документами, хроникой подвига и аудиогидом.
+        </p>
+
+        <!-- Поиск и фильтры полки -->
+        <div class="shelf-toolbar">
+          <div class="shelf-search">
+            <span>🔍</span>
+            <input type="text" id="shelfSearchInput" placeholder="Поиск тома по имени героя, специальности или награде...">
+          </div>
+          <div class="shelf-filters">
+            <button class="shelf-filter-btn active" data-filter="all" type="button">Все книги (20)</button>
+            <button class="shelf-filter-btn" data-filter="left" type="button">Левая плита (10)</button>
+            <button class="shelf-filter-btn" data-filter="right" type="button">Правая плита (10)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Деревянные полки с 3D-книгами -->
+    <div class="container shelf-display-container">
+      <div class="bookshelf-tier" id="bookshelfGrid">
+        <!-- 20 интерактивных книг генерируются через js/reader.js -->
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ==========================================================================
+       ВИД 2: 3D-ЧИТАЛКА РАЗВОРОТА КНИГИ (BOOK FLIPBOOK VIEW)
+       ========================================================================== -->
+  <section class="book-reader-section" id="bookReaderView" style="display:none;">
+    
+    <!-- Панель управления чтением -->
+    <div class="reader-control-panel">
+      <div class="container control-panel-inner">
+        
+        <div class="current-book-meta">
+          <span class="meta-vol" id="readerVolBadge">Том I</span>
+          <strong class="meta-hero-name" id="readerHeroTitle">Владислав Петухов</strong>
+        </div>
+
+        <div class="reader-tools">
+          <button class="tool-btn" id="readerAudioToggleBtn" onclick="ReaderEngine.toggleHeroAudio()" type="button">
+            🎧 Слушать аудиогид (MP3)
+          </button>
+          
+          <div class="theme-selector">
+            <button class="theme-dot active" data-theme="theme-parchment" title="Винтажный пергамент"></button>
+            <button class="theme-dot" data-theme="theme-dark" title="Ночной бархат"></button>
+            <button class="theme-dot" data-theme="theme-archive" title="Архивный бланк"></button>
+          </div>
+
+          <button class="tool-btn" onclick="window.print()" title="Печать разворота" type="button">🖨</button>
+          <button class="tool-btn btn-close-reader" onclick="ReaderEngine.closeBook()" title="Закрыть книгу" type="button">✕</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 3D Сцена книги -->
+    <div class="book-stage-wrapper">
+      
+      <!-- Стрелка влево -->
+      <button class="flip-nav-btn prev-btn" id="prevPageBtn" onclick="ReaderEngine.prevPage()" aria-label="Предыдущая страница">
+        <span>❮</span>
+      </button>
+
+      <!-- Разворот книги -->
+      <div class="folio-book-3d theme-parchment" id="folioBookElement">
+        
+        <!-- Ляссе (Закладка) -->
+        <div class="ribbon-bookmark"></div>
+
+        <!-- Левая страница -->
+        <div class="book-page page-left" id="pageLeftContent">
+          <!-- Генерируется динамически -->
+        </div>
+
+        <!-- Центральный корешок / Тень сгиба -->
+        <div class="book-spine-crease"></div>
+
+        <!-- Правая страница -->
+        <div class="book-page page-right" id="pageRightContent">
+          <!-- Генерируется динамически -->
+        </div>
+
+      </div>
+
+      <!-- Стрелка вправо -->
+      <button class="flip-nav-btn next-btn" id="nextPageBtn" onclick="ReaderEngine.nextPage()" aria-label="Следующая страница">
+        <span>❯</span>
+      </button>
+
+    </div>
+
+    <!-- Нижняя статусная строка читалки -->
+    <div class="reader-bottom-bar">
+      <div class="container bottom-bar-inner">
+        <span class="pagination-info" id="paginationDisplay">Разворот: Стр. 1–2 из 4</span>
+        <div class="page-dots-track" id="pageDotsTrack"></div>
+        <span class="shortcut-tip">Листайте стрелками [←] [→] клавиатуры или свайпом</span>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- АУДИОПЛЕЕР ГЛАВЫ -->
+  <audio id="readerAudioElement" preload="metadata"></audio>
+
+  <!-- TOAST УВЕДОМЛЕНИЯ -->
+  <div id="readerToast" class="reader-toast"></div>
+
+  <!-- СКРИПТЫ -->
+  <script src="js/data.js"></script>
+  <script src="js/sources.js"></script>
+  <script src="js/tts-narrator.js"></script>
+  <script src="js/anti-cheat-tribute.js"></script>
+  <script src="js/heraldry-resolver.js"></script>
+  <script src="js/tech-modules.js"></script>
+  <script src="js/reader.js"></script>
+</body>
+</html>
