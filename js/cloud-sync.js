@@ -16,6 +16,34 @@ const CloudSync = {
   client: null,
   isLive: false,
 
+  normalizeTribute(row) {
+    return {
+      ...row,
+      roleLabel: row.roleLabel ?? row.role_label,
+      dedicationId: row.dedicationId ?? row.dedication_id,
+      dedicationName: row.dedicationName ?? row.dedication_name,
+      isPinned: row.isPinned ?? row.is_pinned ?? false,
+      isVerified: row.isVerified ?? row.is_verified ?? false
+    };
+  },
+
+  serializeTribute(tribute) {
+    return {
+      id: tribute.id,
+      author: tribute.author,
+      role: tribute.role,
+      role_label: tribute.roleLabel,
+      dedication_id: tribute.dedicationId,
+      dedication_name: tribute.dedicationName,
+      message: tribute.message,
+      theme: tribute.theme,
+      date: tribute.date,
+      flames: tribute.flames || 0,
+      is_pinned: Boolean(tribute.isPinned),
+      is_verified: Boolean(tribute.isVerified)
+    };
+  },
+
   init() {
     if (typeof supabase !== 'undefined' && CloudConfig.SUPABASE_URL.indexOf('ВАШ_PROJECT_ID') === -1) {
       try {
@@ -54,16 +82,11 @@ const CloudSync = {
     this.client.channel('realtime_guestbook')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'guestbook_tributes' }, (payload) => {
         if (typeof GuestbookEngine !== 'undefined') {
-          if (payload.eventType === 'INSERT') {
-            GuestbookEngine.tributes.unshift(payload.new);
-            GuestbookEngine.renderWall();
-            GuestbookEngine.updateStats();
-          } else if (payload.eventType === 'UPDATE') {
-            const idx = GuestbookEngine.tributes.findIndex(t => t.id === payload.new.id);
-            if (idx !== -1) GuestbookEngine.tributes[idx] = payload.new;
-            GuestbookEngine.renderWall();
-          } else if (payload.eventType === 'DELETE') {
-            GuestbookEngine.tributes = GuestbookEngine.tributes.filter(t => t.id === payload.old.id);
+          if (payload.eventType === 'INSERT') GuestbookEngine.receiveRealtimeTribute(payload.new);
+          if (payload.eventType === 'UPDATE') GuestbookEngine.updateRealtimeTribute(payload.new);
+          if (payload.eventType === 'DELETE') {
+            GuestbookEngine.tributes = GuestbookEngine.tributes.filter(t => t.id !== payload.old.id);
+            GuestbookEngine.saveStorage();
             GuestbookEngine.renderWall();
             GuestbookEngine.updateStats();
           }
@@ -94,13 +117,14 @@ const CloudSync = {
   // --- МЕТОДЫ СТЕНЫ ПАМЯТИ ---
   async fetchTributes() {
     if (!this.isLive) return null;
-    const { data } = await this.client.from('guestbook_tributes').select('*').order('is_pinned', { ascending: false }).order('created_at', { ascending: false });
-    return data;
+    const { data, error } = await this.client.from('guestbook_tributes').select('*').order('is_pinned', { ascending: false }).order('created_at', { ascending: false });
+    if (error) return null;
+    return data ? data.map(row => this.normalizeTribute(row)) : [];
   },
   async sendTribute(tributeObj) {
     if (!this.isLive) return false;
-    await this.client.from('guestbook_tributes').insert([tributeObj]);
-    return true;
+    const { error } = await this.client.from('guestbook_tributes').insert([this.serializeTribute(tributeObj)]);
+    return !error;
   },
   async toggleFlame(tributeId, delta) {
     if (!this.isLive) return null;

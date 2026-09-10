@@ -61,6 +61,30 @@ const GuestbookEngine = {
     this.updateStats();
   },
 
+  receiveRealtimeTribute(tribute) {
+    const normalizedTribute = window.CloudSync?.normalizeTribute
+      ? CloudSync.normalizeTribute(tribute)
+      : tribute;
+    if (this.tributes.some(item => item.id === normalizedTribute.id)) return;
+    this.tributes.unshift(normalizedTribute);
+    this.saveStorage();
+    this.renderWall();
+    this.updateStats();
+    this.showToast(`Новое послание от ${normalizedTribute.author}!`);
+  },
+
+  updateRealtimeTribute(tribute) {
+    const normalizedTribute = window.CloudSync?.normalizeTribute
+      ? CloudSync.normalizeTribute(tribute)
+      : tribute;
+    const index = this.tributes.findIndex(item => item.id === normalizedTribute.id);
+    if (index === -1) return;
+    this.tributes[index] = normalizedTribute;
+    this.saveStorage();
+    this.renderWall();
+    this.updateStats();
+  },
+
   saveStorage() {
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.tributes));
