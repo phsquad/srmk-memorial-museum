@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Конструктор табличек «Парта Героя» | ГБПОУ СРМК</title>
+  <meta name="description" content="Генератор и макеты памятных табличек «Парта Героя» формата А4 для аудиторий и мастерских колледжа СРМК.">
+  <meta name="theme-color" content="#0a0c0f">
+
+  <!-- Шрифты -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
+
+  <!-- Стили -->
+  <link rel="stylesheet" href="css/site-common.css">
+  <link rel="stylesheet" href="css/desk-qr.css">
+  <link rel="stylesheet" href="css/mobile-desk-qr.css">
+</head>
+<body class="dark-theme">
+
+  <!-- ШАПКА -->
+  <header class="desk-header">
+    <div class="container header-content">
+      <div class="header-left">
+        <a href="index.html" class="logo-badge">СРМК</a>
+        <div class="header-titles">
+          <span class="sub-title">Всероссийский проект «Парта Героя»</span>
+          <h1 class="main-title">Конструктор мемориальных табличек А4</h1>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a href="memory-book.html" class="nav-btn">📖 Книга Памяти</a>
+        <a href="reader.html" class="nav-btn">📚 3D-читалка</a>
+        <a href="quiz.html" class="nav-btn">⚔️ Викторина</a>
+        <a href="certificate.html" class="nav-btn">Сертификаты</a>
+        <a href="methodology.html" class="nav-btn">Методкабинет</a>
+        <a href="verify.html" class="nav-btn">🛡 Проверка</a>
+        <a href="index.html" class="nav-btn btn-primary">← В 3D-музей</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- РАБОЧАЯ ОБЛАСТЬ КОНСТРУКТОРА -->
+  <main class="desk-workspace">
+    
+    <!-- ЛЕВАЯ ПАНЕЛЬ: НАСТРОЙКИ И ПАРАМЕТРЫ ПАРТЫ -->
+    <aside class="desk-sidebar">
+      
+      <!-- Выбор героя -->
+      <div class="control-group">
+        <label class="control-label">Выберите героя из 20 выпускников:</label>
+        <select id="selectHero" class="form-select">
+          <!-- Заполняется динамически через js/desk-qr.js -->
+        </select>
+      </div>
+
+      <!-- Режим генерации -->
+      <div class="control-group">
+        <label class="control-label">Режим печати:</label>
+        <div class="segmented-control">
+          <button class="segment-btn active" id="modeSingleBtn" type="button">Одна табличка</button>
+          <button class="segment-btn" id="modeAllBtn" type="button">Все 20 парт (Пакет)</button>
+        </div>
+      </div>
+
+      <!-- Ориентация листа -->
+      <div class="control-group">
+        <label class="control-label">Ориентация бланка А4:</label>
+        <div class="segmented-control">
+          <button class="segment-btn active" id="orientLandscapeBtn" type="button">Горизонтальная</button>
+          <button class="segment-btn" id="orientPortraitBtn" type="button">Вертикальная</button>
+        </div>
+      </div>
+
+      <!-- Стиль оформления -->
+      <div class="control-group">
+        <label class="control-label">Стиль оформления:</label>
+        <div class="segmented-control">
+          <button class="segment-btn active" id="themeParchmentBtn" type="button">📜 Пергамент</button>
+          <button class="segment-btn" id="themeCleanBtn" type="button">📄 Белый А4</button>
+        </div>
+      </div>
+
+      <!-- Привязка к аудитории/мастерской -->
+      <div class="control-group">
+        <label class="control-label">Номер аудитории / мастерской:</label>
+        <input type="text" id="inputClassroom" class="form-input" placeholder="Например: Мастерская сварки № 3, Кабинет № 204" value="Кабинет электромонтажной практики № 12">
+      </div>
+
+      <!-- Ответственное лицо -->
+      <div class="control-group">
+        <label class="control-label">Заведующий кабинетом / Преподаватель:</label>
+        <input type="text" id="inputTeacher" class="form-input" placeholder="ФИО преподавателя" value="Зав. мастерской: мастер п/о высшей кат. В. Н. Гамаюнов">
+      </div>
+
+      <!-- Кнопки действий -->
+      <div class="action-buttons-group">
+        <button id="btnPrintPlaque" class="btn-action-primary" type="button">
+          <span>🖨️</span> Распечатать табличку (А4)
+        </button>
+        <button id="btnQuickFillAll" class="btn-action-secondary" type="button">
+          ⚡ Подобрать аудиторию по специальности
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- ПРАВАЯ ПАНЕЛЬ: ЖИВОЙ ПРЕДПРОСМОТР ЛИСТА А4 -->
+    <section class="desk-preview-area">
+      <div class="preview-scale-wrapper" id="previewContainer">
+        <!-- Бланк А4 генерируется через JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <div id="deskToast" class="desk-toast"></div>
+
+  <!-- СКРИПТЫ -->
+  <script src="js/data.js"></script>
+  <script src="js/sources.js"></script>
+  <script src="js/tts-narrator.js"></script>
+  <script src="js/desk-qr.js"></script>
+</body>
+</html>

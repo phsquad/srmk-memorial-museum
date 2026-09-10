@@ -1,0 +1,493 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   СТИЛИ КОНСТРУКТОРА «ПАРТА ГЕРОЯ»: css/desk-qr.css
+   ========================================================================== */
+:root {
+  --bg-dark: #0a0c0f;
+  --bg-surface: #12151c;
+  --bg-panel: #181d27;
+  --accent-brass: #c5a059;
+  --accent-brass-hover: #dfba6d;
+  --accent-granite: #8a1c22;
+  --accent-granite-hover: #a8232b;
+  --text-main: #f1f3f7;
+  --text-muted: #9da6b3;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --font-serif: 'Cinzel', Georgia, serif;
+  --font-sans: 'Montserrat', sans-serif;
+  --font-title: 'Playfair Display', Georgia, serif;
+  --transition: 0.22s cubic-bezier(0.2, 0, 0, 1);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0; padding: 0;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Шапка */
+.desk-header {
+  background: rgba(10, 12, 16, 0.96);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border-color);
+  padding: 12px 24px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-badge {
+  background: var(--accent-granite);
+  color: #fff;
+  font-family: var(--font-serif);
+  font-weight: 900;
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  border-radius: 2px;
+  text-decoration: none;
+}
+
+.header-titles .sub-title {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+}
+
+.header-titles .main-title {
+  font-family: var(--font-serif);
+  font-size: 1.02rem;
+  color: var(--accent-brass);
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.nav-btn {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  padding: 7px 14px;
+  border-radius: 2px;
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.nav-btn:hover {
+  color: #fff;
+  border-color: var(--accent-brass);
+}
+
+.nav-btn.btn-primary {
+  background: var(--accent-granite);
+  color: #fff;
+  border-color: var(--accent-granite);
+}
+
+/* Рабочее пространство */
+.desk-workspace {
+  display: grid;
+  grid-template-columns: 430px 1fr;
+  flex-grow: 1;
+  height: calc(100vh - 61px);
+}
+
+.desk-sidebar {
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-color);
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.control-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--accent-brass);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-input, .form-select {
+  width: 100%;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 3px;
+  font-size: 0.84rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus, .form-select:focus {
+  border-color: var(--accent-brass);
+}
+
+.segmented-control {
+  display: flex;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.segment-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 8px 10px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.segment-btn.active {
+  background: var(--accent-brass);
+  color: #000;
+  font-weight: 700;
+}
+
+.action-buttons-group {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.btn-action-primary {
+  background: var(--accent-granite);
+  color: #fff;
+  border: none;
+  padding: 13px;
+  border-radius: 3px;
+  font-family: var(--font-serif);
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(138, 28, 34, 0.4);
+}
+.btn-action-primary:hover { background: var(--accent-granite-hover); }
+
+.btn-action-secondary {
+  background: var(--bg-panel);
+  color: var(--accent-brass);
+  border: 1px solid var(--accent-brass);
+  padding: 10px;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Область предпросмотра */
+.desk-preview-area {
+  background: #06080a;
+  padding: 30px;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.preview-scale-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* ==========================================================================
+   МАКЕТ ТАБЛИЧКИ А4 (297 x 210 мм ГОРИЗОНТАЛЬНАЯ)
+   ========================================================================== */
+.plaque-sheet {
+  width: 297mm;
+  height: 210mm;
+  min-width: 297mm;
+  min-height: 210mm;
+  padding: 12mm;
+  position: relative;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  page-break-after: always;
+}
+
+/* ТЕМА: ПЕРГАМЕНТ */
+.plaque-sheet.theme-parchment {
+  background: radial-gradient(circle at 50% 50%, #fdfaf2 0%, #f4ead0 100%);
+  color: #1a1714;
+}
+
+/* ТЕМА: БЕЛЫЙ А4 */
+.plaque-sheet.theme-clean {
+  background: #ffffff;
+  color: #111111;
+}
+
+/* ВЕРТИКАЛЬНЫЙ РЕЖИМ (ПОРТРЕТ) */
+.plaque-sheet.orient-portrait {
+  width: 210mm;
+  height: 297mm;
+  min-width: 210mm;
+  min-height: 297mm;
+}
+
+/* Орнаментальные рамки */
+.plaque-frame-outer {
+  position: absolute;
+  top: 6mm; left: 6mm; right: 6mm; bottom: 6mm;
+  border: 3.5px solid #8a1c22;
+  pointer-events: none;
+}
+
+.plaque-frame-inner {
+  position: absolute;
+  top: 8mm; left: 8mm; right: 8mm; bottom: 8mm;
+  border: 1.5px solid #c5a059;
+  pointer-events: none;
+}
+
+.plaque-corner {
+  position: absolute;
+  width: 14mm; height: 14mm;
+  border: 2px solid #c5a059;
+}
+.corner-tl { top: 5mm; left: 5mm; border-right: none; border-bottom: none; }
+.corner-tr { top: 5mm; right: 5mm; border-left: none; border-bottom: none; }
+.corner-bl { bottom: 5mm; left: 5mm; border-right: none; border-top: none; }
+.corner-br { bottom: 5mm; right: 5mm; border-left: none; border-top: none; }
+
+/* Шапка таблички */
+.plaque-header {
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+.plaque-project-title {
+  font-family: var(--font-serif);
+  font-size: 13pt;
+  font-weight: 900;
+  color: #8a1c22;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.plaque-college-sub {
+  font-size: 8pt;
+  font-weight: 700;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 1mm;
+}
+
+/* Центральный контент */
+.plaque-grid-content {
+  display: grid;
+  grid-template-columns: 75mm 1fr;
+  gap: 10mm;
+  align-items: center;
+  margin: 3mm 0;
+  position: relative;
+  z-index: 2;
+}
+
+.plaque-left-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3mm;
+}
+
+.plaque-photo-frame {
+  width: 58mm;
+  height: 76mm;
+  border: 2px solid #c5a059;
+  padding: 1.5mm;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+.plaque-photo-frame img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+
+.plaque-qr-box {
+  display: flex;
+  align-items: center;
+  gap: 3mm;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #c5a059;
+  padding: 1.5mm 3mm;
+  border-radius: 2px;
+}
+
+.plaque-qr-img {
+  width: 18mm; height: 18mm; display: block;
+}
+
+.plaque-qr-text {
+  font-size: 6.5pt;
+  font-weight: 700;
+  color: #111;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+/* Правая колонка с биографией и подвигом */
+.plaque-right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5mm;
+}
+
+.plaque-hero-name {
+  font-family: var(--font-title);
+  font-size: 20pt;
+  font-weight: 900;
+  color: #8a1c22;
+  line-height: 1.15;
+  border-bottom: 2px solid #c5a059;
+  padding-bottom: 1.5mm;
+}
+
+.plaque-years-badge {
+  font-family: var(--font-serif);
+  font-size: 11pt;
+  font-weight: 800;
+  color: #111;
+}
+
+.plaque-info-block {
+  font-size: 8.5pt;
+  line-height: 1.45;
+}
+.plaque-info-block strong {
+  color: #8a1c22;
+  text-transform: uppercase;
+  font-size: 7.5pt;
+  display: block;
+  margin-bottom: 0.5mm;
+}
+
+.plaque-quote-box {
+  background: rgba(138, 28, 34, 0.06);
+  border-left: 2.5px solid #8a1c22;
+  padding: 1.5mm 3mm;
+  font-style: italic;
+  font-size: 8pt;
+  color: #222;
+}
+
+/* Подвал таблички */
+.plaque-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(197, 160, 89, 0.4);
+  padding-top: 2mm;
+  font-size: 7pt;
+  color: #444;
+  position: relative;
+  z-index: 2;
+}
+
+.plaque-room-badge {
+  font-weight: 800;
+  color: #8a1c22;
+  text-transform: uppercase;
+}
+
+/* Всплывающий тост */
+.desk-toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  background: rgba(14, 16, 22, 0.96);
+  border: 1px solid var(--accent-brass);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 4px;
+  font-size: 0.84rem;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(60px);
+  transition: all 0.25s ease;
+}
+.desk-toast.active { opacity: 1; transform: translateY(0); }
+
+/* ==========================================================================
+   ПРАВИЛА ПЕЧАТИ (@MEDIA PRINT) — ИДЕАЛЬНЫЙ ЭКСПОРТ В PDF
+   ========================================================================== */
+@page {
+  size: A4 landscape;
+  margin: 0;
+}
+
+@media print {
+  body { background: none !important; color: #000 !important; }
+  .desk-header, .desk-sidebar, .desk-toast { display: none !important; }
+  .desk-workspace { display: block !important; height: auto !important; }
+  .desk-preview-area { background: none !important; padding: 0 !important; display: block !important; }
+  .preview-scale-wrapper { transform: none !important; gap: 0 !important; }
+  
+  .plaque-sheet {
+    box-shadow: none !important;
+    margin: 0 !important;
+    width: 297mm !important;
+    height: 210mm !important;
+    page-break-after: always !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .plaque-sheet.orient-portrait {
+    width: 210mm !important;
+    height: 297mm !important;
+  }
+}
