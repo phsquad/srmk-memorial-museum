@@ -507,12 +507,12 @@ const App = {
               <span class="meta-label">Подразделение и звание:</span>
               <strong>${this.escapeHtml(rankText)}</strong>
             </div>
-            <p class="dossier-deed-text">${this.escapeHtml(deedText)}</p>
+            <div class="dossier-deed-text md-content">${this.parseMarkdown(this.escapeHtml(deedText))}</div>
           </div>
 
           ${hero.quote ? `
-            <blockquote class="dossier-quote">
-              «${this.escapeHtml(hero.quote)}»
+            <blockquote class="dossier-quote md-content">
+              ${this.parseMarkdown(this.escapeHtml(hero.quote))}
             </blockquote>
           ` : ''}
 
@@ -1021,6 +1021,70 @@ const App = {
     return String(str).replace(/[&<>'"]/g, tag => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
     }[tag]));
+  },
+
+  /**
+   * Простой Markdown-парсер для форматирования текста в карточках героев
+   * Поддерживает: **жирный**, *курсив*, заголовки #, ##, ###, цитаты >, списки -, *, разделители ---
+   */
+  parseMarkdown(md) {
+    if (!md) return '';
+    
+    const inline = text => text
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>');
+    
+    const lines = md.trim().split(/\r?\n/);
+    const blocks = [];
+    let paragraph = [];
+    let list = [];
+
+    const flushParagraph = () => {
+      if (paragraph.length) {
+        blocks.push(`<p class="md-paragraph">${inline(paragraph.join(' ').trim())}</p>`);
+        paragraph = [];
+      }
+    };
+    
+    const flushList = () => {
+      if (list.length) {
+        blocks.push(`<ul class="md-list">${list.map(item => `<li>${inline(item)}</li>`).join('')}</ul>`);
+        list = [];
+      }
+    };
+
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      if (!trimmed) {
+        flushParagraph();
+        flushList();
+      } else if (/^###\s/.test(trimmed)) {
+        flushParagraph(); flushList();
+        blocks.push(`<h4 class="md-h4">${inline(trimmed.slice(4))}</h4>`);
+      } else if (/^##\s/.test(trimmed)) {
+        flushParagraph(); flushList();
+        blocks.push(`<h3 class="md-h3">${inline(trimmed.slice(3))}</h3>`);
+      } else if (/^#\s/.test(trimmed)) {
+        flushParagraph(); flushList();
+        blocks.push(`<h2 class="md-h2">${inline(trimmed.slice(2))}</h2>`);
+      } else if (/^>\s?/.test(trimmed)) {
+        flushParagraph(); flushList();
+        blocks.push(`<blockquote class="md-blockquote">${inline(trimmed.replace(/^>\s?/, ''))}</blockquote>`);
+      } else if (/^---+$/.test(trimmed)) {
+        flushParagraph(); flushList();
+        blocks.push('<hr class="md-hr">');
+      } else if (/^[-*]\s+/.test(trimmed)) {
+        flushParagraph();
+        list.push(trimmed.replace(/^[-*]\s+/, ''));
+      } else {
+        flushList();
+        paragraph.push(trimmed);
+      }
+    });
+
+    flushParagraph();
+    flushList();
+    return blocks.join('');
   }
 };
 

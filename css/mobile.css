@@ -1007,6 +1007,61 @@ body {
   line-height: 1.65;
 }
 
+/* Markdown-контент в карточках героев (мобильные) */
+.md-content strong,
+.md-content md-strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.md-content em,
+.md-content md-em {
+  font-style: italic;
+  color: var(--accent-brass);
+}
+
+.md-content .md-paragraph {
+  margin-bottom: 10px;
+  line-height: 1.65;
+}
+
+.md-content .md-h2,
+.md-content .md-h3,
+.md-content .md-h4 {
+  font-family: var(--font-serif);
+  margin: 14px 0 6px 0;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+.md-content .md-h2 { font-size: 1.05rem; }
+.md-content .md-h3 { font-size: 0.95rem; }
+.md-content .md-h4 { font-size: 0.88rem; font-weight: 700; }
+
+.md-content .md-blockquote {
+  border-left: 3px solid var(--accent-brass);
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  font-style: italic;
+  margin: 12px 0;
+}
+
+.md-content .md-list {
+  padding-left: 18px;
+  margin: 10px 0;
+}
+
+.md-content .md-list li {
+  margin-bottom: 5px;
+  line-height: 1.55;
+}
+
+.md-content .md-hr {
+  border: none;
+  border-top: 1px solid var(--border-hairline);
+  margin: 16px 0;
+}
+
 /* Караоке-подсветка Web Speech на мобильных */
 .tts-sentence {
   transition: background-color 0.25s ease, color 0.25s ease;
