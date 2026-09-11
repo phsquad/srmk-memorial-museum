@@ -136,6 +136,70 @@
     outline: 2px solid #c5a059;
     outline-offset: 2px;
   }
+  
+  /* ==========================================================================
+     РАСШИРЕННАЯ ТИПОГРАФИКА MARKDOWN НА МОБИЛЬНЫХ
+     ========================================================================== */
+  
+  .page-story-text h1 { font-size: 1.5em; }
+  .page-story-text h2 { font-size: 1.3em; }
+  .page-story-text h3 { font-size: 1.15em; }
+  
+  .page-story-text p {
+    margin-bottom: 1em;
+    text-align: left; /* На мобильных лучше left, чем justify */
+  }
+  
+  .page-story-text blockquote {
+    padding: 0.8em 1em;
+    margin: 1em 0;
+  }
+  
+  .page-story-text pre {
+    padding: 1em;
+    font-size: 0.75em;
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .page-story-text table {
+    font-size: 0.8em;
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .page-story-text img {
+    margin: 1em 0;
+  }
+  
+  .callout {
+    padding: 1em;
+    margin: 1em 0;
+  }
+  
+  .callout-title {
+    font-size: 0.85em;
+  }
+  
+  /* Инструменты чтения на мобильных */
+  .bookmark-toggle {
+    top: 10px;
+    right: 10px;
+    font-size: 1.5em;
+  }
+  
+  .reader-notes-panel,
+  .reader-toc-panel {
+    width: 100%;
+    right: -100%;
+    top: 60px;
+    max-height: calc(100vh - 60px);
+  }
+  
+  .reading-progress-container {
+    height: 2px; /* Тоньше на мобильных */
+  }
 }
 
 @media (max-width: 480px) {
@@ -145,6 +209,27 @@
   
   .book-spine-card {
     height: 280px;
+  }
+  
+  .page-story-text h1 { font-size: 1.4em; }
+  .page-story-text h2 { font-size: 1.25em; }
+  
+  .page-story-text pre {
+    padding: 0.8em;
+    font-size: 0.7em;
+  }
+  
+  .page-story-text code {
+    font-size: 0.8em;
+  }
+  
+  .note-item {
+    font-size: 0.8em;
+  }
+  
+  .add-note-form textarea {
+    min-height: 80px;
+    font-size: 0.85em;
   }
 }
 
@@ -173,5 +258,116 @@
     max-width: none;
     font-size: 0.8rem;
     padding: 10px 14px;
+  }
+  
+  .page-story-text h1 { font-size: 1.3em; }
+  .page-story-text h2 { font-size: 1.2em; }
+  
+  .page-story-text pre {
+    padding: 0.7em;
+    font-size: 0.65em;
+  }
+  
+  .callout {
+    padding: 0.8em;
+  }
+  
+  .toc-list a {
+    font-size: 0.85em;
+    padding: 5px 8px;
+  }
+}
+
+/* ==========================================================================
+   LANDSCAPE MODE ОПТИМИЗАЦИЯ
+   ========================================================================== */
+@media (max-width: 900px) and (orientation: landscape) {
+  .folio-book-3d {
+    height: calc(100vh - 140px);
+  }
+  
+  .page-right {
+    padding: 16px 14px;
+  }
+  
+  .page-story-text {
+    font-size: 0.9em;
+  }
+  
+  .hero-banner {
+    padding: 20px 0;
+  }
+}
+
+/* ==========================================================================
+   ДОСТУПНОСТЬ И PREFERRED REDUCED MOTION
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .folio-book-3d,
+  .book-page,
+  .reader-notes-panel,
+  .reader-toc-panel,
+  .bookmark-toggle,
+  .reading-progress-bar {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ==========================================================================
+   DARK MODE SUPPORT ДЛЯ МОБИЛЬНЫХ
+   ========================================================================== */
+@media (max-width: 900px) {
+  /* Темная тема для типографики на мобильных */
+  .folio-book-3d.theme-dark .page-story-text h1,
+  .folio-book-3d.theme-dark .page-story-text h2,
+  .folio-book-3d.theme-dark .page-story-text h3 {
+    color: #c5a059;
+  }
+  
+  .folio-book-3d.theme-dark .page-story-text blockquote {
+    background: rgba(197, 160, 89, 0.08);
+    border-left-color: #c5a059;
+  }
+  
+  .folio-book-3d.theme-dark .page-story-text a {
+    color: #64b5f6;
+  }
+  
+  /* Светлая архивная тема */
+  .folio-book-3d.theme-archive .page-story-text h1,
+  .folio-book-3d.theme-archive .page-story-text h2 {
+    color: #8a1c22;
+  }
+}
+
+/* ==========================================================================
+   ПЕЧАТЬ НА МОБИЛЬНЫХ
+   ========================================================================== */
+@media print and (max-width: 900px) {
+  .reader-control-panel,
+  .reader-bottom-bar,
+  .flip-nav-btn,
+  .bookmark-toggle,
+  .reading-progress-container,
+  .reader-notes-panel,
+  .reader-toc-panel {
+    display: none !important;
+  }
+  
+  .folio-book-3d {
+    width: 100% !important;
+    height: auto !important;
+    display: block;
+  }
+  
+  .book-page {
+    padding: 0;
+    margin: 20px 0;
+  }
+  
+  .page-story-text a {
+    text-decoration: none;
+    color: black;
   }
 }
