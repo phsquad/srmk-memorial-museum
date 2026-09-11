@@ -338,7 +338,12 @@ const ReaderEngine = {
    */
   openBook(heroId, updateHash = true) {
     // Ищем в фолиантах или генерируем разворот на лету из heroesDatabase
-    let book = FOLIO_LIBRARY.find(b => b.id === heroId);
+    const extendedBooks = window.GRAND_MEMORY_BOOK_ARCHIVE || [
+      ...(typeof GRAND_MEMORY_BOOK_PART_1 !== 'undefined' ? GRAND_MEMORY_BOOK_PART_1 : []),
+      ...(typeof GRAND_MEMORY_BOOK_PART_2 !== 'undefined' ? GRAND_MEMORY_BOOK_PART_2 : []),
+      ...(typeof GRAND_MEMORY_BOOK_PART_3 !== 'undefined' ? GRAND_MEMORY_BOOK_PART_3 : [])
+    ];
+    let book = extendedBooks.find(b => b.id === heroId) || FOLIO_LIBRARY.find(b => b.id === heroId);
     if (!book && typeof heroesDatabase !== 'undefined') {
       const h = heroesDatabase.find(x => x.id === heroId);
       if (h) {

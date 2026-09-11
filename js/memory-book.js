@@ -646,9 +646,17 @@ const MemoryBookApp = {
     const feed = document.getElementById('storiesFeed');
     if (!feed) return;
 
+    const extendedBooks = window.GRAND_MEMORY_BOOK_ARCHIVE || [
+      ...(typeof GRAND_MEMORY_BOOK_PART_1 !== 'undefined' ? GRAND_MEMORY_BOOK_PART_1 : []),
+      ...(typeof GRAND_MEMORY_BOOK_PART_2 !== 'undefined' ? GRAND_MEMORY_BOOK_PART_2 : []),
+      ...(typeof GRAND_MEMORY_BOOK_PART_3 !== 'undefined' ? GRAND_MEMORY_BOOK_PART_3 : [])
+    ];
+    const extendedById = new Map(extendedBooks.map(hero => [hero.id, hero]));
+    const archive = MEMORY_BOOK_ARCHIVE.map(hero => ({ ...hero, ...(extendedById.get(hero.id) || {}) }));
+
     const query = (document.getElementById('bookSearchInput')?.value || '').toLowerCase().trim();
 
-    const filtered = MEMORY_BOOK_ARCHIVE.filter(hero => {
+    const filtered = archive.filter(hero => {
       let matchesFilter = true;
       if (this.currentFilter === 'left') matchesFilter = hero.plaque === 'left';
       if (this.currentFilter === 'right') matchesFilter = hero.plaque === 'right';
