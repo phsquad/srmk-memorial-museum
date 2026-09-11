@@ -157,6 +157,12 @@ body {
   gap: 6px;
   white-space: nowrap;
   transition: all 0.2s ease;
+  /* 🔥 Сброс пользовательских стилей браузера */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  font-family: var(--font-sans);
+  cursor: pointer;
 }
 
 .btn-header:hover {
@@ -164,6 +170,7 @@ body {
   border-color: var(--accent-brass);
   background: rgba(197, 160, 89, 0.12);
   transform: translateY(-1px);
+  outline: none;
 }
 
 .btn-header.btn-primary {
@@ -173,10 +180,12 @@ body {
   font-weight: 700;
 }
 
-.btn-header.btn-primary:hover {
+.btn-header.btn-primary:hover,
+.btn-header.btn-primary:focus-visible {
   background: var(--accent-granite-hover);
   border-color: var(--accent-granite-hover);
   box-shadow: 0 0 14px var(--accent-granite-dim);
+  outline: none;
 }
 
 @media (max-width: 1024px) {
