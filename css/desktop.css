@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 /* ==========================================================================
-   1. ДИЗАЙН-ТОКЕНЫ, ПЕРЕМЕННЫЕ И СБРОС (DESKTOP MASTER ENGINE v12.0)
+   1. ДИЗАЙН-ТОКЕНЫ, ПЕРЕМЕННЫЕ И СБРОС (DESKTOP MASTER ENGINE v13.0)
    ========================================================================== */
 :root {
   /* Палитра Chiaroscuro: Обсидиан, Мемориальный гранит, Оружейная латунь и Живой огонь */
@@ -84,7 +84,7 @@ main {
   z-index: 1;
 }
 
-/* Кастомный скульптурный скроллбар */
+/* Кастомный скроллбар */
 ::-webkit-scrollbar {
   width: 7px;
   height: 7px;
@@ -452,7 +452,7 @@ main {
 
 .hero-title {
   font-family: var(--font-serif);
-  font-size: clamp(2.4rem, 4.5vw, 3.6rem);
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
   line-height: 1.18;
   margin-bottom: 22px;
   font-weight: 900;
@@ -472,7 +472,7 @@ main {
   max-width: 720px;
   margin: 0 auto 42px;
   color: var(--text-secondary);
-  font-size: 1.08rem;
+  font-size: 1.05rem;
   font-weight: 400;
   line-height: 1.7;
 }
@@ -526,50 +526,8 @@ main {
   gap: 16px;
 }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  padding: 13px 28px;
-  border-radius: 2px;
-  font-weight: 700;
-  font-size: 0.88rem;
-  cursor: pointer;
-  text-decoration: none;
-  transition: var(--transition);
-  border: 1px solid transparent;
-  letter-spacing: 0.4px;
-}
-
-.btn-primary {
-  background: var(--accent-granite);
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 4px 20px var(--accent-granite-dim);
-}
-
-.btn-primary:hover {
-  background: var(--accent-granite-hover);
-  box-shadow: 0 6px 26px var(--accent-granite-glow);
-  transform: translateY(-1px);
-}
-
-.btn-secondary {
-  background: rgba(255, 255, 255, 0.02);
-  color: var(--text-primary);
-  border-color: var(--border-medium);
-}
-
-.btn-secondary:hover {
-  border-color: var(--accent-brass);
-  color: var(--accent-brass);
-  background: var(--accent-brass-dim);
-  transform: translateY(-1px);
-}
-
 /* ==========================================================================
-   4. ЭКСПОЗИЦИОННЫЕ ЗАЛЫ (ОБЩИЙ КАРКАС)
+   4. ЗАЛЫ МУЗЕЯ (I, II, III, IV) — ЭКСПОЗИЦИОННЫЙ КАРКАС
    ========================================================================== */
 .section {
   padding: 85px 0;
@@ -646,7 +604,6 @@ main {
   padding: 20px;
   margin-top: 28px;
   box-shadow: var(--shadow-elevated);
-  perspective: 1200px;
 }
 
 .memorial-stand-canvas {
@@ -654,19 +611,19 @@ main {
   width: 100%;
   min-height: 540px;
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap; /* Разрешаем мягкий перенос плит на ноутбуках */
+  justify-content: center;
   align-items: stretch;
   padding: 28px;
   gap: 24px;
-  transform-style: preserve-3d;
-  transition: transform 0.1s ease-out;
+  z-index: 1;
 }
 
 .memorial-bg-img {
   position: absolute;
   top: 0; left: 0; width: 100%; height: 100%;
   object-fit: cover;
-  filter: brightness(0.55) contrast(1.1);
+  filter: brightness(0.4) contrast(1.1);
   z-index: 1;
   border-radius: 2px;
 }
@@ -674,7 +631,8 @@ main {
 .plaque-interactive-zone {
   position: relative;
   z-index: 2;
-  width: 400px;
+  width: 100%;
+  max-width: 410px;
   background: rgba(12, 14, 18, 0.94);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -684,7 +642,6 @@ main {
   display: flex;
   flex-direction: column;
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.85);
-  transform: translateZ(30px);
 }
 
 .plaque-title {
@@ -720,6 +677,9 @@ main {
   justify-content: space-between;
   border-radius: 0 2px 2px 0;
   color: #e2e8f0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .plaque-item:hover, .plaque-item:focus-visible {
@@ -734,6 +694,8 @@ main {
   color: var(--accent-brass);
   font-size: 0.85rem;
   transition: transform var(--transition);
+  flex-shrink: 0;
+  margin-left: 8px;
 }
 
 .plaque-item:hover .plaque-arrow {
@@ -741,7 +703,7 @@ main {
 }
 
 /* ==========================================================================
-   6. ЗАЛ II: «ЗА ПАРТОЙ ГЕРОЯ» — ПОИСК, ФИЛЬТРЫ И ГАЛЕРЕЯ
+   6. ЗАЛ II: «ЗА ПАРТОЙ ГЕРОЯ» — ПОИСК, ФИЛЬТРЫ И ГАЛЕРЕЯ (CLAMP ШРИФТЫ)
    ========================================================================== */
 .search-wrapper {
   max-width: 560px;
@@ -856,7 +818,8 @@ main {
 
 .heroes-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  /* 🔥 Умный автоподбор колонок под разное разрешение экрана */
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 26px;
   margin-top: 36px;
 }
@@ -914,6 +877,7 @@ main {
   border-radius: 2px;
   letter-spacing: 0.5px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  z-index: 2;
 }
 
 .hero-candle-badge {
@@ -928,6 +892,7 @@ main {
   border-radius: 2px;
   border: 1px solid var(--border-hairline);
   backdrop-filter: blur(6px);
+  z-index: 2;
 }
 
 .hero-card-body {
@@ -939,11 +904,14 @@ main {
 
 .hero-card-name {
   font-family: var(--font-serif);
-  font-size: 1.1rem;
+  font-size: clamp(1.02rem, 1.3vw, 1.18rem); /* Адаптивный clamp для ФИО */
   line-height: 1.35;
   margin-bottom: 6px;
   color: var(--text-primary);
   font-weight: 700;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .hero-card-specialty {
@@ -1013,7 +981,7 @@ main {
 
 .battle-timeline-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); /* Авто-колонки на ноутбуках */
   gap: 22px;
   margin-bottom: 34px;
 }
@@ -1039,6 +1007,8 @@ main {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .theatre-badge {
@@ -1126,6 +1096,8 @@ main {
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid var(--border-hairline);
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .map-title-group {
@@ -1165,7 +1137,7 @@ main {
   background: #080a0d;
 }
 
-/* Инвертированный высококонтрастный фильтр для подложки Яндекс Карт */
+/* Нуар-фильтр для Яндекс Карт */
 .battle-map-wrapper ymaps[class$="-map"] {
   filter: invert(92%) hue-rotate(180deg) grayscale(75%) contrast(115%);
 }
@@ -1179,7 +1151,7 @@ main {
    ========================================================================== */
 .memory-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Адаптивная сетка карт */
   gap: 24px;
   margin-bottom: 34px;
 }
@@ -1238,7 +1210,7 @@ main {
 }
 
 /* ==========================================================================
-   9. МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ И ОНЛАЙН-ДИКТОР
+   9. МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ С ЗАЩИТОЙ ПО ВЫСОТЕ И СКРОЛЛОМ
    ========================================================================== */
 .modal {
   position: fixed;
@@ -1271,6 +1243,7 @@ main {
   border-radius: 2px;
   max-width: 940px;
   width: 100%;
+  /* 🔥 Фикс: Ограничение высоты для экранов ноутбуков */
   max-height: 90vh;
   overflow-y: auto;
   padding: 34px;
@@ -1289,6 +1262,7 @@ main {
   line-height: 1;
   cursor: pointer;
   transition: color var(--transition);
+  z-index: 10;
 }
 
 .modal-close:hover {
@@ -1333,6 +1307,13 @@ main {
   display: grid;
   grid-template-columns: 290px 1fr;
   gap: 32px;
+}
+
+@media (max-width: 768px) {
+  .dossier-layout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
 }
 
 .dossier-sidebar {
@@ -1516,6 +1497,8 @@ main {
   color: var(--text-primary);
   margin-bottom: 6px;
   font-weight: 700;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .dossier-years-badge {
@@ -1543,7 +1526,7 @@ main {
 
 .dossier-student-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Умная сетка в досье */
   gap: 12px;
   background: var(--bg-surface);
   border: 1px solid var(--border-hairline);
@@ -1555,6 +1538,7 @@ main {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  min-width: 0;
 }
 
 .student-info-item .meta-label {
@@ -1568,6 +1552,8 @@ main {
   font-size: 0.88rem;
   color: var(--text-primary);
   font-weight: 600;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .dossier-deed-text {
@@ -1618,6 +1604,8 @@ main {
   display: inline-flex;
   align-items: center;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .award-badge-mini {
@@ -1625,6 +1613,7 @@ main {
   height: 18px;
   object-fit: contain;
   margin-right: 7px;
+  flex-shrink: 0;
 }
 
 .dossier-memorial-status {
@@ -2000,6 +1989,7 @@ main {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(197, 160, 89, 0.25);
   transition: transform 0.4s var(--transition), box-shadow 0.4s var(--transition), border-color 0.4s ease;
   background: var(--bg-surface);
+  z-index: 2;
 }
 
 .master-cover-frame:hover {

@@ -1,7 +1,7 @@
 @charset "UTF-8";
 
 /* ==========================================================================
-   1. ДИЗАЙН-ТОКЕНЫ, ПЕРЕМЕННЫЕ И TOUCH-СБРОС (MOBILE MASTER ENGINE v12.0)
+   1. ДИЗАЙН-ТОКЕНЫ, ПЕРЕМЕННЫЕ И TOUCH-СБРОС (MOBILE MASTER ENGINE v13.0)
    ========================================================================== */
 :root {
   /* Цветовая архитектура (100% паритет с Desktop) */
@@ -47,7 +47,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent; /* Устранение синей вспышки при тапе на iOS */
+  -webkit-tap-highlight-color: transparent; /* Убирает синий квадрат при тапе */
 }
 
 html {
@@ -64,7 +64,7 @@ body {
   line-height: 1.55;
   overflow-x: hidden;
   min-height: 100vh;
-  /* Резервирование места под нижний Tab Bar */
+  /* Динамический отступ под нижний Tab Bar с учетом жестовой полосы iOS */
   padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
   -webkit-font-smoothing: antialiased;
 }
@@ -83,7 +83,7 @@ body {
 }
 
 /* ==========================================================================
-   2. КОМПАКТНАЯ ФИКСИРОВАННАЯ ШАПКА (MOBILE HEADER)
+   2. КОМПАКТНАЯ ФИКСИРОВАННАЯ ШАПКА (APP HEADER)
    ========================================================================== */
 .header {
   position: fixed;
@@ -246,7 +246,7 @@ body {
 }
 
 /* ==========================================================================
-   3. МОБИЛЬНЫЙ ГЕРОЙ-ЭКРАН (HERO)
+   3. МОБИЛЬНЫЙ ЭКРАН HERO
    ========================================================================== */
 .hero-section {
   padding: calc(75px + env(safe-area-inset-top, 0px)) 16px 28px;
@@ -436,6 +436,9 @@ body {
   border-radius: 0 2px 2px 0;
   color: #e2e8f0;
   transition: var(--transition);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .plaque-item:active {
@@ -448,6 +451,8 @@ body {
 .plaque-arrow {
   color: var(--accent-brass);
   font-size: 0.85rem;
+  flex-shrink: 0;
+  margin-left: 8px;
 }
 
 /* ==========================================================================
@@ -476,7 +481,7 @@ body {
   box-shadow: 0 0 12px var(--accent-brass-dim);
 }
 
-/* Инерционная горизонтальная лента специальностей (Touch-friendly) */
+/* Инерционная горизонтальная лента специальностей */
 .specialty-filters-bar {
   display: flex;
   width: 100%;
@@ -559,6 +564,7 @@ body {
   border-radius: 2px;
   letter-spacing: 0.5px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  z-index: 2;
 }
 
 .hero-candle-badge {
@@ -573,6 +579,7 @@ body {
   border-radius: 2px;
   border: 1px solid var(--border-hairline);
   backdrop-filter: blur(6px);
+  z-index: 2;
 }
 
 .hero-card-body {
@@ -589,6 +596,8 @@ body {
   margin-bottom: 4px;
   color: var(--text-primary);
   font-weight: 700;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .hero-card-specialty {
