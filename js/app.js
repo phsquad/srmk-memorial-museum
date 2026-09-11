@@ -327,6 +327,23 @@ const App = {
       const specialtyText = hero.education?.specialty || "Выпускник колледжа";
       const candleCount = AppState.candles[hero.id] || 0;
 
+      // 🔥 Генерация мини-медалей для карточки (максимум 4 для компактности)
+      let medalsHTML = '';
+      if (hero.awards && Array.isArray(hero.awards) && hero.awards.length > 0) {
+        const displayAwards = hero.awards.slice(0, 4); // Показываем до 4 медалей
+        medalsHTML = `<div class="hero-card-medals">
+          ${displayAwards.map(awardTitle => {
+            const awardVisual = typeof ArchiveService !== 'undefined' 
+              ? ArchiveService.getAwardVisual(awardTitle) 
+              : null;
+            const medalImg = awardVisual?.badge || this._getDefaultMedalIcon();
+            const medalTitle = this.escapeHtml(awardTitle);
+            return `<span class="medal-icon" title="${medalTitle}"><img src="${medalImg}" alt="${medalTitle}" onerror="this.style.display='none'"></span>`;
+          }).join('')}
+          ${hero.awards.length > 4 ? `<span class="medal-more" title="Ещё ${hero.awards.length - 4} наград">+${hero.awards.length - 4}</span>` : ''}
+        </div>`;
+      }
+
       // 🔥 Создаем элемент через createElement для предотвращения утечки текстовых узлов
       const card = document.createElement('article');
       card.className = 'hero-card';
@@ -339,6 +356,7 @@ const App = {
           <img src="${photoSrc}" alt="${this.escapeHtml(hero.name)}" class="hero-card-img" loading="lazy" onerror="this.src='${FALLBACK_HERO_AVATAR}'">
           <span class="hero-card-badge">СВО</span>
           ${candleCount > 0 ? `<span class="hero-candle-badge" title="Зажжено свечей памяти">🕯 ${candleCount}</span>` : ''}
+          ${medalsHTML ? `<div class="hero-card-medals-overlay">${medalsHTML}</div>` : ''}
         </div>
         <div class="hero-card-body">
           <h3 class="hero-card-name">${this.escapeHtml(hero.name)}</h3>
