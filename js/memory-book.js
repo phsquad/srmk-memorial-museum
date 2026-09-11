@@ -1334,6 +1334,148 @@ const MemoryBookApp = {
       const progress = (window.scrollY / total) * 100;
       if (bar) bar.style.width = `${progress}%`;
     }, { passive: true });
+  },
+
+  // ОТКРЫТИЕ ДЕТАЛЬНОЙ СТРАНИЦЫ ГЕРОЯ (МОДАЛЬНОЕ ОКНО С ВКЛАДКАМИ)
+  openHeroDetail(heroId) {
+    const hero = this.getArchive().find(h => h.id === heroId);
+    if (!hero) return;
+
+    const modal = document.getElementById('heroDetailModal');
+    const mdParser = typeof DataHelpers !== 'undefined' ? DataHelpers.parseMarkdown : null;
+
+    // Заполняем данные героя
+    document.getElementById('detailHeroName').textContent = hero.name;
+    document.getElementById('detailHeroImage').src = hero.photoFile || 'assets/images/cover-master.jpg';
+    document.getElementById('detailHeroImage').alt = hero.name;
+    document.getElementById('detailHeroStatus').textContent = hero.status || 'Погиб в бою';
+    document.getElementById('detailBirthDate').textContent = hero.birthDate || '';
+    document.getElementById('detailDeathDate').textContent = hero.deathDate || '';
+    document.getElementById('detailRank').textContent = hero.rank || '';
+    document.getElementById('detailSpecialty').textContent = hero.specialty || '';
+
+    // Рендерим Markdown контент
+    const bioContent = document.getElementById('detailBiographyContent');
+    const deedContent = document.getElementById('detailDeedContent');
+    const quoteContent = document.getElementById('detailQuoteContent');
+    const quoteSource = document.getElementById('detailQuoteSource');
+
+    if (mdParser && hero.biography) {
+      bioContent.innerHTML = mdParser(hero.biography);
+    } else {
+      bioContent.innerHTML = hero.biography || '<p>Биография загружается...</p>';
+    }
+
+    if (mdParser && hero.deed) {
+      deedContent.innerHTML = mdParser(hero.deed);
+    } else {
+      deedContent.innerHTML = hero.deed || '<p>Описание подвига загружается...</p>';
+    }
+
+    if (hero.quote) {
+      quoteContent.textContent = hero.quote.replace(/[">]/g, '');
+      quoteSource.textContent = hero.quoteSource || '';
+    }
+
+    // Награды (мини)
+    const awardsContainer = document.getElementById('detailAwardsMini');
+    awardsContainer.innerHTML = '';
+    if (hero.awards && hero.awards.length > 0) {
+      hero.awards.forEach(award => {
+        const badge = document.createElement('div');
+        badge.className = 'award-badge';
+        badge.title = award;
+        badge.textContent = this.getAwardIcon(award);
+        awardsContainer.appendChild(badge);
+      });
+    }
+
+    // Галерея
+    this.renderDetailGallery(hero);
+
+    // Кнопка "Читать полную историю"
+    const btnReadFull = document.getElementById('btnReadFullStory');
+    btnReadFull.href = `hero-detail.html?id=${hero.id}`;
+
+    // Открываем модальное окно
+    this.lastFocusedElement = document.activeElement;
+    modal.showModal();
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    modal.querySelector('.modal-close-btn')?.focus();
+  },
+
+  closeHeroDetail() {
+    const modal = document.getElementById('heroDetailModal');
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    modal.close();
+    document.body.style.overflow = 'auto';
+    if (this.lastFocusedElement && typeof this.lastFocusedElement.focus === 'function') {
+      this.lastFocusedElement.focus();
+    }
+  },
+
+  renderDetailGallery(hero) {
+    const galleryGrid = document.getElementById('detailGalleryGrid');
+    galleryGrid.innerHTML = '';
+
+    const images = hero.gallery || [hero.photoFile];
+    if (!images || images.length === 0) {
+      galleryGrid.innerHTML = '<p>Галерея пуста</p>';
+      return;
+    }
+
+    images.forEach((img, idx) => {
+      const item = document.createElement('div');
+      item.className = 'gallery-item';
+      item.innerHTML = `<img src="${img}" alt="Фото ${idx + 1}" loading="lazy">`;
+      item.addEventListener('click', () => this.openLightbox(img, `Фото: ${hero.name}`));
+      galleryGrid.appendChild(item);
+    });
+  },
+
+  // ЛАЙТБОКС ДЛЯ ПРОСМОТРА ИЗОБРАЖЕНИЙ
+  openLightbox(imageSrc, caption) {
+    const modal = document.getElementById('lightboxModal');
+    document.getElementById('lightboxImage').src = imageSrc;
+    document.getElementById('lightboxCaption').textContent = caption;
+    modal.showModal();
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    modal.querySelector('.lightbox-close-btn')?.focus();
+  },
+
+  closeLightbox() {
+    const modal = document.getElementById('lightboxModal');
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    modal.close();
+  },
+
+  // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+  getAwardIcon(award) {
+    const icons = {
+      'Герой России': '🌟',
+      'Орден Мужества': '⭐️',
+      'Медаль За отвагу': '🎖',
+      'Орден Отечественной войны': '🏅',
+      'Медаль За победу над Германией': '🏆'
+    };
+    for (const key in icons) {
+      if (award.includes(key)) return icons[key];
+    }
+    return '🎖';
+  },
+
+  showToast(message, type = 'info') {
+    const toast = document.getElementById('bookToast');
+    toast.textContent = message;
+    toast.className = `book-toast show toast-${type}`;
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3000);
   }
 };
 

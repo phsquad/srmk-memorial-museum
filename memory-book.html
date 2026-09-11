@@ -96,6 +96,29 @@
   </header>
 
   <!-- ==========================================================================
+       ХЛЕБНЫЕ КРОШКИ / BREADCRUMBS
+       ========================================================================== -->
+  <nav class="breadcrumbs-nav" role="navigation" aria-label="Хлебные крошки">
+    <div class="container">
+      <ol class="breadcrumbs" itemscope itemtype="https://schema.org/BreadcrumbList">
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <a href="index.html" itemprop="item">
+            <span itemprop="name">🏠 Главная</span>
+          </a>
+          <meta itemprop="position" content="1" />
+        </li>
+        <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+          <span class="breadcrumb-separator" aria-hidden="true">›</span>
+          <span itemprop="item" aria-current="page">
+            <span itemprop="name">📖 Книга Памяти</span>
+          </span>
+          <meta itemprop="position" content="2" />
+        </li>
+      </ol>
+    </div>
+  </nav>
+
+  <!-- ==========================================================================
        ТИТУЛЬНЫЙ БАННЕР С МАГИСТРАЛЬНОЙ ОБЛОЖКОЙ
        ========================================================================== -->
   <section class="book-hero" role="region" aria-labelledby="heroTitle">
@@ -220,29 +243,124 @@
   </div>
 
   <!-- ==========================================================================
-       ПОДВАЛ (FOOTER)
+       АЛЬТЕРНАТИВНЫЙ КОНТЕНТ: О ПРОЕКТЕ (MARKDOWN)
        ========================================================================== -->
-  <footer class="book-footer" role="contentinfo">
-    <div class="container footer-content">
-      <div class="footer-col">
-        <h4>ГБПОУ СРМК</h4>
-        <p>Ставропольский региональный многопрофильный колледж</p>
-        <p>г. Ставрополь, проспект Юности, д. 3</p>
-      </div>
-      <div class="footer-col text-center">
-        <div class="memorial-crest-mini" aria-hidden="true">⭐️</div>
-        <p class="footer-quote">«Быть воином — жить вечно»</p>
-      </div>
-      <div class="footer-col text-right">
-        <p>© 2026 Электронный фонд Мемориала Славы СРМК.</p>
-        <p>Всероссийская акция «Карта доблести: хранители подвигов».</p>
-      </div>
+  <section id="aboutProjectSection" class="about-project-section" role="region" aria-labelledby="aboutTitle" hidden>
+    <div class="container">
+      <article class="markdown-article" itemscope itemtype="https://schema.org/Article">
+        <header>
+          <h2 id="aboutTitle" itemprop="headline">📜 О проекте «Карта доблести: хранители подвигов»</h2>
+          <p class="article-meta">
+            <time itemprop="datePublished" datetime="2026-01-27">27 января 2026</time>
+            <span itemprop="author">ГБПОУ СРМК</span>
+          </p>
+        </header>
+        
+        <div class="markdown-content" itemprop="articleBody">
+          <!-- Markdown контент будет загружен через JS -->
+        </div>
+        
+        <footer class="article-footer">
+          <div class="article-tags" role="list" aria-label="Теги">
+            <span class="tag" role="listitem">#ПамятьНарода</span>
+            <span class="tag" role="listitem">#СРМК</span>
+            <span class="tag" role="listitem">#ГероиРоссии</span>
+            <span class="tag" role="listitem">#БессмертныйПолк</span>
+          </div>
+        </footer>
+      </article>
     </div>
-  </footer>
+  </section>
 
-  <!-- TOAST УВЕДОМЛЕНИЯ -->
+  <!-- ==========================================================================
+       МОДАЛЬНОЕ ОКНО: ДЕТАЛЬНАЯ СТРАНИЦА ГЕРОЯ
+       ========================================================================== -->
+  <dialog id="heroDetailModal" class="hero-detail-modal" role="dialog" aria-modal="true" aria-labelledby="detailHeroName">
+    <div class="modal-overlay" onclick="MemoryBookApp.closeHeroDetail()"></div>
+    <div class="modal-content hero-detail-content">
+      
+      <!-- Заголовок профиля -->
+      <header class="detail-header" itemscope itemtype="https://schema.org/Person">
+        <button class="modal-close-btn" onclick="MemoryBookApp.closeHeroDetail()" aria-label="Закрыть">&times;</button>
+        
+        <div class="detail-portrait-wrapper">
+          <img src="" alt="" id="detailHeroImage" itemprop="image" loading="lazy">
+          <div class="detail-status-badge" id="detailHeroStatus"></div>
+        </div>
+        
+        <div class="detail-info">
+          <h2 id="detailHeroName" itemprop="name"></h2>
+          <p class="detail-dates">
+            <time id="detailBirthDate" itemprop="birthDate"></time> — 
+            <time id="detailDeathDate" itemprop="deathDate"></time>
+          </p>
+          <div class="detail-rank" itemprop="jobTitle"></div>
+          <div class="detail-specialty" id="detailSpecialty"></div>
+          
+          <div class="detail-awards-mini" id="detailAwardsMini" aria-label="Награды героя"></div>
+        </div>
+      </header>
+      
+      <!-- Вкладки контента -->
+      <nav class="detail-tabs-nav" role="tablist" aria-label="Разделы биографии">
+        <button class="tab-btn active" data-tab="biography" role="tab" aria-selected="true" aria-controls="tab-biography">Биография</button>
+        <button class="tab-btn" data-tab="deed" role="tab" aria-selected="false" aria-controls="tab-deed">Подвиг</button>
+        <button class="tab-btn" data-tab="quote" role="tab" aria-selected="false" aria-controls="tab-quote">Цитата</button>
+        <button class="tab-btn" data-tab="gallery" role="tab" aria-selected="false" aria-controls="tab-gallery">Галерея</button>
+        <button class="tab-btn" data-tab="map" role="tab" aria-selected="false" aria-controls="tab-map">Карта пути</button>
+      </nav>
+      
+      <!-- Содержимое вкладок -->
+      <div class="detail-tabs-content">
+        <div id="tab-biography" class="tab-pane active" role="tabpanel" aria-labelledby="biography-tab">
+          <article class="markdown-body" id="detailBiographyContent"></article>
+        </div>
+        
+        <div id="tab-deed" class="tab-pane" role="tabpanel" aria-labelledby="deed-tab">
+          <article class="markdown-body" id="detailDeedContent"></article>
+        </div>
+        
+        <div id="tab-quote" class="tab-pane" role="tabpanel" aria-labelledby="quote-tab">
+          <blockquote class="quote-block" id="detailQuoteContent"></blockquote>
+          <cite id="detailQuoteSource"></cite>
+        </div>
+        
+        <div id="tab-gallery" class="tab-pane" role="tabpanel" aria-labelledby="gallery-tab">
+          <div class="gallery-grid" id="detailGalleryGrid"></div>
+        </div>
+        
+        <div id="tab-map" class="tab-pane" role="tabpanel" aria-labelledby="map-tab">
+          <div class="map-container" id="detailMapContainer" aria-label="Карта пути героя">
+            <p>Интерактивная карта загружается...</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Кнопки действий -->
+      <footer class="detail-actions">
+        <a href="#" class="btn-action btn-primary" id="btnReadFullStory" target="_blank">📖 Читать полную историю</a>
+        <button class="btn-action" onclick="window.print()">🖨 Печать</button>
+        <button class="btn-action" id="btnShareHero">🔗 Поделиться</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <!-- ==========================================================================
+       МОДАЛЬНОЕ ОКЛО: ЛАЙТБОКС ДЛЯ ГАЛЕРЕИ
+       ========================================================================== -->
+  <dialog id="lightboxModal" class="lightbox-dialog" role="dialog" aria-modal="true" aria-label="Просмотр изображения">
+    <button class="lightbox-close-btn" onclick="MemoryBookApp.closeLightbox()" aria-label="Закрыть">×</button>
+    <figure class="lightbox-figure">
+      <img src="" alt="" id="lightboxImage">
+      <figcaption id="lightboxCaption"></figcaption>
+    </figure>
+  </dialog>
+
+  <!-- ==========================================================================
+       КОНТЕЙНЕР ТОСТ-УВЕДОМЛЕНИЙ
+       ========================================================================== -->
   <div id="bookToast" class="book-toast" role="status" aria-live="polite" aria-label="Уведомления"></div>
-
+  
   <!-- ==========================================================================
        СКРИПТЫ
        ========================================================================== -->
@@ -255,10 +373,13 @@
   <script src="js/grand-memory-book-part-2.js" defer></script>
   <script src="js/grand-memory-book-part-3.js" defer></script>
 
-  <!-- 3. Облачный мост -->
+  <!-- 3. Контент для страницы "О проекте" (Markdown) -->
+  <script src="js/memory-book-content.js" defer></script>
+
+  <!-- 4. Облачный мост -->
   <script src="js/cloud-sync.js" defer></script>
 
-  <!-- 4. Движок страницы -->
+  <!-- 5. Движок страницы -->
   <script src="js/memory-book.js" defer></script>
   
   <!-- 5. UI Enhancements -->
@@ -286,13 +407,80 @@
       searchInput.focus();
     });
 
-    // Keyboard Navigation for Modal
+    // Keyboard Navigation for Modals
     document.addEventListener('keydown', function(e) {
-      const modal = document.getElementById('readerModal');
-      if (e.key === 'Escape' && modal.open) {
-        MemoryBookApp.closeReader();
+      const readerModal = document.getElementById('readerModal');
+      const detailModal = document.getElementById('heroDetailModal');
+      const lightboxModal = document.getElementById('lightboxModal');
+      
+      if (e.key === 'Escape') {
+        if (lightboxModal.open) MemoryBookApp.closeLightbox();
+        else if (detailModal.open) MemoryBookApp.closeHeroDetail();
+        else if (readerModal.open) MemoryBookApp.closeReader();
+      }
+    });
+
+    // Tab Navigation for Hero Detail Modal
+    document.querySelectorAll('.detail-tabs-nav .tab-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const tabId = this.dataset.tab;
+        
+        // Update buttons
+        document.querySelectorAll('.detail-tabs-nav .tab-btn').forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        this.classList.add('active');
+        this.setAttribute('aria-selected', 'true');
+        
+        // Update panels
+        document.querySelectorAll('.detail-tabs-content .tab-pane').forEach(panel => {
+          panel.classList.remove('active');
+        });
+        document.getElementById('tab-' + tabId).classList.add('active');
+      });
+    });
+
+    // Share API
+    document.getElementById('btnShareHero')?.addEventListener('click', async function() {
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: document.getElementById('detailHeroName').textContent,
+            text: 'Память о герое жива!',
+            url: window.location.href
+          });
+        } catch (err) {
+          console.log('Share canceled');
+        }
+      } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(window.location.href);
+        MemoryBookApp.showToast('Ссылка скопирована в буфер обмена', 'success');
       }
     });
   </script>
+  
+  <!-- ==========================================================================
+       ПОДВАЛ (FOOTER)
+       ========================================================================== -->
+  <footer class="book-footer" role="contentinfo">
+    <div class="container footer-content">
+      <div class="footer-col">
+        <h4>ГБПОУ СРМК</h4>
+        <p>Ставропольский региональный многопрофильный колледж</p>
+        <p>г. Ставрополь, проспект Юности, д. 3</p>
+      </div>
+      <div class="footer-col text-center">
+        <div class="memorial-crest-mini" aria-hidden="true">⭐️</div>
+        <p class="footer-quote">«Быть воином — жить вечно»</p>
+      </div>
+      <div class="footer-col text-right">
+        <p>© 2026 Электронный фонд Мемориала Славы СРМК.</p>
+        <p>Всероссийская акция «Карта доблести: хранители подвигов».</p>
+      </div>
+    </div>
+  </footer>
+  
 </body>
 </html>
