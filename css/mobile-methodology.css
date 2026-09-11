@@ -19,13 +19,15 @@
     width: 100%;
     display: flex;
     gap: 6px;
+    overflow-x: auto;
   }
 
   .nav-btn {
-    flex: 1;
+    flex: 0 0 auto;
     text-align: center;
     padding: 8px 6px;
     font-size: 0.74rem;
+    white-space: nowrap;
   }
 
   .method-hero {
