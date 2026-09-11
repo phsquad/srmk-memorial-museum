@@ -1370,6 +1370,18 @@ main {
     grid-template-columns: 1fr;
     gap: 20px;
   }
+  
+  .hero-awards-gallery {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-awards-gallery {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+  }
 }
 
 .dossier-sidebar {
@@ -1386,6 +1398,66 @@ main {
   border: 1px solid var(--border-hairline);
   border-radius: 2px;
   overflow: hidden;
+}
+
+/* Галерея наград под фото героя */
+.hero-awards-gallery {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  padding: 10px 0;
+  background: rgba(14, 17, 22, 0.6);
+  border: 1px solid var(--border-hairline);
+  border-radius: 2px;
+}
+
+.award-icon-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+  background: #0a0c10;
+  border: 1px solid var(--border-hairline);
+  border-radius: 2px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color var(--transition), transform var(--transition);
+}
+
+.award-icon-wrapper:hover {
+  border-color: var(--accent-brass);
+  transform: scale(1.05);
+}
+
+.award-badge-hero {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+}
+
+.award-name-tooltip {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(10, 12, 16, 0.95);
+  color: var(--text-secondary);
+  font-size: 0.65rem;
+  padding: 3px 2px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity var(--transition);
+  pointer-events: none;
+}
+
+.award-icon-wrapper:hover .award-name-tooltip {
+  opacity: 1;
 }
 
 .dossier-gallery-main img {
