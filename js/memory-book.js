@@ -625,6 +625,8 @@ const MemoryBookApp = {
   currentFilter: 'all',
   currentPlayingId: null,
   audioEl: null,
+  currentHeroIndex: -1,
+  lastFocusedElement: null,
 
   init() {
     this.audioEl = document.getElementById('bookAudioPlayer');
@@ -633,6 +635,10 @@ const MemoryBookApp = {
     this.bindEvents();
     this.initAudioEvents();
     this.initScrollProgress();
+    const linkedHero = window.location.hash.replace('#', '');
+    if (MEMORY_BOOK_ARCHIVE.some(hero => hero.id === linkedHero)) {
+      this.openReader(linkedHero, false);
+    }
     console.log("[MemoryBook] Архивно-маркдаун движок готов.");
   },
 
@@ -684,6 +690,11 @@ const MemoryBookApp = {
           <div class="chapter-hero-titles">
             <h3>${hero.name}</h3>
             <div class="chapter-hero-years">${hero.years}</div>
+            <div class="chapter-meta-grid">
+              <span><strong>Профессия</strong>${hero.specialty}</span>
+              <span><strong>Рубеж</strong>${hero.location}</span>
+              <span><strong>Награды</strong>${hero.awards}</span>
+            </div>
             <p class="chapter-short-desc">${hero.shortSnippet}</p>
 
             <div class="chapter-actions-bar">
@@ -693,6 +704,9 @@ const MemoryBookApp = {
               <button class="btn-chapter" onclick="MemoryBookApp.playHeroAudio('${hero.id}')" type="button">
                 🎧 Слушать аудиогид (MP3)
               </button>
+              <a href="reader.html#${hero.id}" class="btn-chapter">
+                📚 Открыть 3D-фолиант
+              </a>
               <a href="index.html#hero-${hero.id}" class="btn-chapter">
                 🏛 В 3D-музей
               </a>
@@ -734,6 +748,9 @@ const MemoryBookApp = {
       });
     }
 
+    document.getElementById('prevChapterBtn')?.addEventListener('click', () => this.openAdjacentChapter(-1));
+    document.getElementById('nextChapterBtn')?.addEventListener('click', () => this.openAdjacentChapter(1));
+
     document.querySelectorAll('.filter-pill').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
@@ -746,32 +763,76 @@ const MemoryBookApp = {
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') this.closeReader();
     });
+
+    window.addEventListener('hashchange', () => {
+      const heroId = window.location.hash.replace('#', '');
+      if (MEMORY_BOOK_ARCHIVE.some(hero => hero.id === heroId)) this.openReader(heroId, false);
+    });
   },
 
   // МАРКДАУН-ПАРСЕР
   parseMarkdown(md) {
-    let html = md
-      .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-      .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-      .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-      .replace(/^\> (.*$)/gim, '<blockquote>$1</blockquote>')
-      .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
-      .replace(/\*(.*)\*/gim, '<em>$1</em>')
-      .replace(/---/gim, '<hr>')
-      .replace(/\n$/gim, '<br />');
+    const inline = text => text
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>');
+    const lines = md.trim().split(/\r?\n/);
+    const blocks = [];
+    let paragraph = [];
+    let list = [];
 
-    // Обертка параграфов
-    html = html.split('\n\n').map(p => {
-      if (p.startsWith('<h') || p.startsWith('<blockquote') || p.startsWith('<hr')) return p;
-      return `<p>${p.trim()}</p>`;
-    }).join('');
+    const flushParagraph = () => {
+      if (paragraph.length) {
+        blocks.push(`<p>${inline(paragraph.join(' ').trim())}</p>`);
+        paragraph = [];
+      }
+    };
+    const flushList = () => {
+      if (list.length) {
+        blocks.push(`<ul>${list.map(item => `<li>${inline(item)}</li>`).join('')}</ul>`);
+        list = [];
+      }
+    };
 
-    return html;
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      if (!trimmed) {
+        flushParagraph();
+        flushList();
+      } else if (/^###\s/.test(trimmed)) {
+        flushParagraph(); flushList();
+        blocks.push(`<h3>${inline(trimmed.slice(4))}</h3>`);
+      } else if (/^##\s/.test(trimmed)) {
+        flushParagraph(); flushList();
+        blocks.push(`<h2>${inline(trimmed.slice(3))}</h2>`);
+      } else if (/^#\s/.test(trimmed)) {
+        flushParagraph(); flushList();
+        blocks.push(`<h1>${inline(trimmed.slice(2))}</h1>`);
+      } else if (/^>\s?/.test(trimmed)) {
+        flushParagraph(); flushList();
+        blocks.push(`<blockquote>${inline(trimmed.replace(/^>\s?/, ''))}</blockquote>`);
+      } else if (/^---+$/.test(trimmed)) {
+        flushParagraph(); flushList();
+        blocks.push('<hr>');
+      } else if (/^[-*]\s+/.test(trimmed)) {
+        flushParagraph();
+        list.push(trimmed.replace(/^[-*]\s+/, ''));
+      } else {
+        flushList();
+        paragraph.push(trimmed);
+      }
+    });
+
+    flushParagraph();
+    flushList();
+    return blocks.join('');
   },
 
-  openReader(heroId) {
+  openReader(heroId, updateHash = true) {
     const hero = MEMORY_BOOK_ARCHIVE.find(h => h.id === heroId);
     if (!hero) return;
+
+    this.currentHeroIndex = MEMORY_BOOK_ARCHIVE.findIndex(h => h.id === heroId);
+    this.lastFocusedElement = document.activeElement;
 
     document.getElementById('readerHeroTag').textContent = `${hero.chapterNum} • ${hero.name}`;
     document.getElementById('markdownRenderContainer').innerHTML = this.parseMarkdown(hero.markdown);
@@ -779,13 +840,30 @@ const MemoryBookApp = {
     const audioBtn = document.getElementById('readerAudioBtn');
     audioBtn.onclick = () => this.playHeroAudio(hero.id);
 
-    document.getElementById('readerModal').classList.add('active');
+    const modal = document.getElementById('readerModal');
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    document.getElementById('readerPosition').textContent = `${hero.chapterNum} из ${MEMORY_BOOK_ARCHIVE.length}`;
+    document.getElementById('prevChapterBtn').disabled = this.currentHeroIndex === 0;
+    document.getElementById('nextChapterBtn').disabled = this.currentHeroIndex === MEMORY_BOOK_ARCHIVE.length - 1;
     document.body.style.overflow = 'hidden';
+    document.getElementById('readerModal').querySelector('.reader-close')?.focus();
+    if (updateHash) history.replaceState(null, '', `#${hero.id}`);
   },
 
   closeReader() {
-    document.getElementById('readerModal').classList.remove('active');
+    const modal = document.getElementById('readerModal');
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = 'auto';
+    if (this.lastFocusedElement && typeof this.lastFocusedElement.focus === 'function') this.lastFocusedElement.focus();
+    if (MEMORY_BOOK_ARCHIVE.some(hero => hero.id === window.location.hash.replace('#', ''))) history.replaceState(null, '', window.location.pathname + window.location.search);
+  },
+
+  openAdjacentChapter(direction) {
+    const nextIndex = this.currentHeroIndex + direction;
+    const nextHero = MEMORY_BOOK_ARCHIVE[nextIndex];
+    if (nextHero) this.openReader(nextHero.id);
   },
 
   // УПРАВЛЕНИЕ АУДИОГИДОМ (MP3)

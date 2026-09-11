@@ -242,6 +242,8 @@ const ReaderEngine = {
     this.audioEl = document.getElementById('readerAudioElement');
     this.renderShelf();
     this.bindEvents();
+    const linkedHero = window.location.hash.replace('#', '');
+    if (linkedHero) this.openBook(linkedHero, false);
     console.log("[ReaderEngine] Интерактивный фолиант и 3D-читалка готовы к работе.");
   },
 
@@ -318,7 +320,7 @@ const ReaderEngine = {
       const specText = hero.education?.specialty || hero.specialty || 'Выпускник колледжа';
 
       return `
-        <article class="book-spine-card" onclick="ReaderEngine.openBook('${hero.id}')">
+        <article class="book-spine-card" tabindex="0" role="button" aria-label="Открыть фолиант: ${hero.name}" onclick="ReaderEngine.openBook('${hero.id}')" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); ReaderEngine.openBook('${hero.id}'); }">
           <div class="book-spine-vol">${volNum} • ${hero.plaque === 'left' ? 'Левая' : 'Правая'} плита</div>
           <div class="book-spine-portrait">
             <img src="${photoSrc}" alt="${hero.name}" onerror="this.src='assets/images/memorial-bg.jpg'">
@@ -334,7 +336,7 @@ const ReaderEngine = {
   /**
    * 3. Открытие книги
    */
-  openBook(heroId) {
+  openBook(heroId, updateHash = true) {
     // Ищем в фолиантах или генерируем разворот на лету из heroesDatabase
     let book = FOLIO_LIBRARY.find(b => b.id === heroId);
     if (!book && typeof heroesDatabase !== 'undefined') {
@@ -381,6 +383,8 @@ const ReaderEngine = {
     document.getElementById('shelfView').style.display = 'none';
     document.getElementById('bookReaderView').style.display = 'flex';
     document.getElementById('btnReturnToShelf').style.display = 'inline-block';
+    document.body.classList.add('reader-is-open');
+    if (updateHash) history.replaceState(null, '', `#${book.id}`);
 
     this.playPageTurnSound();
     this.renderSpread();
@@ -391,7 +395,9 @@ const ReaderEngine = {
     document.getElementById('bookReaderView').style.display = 'none';
     document.getElementById('shelfView').style.display = 'block';
     document.getElementById('btnReturnToShelf').style.display = 'none';
+    document.body.classList.remove('reader-is-open');
     this.currentBook = null;
+    if (window.location.hash) history.replaceState(null, '', window.location.pathname + window.location.search);
   },
 
   renderSpread() {
@@ -409,8 +415,8 @@ const ReaderEngine = {
 
     // Обновление точек
     const dotsTrack = document.getElementById('pageDotsTrack');
-    dotsTrack.innerHTML = this.currentBook.pages.map((_, i) => 
-      `<div class="page-dot ${i === this.currentSpreadIdx ? 'active' : ''}" onclick="ReaderEngine.goToSpread(${i})"></div>`
+    dotsTrack.innerHTML = this.currentBook.pages.map((_, i) =>
+      `<button class="page-dot ${i === this.currentSpreadIdx ? 'active' : ''}" aria-label="Открыть ${i + 1}-й разворот" aria-pressed="${i === this.currentSpreadIdx}" onclick="ReaderEngine.goToSpread(${i})" type="button"></button>`
     ).join('');
 
     document.getElementById('prevPageBtn').style.visibility = this.currentSpreadIdx > 0 ? 'visible' : 'hidden';
@@ -464,6 +470,7 @@ const ReaderEngine = {
   stopAudio() {
     if (this.audioEl) {
       this.audioEl.pause();
+      this.audioEl.currentTime = 0;
       this.isPlayingAudio = false;
       const btn = document.getElementById('readerAudioToggleBtn');
       if (btn) {
@@ -507,6 +514,11 @@ const ReaderEngine = {
         e.preventDefault();
         this.toggleHeroAudio();
       }
+    });
+
+    window.addEventListener('hashchange', () => {
+      const heroId = window.location.hash.replace('#', '');
+      if (heroId && heroId !== this.currentBook?.id) this.openBook(heroId, false);
     });
 
     // Сенсорные свайпы на смартфоне

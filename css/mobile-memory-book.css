@@ -123,6 +123,15 @@
     font-size: 1.25rem;
   }
 
+  .chapter-meta-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .chapter-meta-grid span {
+    padding: 8px 10px;
+  }
+
   .chapter-actions-bar {
     flex-direction: column;
     gap: 8px;
@@ -148,7 +157,31 @@
 
   .reader-topbar {
     padding: calc(12px + env(safe-area-inset-top, 0px)) 16px 12px;
+    gap: 8px;
+    align-items: flex-start;
   }
+
+  .reader-hero-tag { max-width: 55%; line-height: 1.35; }
+
+  .reader-actions { gap: 5px; }
+
+  .reader-btn {
+    padding: 8px;
+    font-size: 0;
+  }
+
+  .reader-btn::first-letter { font-size: 1rem; }
+
+  .chapter-reader-nav {
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .reader-nav-btn {
+    padding: 9px 8px;
+    font-size: 0.7rem;
+  }
+
+  .chapter-reader-position { font-size: 0.68rem; }
 
   .markdown-body {
     padding: 20px 16px 80px;

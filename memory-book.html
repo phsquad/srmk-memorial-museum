@@ -86,8 +86,8 @@
     <div class="container controls-inner">
       <div class="search-box">
         <span class="search-icon">🔍</span>
-        <input type="text" id="bookSearchInput" class="search-input" placeholder="Поиск по имени, специальности, наградам или месту подвига...">
-        <button id="clearSearchBtn" class="clear-btn" style="display:none;">&times;</button>
+        <input type="search" id="bookSearchInput" class="search-input" aria-label="Поиск по Книге Памяти" placeholder="Поиск по имени, специальности, наградам или месту подвига...">
+        <button id="clearSearchBtn" class="clear-btn" style="display:none;" type="button" aria-label="Очистить поиск">&times;</button>
       </div>
 
       <div class="filters-pills" role="group" aria-label="Фильтры глав">
@@ -117,7 +117,7 @@
   <!-- ==========================================================================
        МОДАЛЬНЫЙ МАРКДАУН-РИДЕР (ПОЛНОЭКРАННОЕ ЧТЕНИЕ ГЛАВЫ)
        ========================================================================== -->
-  <div class="reader-modal" id="readerModal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="reader-modal" id="readerModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="readerHeroTag">
     <div class="reader-overlay" onclick="MemoryBookApp.closeReader()"></div>
     <div class="reader-dialog">
       
@@ -133,6 +133,12 @@
 
       <!-- Контейнер отрендеренного Markdown -->
       <article class="markdown-body" id="markdownRenderContainer"></article>
+
+      <nav class="chapter-reader-nav" aria-label="Навигация по главам">
+        <button class="reader-nav-btn" id="prevChapterBtn" type="button">← Предыдущая глава</button>
+        <span class="chapter-reader-position" id="readerPosition">Глава 1 из 20</span>
+        <button class="reader-nav-btn" id="nextChapterBtn" type="button">Следующая глава →</button>
+      </nav>
 
     </div>
   </div>
