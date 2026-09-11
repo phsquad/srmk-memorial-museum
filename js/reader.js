@@ -1,236 +1,58 @@
 /**
  * ============================================================================
- * ДВИЖОК 3D-ЧИТАЛКИ И БИБЛИОТЕКИ: js/reader.js (v11.0 Master)
- * Синтез шелеста страниц, 20 иллюстрированных томов и 3D-развороты
+ * ДВИЖОК 3D-ЧИТАЛКИ И БИБЛИОТЕКИ: js/reader.js (v12.0 Ultra Enterprise Edition)
+ * 
+ * Включает:
+ * 1. Процедурный синтезатор шелеста страниц (Web Audio API)
+ * 2. Автоматическое объединение томов (Пролог + 20 глав)
+ * 3. Накатное глубокое связывание (Deep Linking) по хэшу URL
+ * 4. Защищенный Fallback-генератор разворотов на лету из heroesDatabase
+ * 5. Мультимедийные MP3-плееры, смену тем, свайп-жесты и клавиатуру
  * ============================================================================
  */
 
 'use strict';
 
 const FOLIO_LIBRARY = [
+  // Базовая заглушка на случай отсутствия загруженных внешних томов
   {
-    id: "nazyrov-sh-r",
-    volNum: "Том I",
-    name: "Назыров Шамиль Рустамович",
-    years: "2002 — 2023",
-    specialty: "Электромонтер (Красный диплом)",
-    military: "Гвардии рядовой, водитель «Машины жизни»",
-    awards: "Орден Мужества, Медаль «За храбрость» II ст.",
-    plaque: "left",
-    photo: "assets/images/heroes/nazyrov.jpg",
-    audioFile: "assets/audio/guides/nazyrov.mp3",
+    id: "prologue-master-cover",
+    volNum: "ГЛАВНЫЙ ТОМ",
+    chapterNum: "Вводная глава",
+    name: "Подвиг воинов-героев, защитников Отечества",
+    years: "1973 — 2026",
+    specialty: "ГБПОУ «Ставропольский региональный многопрофильный колледж»",
+    military: "Мемориал Славы СРМК",
+    awards: "Ордена Мужества",
+    plaque: "general",
+    photo: "assets/images/cover-master.jpg",
+    audioFile: "assets/audio/guides/general-tour.mp3",
     pages: [
       {
-        spreadNum: "Разворот I (Стр. 1–2)",
-        chapterTitle: "Глава 1. Родник на выжженной земле",
+        spreadNum: "Титульный разворот (Стр. 1–2)",
+        chapterTitle: "Глава 1. Быть воином — жить вечно",
         leftHtml: `
-          <div class="page-header-meta"><span>ГБПОУ СРМК</span><span>АРХИВНОЕ ДЕЛО № 2021-Э</span></div>
-          <div class="page-visual-frame"><img src="assets/images/heroes/nazyrov.jpg" alt="Шамиль Назыров"></div>
-          <div class="page-quote-box">«Он был лучшим во всех делах — добрым, смелым и надежным.»<br><small>— Из письма командира взвода</small></div>
-          <p style="font-size:0.85rem; color:#555;"><strong>Специальность:</strong> Ремонт электрооборудования.<br><strong>Отличие:</strong> Диплом с отличием, курсы сварщика.<br><strong>Подразделение:</strong> в/ч 12676 (Крым, Перевальное).</p>
+          <div class="page-header-meta"><span>ГБПОУ СРМК</span><span>ЭЛЕКТРОННАЯ КНИГА ПАМЯТИ</span></div>
+          <div class="page-visual-frame" style="height: 380px;">
+            <img src="assets/images/cover-master.jpg" alt="Обложка Книги Памяти" style="object-fit: cover;">
+          </div>
+          <div class="page-number-footer">Лицевая обложка</div>
+        `,
+        rightHtml: `
+          <div class="page-header-meta"><span>ПРОЛОГ</span><span>ВСТУПЛЕНИЕ</span></div>
+          <h3 class="page-chapter-title">Быть воином — жить вечно</h3>
+          <div class="page-story-text">
+            <span class="drop-cap">Э</span>та книга — священная летопись подвига 20 выпускников Ставропольского регионального многопрофильного колледжа, отдавших свои жизни за свободу и независимость нашей Родины.
+            <p style="margin-top:14px;">Здесь переплетены мирный созидательный труд в учебных мастерских СРМК и высочайшая воинская доблесть на переднем крае. Каждая страница — свидетельство бессмертия духа нашего студенческого братства.</p>
+            <p style="margin-top:14px; font-weight:bold; color:#8a1c22;">Вечная слава воинам-героям, защитникам Отечества!</p>
+          </div>
           <div class="page-number-footer">Стр. 1</div>
-        `,
-        rightHtml: `
-          <div class="page-header-meta"><span>ПОВЕСТЬ О МУЖЕСТВЕ</span><span>ТОМ I</span></div>
-          <h3 class="page-chapter-title">Врата призвания</h3>
-          <div class="page-story-text">
-            <span class="drop-cap">В</span> ауле Куликовы Копани Туркменского района о Шамиле Назырове всегда говорили с особой теплотой. С юных лет его отличали пытливый ум и поразительное трудолюбие. Поступив в Ставропольский региональный многопрофильный колледж, он сразу задал высочайшую планку: безупречная учеба, победы на олимпиадах и красный диплом электромонтера.
-            <p style="margin-top:12px;">Параллельно Шамиль освоил профессию сварщика, стремясь овладеть ремеслом до тонкостей. После выпуска поступил на бюджет в Аграрный университет, но в декабре 2021 года принял взрослое мужское решение — подписал контракт с Вооруженными Силами.</p>
-          </div>
-          <div class="page-number-footer">Стр. 2</div>
-        `
-      },
-      {
-        spreadNum: "Разворот II (Стр. 3–4)",
-        chapterTitle: "Глава 2. Рейсы бессмертия",
-        leftHtml: `
-          <div class="page-header-meta"><span>СЕКТОР ТВД</span><span>ХЕРСОНСКИЙ РУБЕЖ</span></div>
-          <div class="page-visual-frame"><img src="assets/images/memorial-bg.jpg" alt="Мемориал"></div>
-          <div class="page-quote-box">«Его водовоз бойцы с надеждой ждали на самом переднем крае. Таких машин было всего две на полк.»</div>
-          <p style="font-size:0.85rem; color:#555;"><strong>Боевой путь:</strong> Освобождение аэропорта, доставка воды в пекло боев, с. Гладковка.<br><strong>Награда:</strong> Медаль «За храбрость» II ст.</p>
-          <div class="page-number-footer">Стр. 3</div>
-        `,
-        rightHtml: `
-          <div class="page-header-meta"><span>ХРОНИКА ПОДВИГА</span><span>4 МАЯ 2023 ГОДА</span></div>
-          <h3 class="page-chapter-title">«Машина жизни»</h3>
-          <div class="page-story-text">
-            <span class="drop-cap">С</span> первых часов спецоперации рядовой Назыров совершал рейсы сквозь артиллерийские заслоны. В степях Таврии под палящим солнцем цистерна с водой была вопросом жизни для сотен бойцов.
-            <p style="margin-top:12px;"><strong>4 мая 2023 года</strong> в селе Гладковка под непрерывным артобстрелом Шамиль доставил спасительный груз на передовую. Осколочный залп реактивной артиллерии оборвал жизнь 20-летнего героя на боевом посту.</p>
-            <p style="margin-top:12px; font-weight:bold; color:#8a1c22;">Указом Президента РФ посмертно награжден Орденом Мужества. В СРМК открыта «Парта Героя».</p>
-          </div>
-          <div class="page-number-footer">Стр. 4</div>
-        `
-      }
-    ]
-  },
-  {
-    id: "petukhov-v-v",
-    volNum: "Том II",
-    name: "Петухов Владислав Витальевич",
-    years: "1996 — 2022",
-    specialty: "Техническая эксплуатация оборудования",
-    military: "Рядовой, мотострелковые войска",
-    awards: "Орден Мужества (посмертно)",
-    plaque: "left",
-    photo: "assets/images/heroes/petukhov.jpg",
-    audioFile: "assets/audio/guides/petukhov.mp3",
-    pages: [
-      {
-        spreadNum: "Разворот I (Стр. 1–2)",
-        chapterTitle: "Глава 1. Щит прикрытия",
-        leftHtml: `
-          <div class="page-header-meta"><span>ГБПОУ СРМК</span><span>ВЫПУСК 2016 ГОДА</span></div>
-          <div class="page-visual-frame"><img src="assets/images/heroes/petukhov.jpg" alt="Владислав Петухов"></div>
-          <div class="page-quote-box">«Владислав всегда брал на себя самые ответственные задачи — и за станком, и в боевом строю.»</div>
-          <div class="page-number-footer">Стр. 1</div>
-        `,
-        rightHtml: `
-          <div class="page-header-meta"><span>ДОНЕЦКИЙ РУБЕЖ</span><span>15 ДЕКАБРЯ 2022</span></div>
-          <h3 class="page-chapter-title">Огонь на себя</h3>
-          <div class="page-story-text">
-            <span class="drop-cap">В</span>ладислав окончил колледж в 2016 году со специальностью техника-механика. 15 декабря 2022 года на Донецком направлении во время яростной контратаки бронетехники противника рядовой Петухов занял позицию на бруствере и прицельным огнем сковал наступающих, спасая группу эвакуации раненых сослуживцев.
-            <p style="margin-top:14px; font-weight:bold; color:#8a1c22;">Награжден Орденом Мужества посмертно. Навечно в строю колледжа.</p>
-          </div>
-          <div class="page-number-footer">Стр. 2</div>
-        `
-      }
-    ]
-  },
-  {
-    id: "yaryshev-m-v",
-    volNum: "Том III",
-    name: "Ярышев Максим Викторович",
-    years: "1985 — 2024",
-    specialty: "Сварочное производство (выпуск 2004 г.)",
-    military: "Сержант, командир штурмового отделения",
-    awards: "Орден Мужества, Медаль «За отвагу»",
-    plaque: "left",
-    photo: "assets/images/heroes/yaryshev.jpg",
-    audioFile: "assets/audio/guides/yaryshev.mp3",
-    pages: [
-      {
-        spreadNum: "Разворот I (Стр. 1–2)",
-        chapterTitle: "Глава 1. Авдеевский прорыв",
-        leftHtml: `
-          <div class="page-header-meta"><span>МАСТЕР СВАРКИ</span><span>ВЫПУСК 2004 Г.</span></div>
-          <div class="page-visual-frame"><img src="assets/images/heroes/yaryshev.jpg" alt="Максим Ярышев"></div>
-          <div class="page-quote-box">«Профессия научила держать удар, а долг позвал на защиту Родины.»</div>
-          <div class="page-number-footer">Стр. 1</div>
-        `,
-        rightHtml: `
-          <div class="page-header-meta"><span>ШТУРМ АВДЕЕВКИ</span><span>20 ЯНВАРЯ 2024</span></div>
-          <h3 class="page-chapter-title">Впереди штурмовиков</h3>
-          <div class="page-story-text">
-            <span class="drop-cap">О</span>пытный мастер сварки, Максим в 2023 году ушел на фронт добровольцем. Возглавив штурмовое отделение, сержант Ярышев лично вел бойцов на захват бетонированных дотов Авдеевки. Погиб при отражении контратаки, удержав высоту.
-            <p style="margin-top:14px; font-weight:bold; color:#8a1c22;">Кавалер медали «За отвагу» и Ордена Мужества посмертно.</p>
-          </div>
-          <div class="page-number-footer">Стр. 2</div>
-        `
-      }
-    ]
-  },
-  {
-    id: "nazarenko-n-s",
-    volNum: "Том IV",
-    name: "Назаренко Никита Сергеевич",
-    years: "2004 — 2024",
-    specialty: "Наладчик сетей (выпуск 2024 г.)",
-    military: "Рядовой, войска связи",
-    awards: "Орден Мужества (посмертно)",
-    plaque: "left",
-    photo: "assets/images/heroes/nazarenko.jpg",
-    audioFile: "assets/audio/guides/nazarenko.mp3",
-    pages: [
-      {
-        spreadNum: "Разворот I (Стр. 1–2)",
-        chapterTitle: "Глава 1. Связь сквозь огонь",
-        leftHtml: `
-          <div class="page-header-meta"><span>IT-ОТДЕЛЕНИЕ</span><span>20 ЛЕТ</span></div>
-          <div class="page-visual-frame"><img src="assets/images/heroes/nazarenko.jpg" alt="Никита Назаренко"></div>
-          <div class="page-quote-box">«Самый юный герой мемориала. Диплом получил в июне, а в августе шагнул в бессмертие.»</div>
-          <div class="page-number-footer">Стр. 1</div>
-        `,
-        rightHtml: `
-          <div class="page-header-meta"><span>КУРСКОЕ ПРИГРАНИЧЬЕ</span><span>13 АВГУСТА 2024</span></div>
-          <h3 class="page-chapter-title">Подвиг связиста</h3>
-          <div class="page-story-text">
-            <span class="drop-cap">В</span> августе 2024 года во время отражения вторжения в Курскую область 20-летний связист Никита Назаренко под разрывами снарядов вручную восстановил перебитую линию боевого управления штабов. Погиб смертью храбрых.
-            <p style="margin-top:14px; font-weight:bold; color:#8a1c22;">Награжден Орденом Мужества посмертно.</p>
-          </div>
-          <div class="page-number-footer">Стр. 2</div>
-        `
-      }
-    ]
-  },
-  {
-    id: "martynov-s-k",
-    volNum: "Том V",
-    name: "Мартынов Станислав Константинович",
-    years: "2000 — 2023",
-    specialty: "Пожарная безопасность (выпуск 2020 г.)",
-    military: "Младший сержант спецподразделения",
-    awards: "Орден Мужества (посмертно)",
-    plaque: "right",
-    photo: "assets/images/heroes/martynov.jpg",
-    audioFile: "assets/audio/guides/martynov.mp3",
-    pages: [
-      {
-        spreadNum: "Разворот I (Стр. 1–2)",
-        chapterTitle: "Глава 1. Командирский бросок",
-        leftHtml: `
-          <div class="page-header-meta"><span>СТАРОСТА МЧС</span><span>ВЫПУСК 2020 Г.</span></div>
-          <div class="page-visual-frame"><img src="assets/images/heroes/martynov.jpg" alt="Станислав Мартынов"></div>
-          <div class="page-quote-box">«Сила командира — в ответственности за каждого бойца.»</div>
-          <div class="page-number-footer">Стр. 1</div>
-        `,
-        rightHtml: `
-          <div class="page-header-meta"><span>УГЛЕДАРСКИЙ РУБЕЖ</span><span>17 ИЮНЯ 2023</span></div>
-          <h3 class="page-chapter-title">Штурм высоты</h3>
-          <div class="page-story-text">
-            <span class="drop-cap">П</span>осле ранения офицера младший сержант Мартынов принял командование штурмовым отделением на себя, поднял бойцов в атаку и овладел вражеским опорным пунктом под Угледаром.
-            <p style="margin-top:14px; font-weight:bold; color:#8a1c22;">Кавалер Ордена Мужества посмертно. В СРМК открыта Парта Героя.</p>
-          </div>
-          <div class="page-number-footer">Стр. 2</div>
-        `
-      }
-    ]
-  },
-  {
-    id: "vecherka-n-a",
-    volNum: "Том VI",
-    name: "Вечёрка Николай Анатольевич",
-    years: "1996 — 2022",
-    specialty: "Пожарная безопасность (выпуск 2016 г.)",
-    military: "Разведчик-санитар 247-го гв. ДШП ВДВ",
-    awards: "Орден Мужества (посмертно)",
-    plaque: "right",
-    photo: "assets/images/heroes/vecherka.jpg",
-    audioFile: "assets/audio/guides/vecherka.mp3",
-    pages: [
-      {
-        spreadNum: "Разворот I (Стр. 1–2)",
-        chapterTitle: "Глава 1. Антоновский мост",
-        leftHtml: `
-          <div class="page-header-meta"><span>247-Й ГВ. ДШП</span><span>РАЗВЕДРОТА</span></div>
-          <div class="page-visual-frame"><img src="assets/images/heroes/vecherka.jpg" alt="Николай Вечерка"></div>
-          <div class="page-quote-box">«Первые в бою, первые в вечности.»</div>
-          <div class="page-number-footer">Стр. 1</div>
-        `,
-        rightHtml: `
-          <div class="page-header-meta"><span>ХЕРСОН</span><span>26 ФЕВРАЛЯ 2022</span></div>
-          <h3 class="page-chapter-title">Бой в окружении</h3>
-          <div class="page-story-text">
-            <span class="drop-cap">В</span> первые дни СВО у Антоновского моста через Днепр разведчик-санитар Вечёрка под шквальным огнем перевязывал и эвакуировал раненых товарищей, прикрывая отход до последнего вздоха.
-            <p style="margin-top:14px; font-weight:bold; color:#8a1c22;">Награжден Орденом Мужества посмертно.</p>
-          </div>
-          <div class="page-number-footer">Стр. 2</div>
         `
       }
     ]
   }
 ];
 
-// УПРАВЛЯЮЩИЙ ДВИЖОК ЧИТАЛКИ
 const ReaderEngine = {
   currentBook: null,
   currentSpreadIdx: 0,
@@ -238,17 +60,72 @@ const ReaderEngine = {
   audioEl: null,
   isPlayingAudio: false,
 
+  // Манифест Главной Обложки
+  masterCoverTome: {
+    id: "prologue-master-cover",
+    volNum: "ГЛАВНЫЙ ТОМ",
+    chapterNum: "Вводная глава",
+    name: "Подвиг воинов-героев, защитников Отечества",
+    years: "1973 — 2026",
+    specialty: "ГБПОУ СРМК • Все отделения",
+    military: "Мемориал Славы СРМК",
+    awards: "Ордена Мужества",
+    plaque: "general",
+    photo: "assets/images/cover-master.jpg",
+    audioFile: "assets/audio/guides/general-tour.mp3",
+    pages: [
+      {
+        spreadNum: "Титульный разворот (Стр. 1–2)",
+        chapterTitle: "Глава 1. Быть воином — жить вечно",
+        leftHtml: `
+          <div class="page-header-meta"><span>ГБПОУ СРМК</span><span>ЭЛЕКТРОННАЯ КНИГА ПАМЯТИ</span></div>
+          <div class="page-visual-frame" style="height: 380px;">
+            <img src="assets/images/cover-master.jpg" alt="Обложка Книги Памяти" style="object-fit: cover;">
+          </div>
+          <div class="page-quote-box">«Быть воином — жить вечно»</div>
+          <div class="page-number-footer">Лицевая обложка</div>
+        `,
+        rightHtml: `
+          <div class="page-header-meta"><span>ПРОЛОГ</span><span>ВСТУПЛЕНИЕ</span></div>
+          <h3 class="page-chapter-title">Быть воином — жить вечно</h3>
+          <div class="page-story-text">
+            <span class="drop-cap">Э</span>та книга — священная летопись подвига 20 выпускников Ставропольского регионального многопрофильного колледжа, отдавших свои жизни за свободу и независимость нашей Родины.
+            <p style="margin-top:14px;">Здесь переплетены мирный созидательный труд в учебных мастерских СРМК и высочайшая воинская доблесть на переднем крае. Каждая страница — свидетельство бессмертия духа нашего студенческого братства.</p>
+            <p style="margin-top:14px; font-weight:bold; color:#8a1c22;">Вечная слава воинам-героям, защитникам Отечества!</p>
+          </div>
+          <div class="page-number-footer">Стр. 1</div>
+        `
+      }
+    ]
+  },
+
   init() {
     this.audioEl = document.getElementById('readerAudioElement');
     this.renderShelf();
     this.bindEvents();
+
+    // Чтение хэша для прямого открытия книги
     const linkedHero = window.location.hash.replace('#', '');
-    if (linkedHero) this.openBook(linkedHero, false);
-    console.log("[ReaderEngine] Интерактивный фолиант и 3D-читалка готовы к работе.");
+    if (linkedHero) {
+      this.openBook(linkedHero, false);
+    }
+    console.log("[ReaderEngine v12.0 Master] 3D-Фолиант успешно инициализирован.");
   },
 
   /**
-   * 1. Процедурный синтез звука шуршания бумаги (Web Audio API)
+   * 1. Безопасное получение полного архива (Self-Healing Array Assembly)
+   */
+  getArchive() {
+    const base = window.GRAND_MEMORY_BOOK_ARCHIVE || FOLIO_LIBRARY;
+    const hasCover = base.some(b => b.id === 'prologue-master-cover');
+    if (!hasCover) {
+      return [this.masterCoverTome, ...base];
+    }
+    return base;
+  },
+
+  /**
+   * 2. Процедурный синтезатор шелеста страниц (Web Audio API)
    */
   playPageTurnSound() {
     try {
@@ -258,10 +135,11 @@ const ReaderEngine = {
       if (this.audioContext.state === 'suspended') this.audioContext.resume();
 
       const ctx = this.audioContext;
-      const bufferSize = ctx.sampleRate * 0.15; // 150 мс
+      const bufferSize = ctx.sampleRate * 0.15; // 150 миллисекунд шуршания
       const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
       const data = buffer.getChannelData(0);
 
+      // Генерируем экспоненциально затухающий белый шум
       for (let i = 0; i < bufferSize; i++) {
         data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.3));
       }
@@ -269,11 +147,12 @@ const ReaderEngine = {
       const noise = ctx.createBufferSource();
       noise.buffer = buffer;
 
+      // Полосовой фильтр (BiquadFilter) со скользящей частотой (800Hz ➔ 300Hz)
       const filter = ctx.createBiquadFilter();
       filter.type = 'bandpass';
       filter.frequency.setValueAtTime(800, ctx.currentTime);
       filter.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.15);
-      filter.Q.value = 3;
+      filter.Q.value = 3.5;
 
       const gain = ctx.createGain();
       gain.gain.setValueAtTime(0.08, ctx.currentTime);
@@ -284,20 +163,23 @@ const ReaderEngine = {
       gain.connect(ctx.destination);
 
       noise.start();
-    } catch (e) {}
+    } catch (e) {
+      console.warn("[Web Audio] Звуковой движок временно недоступен:", e);
+    }
   },
 
   /**
-   * 2. Отрисовка книжной полки
+   * 3. Отрисовка книжной полки (Bookshelf Renderer)
    */
   renderShelf() {
     const grid = document.getElementById('bookshelfGrid');
     if (!grid) return;
 
     const query = (document.getElementById('shelfSearchInput')?.value || '').toLowerCase().trim();
-    const filter = document.querySelector('.shelf-filter-btn.active')?.dataset.filter || 'all';
+    const filterBtn = document.querySelector('.shelf-filter-btn.active');
+    const filter = filterBtn ? filterBtn.dataset.filter : 'all';
 
-    const list = window.GRAND_MEMORY_BOOK_ARCHIVE || FOLIO_LIBRARY;
+    const list = this.getArchive();
 
     const filtered = list.filter(hero => {
       let matchFilter = true;
@@ -307,22 +189,25 @@ const ReaderEngine = {
       let matchSearch = true;
       if (query) {
         matchSearch = hero.name.toLowerCase().includes(query) ||
-          (hero.education?.specialty && hero.education.specialty.toLowerCase().includes(query)) ||
-          (hero.specialty && hero.specialty.toLowerCase().includes(query));
+          (hero.specialty && hero.specialty.toLowerCase().includes(query)) ||
+          (hero.education?.specialty && hero.education.specialty.toLowerCase().includes(query));
       }
       return matchFilter && matchSearch;
     });
 
     grid.innerHTML = filtered.map((hero, idx) => {
       const volNum = hero.volNum || `Том ${idx + 1}`;
-      const photoSrc = hero.media?.photo || hero.photo || 'assets/images/memorial-bg.jpg';
+      const photoSrc = hero.media?.photo || hero.photo || 'assets/images/cover-master.jpg';
       const specText = hero.education?.specialty || hero.specialty || 'Выпускник колледжа';
+      const isMaster = hero.id === 'prologue-master-cover';
 
       return `
-        <article class="book-spine-card" tabindex="0" role="button" aria-label="Открыть фолиант: ${hero.name}" onclick="ReaderEngine.openBook('${hero.id}')" onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); ReaderEngine.openBook('${hero.id}'); }">
-          <div class="book-spine-vol">${volNum} • ${hero.plaque === 'left' ? 'Левая' : 'Правая'} плита</div>
+        <article class="book-spine-card ${isMaster ? 'master-tome' : ''}" tabindex="0" role="button" aria-label="Открыть фолиант: ${hero.name}" 
+                 onclick="ReaderEngine.openBook('${hero.id}')" 
+                 onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); ReaderEngine.openBook('${hero.id}'); }">
+          <div class="book-spine-vol">${volNum} • ${hero.plaque === 'left' ? 'Левая' : (hero.plaque === 'right' ? 'Правая' : 'ГБПОУ СРМК')}</div>
           <div class="book-spine-portrait">
-            <img src="${photoSrc}" alt="${hero.name}" onerror="this.src='assets/images/memorial-bg.jpg'">
+            <img src="${photoSrc}" alt="${hero.name}" onerror="this.src='assets/images/cover-master.jpg'">
           </div>
           <h4 class="book-spine-title">${hero.name}</h4>
           <p class="book-spine-spec">${specText}</p>
@@ -333,39 +218,40 @@ const ReaderEngine = {
   },
 
   /**
-   * 3. Открытие книги
+   * 4. Раскрытие книги (Поддержка Fallback-генератора на лету)
    */
   openBook(heroId, updateHash = true) {
-    // Ищем в фолиантах или генерируем разворот на лету из heroesDatabase
-    const extendedBooks = window.GRAND_MEMORY_BOOK_ARCHIVE || [
-      ...(typeof GRAND_MEMORY_BOOK_PART_1 !== 'undefined' ? GRAND_MEMORY_BOOK_PART_1 : []),
-      ...(typeof GRAND_MEMORY_BOOK_PART_2 !== 'undefined' ? GRAND_MEMORY_BOOK_PART_2 : []),
-      ...(typeof GRAND_MEMORY_BOOK_PART_3 !== 'undefined' ? GRAND_MEMORY_BOOK_PART_3 : [])
-    ];
-    let book = extendedBooks.find(b => b.id === heroId) || FOLIO_LIBRARY.find(b => b.id === heroId);
+    const archive = this.getArchive();
+    let book = archive.find(b => b.id === heroId);
+
+    // ⚡️ FALLBACK ГЕНЕРАТОР РАЗВОРОТОВ НА ЛЕТУ ИЗ HEROESDATABASE:
     if (!book && typeof heroesDatabase !== 'undefined') {
       const h = heroesDatabase.find(x => x.id === heroId);
       if (h) {
         book = {
           id: h.id,
-          volNum: `Том Мемориала`,
+          volNum: "Том Летописи",
+          chapterNum: "Глава памяти",
           name: h.name,
+          years: h.dates?.years || `${h.dates?.birth || ''} — ${h.dates?.death || ''}`,
+          specialty: h.education?.specialty || "Выпускник СРМК",
+          photo: h.media?.photo || 'assets/images/cover-master.jpg',
           audioFile: h.media?.audioGuide || `assets/audio/guides/${h.id}.mp3`,
           pages: [
             {
               spreadNum: "Разворот I (Стр. 1–2)",
               leftHtml: `
-                <div class="page-header-meta"><span>ГБПОУ СРМК</span><span>АРХИВ ВЫПУСКНИКА</span></div>
-                <div class="page-visual-frame"><img src="${h.media?.photo || 'assets/images/memorial-bg.jpg'}" alt="${h.name}"></div>
-                <div class="page-quote-box">«${h.quote || 'Верность воинскому долгу.'}»</div>
-                <p style="font-size:0.85rem; color:#555;"><strong>Специальность:</strong> ${h.education?.specialty || 'СРМК'}<br><strong>Звание:</strong> ${h.military?.rank || 'Воин ВС РФ'}</p>
+                <div class="page-header-meta"><span>ГБПОУ СРМК</span><span>АРХИВНЫЙ МЕДАЛЬОН</span></div>
+                <div class="page-visual-frame"><img src="${h.media?.photo || 'assets/images/cover-master.jpg'}" alt="${h.name}" onerror="this.src='assets/images/cover-master.jpg'"></div>
+                <div class="page-quote-box">«${h.quote || 'Верность воинскому долгу и памяти студенческого братства.'}»</div>
+                <p style="font-size:0.85rem; color:#444;"><strong>Профессия:</strong> ${h.education?.specialty || 'Выпускник колледжа'}<br><strong>Звание:</strong> ${h.military?.rank || 'Воин ВС РФ'}<br><strong>Рубеж:</strong> ${h.mapCoords?.locationName || 'ТВД'}</p>
                 <div class="page-number-footer">Стр. 1</div>
               `,
               rightHtml: `
-                <div class="page-header-meta"><span>ЛЕТОПИСЬ МУЖЕСТВА</span><span>${h.name}</span></div>
-                <h3 class="page-chapter-title">Ратный подвиг</h3>
+                <div class="page-header-meta"><span>АРХИВ КНИГИ ПАМЯТИ</span><span>ГЛАВА I</span></div>
+                <h3 class="page-chapter-title">Хроника подвига</h3>
                 <div class="page-story-text">
-                  <span class="drop-cap">${h.name[0]}</span>${h.deed || 'Описание подвига уточняется в архивах колледжа.'}
+                  <span class="drop-cap">${h.name[0]}</span>${h.deed || 'Сведения о боевом пути и ратном подвиге героя-выпускника в настоящее время верифицируются через архивы Министерства обороны РФ.'}
                   <p style="margin-top:14px; font-weight:bold; color:#8a1c22;">Награжден Орденом Мужества посмертно. Увековечен на Мемориале Славы СРМК.</p>
                 </div>
                 <div class="page-number-footer">Стр. 2</div>
@@ -388,7 +274,10 @@ const ReaderEngine = {
     document.getElementById('bookReaderView').style.display = 'flex';
     document.getElementById('btnReturnToShelf').style.display = 'inline-block';
     document.body.classList.add('reader-is-open');
-    if (updateHash) history.replaceState(null, '', `#${book.id}`);
+
+    if (updateHash) {
+      history.replaceState(null, '', `#${book.id}`);
+    }
 
     this.playPageTurnSound();
     this.renderSpread();
@@ -401,9 +290,15 @@ const ReaderEngine = {
     document.getElementById('btnReturnToShelf').style.display = 'none';
     document.body.classList.remove('reader-is-open');
     this.currentBook = null;
-    if (window.location.hash) history.replaceState(null, '', window.location.pathname + window.location.search);
+    
+    if (window.location.hash) {
+      history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
   },
 
+  /**
+   * 5. Отрисовка текущего 3D-разворота
+   */
   renderSpread() {
     if (!this.currentBook) return;
 
@@ -411,17 +306,22 @@ const ReaderEngine = {
     const leftEl = document.getElementById('pageLeftContent');
     const rightEl = document.getElementById('pageRightContent');
 
-    leftEl.innerHTML = spread.leftHtml;
-    rightEl.innerHTML = spread.rightHtml;
+    if (leftEl) leftEl.innerHTML = spread.leftHtml;
+    if (rightEl) rightEl.innerHTML = spread.rightHtml;
 
     const total = this.currentBook.pages.length;
     document.getElementById('paginationDisplay').textContent = `${spread.spreadNum} из ${total}`;
 
-    // Обновление точек
+    // Генерация нави-точек разворотов
     const dotsTrack = document.getElementById('pageDotsTrack');
-    dotsTrack.innerHTML = this.currentBook.pages.map((_, i) =>
-      `<button class="page-dot ${i === this.currentSpreadIdx ? 'active' : ''}" aria-label="Открыть ${i + 1}-й разворот" aria-pressed="${i === this.currentSpreadIdx}" onclick="ReaderEngine.goToSpread(${i})" type="button"></button>`
-    ).join('');
+    if (dotsTrack) {
+      dotsTrack.innerHTML = this.currentBook.pages.map((_, i) =>
+        `<button class="page-dot ${i === this.currentSpreadIdx ? 'active' : ''}" 
+                 aria-label="Открыть ${i + 1}-й разворот" 
+                 aria-pressed="${i === this.currentSpreadIdx}" 
+                 onclick="ReaderEngine.goToSpread(${i})" type="button"></button>`
+      ).join('');
+    }
 
     document.getElementById('prevPageBtn').style.visibility = this.currentSpreadIdx > 0 ? 'visible' : 'hidden';
     document.getElementById('nextPageBtn').style.visibility = this.currentSpreadIdx < total - 1 ? 'visible' : 'hidden';
@@ -452,6 +352,9 @@ const ReaderEngine = {
     this.renderSpread();
   },
 
+  /**
+   * 6. Мультимедиа-плеер
+   */
   toggleHeroAudio() {
     if (!this.currentBook || !this.audioEl) return;
 
@@ -463,10 +366,12 @@ const ReaderEngine = {
       this.audioEl.src = this.currentBook.audioFile;
       this.audioEl.play().then(() => {
         this.isPlayingAudio = true;
-        btn.classList.add('playing');
-        btn.textContent = '❚❚ Пауза аудиогида';
+        if (btn) {
+          btn.classList.add('playing');
+          btn.textContent = '❚❚ Пауза аудиогида';
+        }
       }).catch(() => {
-        this.showToast('Аудиофайл готовится к публикации');
+        this.showToast('Аудиофайл очерка подготавливается к публикации в базе СРМК.');
       });
     }
   },
@@ -484,11 +389,14 @@ const ReaderEngine = {
     }
   },
 
+  /**
+   * 7. Привязка обработчиков интерфейса
+   */
   bindEvents() {
-    // Поиск по полке
+    // Живой поиск по полке
     document.getElementById('shelfSearchInput')?.addEventListener('input', () => this.renderShelf());
 
-    // Фильтры
+    // Фильтрация полки (Левая / Правая плиты)
     document.querySelectorAll('.shelf-filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.shelf-filter-btn').forEach(b => b.classList.remove('active'));
@@ -497,18 +405,18 @@ const ReaderEngine = {
       });
     });
 
-    // Темы оформления разворота
+    // Изменение цветовых тем книги памяти
     document.querySelectorAll('.theme-dot').forEach(dot => {
       dot.addEventListener('click', () => {
         document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
         dot.classList.add('active');
         const theme = dot.dataset.theme;
         const book = document.getElementById('folioBookElement');
-        book.className = `folio-book-3d ${theme}`;
+        if (book) book.className = `folio-book-3d ${theme}`;
       });
     });
 
-    // Клавиатура
+    // Управление горячими клавишами
     document.addEventListener('keydown', (e) => {
       if (!this.currentBook) return;
       if (e.key === 'ArrowRight') this.nextPage();
@@ -520,12 +428,15 @@ const ReaderEngine = {
       }
     });
 
+    // Реакция на изменение хэша URL (глубокие ссылки)
     window.addEventListener('hashchange', () => {
       const heroId = window.location.hash.replace('#', '');
-      if (heroId && heroId !== this.currentBook?.id) this.openBook(heroId, false);
+      if (heroId && heroId !== this.currentBook?.id) {
+        this.openBook(heroId, false);
+      }
     });
 
-    // Сенсорные свайпы на смартфоне
+    // Сенсорные жесты свайпа на мобильных устройствах
     let touchStartX = 0;
     const bookEl = document.getElementById('folioBookElement');
     if (bookEl) {
@@ -535,10 +446,17 @@ const ReaderEngine = {
 
       bookEl.addEventListener('touchend', e => {
         const deltaX = e.changedTouches[0].screenX - touchStartX;
-        if (deltaX < -50) this.nextPage();
-        if (deltaX > 50) this.prevPage();
+        if (deltaX < -60) this.nextPage(); // Свайп влево ➔ Вперед
+        if (deltaX > 60) this.prevPage();  // Свайп вправо ➔ Назад
       }, { passive: true });
     }
+  },
+
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>'"]/g, tag => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    }[tag]));
   },
 
   showToast(msg) {
@@ -550,4 +468,5 @@ const ReaderEngine = {
   }
 };
 
+window.ReaderEngine = ReaderEngine;
 document.addEventListener('DOMContentLoaded', () => ReaderEngine.init());

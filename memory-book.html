@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Электронная Книга Памяти | «Быть воином — жить вечно» ГБПОУ СРМК</title>
-  <meta name="description" content="Летопись ратной славы 20 выпускников ГБПОУ СРМК. Подлинные архивные очерки, аудиогиды и исторические свидетельства.">
+  <meta name="description" content="Электронная летопись и подробные архивные очерки о подвигах 20 героев-выпускников Ставропольского регионального многопрофильного колледжа.">
   <meta name="theme-color" content="#0a0c0f">
 
   <!-- Шрифты -->
@@ -19,7 +19,10 @@
 </head>
 <body class="dark-theme">
 
-  <!-- ЕДИНАЯ ОЧИЩЕННАЯ ШАПКА -->
+  <!-- ВЕРХНИЙ ИНДИКАТОР ПРОКРУТКИ -->
+  <div class="reading-progress-bar" id="readingProgressBar"></div>
+
+  <!-- ЕДИНАЯ НАВИГАЦИОННАЯ ШАПКА -->
   <header class="book-header">
     <div class="container header-container">
       
@@ -32,49 +35,32 @@
         </div>
       </div>
 
-      <!-- НАВИГАЦИОННОЕ МЕНЮ БЕЗ ДУБЛЕЙ И СЫРЫХ ССЫЛОК -->
+      <!-- НАВИГАЦИОННОЕ МЕНЮ -->
       <nav class="header-actions" aria-label="Навигация по разделам">
-        <a href="reader.html" class="btn-header" title="3D Фолиант с перелистыванием">
-          📚 Читалка 3D
-        </a>
-        <a href="quiz.html" class="btn-header" title="Интерактивная викторина">
-          ⚔️ Квест-квиз
-        </a>
-        <a href="desk-qr.html" class="btn-header" title="Конструктор табличек Парта Героя">
-          🪑 Парта Героя
-        </a>
-        <a href="guestbook.html" class="btn-header" title="Послания и лампады памяти">
-          🕯 Стена Памяти
-        </a>
-        <a href="certificate.html" class="btn-header" title="Генератор наградных документов">
-          📜 Сертификаты
-        </a>
-        <a href="methodology.html" class="btn-header" title="Банк уроков для преподавателей">
-          📑 Методкабинет
-        </a>
-        <a href="index.html" class="btn-header btn-primary" title="Вернуться в виртуальный 3D-музей">
-          ← В 3D-музей
-        </a>
+        <a href="reader.html" class="btn-header" title="3D Фолиант с перелистыванием">📚 Читалка 3D</a>
+        <a href="quiz.html" class="btn-header" title="Интерактивная викторина">⚔️ Квест-квиз</a>
+        <a href="desk-qr.html" class="btn-header" title="Конструктор табличек Парта Героя">🪑 Парта Героя</a>
+        <a href="guestbook.html" class="btn-header" title="Послания и лампады памяти">🕯 Стена Памяти</a>
+        <a href="certificate.html" class="btn-header" title="Генератор наградных документов">📜 Сертификаты</a>
+        <a href="methodology.html" class="btn-header" title="Банк уроков для преподавателей">📑 Методкабинет</a>
+        <a href="index.html" class="btn-header btn-primary" title="Вернуться в 3D-музей">← В 3D-музей</a>
       </nav>
     </div>
   </header>
 
-  <!-- ИНДИКАТОР ПРОКРУТКИ -->
-  <div class="reading-progress-bar" id="readingProgressBar"></div>
-
-  <!-- ТИТУЛЬНЫЙ БАННЕР -->
+  <!-- ТИТУЛЬНЫЙ БАННЕР С МАГИСТРАЛЬНОЙ ОБЛОЖКОЙ 3:2 -->
   <section class="book-hero">
     <div class="container hero-content">
-      <div class="hero-crest">⭐️</div>
-      <div class="hero-badge">Летопись мужества • 1973 — 2026</div>
-      <h2 class="hero-title">ИМЕНА, ВПИСАННЫЕ В ВЕЧНОСТЬ</h2>
-      <p class="hero-quote">
-        «Подвиг воина — это не мгновение слепой ярости. Это вершина человеческого духа, где соединяются любовь к родной земле, верность студенческому братству и готовность отдать жизнь за други своя.»
-      </p>
       
+      <!-- РАМА МАГИСТРАЛЬНОЙ ОБЛОЖКИ 3:2 -->
+      <div class="master-cover-frame">
+        <img src="assets/images/cover-master.jpg" alt="Подвиг воинов-героев, защитников Отечества" class="master-cover-img">
+        <div class="cover-glow-overlay"></div>
+      </div>
+
       <div class="hero-stats-row">
-        <div class="stat-badge"><strong>21</strong> Глав летописи</div>
-        <div class="stat-badge"><strong>21</strong> Аудиогидов (MP3)</div>
+        <div class="stat-badge"><strong>21</strong> Глава летописи</div>
+        <div class="stat-badge"><strong>21</strong> Аудиогид (MP3)</div>
         <div class="stat-badge"><strong>100%</strong> Достоверные архивы</div>
         <div class="stat-badge"><strong>4</strong> Сектора ТВД</div>
       </div>
@@ -92,8 +78,8 @@
 
       <div class="filters-pills" role="group" aria-label="Фильтры глав">
         <button class="filter-pill active" data-filter="all" type="button">Все главы (21)</button>
-        <button class="filter-pill" data-filter="left" type="button">Левая плита монумента (10)</button>
-        <button class="filter-pill" data-filter="right" type="button">Правая плита монумента (10)</button>
+        <button class="filter-pill" data-filter="left" type="button">Левая плита мемориала (10)</button>
+        <button class="filter-pill" data-filter="right" type="button">Правая плита мемориала (10)</button>
       </div>
     </div>
   </nav>
@@ -110,12 +96,14 @@
     </aside>
 
     <!-- ЛЕНТА ГЛАВ -->
-    <section class="book-stories-feed" id="storiesFeed"></section>
+    <section class="book-stories-feed" id="storiesFeed">
+      <!-- Сюда динамически рендерятся карточки через memory-book.js -->
+    </section>
 
   </main>
 
   <!-- ==========================================================================
-       МОДАЛЬНЫЙ МАРКДАУН-РИДЕР (ПОЛНОЭКРАННОЕ ЧТЕНИЕ ГЛАВЫ)
+       МОДАЛЬНЫЙ МАРКДАУН-РИДЕР (ПОЛНОЭКРАННОЕ ЧТЕНИЕ)
        ========================================================================== -->
   <div class="reader-modal" id="readerModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="readerHeroTag">
     <div class="reader-overlay" onclick="MemoryBookApp.closeReader()"></div>
@@ -126,14 +114,15 @@
         <div class="reader-hero-tag" id="readerHeroTag">Глава летописи</div>
         <div class="reader-actions">
           <button class="reader-btn" id="readerAudioBtn" type="button">🎧 Слушать аудиогид</button>
-          <button class="reader-btn" onclick="window.print()" type="button">🖨 Печать</button>
+          <button class="reader-btn" onclick="window.print()" type="button">🖨 Печать Справки</button>
           <button class="reader-close" onclick="MemoryBookApp.closeReader()" type="button" aria-label="Закрыть">&times;</button>
         </div>
       </div>
 
-      <!-- Контейнер отрендеренного Markdown -->
+      <!-- Контейнер отрендерованного Markdown -->
       <article class="markdown-body" id="markdownRenderContainer"></article>
 
+      <!-- Навигация по главам внутри ридера -->
       <nav class="chapter-reader-nav" aria-label="Навигация по главам">
         <button class="reader-nav-btn" id="prevChapterBtn" type="button">← Предыдущая глава</button>
         <span class="chapter-reader-position" id="readerPosition">Глава 1 из 21</span>
@@ -143,7 +132,7 @@
     </div>
   </div>
 
-  <!-- ПЛАВАЮЩИЙ АУДИОПЛЕЕР (ДЛЯ ВОСПРОИЗВЕДЕНИЯ MP3) -->
+  <!-- ПЛАВАЮЩИЙ АУДИОПЛЕЕР (ДЛЯ MP3-АУДИОГИДОВ) -->
   <div class="book-audio-bar" id="bookAudioBar">
     <div class="container audio-bar-content">
       <button class="audio-toggle-btn" id="bookAudioPlayBtn" type="button">▶</button>
@@ -160,7 +149,7 @@
     <audio id="bookAudioPlayer" preload="metadata"></audio>
   </div>
 
-  <!-- ПОДВАЛ -->
+  <!-- ПОДВАЛ (FOOTER) -->
   <footer class="book-footer">
     <div class="container footer-content">
       <div class="footer-col">
@@ -181,14 +170,22 @@
 
   <div id="bookToast" class="book-toast"></div>
 
-  <!-- СКРИПТЫ -->
+  <!-- ==========================================================================
+       ПОДКЛЮЧЕНИЕ СКРИПТОВ (СТРОГИЙ ПОРЯДОК ЗАГРУЗКИ)
+       ========================================================================== -->
+  <!-- 1. Облачная база данных Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- 2. База данных мемориала и расширенные тома летописи -->
   <script src="js/data.js"></script>
   <script src="js/grand-memory-book-part-1.js"></script>
   <script src="js/grand-memory-book-part-2.js"></script>
   <script src="js/grand-memory-book-part-3.js"></script>
-  <!-- SUPABASE REALTIME CLOUD SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- 3. Облачный мост и защитный шлюз -->
   <script src="js/cloud-sync.js"></script>
+  
+  <!-- 4. Управляющий движок страницы Книги Памяти -->
   <script src="js/memory-book.js"></script>
 </body>
 </html>

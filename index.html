@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>Виртуальный музей ГБПОУ СРМК | «Быть воином — жить вечно»</title>
-  <meta name="description" content="Интерактивный цифровой мемориал памяти 20 выпускников ГБПОУ СРМК, павших при исполнении воинского долга. Всероссийская акция «Карта доблести: хранители подвигов».">
+  <meta name="description" content="Интерактивный цифровой мемориал памяти 20 выпускников ГБПОУ СРМК, павших при защите Отечества. Всероссийская акция «Карта доблести: хранители подвигов».">
   <meta name="theme-color" content="#0a0c0f">
 
   <!-- УМНЫЙ ШЛЮЗ АВТООПРЕДЕЛЕНИЯ УСТРОЙСТВА -->
@@ -22,7 +22,7 @@
   <meta property="og:locale" content="ru_RU">
   <meta property="og:title" content="Виртуальный музей ГБПОУ СРМК: «Быть воином — жить вечно»">
   <meta property="og:description" content="Мемориальная экспозиция и оцифрованные архивы 20 выпускников Ставропольского регионального многопрофильного колледжа.">
-  <meta property="og:image" content="assets/images/memorial-bg.jpg">
+  <meta property="og:image" content="assets/images/cover-master.jpg">
 
   <!-- Шрифтовые гарнитуры -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -49,11 +49,11 @@
     </div>
   </aside>
 
-  <!-- 2. ГЛАВНАЯ ЭРГОНОМИЧНАЯ ШАПКА -->
+  <!-- 2. ГЛАВНАЯ НАВИГАЦИОННАЯ ШАПКА -->
   <header class="header" id="siteHeader">
     <div class="container header-container">
       
-      <!-- ЛОГОТИП И НАЗВАНИЕ (БЕЗ РАЗРЫВОВ СТРОК) -->
+      <!-- ЛОГОТИП И НАЗВАНИЕ -->
       <a href="#heroIntro" class="logo-group" aria-label="На главную страницу музея">
         <div class="logo-badge">СРМК</div>
         <div class="logo-text">
@@ -164,7 +164,7 @@
           <span class="highlight">ОНИ ШАГНУЛИ В ВЕЧНОСТЬ.</span>
         </h1>
         <p class="hero-subtitle">
-          Интерактивная музейная экспозиция памяти 20 выпускников Ставропольского регионального многопрофильного колледжа, совершивших бессмертный ратный подвиг при защите Отечества.
+          Интерактивная мемориальная экспозиция памяти 20 выпускников Ставропольского регионального многопрофильного колледжа, совершивших бессмертный ратный подвиг при защите Отечества.
         </p>
         
         <div class="hero-stats" role="region" aria-label="Фонд экспозиции">
@@ -194,6 +194,13 @@
     <!-- ЗАЛ I: ИНТЕРАКТИВНЫЙ МЕМОРИАЛ «ЗВЕЗДА ПАМЯТИ» -->
     <section id="memorial" class="section memorial-section">
       <div class="container">
+        
+        <!-- 🔥 МАГИСТРАЛЬНАЯ ОБЛОЖКА 3:2 НА ГЛАВНОМ ЭКРАНЕ ЗАЛА -->
+        <div class="master-cover-frame">
+          <img src="assets/images/cover-master.jpg" alt="Подвиг воинов-героев СРМК" class="master-cover-img" loading="lazy">
+          <div class="cover-glow-overlay"></div>
+        </div>
+
         <div class="section-header">
           <div class="hall-tag">Зал I музея</div>
           <h2 class="section-title">Мемориал Славы «Звезда Памяти»</h2>
@@ -496,7 +503,7 @@
         <h3>Конкурсный статус</h3>
         <p>Проект разработан для Всероссийской акции «Имя в истории образовательной организации» (номинация «За партой героя»).</p>
         <p class="copyright">© 2026 ГБПОУ СРМК. «Быть воином — жить вечно».</p>
-        <button onclick="if(typeof AdminCMS !== 'undefined') AdminCMS.open()" style="background:none; border:none; color:var(--text-tertiary); font-size:11px; cursor:pointer; margin-top:8px;">
+        <button onclick="if(typeof AdminCMS !== 'undefined') AdminCMS.open()" style="background:none; border:none; color:var(--text-tertiary); font-size:11px; cursor:pointer; margin-top:8px;" type="button">
           [ Панель управления ]
         </button>
       </div>
@@ -506,28 +513,24 @@
   <!-- ==========================================================================
        ПОДКЛЮЧЕНИЕ СКРИПТОВ (СТРОГИЙ ПОРЯДОК ЗАГРУЗКИ)
        ========================================================================== -->
-  
-  <!-- 1. Внешние API -->
-  <script src="https://api-maps.yandex.ru/2.1/?apikey=ваш_ключ&lang=ru_RU" type="text/javascript"></script>
-  
-  <!-- 2. Базы данных и источники -->
-  <script src="js/data.js"></script>
-
-  <!-- 2. SUPABASE REALTIME CLOUD SDK (Облако) -->
+  <!-- 1. Внешние SDK и API -->
+  <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/cloud-sync.js"></script>
-
+  
+  <!-- 2. База данных и источники -->
+  <script src="js/data.js"></script>
   <script src="js/sources.js"></script>
 
-  <!-- 3. НОВЫЕ ИНЖЕНЕРНЫЕ МОДУЛИ (TTS, AntiBot, Heraldry) -->
+  <!-- 3. Облачный мост, защита и геральдика -->
+  <script src="js/cloud-sync.js"></script>
   <script src="js/tts-narrator.js"></script>
   <script src="js/anti-cheat-tribute.js"></script>
   <script src="js/heraldry-resolver.js"></script>
+  <script src="js/tech-modules.js"></script>
 
-  <!-- 4. Главные контроллеры -->
+  <!-- 4. Основной контроллер выставки и панель CMS -->
   <script src="js/app.js"></script>
   <script src="js/admin.js"></script>
-  <script src="js/tech-modules.js"></script>
 
   <!-- Интерактивные триггеры страницы -->
   <script>
