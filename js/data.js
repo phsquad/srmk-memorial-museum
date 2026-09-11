@@ -174,9 +174,12 @@ const heroesDatabase = [
     deed: "**Выполнял боевые задачи на Донецком направлении.** Проявил мужество и самоотверженность при отражении контратаки превосходящих сил противника, прикрыв эвакуацию группы раненых бойцов.",
     quote: "*Верность воинскому долгу и памяти студенческого братства.*",
     media: {
-      photo: "assets/images/heroes/petukhov.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
       audioGuide: "assets/audio/guides/petukhov.mp3",
-      documents: ["Архивное дело студента выпуска 2016 г.", "Приказ о зачислении в СРМК"]
+      documents: ["Архивное дело студента выпуска 2016 г.", "Приказ о зачислении в СРМК"],
+      awardsImages: [
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png"
+      ]
     },
     memorialStatus: "Увековечен на левой плите Мемориала Славы СРМК",
     mapCoords: { lat: 48.0159, lng: 37.8028, locationName: "Донецкое направление (ДНР)" }
@@ -202,9 +205,13 @@ const heroesDatabase = [
     deed: "Опытный специалист, добровольцем ушедший на передовую. Руководил штурмовым отделением при прорыве бетонированных укреплений и дотов Авдеевского района.",
     quote: "Профессия научила держать удар, а долг позвал на защиту Отечества.",
     media: {
-      photo: "assets/images/heroes/yaryshev.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
       audioGuide: "assets/audio/guides/yaryshev.mp3",
-      documents: ["Архивная ведомость практики", "Наградной лист"]
+      documents: ["Архивная ведомость практики", "Наградной лист"],
+        awardsImages: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Medal_For_Courage_RF.png/300px-Medal_For_Courage_RF.png"
+        ]
     },
     memorialStatus: "Увековечен на левой плите Мемориала Славы СРМК",
     mapCoords: { lat: 48.1399, lng: 37.7497, locationName: "Авдеевский укрепленный район" }
@@ -230,9 +237,12 @@ const heroesDatabase = [
     deed: "Выполнял боевые задачи в составе Ставропольского десантного полка. Спас жизни раненых товарищей, эвакуируя бойцов под непрерывным кассетным обстрелом на Ореховском направлении.",
     quote: "Спасение жизней — призвание на службе и в бою.",
     media: {
-      photo: "assets/images/heroes/sopolev.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
       audioGuide: "assets/audio/guides/sopolev.mp3",
-      documents: ["Диплом отделения Пожарной безопасности СРМК"]
+      documents: ["Диплом отделения Пожарной безопасности СРМК"],
+        awardsImages: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png"
+        ]
     },
     memorialStatus: "Увековечен на левой плите Мемориала Славы СРМК",
     mapCoords: { lat: 47.4489, lng: 35.3908, locationName: "Запорожское направление (Орехов)" }
@@ -258,9 +268,12 @@ const heroesDatabase = [
     deed: "Обеспечил прикрытие перегруппировки батальона на Бахмутском рубеже, отразив фланговый удар превосходящих сил бронетехники противника.",
     quote: "Честно выполнил свой воинский долг.",
     media: {
-      photo: "assets/images/heroes/belov.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
       audioGuide: "assets/audio/guides/belov.mp3",
-      documents: ["Студенческая зачетная книжка СРМК"]
+      documents: ["Студенческая зачетная книжка СРМК"],
+        awardsImages: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png"
+        ]
     },
     memorialStatus: "Увековечен на левой плите Мемориала Славы СРМК",
     mapCoords: { lat: 48.5987, lng: 37.9982, locationName: "Бахмутское направление" }
@@ -286,9 +299,12 @@ const heroesDatabase = [
     deed: "Под шквальным артиллерийским огнем и ударами FPV-дронов противника осуществлял регулярную доставку боеприпасов на передовые позиции в районе Марьинки.",
     quote: "Каждый рейс на передовую — это спасенные жизни товарищей.",
     media: {
-      photo: "assets/images/heroes/shartov.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
       audioGuide: "assets/audio/guides/shartov.mp3",
-      documents: ["Сводная ведомость производственной практики"]
+      documents: ["Сводная ведомость производственной практики"],
+        awardsImages: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png"
+        ]
     },
     memorialStatus: "Увековечен на левой плите Мемориала Славы СРМК",
     mapCoords: { lat: 47.9995, lng: 37.5012, locationName: "Марьинское направление" }
@@ -314,9 +330,13 @@ const heroesDatabase = [
     deed: "Обеспечивал передовую питьевой водой под прицельными обстрелами. Его водовоз бойцы назвали «Машиной жизни». Участвовал во взятии аэропорта в Херсонской обл. Погиб в с. Гладковка.",
     quote: "Добрым, отзывчивым, смелым, надежным... Он был лучшим во всех делах.",
     media: {
-      photo: "assets/images/heroes/nazyrov.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
       audioGuide: "assets/audio/guides/nazyrov.mp3",
-      documents: ["Красный диплом СРМК", "Удостоверение Ветерана боевых действий"]
+      documents: ["Красный диплом СРМК", "Удостоверение Ветерана боевых действий"],
+        awardsImages: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Medal_For_Bravery_2_class.png/300px-Medal_For_Bravery_2_class.png"
+        ]
     },
     memorialStatus: "Именная «Парта Героя» в электромастерской СРМК",
     mapCoords: { lat: 46.4172, lng: 32.6144, locationName: "с. Гладковка, Херсонская область" }
@@ -342,9 +362,12 @@ const heroesDatabase = [
     deed: "Проявил мужество при прорыве эшелонированной обороны в ДНР. Несмотря на попадание снаряда, сумел потушить пожар изнутри и вывел танк из-под огня.",
     quote: "Броня сильна стойкостью экипажа.",
     media: {
-      photo: "assets/images/heroes/lukyanenko.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
       audioGuide: "assets/audio/guides/lukyanenko.mp3",
-      documents: ["Архивная карточка выпускника СРМК"]
+      documents: ["Архивная карточка выпускника СРМК"],
+        awardsImages: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png"
+        ]
     },
     memorialStatus: "Увековечен на левой плите Мемориала Славы СРМК",
     mapCoords: { lat: 48.3001, lng: 37.6002, locationName: "Донецкое направление" }
@@ -370,9 +393,12 @@ const heroesDatabase = [
     deed: "Обеспечил боевую связь штабов в Курском приграничье под ракетно-кассетными обстрелами. Вручную восстановил перебитую линию 13 августа 2024 г. Погиб на боевом посту.",
     quote: "Самый юный герой в строю выпускников нашего колледжа.",
     media: {
-      photo: "assets/images/heroes/nazarenko.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
       audioGuide: "assets/audio/guides/nazarenko.mp3",
-      documents: ["Диплом СРМК выпуска 2024 года"]
+      documents: ["Диплом СРМК выпуска 2024 года"],
+        awardsImages: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png"
+        ]
     },
     memorialStatus: "Мемориальный стенд кафедры IT СРМК",
     mapCoords: { lat: 51.3000, lng: 35.2000, locationName: "Курское приграничье" }
@@ -398,9 +424,12 @@ const heroesDatabase = [
     deed: "Выполнял задачи по разминированию коридоров для продвижения бронетехники под огнем противника на Запорожском фронте. Лично обезвредил десятки мин.",
     quote: "Труд сапера спасает сотни жизней.",
     media: {
-      photo: "assets/images/heroes/lutsenko.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
       audioGuide: "assets/audio/guides/lutsenko.mp3",
-      documents: ["Журнал производственного обучения"]
+      documents: ["Журнал производственного обучения"],
+        awardsImages: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png"
+        ]
     },
     memorialStatus: "Увековечен на левой плите Мемориала Славы СРМК",
     mapCoords: { lat: 47.1000, lng: 36.8000, locationName: "Запорожский рубеж" }
@@ -426,9 +455,12 @@ const heroesDatabase = [
     deed: "Отражал атаку превосходящих сил врага под Ореховом. Вел непрерывный заградительный пулеметный огонь и удержал стратегическую лесополосу.",
     quote: "Никто кроме нас.",
     media: {
-      photo: "assets/images/heroes/ponomarchuk.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
       audioGuide: "assets/audio/guides/ponomarchuk.mp3",
-      documents: ["Диплом спасателя СРМК"]
+      documents: ["Диплом спасателя СРМК"],
+        awardsImages: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png"
+        ]
     },
     memorialStatus: "Увековечен на левой плите Мемориала Славы СРМК",
     mapCoords: { lat: 47.5500, lng: 35.8000, locationName: "Ореховское направление" }
@@ -458,9 +490,12 @@ const heroesDatabase = [
     deed: "Принял командование штурмовой группой после ранения офицера, перестроил боевой порядок и решительным броском овладел опорным пунктом под Угледаром.",
     quote: "Сила командира — в ответственности за каждого бойца.",
     media: {
-      photo: "assets/images/heroes/martynov.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
       audioGuide: "assets/audio/guides/martynov.mp3",
-      documents: ["Грамоты за отличную учебу СРМК", "Наградной лист"]
+      documents: ["Грамоты за отличную учебу СРМК", "Наградной лист"],
+        awardsImages: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png"
+        ]
     },
     memorialStatus: "Именная «Парта Героя» в корпусе МЧС СРМК",
     mapCoords: { lat: 47.8500, lng: 37.2000, locationName: "Угледарское направление" }
@@ -486,9 +521,12 @@ const heroesDatabase = [
     deed: "Освобождал населенные пункты южного направления в составе дозора ВДВ. Попав в засаду, сковал фланг противника огнем и обеспечил развертывание взвода.",
     quote: "Гвардейцы не отступают.",
     media: {
-      photo: "assets/images/heroes/gorlov.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
       audioGuide: "assets/audio/guides/gorlov.mp3",
-      documents: ["Информационное письмо в/ч 54801", "Орденская книжка"]
+      documents: ["Информационное письмо в/ч 54801", "Орденская книжка"],
+        awardsImages: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png"
+        ]
     },
     memorialStatus: "Стенд «Бессмертный полк СВО» и парта памяти в СРМК",
     mapCoords: { lat: 46.8500, lng: 33.2000, locationName: "Херсонское направление" }
@@ -514,9 +552,12 @@ const heroesDatabase = [
     deed: "26 февраля 2022 года в бою за Антоновский мост под шквальным минометным огнем оказывал медпомощь раненым десантникам и прикрывал их эвакуацию.",
     quote: "Первые в бою, первые в вечности.",
     media: {
-      photo: "assets/images/heroes/vecherka.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
       audioGuide: "assets/audio/guides/vecherka.mp3",
-      documents: ["Архивное дело студента МЧС", "Наградной лист"]
+      documents: ["Архивное дело студента МЧС", "Наградной лист"],
+        awardsImages: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png"
+        ]
     },
     memorialStatus: "Именная мемориальная доска и Парта Героя в СРМК",
     mapCoords: { lat: 46.7500, lng: 32.8000, locationName: "Антоновский мост, г. Херсон" }
@@ -542,9 +583,12 @@ const heroesDatabase = [
     deed: "Отразил танковый прорыв в первые недели СВО. Принял неравный бой, отвлек бронетехнику на себя и спас экипаж соседней боевой машины БМП.",
     quote: "Его подвиг навсегда вписан в золотые страницы нашего колледжа.",
     media: {
-      photo: "assets/images/heroes/samokhin.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
       audioGuide: "assets/audio/guides/samokhin.mp3",
-      documents: ["Скан Указа Президента РФ № 83029", "Студенческий билет СРМК"]
+      documents: ["Скан Указа Президента РФ № 83029", "Студенческий билет СРМК"],
+        awardsImages: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png"
+        ]
     },
     memorialStatus: "Увековечен на правой плите Мемориала Славы СРМК",
     mapCoords: { lat: 47.1500, lng: 34.5000, locationName: "Запорожский рубеж" }
@@ -570,9 +614,12 @@ const heroesDatabase = [
     deed: "Офицер спецподразделения Пограничной службы ФСБ. Лично ликвидировал двух диверсантов в приграничном бою и предотвратил прорыв границы.",
     quote: "Пример чести, доблести и отваги.",
     media: {
-      photo: "assets/images/heroes/butov.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
       audioGuide: "assets/audio/guides/butov.mp3",
-      documents: ["Удостоверение сотрудника ПУ ФСБ", "Студенческая зачетка"]
+      documents: ["Удостоверение сотрудника ПУ ФСБ", "Студенческая зачетка"],
+        awardsImages: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png"
+        ]
     },
     memorialStatus: "Памятный стенд на кафедре IT-технологий СРМК",
     mapCoords: { lat: 46.5000, lng: 34.9000, locationName: "Приграничная полоса" }
@@ -598,9 +645,12 @@ const heroesDatabase = [
     deed: "Принял ожесточенный встречный бой 26 февраля 2022 года на Херсонском плацдарме. Держал оборону под минометным огнем до конца.",
     quote: "Мастерство в профессии, несокрушимый дух в бою.",
     media: {
-      photo: "assets/images/heroes/elagin.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
       audioGuide: "assets/audio/guides/elagin.mp3",
-      documents: ["Журнал учебной группы сварщиков 2016–2019 гг."]
+      documents: ["Журнал учебной группы сварщиков 2016–2019 гг."],
+        awardsImages: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png"
+        ]
     },
     memorialStatus: "Именная «Парта Героя» в сварочной мастерской СРМК",
     mapCoords: { lat: 46.7200, lng: 33.1000, locationName: "Херсонский плацдарм" }
@@ -626,9 +676,13 @@ const heroesDatabase = [
     deed: "Отразил штурм бронеколонны на Времевском выступе. Огнем сорвал высадку пехоты и удержал рубеж. Был награжден медалью Суворова при жизни.",
     quote: "Честь дороже жизни.",
     media: {
-      photo: "assets/images/heroes/grigoriev.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Medal_of_Suvorov.png/300px-Medal_of_Suvorov.png",
       audioGuide: "assets/audio/guides/grigoriev.mp3",
-      documents: ["Мемориальная доска со школы и колледжа"]
+      documents: ["Мемориальная доска со школы и колледжа"],
+        awardsImages: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Medal_of_Suvorov.png/300px-Medal_of_Suvorov.png"
+        ]
     },
     memorialStatus: "Мемориальная доска на фасаде учебного корпуса",
     mapCoords: { lat: 47.7800, lng: 36.9000, locationName: "Времевский выступ" }
@@ -654,9 +708,12 @@ const heroesDatabase = [
     deed: "Подавил пулеметный дзот противника в решающий момент штурма на Донецком рубеже, выдвинувшись во фланг под непрерывным огнем.",
     quote: "Прикрыл товарищей огнем в решающий момент боя.",
     media: {
-      photo: "assets/images/heroes/brynza.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
       audioGuide: "assets/audio/guides/brynza.mp3",
-      documents: ["Личное дело студента автоотделения"]
+      documents: ["Личное дело студента автоотделения"],
+        awardsImages: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png"
+        ]
     },
     memorialStatus: "Увековечен на правой плите Мемориала Славы СРМК",
     mapCoords: { lat: 47.9200, lng: 37.4500, locationName: "Донецкое направление" }
@@ -682,9 +739,12 @@ const heroesDatabase = [
     deed: "Морской пехотинец. Во время десантной операции на Днепре первым закрепился на берегу, занял круговую оборону и обеспечил прикрытие группы с воды.",
     quote: "Где мы — там победа.",
     media: {
-      photo: "assets/images/heroes/serbienko.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
       audioGuide: "assets/audio/guides/serbienko.mp3",
-      documents: ["Диплом спасателя СРМК"]
+      documents: ["Диплом спасателя СРМК"],
+        awardsImages: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png"
+        ]
     },
     memorialStatus: "Увековечен на правой плите Мемориала Славы СРМК",
     mapCoords: { lat: 46.6000, lng: 32.5000, locationName: "Днепровский рубеж" }
@@ -710,9 +770,13 @@ const heroesDatabase = [
     deed: "Командовал взводным опорным пунктом на Покровском направлении. Уничтожил бронетранспортер и обеспечил эвакуацию раненых, оставшись до конца.",
     quote: "Верность присяге до последнего дыхания.",
     media: {
-      photo: "assets/images/heroes/chupin.jpg",
+      photo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Medal_For_Courage_RF.png/300px-Medal_For_Courage_RF.png",
       audioGuide: "assets/audio/guides/chupin.mp3",
-      documents: ["Студенческая зачетная кничка выпуска 2019 г."]
+      documents: ["Студенческая зачетная кничка выпуска 2019 г."],
+        awardsImages: [
+          "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Medal_For_Courage_RF.png/300px-Medal_For_Courage_RF.png"
+        ]
     },
     memorialStatus: "Увековечен на правой плите Мемориала Славы СРМК",
     mapCoords: { lat: 48.2500, lng: 37.4000, locationName: "Покровское направление" }
