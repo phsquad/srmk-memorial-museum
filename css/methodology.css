@@ -286,3 +286,14 @@ body {
 @media print {
   #masterExampleContainer { display: none !important; }
 }
+.mode-btn:focus-visible, .tab-btn:focus-visible, .nav-btn:focus-visible, .module-links a:focus-visible, .action-btn:focus-visible, .mini-btn:focus-visible {
+  outline: 2px solid var(--accent-brass-hover);
+  outline-offset: 3px;
+}
+.master-example[hidden], .tab-content[hidden] { display: none !important; }
+.master-example { margin-top: 4px; animation: master-reveal 0.32s ease-out both; }
+.master-mode .tabs-nav-wrapper { border-bottom-color: var(--border-accent); }
+.master-mode .method-main { padding-top: 30px; }
+.master-mode .mode-btn.active { box-shadow: 0 0 0 2px rgba(197, 160, 89, 0.18), 0 0 24px var(--accent-brass-dim); }
+.master-mode .master-watermark-layer { opacity: 0.92; }
+@keyframes master-reveal { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

@@ -51,10 +51,10 @@
 
       <!-- ПАНЕЛЬ ВЫБОРА РЕЖИМА -->
       <div class="mode-selection-bar">
-        <button class="mode-btn active" id="btnModeConstructor" onclick="Methodology.switchMode('constructor')" type="button">
+        <button class="mode-btn active" id="btnModeConstructor" aria-pressed="true" onclick="Methodology.switchMode('constructor')" type="button">
           ✏️ Конструктор урока с нуля (Свои данные)
         </button>
-        <button class="mode-btn" id="btnModeMaster" onclick="Methodology.switchMode('master')" type="button">
+        <button class="mode-btn" id="btnModeMaster" aria-pressed="false" onclick="Methodology.switchMode('master')" type="button">
           👑 Эталонный образец СРМК (Только просмотр)
         </button>
       </div>
@@ -180,7 +180,7 @@
     <!-- ==========================================================================
          КОНТУР 2: ЭТАЛОННЫЙ ОБРАЗЕЦ СРАК (ЗАЩИЩЕН ОТ КОПИРОВАНИЯ)
          ========================================================================== -->
-    <div id="masterExampleContainer" style="display: none;">
+    <section id="masterExampleContainer" class="master-example" hidden>
       
       <div class="section-topbar">
         <div>
@@ -264,7 +264,7 @@
         </div>
       </div>
 
-    </div>
+    </section>
 
     <!-- ДРУГИЕ ВКЛАДКИ -->
     <section class="tab-content" id="tab-cards-view">

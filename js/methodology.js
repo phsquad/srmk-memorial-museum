@@ -38,9 +38,12 @@ const Methodology = {
     if (mode === 'master') {
       btnConst.classList.remove('active');
       btnMaster.classList.add('active');
+      btnConst.setAttribute('aria-pressed', 'false');
+      btnMaster.setAttribute('aria-pressed', 'true');
 
-      constTab.style.display = 'none';
-      masterContainer.style.display = 'block';
+      constTab.hidden = true;
+      masterContainer.hidden = false;
+      document.body.classList.add('master-mode');
 
       // Активируем защитный скрипт для эталона
       if (typeof MasterProtection !== 'undefined') {
@@ -51,9 +54,12 @@ const Methodology = {
     } else {
       btnMaster.classList.remove('active');
       btnConst.classList.add('active');
+      btnMaster.setAttribute('aria-pressed', 'false');
+      btnConst.setAttribute('aria-pressed', 'true');
 
-      masterContainer.style.display = 'none';
-      constTab.style.display = 'block';
+      masterContainer.hidden = true;
+      constTab.hidden = false;
+      document.body.classList.remove('master-mode');
 
       // Отключаем защиту для собственного конструктора
       if (typeof MasterProtection !== 'undefined') {
