@@ -13,8 +13,11 @@ const Methodology = {
   init() {
     this.restoreConstructorData();
     this.bindTabs();
+    this.bindConstructorFields();
     this.bindProtectionEvents();
     this.setCopyrightMode(false, false);
+    this.openTabFromHash();
+    window.addEventListener('hashchange', () => this.openTabFromHash());
     console.log("[Methodology] Модуль конструктора обновлен.");
   },
 
@@ -26,6 +29,8 @@ const Methodology = {
     const watermark = document.getElementById('watermarkOverlay');
     const wrappers = document.querySelectorAll('.protected-wrapper');
     const exportBtns = document.querySelectorAll('.btn-export-lockable');
+    const constructorFields = document.querySelectorAll('#tab-constructor input, #tab-constructor select');
+    const generateBtn = document.querySelector('.btn-generate-plan');
 
     if (isProtected) {
       editBtn?.classList.remove('active');
@@ -37,6 +42,8 @@ const Methodology = {
 
       wrappers.forEach(w => w.classList.add('copyright-locked'));
       exportBtns.forEach(b => b.classList.add('disabled-lock'));
+      constructorFields.forEach(field => { field.disabled = true; });
+      if (generateBtn) generateBtn.disabled = true;
 
       if (notify) this.showToast("🔒 Режим защиты авторских прав включен. Доступен ТОЛЬКО ПРОСМОТР.");
     } else {
@@ -49,6 +56,8 @@ const Methodology = {
 
       wrappers.forEach(w => w.classList.remove('copyright-locked'));
       exportBtns.forEach(b => b.classList.remove('disabled-lock'));
+      constructorFields.forEach(field => { field.disabled = false; });
+      if (generateBtn) generateBtn.disabled = false;
 
       if (notify) this.showToast("✏️ Режим конструктора включен. Вы можете редактировать план.");
     }
@@ -76,13 +85,14 @@ const Methodology = {
       return;
     }
 
-    const teacher = document.getElementById('constructTeacherName').value || 'Генте А. В.';
-    const role = document.getElementById('constructTeacherRole').value || 'Преподаватель';
-    const discipline = document.getElementById('constructDiscipline').value || 'История России';
-    const group = document.getElementById('constructGroup').value || 'Группа';
-    const topic = document.getElementById('constructTopic').value || 'Урок Мужества';
-    const q1 = document.getElementById('constructQ1').value;
-    const q2 = document.getElementById('constructQ2').value;
+    const readValue = (id, fallback = '') => document.getElementById(id)?.value.trim() || fallback;
+    const teacher = readValue('constructTeacherName', 'Генте А. В.');
+    const role = readValue('constructTeacherRole', 'Преподаватель');
+    const discipline = readValue('constructDiscipline', 'История России');
+    const group = readValue('constructGroup', 'Группа');
+    const topic = readValue('constructTopic', 'Урок Мужества');
+    const q1 = readValue('constructQ1');
+    const q2 = readValue('constructQ2');
 
     this.saveConstructorData();
 
@@ -93,14 +103,20 @@ const Methodology = {
     document.getElementById('displayTopic').textContent = topic;
     document.getElementById('mapOwnerSubtitle').textContent = `Разработчик: ${teacher} • Дисциплина: ${discipline} (${group})`;
 
-    if (q1) document.getElementById('displayQ1').textContent = q1;
-    if (q2) document.getElementById('displayQ2').textContent = q2;
+    document.getElementById('displayQ1').textContent = q1 || 'Вопрос будет добавлен автором.';
+    document.getElementById('displayQ2').textContent = q2 || 'Вопрос будет добавлен автором.';
 
     this.showToast("⚡ Данные успешно применены ко всем материалам!");
 
     // Переходим на вкладку Технологической карты
-    const mapTabBtn = document.querySelector('.tab-btn[data-tab="tech-maps"]');
-    if (mapTabBtn) mapTabBtn.click();
+    this.activateTab('tech-maps');
+  },
+
+  bindConstructorFields() {
+    document.querySelectorAll('#tab-constructor input, #tab-constructor select').forEach(field => {
+      field.addEventListener('input', () => this.saveConstructorData());
+      field.addEventListener('change', () => this.saveConstructorData());
+    });
   },
 
   bindTabs() {
@@ -109,16 +125,30 @@ const Methodology = {
 
     tabButtons.forEach(btn => {
       btn.addEventListener('click', () => {
-        const targetId = `tab-${btn.dataset.tab}`;
-
-        tabButtons.forEach(b => b.classList.remove('active'));
-        tabContents.forEach(c => c.classList.remove('active'));
-
-        btn.classList.add('active');
-        const targetContent = document.getElementById(targetId);
-        if (targetContent) targetContent.classList.add('active');
+        this.activateTab(btn.dataset.tab);
       });
     });
+  },
+
+  activateTab(tabName, updateHash = true) {
+    const targetContent = document.getElementById(`tab-${tabName}`);
+    const targetButton = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+    if (!targetContent || !targetButton) return;
+
+    document.querySelectorAll('.tab-btn').forEach(button => {
+      const active = button === targetButton;
+      button.classList.toggle('active', active);
+      button.setAttribute('aria-selected', String(active));
+    });
+    document.querySelectorAll('.tab-content').forEach(content => {
+      content.classList.toggle('active', content === targetContent);
+    });
+    if (updateHash) history.replaceState(null, '', `#${tabName}`);
+  },
+
+  openTabFromHash() {
+    const tabName = window.location.hash.slice(1);
+    if (tabName) this.activateTab(tabName, false);
   },
 
   async copyText(elementId, successMessage = "Скопировано!") {
@@ -202,6 +232,20 @@ const Methodology = {
       this.showToast("🔒 Печать заблокирована в режиме защиты авторских прав.");
       return;
     }
+    const card = document.getElementById(cardId);
+    if (!card) return;
+
+    document.querySelectorAll('.print-target').forEach(item => item.classList.remove('print-target'));
+    card.classList.add('print-target');
+    document.body.classList.add('printing-card');
+
+    const cleanup = () => {
+      document.body.classList.remove('printing-card');
+      card.classList.remove('print-target');
+      window.removeEventListener('afterprint', cleanup);
+    };
+
+    window.addEventListener('afterprint', cleanup);
     window.print();
   },
 
