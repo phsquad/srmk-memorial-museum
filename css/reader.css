@@ -2,6 +2,7 @@
 
 /* ==========================================================================
    3D-ЧИТАЛКА И КНИЖНАЯ ПОЛКА: css/reader.css
+   Версия: 2.0 — Расширенная доступность, анимации, темизация
    ========================================================================== */
 :root {
   --bg-main: #0a0c0f;
@@ -16,18 +17,35 @@
   --text-primary: #f1f3f7;
   --text-secondary: #9da6b3;
   --text-tertiary: #626a78;
+  --text-inverse: #0a0c0f;
   --border-hairline: rgba(255, 255, 255, 0.08);
   --border-accent: rgba(197, 160, 89, 0.3);
+  --border-focus: rgba(197, 160, 89, 0.6);
 
   --font-serif: 'Cinzel', Georgia, serif;
   --font-book: 'Lora', 'Times New Roman', serif;
   --font-sans: 'Montserrat', sans-serif;
+  --transition-fast: 0.15s cubic-bezier(0.2, 0, 0, 1);
   --transition: 0.25s cubic-bezier(0.2, 0, 0, 1);
+  --transition-slow: 0.4s cubic-bezier(0.2, 0, 0, 1);
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
 }
 
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0; padding: 0;
+}
+
+/* Доступность: видимый фокус */
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 3px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
 }
 
 body {
@@ -38,6 +56,8 @@ body {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .container {
@@ -45,6 +65,12 @@ body {
   max-width: 1260px;
   margin: 0 auto;
   padding: 0 24px;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 32px;
+  }
 }
 
 /* Шапка */
@@ -106,23 +132,36 @@ body {
   border: 1px solid var(--border-hairline);
   color: var(--text-secondary);
   padding: 7px 14px;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   text-decoration: none;
   font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .header-btn:hover {
   color: #fff;
   border-color: var(--accent-brass);
+  background: rgba(197, 160, 89, 0.1);
 }
 
 .header-btn.btn-primary {
   background: var(--accent-granite);
   color: #fff;
   border-color: var(--accent-granite);
+}
+
+.header-btn.btn-primary:hover {
+  background: var(--accent-granite-hover);
+}
+
+.header-btn:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }
 
 /* ==========================================================================
@@ -578,29 +617,92 @@ body {
 .pagination-info { font-family: var(--font-serif); color: var(--accent-brass); font-size: 0.82rem; }
 .shortcut-tip { font-size: 0.74rem; color: var(--text-tertiary); }
 
-.page-dots-track { display: flex; gap: 6px; }
 .page-dot {
-  width: 10px; height: 10px; border: 0; padding: 0; border-radius: 50%; background: #333; cursor: pointer;
+  width: 10px; height: 10px; 
+  border: 0; padding: 0; 
+  border-radius: 50%; 
+  background: #333; 
+  cursor: pointer;
+  transition: var(--transition-fast);
 }
-.page-dot.active { background: var(--accent-brass); transform: scale(1.3); }
-.page-dot:focus-visible { outline: 2px solid var(--accent-brass-hover); outline-offset: 3px; }
+
+.page-dot.active { 
+  background: var(--accent-brass); 
+  transform: scale(1.3); 
+}
+
+.page-dot:hover:not(.active) {
+  background: #555;
+}
+
+.page-dot:focus-visible { 
+  outline: 2px solid var(--accent-brass-hover); 
+  outline-offset: 3px; 
+}
 
 /* Всплывающий тост */
 .reader-toast {
   position: fixed;
   bottom: 30px; right: 30px;
-  background: rgba(14, 16, 22, 0.96);
+  background: rgba(14, 16, 22, 0.98);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--accent-brass);
+  border-left: 4px solid var(--accent-brass);
   color: #fff;
   padding: 12px 20px;
-  border-radius: 4px;
+  border-radius: var(--radius-md);
   font-size: 0.85rem;
   z-index: 3000;
   opacity: 0;
-  transform: translateY(40px);
-  transition: all 0.25s ease;
+  transform: translateY(40px) scale(0.95);
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  max-width: 320px;
 }
-.reader-toast.active { opacity: 1; transform: translateY(0); }
+
+.reader-toast.active { 
+  opacity: 1; 
+  transform: translateY(0) scale(1); 
+}
+
+.reader-toast.toast-success {
+  border-color: var(--status-green, #10b981);
+  border-left-color: var(--status-green, #10b981);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.reader-toast.toast-error {
+  border-color: var(--status-red, #ef4444);
+  border-left-color: var(--status-red, #ef4444);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+@keyframes pageFlip {
+  from { 
+    opacity: 0; 
+    transform: rotateY(-15deg) translateX(-20px);
+  }
+  to { 
+    opacity: 1; 
+    transform: rotateY(0) translateX(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from { 
+    opacity: 0; 
+    transform: scale(0.95);
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1);
+  }
+}
+
+/* Анимация для страниц книги */
+.book-page {
+  animation: fadeInScale 0.4s ease-out;
+}
 
 /* Адаптивность для смартфонов (1 страница) */
 @media (max-width: 900px) {
@@ -614,6 +716,12 @@ body {
   .prev-btn { left: 10px; }
   .next-btn { right: 10px; }
   .shortcut-tip { display: none; }
+  .reader-toast {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    max-width: none;
+  }
 }
 
 @media (max-width: 550px) {
