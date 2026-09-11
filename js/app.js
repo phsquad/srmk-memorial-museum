@@ -327,10 +327,13 @@ const App = {
       const specialtyText = hero.education?.specialty || "Выпускник колледжа";
       const candleCount = AppState.candles[hero.id] || 0;
 
+      // 🔥 Создаем элемент через createElement для предотвращения утечки текстовых узлов
       const card = document.createElement('article');
       card.className = 'hero-card';
+      card.setAttribute('role', 'article');
+      card.setAttribute('aria-label', `Карточка героя: ${hero.name}`);
       
-      // 🔥 Наполнение строго изолированной HTML-структурой
+      // 🔥 Наполнение строго изолированной HTML-структурой через DocumentFragment
       card.innerHTML = `
         <div class="hero-card-img-wrap">
           <img src="${photoSrc}" alt="${this.escapeHtml(hero.name)}" class="hero-card-img" loading="lazy" onerror="this.src='${FALLBACK_HERO_AVATAR}'">
@@ -339,9 +342,9 @@ const App = {
         </div>
         <div class="hero-card-body">
           <h3 class="hero-card-name">${this.escapeHtml(hero.name)}</h3>
-          <p class="hero-card-specialty">${this.escapeHtml(specialtyText)}</p>
+          <p class="hero-card-specialty" title="${this.escapeHtml(specialtyText)}">${this.escapeHtml(specialtyText)}</p>
           <p class="hero-card-years">${this.escapeHtml(yearsText)}</p>
-          <button class="hero-card-btn" onclick="App.openModal('${hero.id}')" type="button">
+          <button class="hero-card-btn" onclick="App.openModal('${hero.id}')" type="button" aria-label="Открыть досье на ${this.escapeHtml(hero.name)}">
             Открыть архивное досье
           </button>
         </div>

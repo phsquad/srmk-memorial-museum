@@ -834,6 +834,7 @@ main {
   flex-direction: column;
   box-shadow: var(--shadow-subtle);
   position: relative;
+  height: 100%; /* 🔥 Фиксация высоты для выравнивания кнопок */
 }
 
 .hero-card:hover {
@@ -919,6 +920,13 @@ main {
   font-size: 0.8rem;
   font-weight: 600;
   margin-bottom: 4px;
+  /* 🔥 Фиксация высоты для предотвращения скачков */
+  min-height: 2.4em;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .hero-card-years {
@@ -2271,4 +2279,21 @@ body.large-text .section-title {
 @media (max-width: 860px) {
   .modules-dropdown, .btn-header-cert, .passport-btn, .contest-badge { display: none; }
   .mobile-burger-btn { display: flex; }
+}
+
+/* 🔥 Планшетная адаптация для карточек (1024px и ниже) */
+@media (max-width: 1024px) {
+  .hero-card-specialty {
+    min-height: 2.8em; /* Чуть больше высоты для узких экранов */
+    font-size: 0.75rem;
+  }
+  
+  .hero-card-name {
+    font-size: clamp(0.95rem, 1.2vw, 1.1rem);
+  }
+  
+  .hero-card-btn {
+    padding: 10px 8px;
+    font-size: 0.78rem;
+  }
 }
