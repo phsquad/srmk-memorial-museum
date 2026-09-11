@@ -1,289 +1,186 @@
 /**
  * ============================================================================
- * ЛОГИКА МЕТОДИЧЕСКОГО КАБИНЕТА: js/methodology.js (v2.1)
+ * ЛОГИКА МЕТОДИЧЕСКОГО КАБИНЕТА: js/methodology.js (v3.0 Dual-Mode)
  * ============================================================================
  */
 
 'use strict';
 
 const Methodology = {
-  storageKey: 'srmk_methodology_constructor_v1',
-  isCopyrightProtected: false,
+  currentMode: 'constructor', // 'constructor' | 'master'
 
   init() {
-    this.restoreConstructorData();
     this.bindTabs();
-    this.bindConstructorFields();
-    this.bindProtectionEvents();
-    this.setCopyrightMode(false, false);
-    this.openTabFromHash();
-    window.addEventListener('hashchange', () => this.openTabFromHash());
-    console.log("[Methodology] Модуль конструктора обновлен.");
+    console.log("[Methodology] Двухконтурный кабинет активен.");
   },
 
-  setCopyrightMode(isProtected, notify = true) {
-    this.isCopyrightProtected = isProtected;
+  /**
+   * 1. Переключение между Конструктором с нуля и Защищенным Эталоном
+   */
+  switchMode(mode) {
+    this.currentMode = mode;
 
-    const editBtn = document.getElementById('btnModeEdit');
-    const protectBtn = document.getElementById('btnModeProtect');
-    const watermark = document.getElementById('watermarkOverlay');
-    const wrappers = document.querySelectorAll('.protected-wrapper');
-    const exportBtns = document.querySelectorAll('.btn-export-lockable');
-    const constructorFields = document.querySelectorAll('#tab-constructor input, #tab-constructor select');
-    const generateBtn = document.querySelector('.btn-generate-plan');
+    const btnConst = document.getElementById('btnModeConstructor');
+    const btnMaster = document.getElementById('btnModeMaster');
+    const constTab = document.getElementById('tab-constructor-view');
+    const masterContainer = document.getElementById('masterExampleContainer');
+    const masterCard = document.getElementById('masterPlanContent');
 
-    if (isProtected) {
-      editBtn?.classList.remove('active');
-      protectBtn?.classList.add('active');
-      editBtn?.setAttribute('aria-pressed', 'false');
-      protectBtn?.setAttribute('aria-pressed', 'true');
+    if (mode === 'master') {
+      btnConst.classList.remove('active');
+      btnMaster.classList.add('active');
 
-      if (watermark) watermark.style.display = 'flex';
+      constTab.style.display = 'none';
+      masterContainer.style.display = 'block';
 
-      wrappers.forEach(w => w.classList.add('copyright-locked'));
-      exportBtns.forEach(b => b.classList.add('disabled-lock'));
-      constructorFields.forEach(field => { field.disabled = true; });
-      if (generateBtn) generateBtn.disabled = true;
+      // Активируем защитный скрипт для эталона
+      if (typeof MasterProtection !== 'undefined') {
+        MasterProtection.enable(masterCard);
+      }
 
-      if (notify) this.showToast("🔒 Режим защиты авторских прав включен. Доступен ТОЛЬКО ПРОСМОТР.");
+      this.showToast("🔒 Включен защищенный режим просмотра эталона СРМК.");
     } else {
-      protectBtn?.classList.remove('active');
-      editBtn?.classList.add('active');
-      editBtn?.setAttribute('aria-pressed', 'true');
-      protectBtn?.setAttribute('aria-pressed', 'false');
+      btnMaster.classList.remove('active');
+      btnConst.classList.add('active');
 
-      if (watermark) watermark.style.display = 'none';
+      masterContainer.style.display = 'none';
+      constTab.style.display = 'block';
 
-      wrappers.forEach(w => w.classList.remove('copyright-locked'));
-      exportBtns.forEach(b => b.classList.remove('disabled-lock'));
-      constructorFields.forEach(field => { field.disabled = false; });
-      if (generateBtn) generateBtn.disabled = false;
+      // Отключаем защиту для собственного конструктора
+      if (typeof MasterProtection !== 'undefined') {
+        MasterProtection.disable(masterCard);
+      }
 
-      if (notify) this.showToast("✏️ Режим конструктора включен. Вы можете редактировать план.");
+      this.showToast("✏️ Вы в режиме конструктора с нуля. Заполните форму.");
     }
   },
 
-  bindProtectionEvents() {
-    document.addEventListener('copy', (e) => {
-      if (this.isCopyrightProtected) {
-        e.preventDefault();
-        this.showToast("🔒 Материал защищен авторским правом ГБПОУ СРМК. Копирование запрещено.");
-      }
-    });
-
-    document.addEventListener('contextmenu', (e) => {
-      if (this.isCopyrightProtected) {
-        e.preventDefault();
-        this.showToast("🔒 Правая кнопка мыши заблокирована в режиме защиты.");
-      }
-    });
+  /**
+   * 2. Очистить форму Конструктора (С нуля)
+   */
+  clearConstructorForm() {
+    document.getElementById('customLessonForm').reset();
+    document.getElementById('userPlanResult').style.display = 'none';
+    this.showToast("🧹 Форма полностью очищена. Введите свои данные с нуля.");
   },
 
-  applyConstructorData() {
-    if (this.isCopyrightProtected) {
-      this.showToast("Переключитесь в режим «Интерактивный конструктор» для редактирования!");
-      return;
+  /**
+   * 3. Сформировать пользовательский индивидуальный план
+   */
+  generateCustomPlan() {
+    const teacher = document.getElementById('inputTeacher').value.trim() || 'ФИО Преподавателя';
+    const role = document.getElementById('inputRole').value.trim() || 'Преподаватель СПО';
+    const discipline = document.getElementById('inputDiscipline').value.trim() || 'Учебная дисциплина';
+    const group = document.getElementById('inputGroup').value.trim() || 'Учебная группа';
+    const topic = document.getElementById('inputTopic').value.trim() || 'Тема патриотического урока';
+    const q1 = document.getElementById('inputQ1').value.trim();
+    const q2 = document.getElementById('inputQ2').value.trim();
+
+    const planContent = document.getElementById('userPlanContent');
+    const resultBox = document.getElementById('userPlanResult');
+
+    planContent.innerHTML = `
+      <div class="meta-doc-header">
+        <div><strong>Организация:</strong> ГБПОУ «Ставропольский региональный многопрофильный колледж»</div>
+        <div><strong>Разработчик:</strong> ${teacher} (${role})</div>
+        <div><strong>Дисциплина / Группа:</strong> ${discipline} • ${group}</div>
+        <div><strong>Тема урока:</strong> ${topic}</div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="method-table">
+          <thead>
+            <tr>
+              <th>Этап и время</th>
+              <th>Деятельность преподавателя (${teacher})</th>
+              <th>Деятельность студентов (${group})</th>
+              <th>Интеграция ресурсов</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1. Организация</strong><br><small>3 мин</small></td>
+              <td>Приветствие. Включение Колокола Памяти. Постановка целей по теме: «${topic}».</td>
+              <td>Восприятие темы, сканирование вводного QR-кода.</td>
+              <td>Синтезатор колокола, сайт музея.</td>
+            </tr>
+            <tr>
+              <td><strong>2. Исследование</strong><br><small>25 мин</small></td>
+              <td>Организация работы микрогрупп с карточками. Индивидуальные консультации.</td>
+              <td>Работа в 4 секторах ТВД, прослушивание аудиогидов, поиск архивов ЦАМО.</td>
+              <td>Раздел «Книга Памяти» и аудиогиды MP3.</td>
+            </tr>
+            <tr>
+              <td><strong>3. Рефлексия</strong><br><small>17 мин</small></td>
+              <td>Подведение итогов. Организация зажжения свечей и выписки сертификатов.</td>
+              <td>Зажжение свечей памяти, генерация именных наградных листов.</td>
+              <td>Модули <code>certificate.html</code> и <code>verify.html</code>.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    if (q1) {
+      const q1El = document.getElementById('cardQ1Display');
+      if (q1El) q1El.textContent = q1;
     }
 
-    const readValue = (id, fallback = '') => document.getElementById(id)?.value.trim() || fallback;
-    const teacher = readValue('constructTeacherName', 'Генте А. В.');
-    const role = readValue('constructTeacherRole', 'Преподаватель');
-    const discipline = readValue('constructDiscipline', 'История России');
-    const group = readValue('constructGroup', 'Группа');
-    const topic = readValue('constructTopic', 'Урок Мужества');
-    const q1 = readValue('constructQ1');
-    const q2 = readValue('constructQ2');
+    resultBox.style.display = 'block';
+    resultBox.scrollIntoView({ behavior: 'smooth' });
 
-    this.saveConstructorData();
-
-    document.getElementById('displayTeacher').textContent = teacher;
-    document.getElementById('displayRole').textContent = role;
-    document.getElementById('displayDiscipline').textContent = discipline;
-    document.getElementById('displayGroup').textContent = group;
-    document.getElementById('displayTopic').textContent = topic;
-    document.getElementById('mapOwnerSubtitle').textContent = `Разработчик: ${teacher} • Дисциплина: ${discipline} (${group})`;
-
-    document.getElementById('displayQ1').textContent = q1 || 'Вопрос будет добавлен автором.';
-    document.getElementById('displayQ2').textContent = q2 || 'Вопрос будет добавлен автором.';
-
-    this.showToast("⚡ Данные успешно применены ко всем материалам!");
-
-    // Переходим на вкладку Технологической карты
-    this.activateTab('tech-maps');
-  },
-
-  bindConstructorFields() {
-    document.querySelectorAll('#tab-constructor input, #tab-constructor select').forEach(field => {
-      field.addEventListener('input', () => this.saveConstructorData());
-      field.addEventListener('change', () => this.saveConstructorData());
-    });
+    this.showToast("⚡ Ваш индивидуальный план успешно сформирован!");
   },
 
   bindTabs() {
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
-
-    tabButtons.forEach(btn => {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        this.activateTab(btn.dataset.tab);
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        btn.classList.add('active');
+        const target = document.getElementById(`tab-${btn.dataset.tab}`);
+        if (target) target.classList.add('active');
       });
     });
   },
 
-  activateTab(tabName, updateHash = true) {
-    const targetContent = document.getElementById(`tab-${tabName}`);
-    const targetButton = document.querySelector(`.tab-btn[data-tab="${tabName}"]`);
-    if (!targetContent || !targetButton) return;
-
-    document.querySelectorAll('.tab-btn').forEach(button => {
-      const active = button === targetButton;
-      button.classList.toggle('active', active);
-      button.setAttribute('aria-selected', String(active));
-    });
-    document.querySelectorAll('.tab-content').forEach(content => {
-      content.classList.toggle('active', content === targetContent);
-    });
-    if (updateHash) history.replaceState(null, '', `#${tabName}`);
-  },
-
-  openTabFromHash() {
-    const tabName = window.location.hash.slice(1);
-    if (tabName) this.activateTab(tabName, false);
-  },
-
-  async copyText(elementId, successMessage = "Скопировано!") {
-    if (this.isCopyrightProtected) {
-      this.showToast("🔒 Скачивание и копирование заблокировано разработчиком.");
-      return;
-    }
-
+  async copyText(elementId, successMsg = "Скопировано!") {
     const el = document.getElementById(elementId);
-    if (!el) return;
-
-    try {
-      await this.writeToClipboard(el.innerText || el.textContent);
-      this.showToast(successMessage);
-    } catch (err) {
-      this.showToast("Ошибка копирования.", "error");
+    if (el && navigator.clipboard) {
+      await navigator.clipboard.writeText(el.innerText || el.textContent);
+      this.showToast(successMsg);
     }
   },
 
-  copyCardText(cardId) {
-    if (this.isCopyrightProtected) {
-      this.showToast("🔒 Копирование карточек заблокировано в режиме защиты.");
-      return;
-    }
-    const card = document.getElementById(cardId);
-    if (card) {
-      this.writeToClipboard(card.innerText).then(() => {
-        this.showToast("Карточка скопирована!");
-      }).catch(() => this.showToast("Ошибка копирования.", "error"));
-    }
-  },
-
-  async writeToClipboard(text) {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text);
-      return;
-    }
-
-    const helper = document.createElement('textarea');
-    helper.value = text;
-    helper.setAttribute('readonly', '');
-    helper.style.position = 'fixed';
-    helper.style.opacity = '0';
-    document.body.appendChild(helper);
-    helper.select();
-    const copied = document.execCommand('copy');
-    helper.remove();
-    if (!copied) throw new Error('Clipboard API is unavailable');
-  },
-
-  saveConstructorData() {
-    const data = {};
-    ['TeacherName', 'TeacherRole', 'Discipline', 'Group', 'Topic', 'Q1', 'Q2'].forEach(field => {
-      const input = document.getElementById(`construct${field}`);
-      if (input) data[field] = input.value;
-    });
-    try {
-      localStorage.setItem(this.storageKey, JSON.stringify(data));
-    } catch (error) {
-      this.showToast("Данные применены только для текущего сеанса.", "error");
-    }
-  },
-
-  restoreConstructorData() {
-    try {
-      const data = JSON.parse(localStorage.getItem(this.storageKey) || '{}');
-      Object.entries(data).forEach(([field, value]) => {
-        const input = document.getElementById(`construct${field}`);
-        if (input && typeof value === 'string') input.value = value;
-      });
-    } catch (error) {
-      try {
-        localStorage.removeItem(this.storageKey);
-      } catch (storageError) {
-      }
-    }
-  },
-
-  printSingleCard(cardId) {
-    if (this.isCopyrightProtected) {
-      this.showToast("🔒 Печать заблокирована в режиме защиты авторских прав.");
-      return;
-    }
-    const card = document.getElementById(cardId);
-    if (!card) return;
-
-    document.querySelectorAll('.print-target').forEach(item => item.classList.remove('print-target'));
-    card.classList.add('print-target');
-    document.body.classList.add('printing-card');
-
-    const cleanup = () => {
-      document.body.classList.remove('printing-card');
-      card.classList.remove('print-target');
-      window.removeEventListener('afterprint', cleanup);
-    };
-
-    window.addEventListener('afterprint', cleanup);
-    window.print();
-  },
-
-  exportToWord(containerId, filename = 'Технологическая_карта_СРМК') {
-    if (this.isCopyrightProtected) {
-      this.showToast("🔒 Скачивание Word-файла заблокировано в режиме защиты!");
-      return;
-    }
-
+  exportToWord(containerId, filename = 'Мой_план_урока') {
     const container = document.getElementById(containerId);
     if (!container) return;
 
-    const htmlContent = `
+    const html = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
       <head><meta charset='utf-8'><title>${filename}</title></head>
       <body>
-        <div style="text-align: center;">
+        <div style="text-align:center;">
           <h2>ГБПОУ «Ставропольский региональный многопрофильный колледж»</h2>
-          <h3>ИНДИВИДУАЛЬНАЯ ТЕХНОЛОГИЧЕСКАЯ КАРТА УРОКА</h3>
+          <h3>ИНДИВИДУАЛЬНЫЙ ПЛАН УРОКА МУЖЕСТВА</h3>
         </div>
         ${container.innerHTML}
       </body></html>
     `;
 
-    const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword;charset=utf-8' });
+    const blob = new Blob(['\ufeff' + html], { type: 'application/msword;charset=utf-8' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = `${filename}.doc`;
     link.click();
-    URL.revokeObjectURL(link.href);
-
-    this.showToast("Файл Word (.doc) скачан!");
+    this.showToast("Файл Word (.doc) с вашим планом скачан!");
   },
 
-  showToast(message) {
+  showToast(msg) {
     const toast = document.getElementById('methodToast');
     if (!toast) return;
-    toast.textContent = message;
+    toast.textContent = msg;
     toast.classList.add('active');
     setTimeout(() => toast.classList.remove('active'), 3200);
   }
