@@ -2,6 +2,7 @@
 
 /* ==========================================================================
    СТИЛИ ИНТЕРАКТИВНОГО КВЕСТА: css/quiz.css
+   Версия: 2.0 — Расширенная доступность, анимации, темизация
    ========================================================================== */
 :root {
   --bg-main: #0a0c0f;
@@ -15,25 +16,55 @@
   --accent-granite-hover: #a8232b;
   --accent-granite-dim: rgba(138, 28, 34, 0.2);
   --status-green: #10b981;
+  --status-green-hover: #059669;
   --status-green-dim: rgba(16, 185, 129, 0.15);
   --status-red: #ef4444;
+  --status-red-hover: #dc2626;
   --status-red-dim: rgba(239, 68, 68, 0.15);
+  --status-warning: #f59e0b;
+  --status-warning-dim: rgba(245, 158, 11, 0.15);
   
   --text-primary: #f1f3f7;
   --text-secondary: #9da6b3;
   --text-tertiary: #626a78;
+  --text-inverse: #0a0c0f;
   --border-hairline: rgba(255, 255, 255, 0.08);
   --border-accent: rgba(197, 160, 89, 0.3);
+  --border-focus: rgba(197, 160, 89, 0.6);
 
   --shadow-elevated: 0 16px 45px rgba(0, 0, 0, 0.85);
+  --shadow-glow: 0 0 24px rgba(197, 160, 89, 0.3);
+  --shadow-success: 0 0 20px rgba(16, 185, 129, 0.4);
+  --shadow-error: 0 0 20px rgba(239, 68, 68, 0.4);
+  
   --font-serif: 'Cinzel', Georgia, serif;
   --font-sans: 'Montserrat', sans-serif;
+  --transition-fast: 0.15s cubic-bezier(0.2, 0, 0, 1);
   --transition: 0.22s cubic-bezier(0.2, 0, 0, 1);
+  --transition-slow: 0.35s cubic-bezier(0.2, 0, 0, 1);
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-full: 9999px;
 }
 
+/* ==========================================================================
+   БАЗОВЫЙ СБРОС И ДОСТУПНОСТЬ
+   ========================================================================== */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0; padding: 0;
+}
+
+/* Улучшенная доступность: видимый фокус для клавиатурной навигации */
+:focus-visible {
+  outline: 2px solid var(--accent-brass);
+  outline-offset: 3px;
+}
+
+/* Скрытие фокуса для мыши */
+:focus:not(:focus-visible) {
+  outline: none;
 }
 
 body {
@@ -44,13 +75,24 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* ==========================================================================
+   КОНТЕЙНЕР И ЛЕЙАУТ
+   ========================================================================== */
 .container {
   width: 100%;
   max-width: 920px;
   margin: 0 auto;
   padding: 0 20px;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 24px;
+  }
 }
 
 /* Шапка */
@@ -112,22 +154,36 @@ body {
   border: 1px solid var(--border-hairline);
   color: var(--text-secondary);
   padding: 7px 14px;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   text-decoration: none;
   font-size: 0.78rem;
   font-weight: 600;
   transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .btn-header:hover {
   color: #fff;
   border-color: var(--accent-brass);
+  background: rgba(197, 160, 89, 0.1);
 }
 
 .btn-header.btn-primary {
   background: var(--accent-granite);
   color: #fff;
   border-color: var(--accent-granite);
+}
+
+.btn-header.btn-primary:hover {
+  background: var(--accent-granite-hover);
+}
+
+/* Доступность кнопок шапки */
+.btn-header:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }
 
 /* Прогресс-бар */
@@ -407,15 +463,28 @@ body {
   color: #fff;
   border: none;
   padding: 13px 28px;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   font-family: var(--font-serif);
   font-weight: 800;
   font-size: 0.92rem;
   cursor: pointer;
   transition: var(--transition);
   box-shadow: 0 4px 16px var(--accent-granite-dim);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
-.btn-claim-cert:hover { background: var(--accent-granite-hover); transform: scale(1.02); }
+
+.btn-claim-cert:hover { 
+  background: var(--accent-granite-hover); 
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--accent-granite-dim);
+}
+
+.btn-claim-cert:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
 
 .retry-actions-box {
   background: var(--bg-elevated);
@@ -431,18 +500,43 @@ body {
   border: 1px solid var(--border-hairline);
   color: var(--text-primary);
   padding: 10px 18px;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
   transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
-.btn-secondary-action:hover { border-color: var(--accent-brass); color: var(--accent-brass); }
+
+.btn-secondary-action:hover { 
+  border-color: var(--accent-brass); 
+  color: var(--accent-brass);
+  background: rgba(197, 160, 89, 0.08);
+}
+
+.btn-secondary-action:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
 
 .result-footer-nav { margin-top: 10px; }
-.back-link { color: var(--text-tertiary); text-decoration: none; font-size: 0.82rem; }
-.back-link:hover { color: #fff; }
+.back-link { 
+  color: var(--text-tertiary); 
+  text-decoration: none; 
+  font-size: 0.82rem;
+  transition: var(--transition-fast);
+}
+.back-link:hover { 
+  color: #fff;
+  text-decoration: underline;
+}
+.back-link:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
 
 .quiz-footer {
   background: #060709;
@@ -457,26 +551,74 @@ body {
 .quiz-toast {
   position: fixed;
   bottom: 24px; right: 24px;
-  background: rgba(14, 16, 22, 0.96);
+  background: rgba(14, 16, 22, 0.98);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--accent-brass);
+  border-left: 4px solid var(--accent-brass);
   color: #fff;
-  padding: 10px 18px;
-  border-radius: 4px;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
   font-size: 0.84rem;
   z-index: 9999;
   opacity: 0;
-  transform: translateY(60px);
-  transition: all 0.25s ease;
+  transform: translateY(60px) scale(0.95);
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  max-width: 320px;
 }
-.quiz-toast.active { opacity: 1; transform: translateY(0); }
+
+.quiz-toast.active { 
+  opacity: 1; 
+  transform: translateY(0) scale(1); 
+}
+
+.quiz-toast.toast-success {
+  border-color: var(--status-green);
+  border-left-color: var(--status-green);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.quiz-toast.toast-error {
+  border-color: var(--status-red);
+  border-left-color: var(--status-red);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.quiz-toast.toast-warning {
+  border-color: var(--status-warning);
+  border-left-color: var(--status-warning);
+  background: rgba(245, 158, 11, 0.1);
+}
 
 @keyframes cardFadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { 
+    opacity: 0; 
+    transform: translateX(40px) translateY(60px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(0) translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Анимация для правильного ответа */
+.option-btn.correct {
+  animation: pulse 0.6s ease-in-out;
 }
 
 @media (max-width: 680px) {
@@ -484,4 +626,10 @@ body {
   .quiz-card { padding: 24px 16px; }
   .header-actions { display: none; }
   .retry-btn-group { flex-direction: column; }
+  .quiz-toast {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    max-width: none;
+  }
 }

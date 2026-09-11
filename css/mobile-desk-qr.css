@@ -2,6 +2,7 @@
 
 /* ==========================================================================
    МОБИЛЬНЫЕ СТИЛИ КОНСТРУКТОРА «ПАРТА ГЕРОЯ»: css/mobile-desk-qr.css
+   Версия 2.0 — Расширенная адаптивность, доступность, ultra-small экраны
    ========================================================================== */
 @media (max-width: 900px) {
   
@@ -18,12 +19,14 @@
   .header-actions {
     width: 100%;
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .nav-btn {
     flex-shrink: 0;
     padding: 6px 12px;
     font-size: 0.74rem;
+    min-height: 44px; /* Touch target size */
   }
 
   .desk-workspace {
@@ -38,6 +41,7 @@
     border-bottom: 1px solid var(--border-color);
     padding: 20px 16px;
     overflow-y: visible;
+    max-height: none;
   }
 
   .action-buttons-group {
@@ -45,8 +49,15 @@
     bottom: 0;
     background: rgba(18, 21, 28, 0.98);
     backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     padding: 12px 0 calc(12px + env(safe-area-inset-bottom, 0px));
     z-index: 50;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+  }
+
+  .btn-action-primary,
+  .btn-action-secondary {
+    min-height: 44px; /* Touch target size */
   }
 
   /* Автоматическое сжатие бланка под экран смартфона */
@@ -65,5 +76,42 @@
 
   .plaque-sheet {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+  }
+  
+  /* Улучшенная доступность для всех интерактивных элементов */
+  .nav-btn:focus-visible,
+  .segment-btn:focus-visible,
+  .btn-action-primary:focus-visible,
+  .btn-action-secondary:focus-visible,
+  .form-input:focus-visible,
+  .form-select:focus-visible {
+    outline: 2px solid #c5a059;
+    outline-offset: 2px;
+  }
+}
+
+/* ==========================================================================
+   ULTRA-SMAL SCREENS (< 400px)
+   ========================================================================== */
+@media (max-width: 400px) {
+  .desk-header {
+    padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px;
+  }
+  
+  .desk-sidebar {
+    padding: 16px 12px;
+  }
+  
+  .desk-toast, .method-toast, .reader-toast {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    max-width: none;
+    font-size: 0.8rem;
+    padding: 10px 14px;
+  }
+  
+  .preview-scale-wrapper {
+    transform: scale(calc((100vw - 24px) / 1122));
   }
 }

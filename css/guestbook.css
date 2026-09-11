@@ -115,6 +115,12 @@ body {
   font-size: 0.78rem;
   font-weight: 600;
   transition: var(--transition);
+  /* 🔥 Сброс пользовательских стилей браузера */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  font-family: var(--font-sans);
+  cursor: pointer;
 }
 
 .nav-btn:hover {
@@ -126,6 +132,12 @@ body {
   background: var(--accent-granite);
   color: #fff;
   border-color: var(--accent-granite);
+}
+
+.nav-btn.btn-primary:hover,
+.nav-btn.btn-primary:focus-visible {
+  background: var(--accent-granite-hover);
+  outline: none;
 }
 
 /* Баннер Hero */

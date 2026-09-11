@@ -2,6 +2,7 @@
 
 /* ==========================================================================
    МОБИЛЬНЫЕ СТИЛИ КВЕСТ-ВИКТОРИНЫ: css/mobile-quiz.css
+   Версия: 2.0 — Расширенная адаптивность и доступность
    ========================================================================== */
 @media (max-width: 768px) {
 
@@ -107,5 +108,29 @@
     width: 100%;
     text-align: center;
     padding: 12px;
+  }
+  
+  /* Тосты на мобильных */
+  .quiz-toast {
+    left: 16px !important;
+    right: 16px !important;
+    bottom: 16px !important;
+    max-width: none !important;
+  }
+}
+
+/* Ультра-малые экраны */
+@media (max-width: 400px) {
+  .quest-title {
+    font-size: 1.2rem;
+  }
+  
+  .quiz-card {
+    padding: 16px 12px;
+  }
+  
+  .option-btn {
+    padding: 10px;
+    font-size: 0.78rem;
   }
 }

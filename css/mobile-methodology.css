@@ -2,6 +2,7 @@
 
 /* ==========================================================================
    МОБИЛЬНЫЕ СТИЛИ МЕТОДИЧЕСКОГО КАБИНЕТА: css/mobile-methodology.css
+   Версия 2.0 — Расширенная адаптивность, доступность, ultra-small экраны
    ========================================================================== */
 @media (max-width: 900px) {
   
@@ -30,6 +31,7 @@
     padding: 8px 6px;
     font-size: 0.74rem;
     line-height: 1.25;
+    min-height: 44px; /* Touch target size */
   }
 
   .method-hero {
@@ -60,7 +62,7 @@
   }
 
   .mode-btn {
-    min-height: 44px;
+    min-height: 44px; /* Touch target size */
   }
 
   .form-grid {
@@ -98,6 +100,7 @@
     padding: 8px 14px;
     font-size: 0.78rem;
     flex-shrink: 0;
+    min-height: 44px; /* Touch target size */
   }
 
   .method-main {
@@ -132,6 +135,7 @@
     width: 100%;
     text-align: center;
     padding: 12px;
+    min-height: 44px; /* Touch target size */
   }
 
   .paper-card {
@@ -162,6 +166,7 @@
   .mini-btn {
     flex: 1;
     justify-content: center;
+    min-height: 44px; /* Touch target size */
   }
 
   .task-card-footer {
@@ -204,5 +209,39 @@
 
   .comp-badge {
     align-self: flex-start;
+  }
+  
+  /* Улучшенная доступность для всех интерактивных элементов */
+  .mode-btn:focus-visible,
+  .tab-btn:focus-visible,
+  .nav-btn:focus-visible,
+  .action-btn:focus-visible,
+  .mini-btn:focus-visible {
+    outline: 2px solid #c5a059;
+    outline-offset: 2px;
+  }
+}
+
+/* ==========================================================================
+   ULTRA-SMAL SCREENS (< 400px)
+   ========================================================================== */
+@media (max-width: 400px) {
+  .hero-title {
+    font-size: 1.3rem;
+  }
+  
+  .constructor-card,
+  .paper-card,
+  .task-card {
+    padding: 14px;
+  }
+  
+  .method-toast, .desk-toast, .reader-toast {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    max-width: none;
+    font-size: 0.8rem;
+    padding: 10px 14px;
   }
 }

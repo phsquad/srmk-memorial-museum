@@ -2,22 +2,43 @@
 
 /* ==========================================================================
    СТИЛИ КОНСТРУКТОРА «ПАРТА ГЕРОЯ»: css/desk-qr.css
+   Версия 2.0 — Расширенная доступность, анимации, темизация, улучшенная печать
    ========================================================================== */
 :root {
   --bg-dark: #0a0c0f;
   --bg-surface: #12151c;
   --bg-panel: #181d27;
+  --bg-elevated: #14171d;
   --accent-brass: #c5a059;
   --accent-brass-hover: #dfba6d;
+  --accent-brass-dim: rgba(197, 160, 89, 0.15);
   --accent-granite: #8a1c22;
   --accent-granite-hover: #a8232b;
+  --accent-granite-dim: rgba(138, 28, 34, 0.2);
   --text-main: #f1f3f7;
   --text-muted: #9da6b3;
+  --text-tertiary: #77808d;
   --border-color: rgba(255, 255, 255, 0.1);
+  --border-accent: rgba(197, 160, 89, 0.28);
+  --shadow-elevated: 0 16px 50px rgba(0, 0, 0, 0.9);
+  --shadow-glow: 0 0 24px rgba(197, 160, 89, 0.2);
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --transition-fast: 0.15s cubic-bezier(0.2, 0, 0, 1);
+  --transition: 0.22s cubic-bezier(0.2, 0, 0, 1);
+  --transition-slow: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   --font-serif: 'Cinzel', Georgia, serif;
   --font-sans: 'Montserrat', sans-serif;
   --font-title: 'Playfair Display', Georgia, serif;
-  --transition: 0.22s cubic-bezier(0.2, 0, 0, 1);
+  
+  /* Статусы для toast-уведомлений */
+  --status-success: #10b981;
+  --status-success-bg: rgba(16, 185, 129, 0.15);
+  --status-error: #ef4444;
+  --status-error-bg: rgba(239, 68, 68, 0.15);
+  --status-warning: #f59e0b;
+  --status-warning-bg: rgba(245, 158, 11, 0.15);
 }
 
 *, *::before, *::after {
@@ -32,17 +53,27 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Шапка */
+/* ==========================================================================
+   ШАПКА — УЛУЧШЕННАЯ НАВИГАЦИЯ
+   ========================================================================== */
 .desk-header {
   background: rgba(10, 12, 16, 0.96);
   backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border-color);
   padding: 12px 24px;
   position: sticky;
   top: 0;
   z-index: 100;
+  transition: var(--transition-fast);
+}
+
+.desk-header.scrolled {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
 }
 
 .header-content {
@@ -64,8 +95,14 @@ body {
   font-weight: 900;
   font-size: 0.85rem;
   padding: 6px 12px;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   text-decoration: none;
+  transition: var(--transition);
+}
+
+.logo-badge:hover {
+  background: var(--accent-granite-hover);
+  box-shadow: 0 0 12px rgba(138, 28, 34, 0.4);
 }
 
 .header-titles .sub-title {
@@ -86,6 +123,7 @@ body {
 .header-actions {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .nav-btn {
@@ -93,7 +131,7 @@ body {
   border: 1px solid var(--border-color);
   color: var(--text-muted);
   padding: 7px 14px;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
   text-decoration: none;
   font-size: 0.78rem;
   font-weight: 600;
@@ -103,6 +141,7 @@ body {
 .nav-btn:hover {
   color: #fff;
   border-color: var(--accent-brass);
+  background: rgba(197, 160, 89, 0.1);
 }
 
 .nav-btn.btn-primary {
@@ -111,7 +150,18 @@ body {
   border-color: var(--accent-granite);
 }
 
-/* Рабочее пространство */
+.nav-btn.btn-primary:hover {
+  background: var(--accent-granite-hover);
+}
+
+.nav-btn:focus-visible {
+  outline: 2px solid var(--accent-brass-hover);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   РАБОЧЕЕ ПРОСТРАНСТВО
+   ========================================================================== */
 .desk-workspace {
   display: grid;
   grid-template-columns: 430px 1fr;
@@ -127,6 +177,21 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-accent) transparent;
+}
+
+.desk-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.desk-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.desk-sidebar::-webkit-scrollbar-thumb {
+  background: var(--border-accent);
+  border-radius: 3px;
 }
 
 .control-group {
@@ -149,21 +214,28 @@ body {
   border: 1px solid var(--border-color);
   color: #fff;
   padding: 10px 12px;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   font-size: 0.84rem;
   outline: none;
-  transition: border-color 0.2s;
+  transition: var(--transition-fast);
 }
 
 .form-input:focus, .form-select:focus {
   border-color: var(--accent-brass);
+  box-shadow: 0 0 12px var(--accent-brass-dim);
+  background: rgba(24, 29, 39, 0.8);
+}
+
+.form-input:focus-visible, .form-select:focus-visible {
+  outline: 2px solid var(--accent-brass-hover);
+  outline-offset: 2px;
 }
 
 .segmented-control {
   display: flex;
   background: var(--bg-panel);
   border: 1px solid var(--border-color);
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   overflow: hidden;
 }
 
@@ -176,13 +248,33 @@ body {
   font-size: 0.76rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: var(--transition);
+  position: relative;
+}
+
+.segment-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.05) 100%);
+  opacity: 0;
+  transition: var(--transition-fast);
+}
+
+.segment-btn:hover::before {
+  opacity: 1;
 }
 
 .segment-btn.active {
   background: var(--accent-brass);
   color: #000;
   font-weight: 700;
+}
+
+.segment-btn:focus-visible {
+  outline: 2px solid var(--accent-brass-hover);
+  outline-offset: 2px;
+  z-index: 1;
 }
 
 .action-buttons-group {
@@ -199,7 +291,7 @@ body {
   color: #fff;
   border: none;
   padding: 13px;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   font-family: var(--font-serif);
   font-weight: 800;
   font-size: 0.9rem;
@@ -209,21 +301,46 @@ body {
   justify-content: center;
   gap: 8px;
   box-shadow: 0 4px 16px rgba(138, 28, 34, 0.4);
+  transition: var(--transition);
 }
-.btn-action-primary:hover { background: var(--accent-granite-hover); }
+
+.btn-action-primary:hover {
+  background: var(--accent-granite-hover);
+  box-shadow: 0 6px 20px rgba(138, 28, 34, 0.6);
+  transform: translateY(-1px);
+}
+
+.btn-action-primary:focus-visible {
+  outline: 2px solid var(--accent-brass-hover);
+  outline-offset: 2px;
+}
 
 .btn-action-secondary {
   background: var(--bg-panel);
   color: var(--accent-brass);
   border: 1px solid var(--accent-brass);
   padding: 10px;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
+  transition: var(--transition);
 }
 
-/* Область предпросмотра */
+.btn-action-secondary:hover {
+  background: var(--accent-brass);
+  color: #000;
+  box-shadow: 0 0 12px rgba(197, 160, 89, 0.3);
+}
+
+.btn-action-secondary:focus-visible {
+  outline: 2px solid var(--accent-brass-hover);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   ОБЛАСТЬ ПРЕДПРОСМОТРА
+   ========================================================================== */
 .desk-preview-area {
   background: #06080a;
   padding: 30px;
@@ -237,6 +354,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 40px;
+  transition: var(--transition-slow);
 }
 
 /* ==========================================================================
@@ -249,12 +367,23 @@ body {
   min-height: 210mm;
   padding: 12mm;
   position: relative;
-  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.9);
+  box-shadow: var(--shadow-elevated);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
   page-break-after: always;
+  transition: var(--transition-slow);
+  animation: plaqueFadeIn 0.5s ease-out both;
+}
+
+@keyframes plaqueFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.plaque-sheet:hover {
+  box-shadow: var(--shadow-elevated), var(--shadow-glow);
 }
 
 /* ТЕМА: ПЕРГАМЕНТ */
@@ -267,6 +396,24 @@ body {
 .plaque-sheet.theme-clean {
   background: #ffffff;
   color: #111111;
+}
+
+/* ТЕМА: ТЕМНАЯ (для предпросмотра) */
+.plaque-sheet.theme-dark {
+  background: linear-gradient(135deg, #1a1d24 0%, #0f1116 100%);
+  color: #f1f3f7;
+}
+
+.plaque-sheet.theme-dark .plaque-frame-outer {
+  border-color: var(--accent-brass);
+}
+
+.plaque-sheet.theme-dark .plaque-frame-inner {
+  border-color: rgba(197, 160, 89, 0.5);
+}
+
+.plaque-sheet.theme-dark .plaque-corner {
+  border-color: var(--accent-brass);
 }
 
 /* ВЕРТИКАЛЬНЫЙ РЕЖИМ (ПОРТРЕТ) */
@@ -283,6 +430,7 @@ body {
   top: 6mm; left: 6mm; right: 6mm; bottom: 6mm;
   border: 3.5px solid #8a1c22;
   pointer-events: none;
+  transition: var(--transition-fast);
 }
 
 .plaque-frame-inner {
@@ -290,13 +438,16 @@ body {
   top: 8mm; left: 8mm; right: 8mm; bottom: 8mm;
   border: 1.5px solid #c5a059;
   pointer-events: none;
+  transition: var(--transition-fast);
 }
 
 .plaque-corner {
   position: absolute;
   width: 14mm; height: 14mm;
   border: 2px solid #c5a059;
+  transition: var(--transition-fast);
 }
+
 .corner-tl { top: 5mm; left: 5mm; border-right: none; border-bottom: none; }
 .corner-tr { top: 5mm; right: 5mm; border-left: none; border-bottom: none; }
 .corner-bl { bottom: 5mm; left: 5mm; border-right: none; border-top: none; }
@@ -353,9 +504,16 @@ body {
   padding: 1.5mm;
   background: #fff;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
 }
+
 .plaque-photo-frame img {
   width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: var(--transition-slow);
+}
+
+.plaque-photo-frame:hover img {
+  transform: scale(1.05);
 }
 
 .plaque-qr-box {
@@ -365,7 +523,13 @@ body {
   background: rgba(255, 255, 255, 0.85);
   border: 1px solid #c5a059;
   padding: 1.5mm 3mm;
-  border-radius: 2px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+}
+
+.plaque-qr-box:hover {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 8px rgba(197, 160, 89, 0.2);
 }
 
 .plaque-qr-img {
@@ -408,6 +572,7 @@ body {
   font-size: 8.5pt;
   line-height: 1.45;
 }
+
 .plaque-info-block strong {
   color: #8a1c22;
   text-transform: uppercase;
@@ -423,6 +588,7 @@ body {
   font-style: italic;
   font-size: 8pt;
   color: #222;
+  border-radius: var(--radius-sm);
 }
 
 /* Подвал таблички */
@@ -444,22 +610,47 @@ body {
   text-transform: uppercase;
 }
 
-/* Всплывающий тост */
+/* ==========================================================================
+   TOAST-УВЕДОМЛЕНИЯ — РАСШИРЕННЫЕ ТЕМЫ
+   ========================================================================== */
 .desk-toast {
   position: fixed;
   bottom: 24px; right: 24px;
   background: rgba(14, 16, 22, 0.96);
   border: 1px solid var(--accent-brass);
   color: #fff;
-  padding: 10px 18px;
-  border-radius: 4px;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
   font-size: 0.84rem;
   z-index: 9999;
   opacity: 0;
   transform: translateY(60px);
-  transition: all 0.25s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  max-width: calc(100vw - 48px);
 }
-.desk-toast.active { opacity: 1; transform: translateY(0); }
+
+.desk-toast.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.desk-toast.success {
+  border-color: var(--status-success);
+  background: var(--status-success-bg);
+}
+
+.desk-toast.error {
+  border-color: var(--status-error);
+  background: var(--status-error-bg);
+}
+
+.desk-toast.warning {
+  border-color: var(--status-warning);
+  background: var(--status-warning-bg);
+}
 
 /* ==========================================================================
    ПРАВИЛА ПЕЧАТИ (@MEDIA PRINT) — ИДЕАЛЬНЫЙ ЭКСПОРТ В PDF
@@ -470,11 +661,32 @@ body {
 }
 
 @media print {
-  body { background: none !important; color: #000 !important; }
-  .desk-header, .desk-sidebar, .desk-toast { display: none !important; }
-  .desk-workspace { display: block !important; height: auto !important; }
-  .desk-preview-area { background: none !important; padding: 0 !important; display: block !important; }
-  .preview-scale-wrapper { transform: none !important; gap: 0 !important; }
+  body {
+    background: none !important;
+    color: #000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  
+  .desk-header, .desk-sidebar, .desk-toast {
+    display: none !important;
+  }
+  
+  .desk-workspace {
+    display: block !important;
+    height: auto !important;
+  }
+  
+  .desk-preview-area {
+    background: none !important;
+    padding: 0 !important;
+    display: block !important;
+  }
+  
+  .preview-scale-wrapper {
+    transform: none !important;
+    gap: 0 !important;
+  }
   
   .plaque-sheet {
     box-shadow: none !important;
@@ -489,5 +701,31 @@ body {
   .plaque-sheet.orient-portrait {
     width: 210mm !important;
     height: 297mm !important;
+  }
+  
+  .plaque-sheet.theme-dark {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+}
+
+/* ==========================================================================
+   АДАПТИВНОСТЬ ДЛЯ УЛЬТРА-МАЛЫХ ЭКРАНОВ
+   ========================================================================== */
+@media (max-width: 400px) {
+  .header-actions {
+    gap: 6px;
+  }
+  
+  .nav-btn {
+    padding: 6px 10px;
+    font-size: 0.72rem;
+  }
+  
+  .desk-toast {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    max-width: none;
   }
 }

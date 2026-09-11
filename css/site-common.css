@@ -39,6 +39,24 @@ button, a, input, select, textarea {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* 🔥 Глобальный сброс стилей браузера для кнопок и ссылок-кнопок */
+button,
+[role="button"],
+a.btn,
+a.btn-primary,
+a.btn-secondary {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
 :where(a, button, input, select, textarea):focus-visible {
   outline: 2px solid var(--site-focus);
   outline-offset: 3px;
