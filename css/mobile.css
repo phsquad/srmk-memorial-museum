@@ -606,9 +606,9 @@ body {
   font-size: 0.8rem;
   font-weight: 600;
   margin-bottom: 4px;
-  /* 🔥 Фиксация высоты для предотвращения скачков */
-  min-height: 2.4em;
-  line-height: 1.2;
+  /* 🔥 Фиксация высоты для предотвращения скачков на мобильных */
+  min-height: 2.6em;
+  line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -1264,7 +1264,7 @@ body.large-text .section-title {
 /* 🔥 Планшетная адаптация для карточек (1024px и ниже) */
 @media (max-width: 1024px) {
   .hero-card-specialty {
-    min-height: 2.8em; /* Чуть больше высоты для узких экранов */
+    min-height: 2.6em; /* Единая высота для всех экранов */
     font-size: 0.75rem;
   }
   
