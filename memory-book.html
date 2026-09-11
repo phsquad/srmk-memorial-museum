@@ -2,33 +2,77 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Электронная Книга Памяти | «Быть воином — жить вечно» ГБПОУ СРМК</title>
-  <meta name="description" content="Электронная летопись и подробные архивные очерки о подвигах 20 героев-выпускников Ставропольского регионального многопрофильного колледжа.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Книга Памяти — Зал Героев | ГБПОУ СРМК</title>
+  <meta name="description" content="Интерактивный зал памяти с карточками героев, поиском, фильтрами и микроразметкой Schema.org">
   <meta name="theme-color" content="#0a0c0f">
-
-  <!-- Шрифты -->
+  
+  <!-- SEO & Social -->
+  <meta property="og:title" content="Книга Памяти — Зал Героев">
+  <meta property="og:description" content="Электронная летопись подвигов 21 героя-выпускника СРМК">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Preload Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
-
+  
   <!-- Стили -->
   <link rel="stylesheet" href="css/site-common.css">
   <link rel="stylesheet" href="css/memory-book.css">
   <link rel="stylesheet" href="css/mobile-memory-book.css">
+  
+  <style>
+    /* Skip Link */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #c9a227;
+      color: white;
+      padding: 8px 16px;
+      z-index: 10000;
+      transition: top 0.3s;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .skip-link:focus { top: 0; }
+    
+    /* Screen Reader Only */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+  </style>
 </head>
-<body class="dark-theme">
+<body class="dark-theme" itemscope itemtype="https://schema.org/WebPage">
+  
+  <!-- Skip Link for Accessibility -->
+  <a href="#main-content" class="skip-link">Перейти к основному контенту</a>
 
   <!-- ВЕРХНИЙ ИНДИКАТОР ПРОКРУТКИ -->
-  <div class="reading-progress-bar" id="readingProgressBar"></div>
+  <div class="reading-progress-bar" id="readingProgressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Прогресс чтения"></div>
 
-  <!-- ЕДИНАЯ НАВИГАЦИОННАЯ ШАПКА -->
-  <header class="book-header">
+  <!-- ==========================================================================
+       ШАПКА / HEADER
+       ========================================================================== -->
+  <header class="book-header" role="banner">
     <div class="container header-container">
       
       <!-- ЛОГОТИП И НАЗВАНИЕ -->
       <div class="header-left">
-        <a href="index.html" class="logo-badge" title="На главную музея">СРМК</a>
+        <a href="index.html" class="logo-badge" aria-label="На главную страницу 3D-музея">СРМК</a>
         <div class="header-titles">
           <span class="sub-title">Историко-мемориальный архив</span>
           <h1 class="main-title">Электронная Книга Памяти и Славы</h1>
@@ -36,29 +80,36 @@
       </div>
 
       <!-- НАВИГАЦИОННОЕ МЕНЮ -->
-      <nav class="header-actions" aria-label="Навигация по разделам">
+      <nav class="header-actions" role="navigation" aria-label="Основная навигация">
         <a href="reader.html" class="btn-header" title="3D Фолиант с перелистыванием">📚 Читалка 3D</a>
         <a href="quiz.html" class="btn-header" title="Интерактивная викторина">⚔️ Квест-квиз</a>
         <a href="desk-qr.html" class="btn-header" title="Конструктор табличек Парта Героя">🪑 Парта Героя</a>
         <a href="guestbook.html" class="btn-header" title="Послания и лампады памяти">🕯 Стена Памяти</a>
         <a href="certificate.html" class="btn-header" title="Генератор наградных документов">📜 Сертификаты</a>
         <a href="methodology.html" class="btn-header" title="Банк уроков для преподавателей">📑 Методкабинет</a>
-        <a href="index.html" class="btn-header btn-primary" title="Вернуться в 3D-музей">← В 3D-музей</a>
+        <a href="index.html" class="btn-header btn-primary" title="Вернуться в 3D-музей">← 3D-музей</a>
+        
+        <!-- Theme Toggle -->
+        <button class="btn-header tool-btn" id="themeToggleBtn" aria-label="Переключить тему оформления" title="Сменить тему">🌓</button>
       </nav>
     </div>
   </header>
 
-  <!-- ТИТУЛЬНЫЙ БАННЕР С МАГИСТРАЛЬНОЙ ОБЛОЖКОЙ 3:2 -->
-  <section class="book-hero">
+  <!-- ==========================================================================
+       ТИТУЛЬНЫЙ БАННЕР С МАГИСТРАЛЬНОЙ ОБЛОЖКОЙ
+       ========================================================================== -->
+  <section class="book-hero" role="region" aria-labelledby="heroTitle">
     <div class="container hero-content">
       
+      <h2 id="heroTitle" class="sr-only">Герои Книги Памяти</h2>
+
       <!-- РАМА МАГИСТРАЛЬНОЙ ОБЛОЖКИ 3:2 -->
-      <div class="master-cover-frame">
-        <img src="assets/images/cover-master.jpg" alt="Подвиг воинов-героев, защитников Отечества" class="master-cover-img">
+      <div class="master-cover-frame" itemscope itemtype="https://schema.org/ImageObject">
+        <img src="assets/images/cover-master.jpg" alt="Подвиг воинов-героев, защитников Отечества" class="master-cover-img" itemprop="contentUrl" loading="lazy">
         <div class="cover-glow-overlay"></div>
       </div>
 
-      <div class="hero-stats-row">
+      <div class="hero-stats-row" role="group" aria-label="Статистика мемориала">
         <div class="stat-badge"><strong>21</strong> Глава летописи</div>
         <div class="stat-badge"><strong>21</strong> Аудиогид (MP3)</div>
         <div class="stat-badge"><strong>100%</strong> Достоверные архивы</div>
@@ -67,37 +118,52 @@
     </div>
   </section>
 
-  <!-- ПАНЕЛЬ ПОИСКА И ФИЛЬТРОВ -->
-  <nav class="book-controls-bar">
+  <!-- ==========================================================================
+       ПАНЕЛЬ ПОИСКА И ФИЛЬТРОВ
+       ========================================================================== -->
+  <nav class="book-controls-bar" role="search" aria-label="Поиск и фильтрация героев">
     <div class="container controls-inner">
-      <div class="search-box">
-        <span class="search-icon">🔍</span>
-        <input type="search" id="bookSearchInput" class="search-input" aria-label="Поиск по Книге Памяти" placeholder="Поиск по имени, специальности, наградам или месту подвига...">
+      <form class="search-box" role="search" aria-label="Поиск по Книге Памяти">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input type="search" id="bookSearchInput" class="search-input" placeholder="Поиск по имени, специальности, наградам или месту подвига..." aria-label="Поиск героя">
         <button id="clearSearchBtn" class="clear-btn" style="display:none;" type="button" aria-label="Очистить поиск">&times;</button>
-      </div>
+      </form>
 
-      <div class="filters-pills" role="group" aria-label="Фильтры глав">
-        <button class="filter-pill active" data-filter="all" type="button">Все главы (21)</button>
-        <button class="filter-pill" data-filter="left" type="button">Левая плита мемориала (10)</button>
-        <button class="filter-pill" data-filter="right" type="button">Правая плита мемориала (10)</button>
+      <div class="filters-pills" role="group" aria-label="Фильтры по расположению на мемориале">
+        <button class="filter-pill active" data-filter="all" type="button" aria-pressed="true">Все главы (21)</button>
+        <button class="filter-pill" data-filter="left" type="button" aria-pressed="false">Левая плита (10)</button>
+        <button class="filter-pill" data-filter="right" type="button" aria-pressed="false">Правая плита (10)</button>
       </div>
     </div>
   </nav>
 
-  <!-- ОСНОВНОЙ КОРПУС ЛЕТОПИСИ -->
-  <main class="container book-layout">
+  <!-- ==========================================================================
+       ОСНОВНОЙ КОНТЕНТ: ОГЛАВЛЕНИЕ + ЛЕНТА ГЛАВ
+       ========================================================================== -->
+  <main id="main-content" class="container book-layout" role="main">
     
     <!-- БОКОВОЕ ОГЛАВЛЕНИЕ -->
-    <aside class="book-toc-sidebar">
+    <aside class="book-toc-sidebar" role="complementary" aria-label="Оглавление глав">
       <div class="toc-card">
         <h3 class="toc-title">Оглавление глав</h3>
-        <div class="toc-scroll-list" id="tocList"></div>
+        <nav aria-label="Навигация по главам">
+          <div class="toc-scroll-list" id="tocList" role="list"></div>
+        </nav>
+      </div>
+      
+      <!-- Статистика -->
+      <div class="toc-card stats-card" style="margin-top: 1rem;">
+        <h3 class="toc-title">Статистика</h3>
+        <div id="statsPanel" aria-live="polite">
+          <!-- Динамически заполняется -->
+        </div>
       </div>
     </aside>
 
-    <!-- ЛЕНТА ГЛАВ -->
-    <section class="book-stories-feed" id="storiesFeed">
+    <!-- ЛЕНТА ГЛАВ (КАРТОЧКИ ГЕРОЕВ) -->
+    <section class="book-stories-feed" id="storiesFeed" role="region" aria-label="Карточки героев">
       <!-- Сюда динамически рендерятся карточки через memory-book.js -->
+      <div class="loading-state" aria-live="polite">Загрузка данных...</div>
     </section>
 
   </main>
@@ -105,52 +171,58 @@
   <!-- ==========================================================================
        МОДАЛЬНЫЙ МАРКДАУН-РИДЕР (ПОЛНОЭКРАННОЕ ЧТЕНИЕ)
        ========================================================================== -->
-  <div class="reader-modal" id="readerModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="readerHeroTag">
+  <dialog id="readerModal" class="reader-modal" role="dialog" aria-modal="true" aria-labelledby="readerHeroTag" aria-describedby="readerDesc">
     <div class="reader-overlay" onclick="MemoryBookApp.closeReader()"></div>
     <div class="reader-dialog">
-      
+
       <!-- Панель управления ридером -->
-      <div class="reader-topbar">
+      <div class="reader-topbar" role="toolbar" aria-label="Инструменты чтения">
         <div class="reader-hero-tag" id="readerHeroTag">Глава летописи</div>
+        <p id="readerDesc" class="sr-only">Полный текст биографии героя</p>
         <div class="reader-actions">
-          <button class="reader-btn" id="readerAudioBtn" type="button">🎧 Слушать аудиогид</button>
-          <button class="reader-btn" onclick="window.print()" type="button">🖨 Печать Справки</button>
+          <button class="reader-btn" id="readerAudioBtn" type="button" aria-label="Включить аудиогид">🎧 Слушать</button>
+          <button class="reader-btn" onclick="window.print()" type="button" aria-label="Печать">🖨 Печать</button>
+          <button class="reader-btn" id="exportJsonBtn" type="button" aria-label="Экспорт в JSON">📥 JSON</button>
           <button class="reader-close" onclick="MemoryBookApp.closeReader()" type="button" aria-label="Закрыть">&times;</button>
         </div>
       </div>
 
       <!-- Контейнер отрендерованного Markdown -->
-      <article class="markdown-body" id="markdownRenderContainer"></article>
+      <article class="markdown-body" id="markdownRenderContainer" role="article" aria-label="Текст биографии"></article>
 
       <!-- Навигация по главам внутри ридера -->
-      <nav class="chapter-reader-nav" aria-label="Навигация по главам">
-        <button class="reader-nav-btn" id="prevChapterBtn" type="button">← Предыдущая глава</button>
-        <span class="chapter-reader-position" id="readerPosition">Глава 1 из 21</span>
-        <button class="reader-nav-btn" id="nextChapterBtn" type="button">Следующая глава →</button>
+      <nav class="chapter-reader-nav" role="navigation" aria-label="Навигация по главам">
+        <button class="reader-nav-btn" id="prevChapterBtn" type="button" aria-label="Предыдущая глава">← Пред.</button>
+        <span class="chapter-reader-position" id="readerPosition" aria-live="polite">Глава 1 из 21</span>
+        <button class="reader-nav-btn" id="nextChapterBtn" type="button" aria-label="Следующая глава">След. →</button>
       </nav>
 
     </div>
-  </div>
+  </dialog>
 
-  <!-- ПЛАВАЮЩИЙ АУДИОПЛЕЕР (ДЛЯ MP3-АУДИОГИДОВ) -->
-  <div class="book-audio-bar" id="bookAudioBar">
+  <!-- ==========================================================================
+       ПЛАВАЮЩИЙ АУДИОПЛЕЕР
+       ========================================================================== -->
+  <div class="book-audio-bar" id="bookAudioBar" role="region" aria-label="Аудиоплеер" hidden>
     <div class="container audio-bar-content">
-      <button class="audio-toggle-btn" id="bookAudioPlayBtn" type="button">▶</button>
+      <button class="audio-toggle-btn" id="bookAudioPlayBtn" type="button" aria-label="Воспроизвести">▶</button>
       <div class="audio-info">
         <span class="audio-title" id="bookAudioTitle">Аудиогид Мемориала</span>
         <span class="audio-hero" id="bookAudioHero">ГБПОУ СРМК</span>
       </div>
-      <div class="audio-progress-wrap" id="bookAudioProgressWrap">
+      <div class="audio-progress-wrap" id="bookAudioProgressWrap" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
         <div class="audio-progress-fill" id="bookAudioProgressFill"></div>
       </div>
-      <span class="audio-timer" id="bookAudioTimer">0:00 / 0:00</span>
-      <button class="audio-close-btn" onclick="MemoryBookApp.stopAudio()" type="button">&times;</button>
+      <span class="audio-timer" id="bookAudioTimer" aria-live="off">0:00 / 0:00</span>
+      <button class="audio-close-btn" onclick="MemoryBookApp.stopAudio()" type="button" aria-label="Закрыть плеер">&times;</button>
     </div>
-    <audio id="bookAudioPlayer" preload="metadata"></audio>
+    <audio id="bookAudioPlayer" preload="metadata" aria-label="Аудиоплеер"></audio>
   </div>
 
-  <!-- ПОДВАЛ (FOOTER) -->
-  <footer class="book-footer">
+  <!-- ==========================================================================
+       ПОДВАЛ (FOOTER)
+       ========================================================================== -->
+  <footer class="book-footer" role="contentinfo">
     <div class="container footer-content">
       <div class="footer-col">
         <h4>ГБПОУ СРМК</h4>
@@ -158,7 +230,7 @@
         <p>г. Ставрополь, проспект Юности, д. 3</p>
       </div>
       <div class="footer-col text-center">
-        <div class="memorial-crest-mini">⭐️</div>
+        <div class="memorial-crest-mini" aria-hidden="true">⭐️</div>
         <p class="footer-quote">«Быть воином — жить вечно»</p>
       </div>
       <div class="footer-col text-right">
@@ -168,24 +240,59 @@
     </div>
   </footer>
 
-  <div id="bookToast" class="book-toast"></div>
+  <!-- TOAST УВЕДОМЛЕНИЯ -->
+  <div id="bookToast" class="book-toast" role="status" aria-live="polite" aria-label="Уведомления"></div>
 
   <!-- ==========================================================================
-       ПОДКЛЮЧЕНИЕ СКРИПТОВ (СТРОГИЙ ПОРЯДОК ЗАГРУЗКИ)
+       СКРИПТЫ
        ========================================================================== -->
-  <!-- 1. Облачная база данных Supabase SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- 1. Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+
+  <!-- 2. База данных мемориала -->
+  <script src="js/data.js" defer></script>
+  <script src="js/grand-memory-book-part-1.js" defer></script>
+  <script src="js/grand-memory-book-part-2.js" defer></script>
+  <script src="js/grand-memory-book-part-3.js" defer></script>
+
+  <!-- 3. Облачный мост -->
+  <script src="js/cloud-sync.js" defer></script>
+
+  <!-- 4. Движок страницы -->
+  <script src="js/memory-book.js" defer></script>
   
-  <!-- 2. База данных мемориала и расширенные тома летописи -->
-  <script src="js/data.js"></script>
-  <script src="js/grand-memory-book-part-1.js"></script>
-  <script src="js/grand-memory-book-part-2.js"></script>
-  <script src="js/grand-memory-book-part-3.js"></script>
-  
-  <!-- 3. Облачный мост и защитный шлюз -->
-  <script src="js/cloud-sync.js"></script>
-  
-  <!-- 4. Управляющий движок страницы Книги Памяти -->
-  <script src="js/memory-book.js"></script>
+  <!-- 5. UI Enhancements -->
+  <script>
+    // Theme Toggle
+    document.getElementById('themeToggleBtn')?.addEventListener('click', function() {
+      const body = document.body;
+      const isDark = body.classList.contains('dark-theme');
+      body.classList.toggle('dark-theme');
+      body.classList.toggle('light-theme');
+      this.textContent = isDark ? '🌙' : '☀️';
+    });
+
+    // Clear Search Button
+    const searchInput = document.getElementById('bookSearchInput');
+    const clearBtn = document.getElementById('clearSearchBtn');
+    
+    searchInput?.addEventListener('input', function() {
+      clearBtn.style.display = this.value ? 'inline-block' : 'none';
+    });
+    
+    clearBtn?.addEventListener('click', function() {
+      searchInput.value = '';
+      clearBtn.style.display = 'none';
+      searchInput.focus();
+    });
+
+    // Keyboard Navigation for Modal
+    document.addEventListener('keydown', function(e) {
+      const modal = document.getElementById('readerModal');
+      if (e.key === 'Escape' && modal.open) {
+        MemoryBookApp.closeReader();
+      }
+    });
+  </script>
 </body>
 </html>
