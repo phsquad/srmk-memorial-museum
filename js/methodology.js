@@ -1,7 +1,6 @@
 /**
  * ============================================================================
- * ЛОГИКА МЕТОДИЧЕСКОГО КАБИНЕТА: js/methodology.js (v2.0)
- * Конструктор данных + Защита авторских прав (Copyright Lock)
+ * ЛОГИКА МЕТОДИЧЕСКОГО КАБИНЕТА: js/methodology.js (v2.1)
  * ============================================================================
  */
 
@@ -13,12 +12,9 @@ const Methodology = {
   init() {
     this.bindTabs();
     this.bindProtectionEvents();
-    console.log("[Methodology] Модуль конструктора и защиты авторских прав запущен.");
+    console.log("[Methodology] Модуль конструктора обновлен.");
   },
 
-  /**
-   * 1. Включение / Выключение режима защиты авторских прав
-   */
   setCopyrightMode(isProtected) {
     this.isCopyrightProtected = isProtected;
 
@@ -47,13 +43,10 @@ const Methodology = {
       wrappers.forEach(w => w.classList.remove('copyright-locked'));
       exportBtns.forEach(b => b.classList.remove('disabled-lock'));
 
-      this.showToast("✏️ Режим конструктора включен. Вы можете редактировать и скачивать план.");
+      this.showToast("✏️ Режим конструктора включен. Вы можете редактировать план.");
     }
   },
 
-  /**
-   * 2. Блокировка копирования при включенной защите
-   */
   bindProtectionEvents() {
     document.addEventListener('copy', (e) => {
       if (this.isCopyrightProtected) {
@@ -65,14 +58,11 @@ const Methodology = {
     document.addEventListener('contextmenu', (e) => {
       if (this.isCopyrightProtected) {
         e.preventDefault();
-        this.showToast("🔒 Правая кнопка мыши заблокирована в режиме защиты авторских прав.");
+        this.showToast("🔒 Правая кнопка мыши заблокирована в режиме защиты.");
       }
     });
   },
 
-  /**
-   * 3. Применение авторских данных из Конструктора
-   */
   applyConstructorData() {
     if (this.isCopyrightProtected) {
       this.showToast("Переключитесь в режим «Интерактивный конструктор» для редактирования!");
@@ -87,7 +77,6 @@ const Methodology = {
     const q1 = document.getElementById('constructQ1').value;
     const q2 = document.getElementById('constructQ2').value;
 
-    // Обновление заголовков и текста
     document.getElementById('displayTeacher').textContent = teacher;
     document.getElementById('displayRole').textContent = role;
     document.getElementById('displayDiscipline').textContent = discipline;
@@ -100,13 +89,11 @@ const Methodology = {
 
     this.showToast("⚡ Данные успешно применены ко всем материалам!");
 
-    // Автопереход на вкладку технологической карты
-    document.querySelector('.tab-btn[data-tab="tech-maps"]').click();
+    // Переходим на вкладку Технологической карты
+    const mapTabBtn = document.querySelector('.tab-btn[data-tab="tech-maps"]');
+    if (mapTabBtn) mapTabBtn.click();
   },
 
-  /**
-   * 4. Переключение вкладок
-   */
   bindTabs() {
     const tabButtons = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
@@ -125,9 +112,6 @@ const Methodology = {
     });
   },
 
-  /**
-   * 5. Скопировать текст (с проверкой защиты)
-   */
   async copyText(elementId, successMessage = "Скопировано!") {
     if (this.isCopyrightProtected) {
       this.showToast("🔒 Скачивание и копирование заблокировано разработчиком.");
@@ -166,9 +150,6 @@ const Methodology = {
     window.print();
   },
 
-  /**
-   * 6. Экспорт в Word (.doc) (с проверкой защиты)
-   */
   exportToWord(containerId, filename = 'Технологическая_карта_СРМК') {
     if (this.isCopyrightProtected) {
       this.showToast("🔒 Скачивание Word-файла заблокировано в режиме защиты!");
@@ -197,7 +178,7 @@ const Methodology = {
     link.click();
     URL.revokeObjectURL(link.href);
 
-    this.showToast("Файл Word (.doc) с вашими данными скачан!");
+    this.showToast("Файл Word (.doc) скачан!");
   },
 
   showToast(message) {

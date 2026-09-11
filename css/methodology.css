@@ -1,13 +1,13 @@
 @charset "UTF-8";
 
 /* ==========================================================================
-   ОБНОВЛЕННЫЕ СТИЛИ МЕТОДИЧЕСКОГО КАБИНЕТА: css/methodology.css
+   СТИЛИ МЕТОДИЧЕСКОГО КАБИНЕТА: css/methodology.css
    ========================================================================== */
 :root {
   --bg-dark: #0a0c0f;
   --bg-surface: #12151c;
   --bg-elevated: #181d26;
-  --bg-panel: #1e2433;
+  --bg-panel: #14171d;
   --accent-brass: #c5a059;
   --accent-brass-hover: #dfba6d;
   --accent-brass-dim: rgba(197, 160, 89, 0.14);
@@ -45,7 +45,101 @@ body {
   padding: 0 24px;
 }
 
-/* Переключатель режима защиты авторских прав */
+/* ==========================================================================
+   КОНСТРУКТОР (ИСПРАВЛЕННЫЕ ПОЛЯ ВВОДА)
+   ========================================================================== */
+.constructor-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-accent);
+  border-radius: 4px;
+  padding: 32px;
+  box-shadow: var(--shadow-elevated);
+}
+
+.constructor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border-hairline);
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.btn-generate-plan {
+  background: var(--accent-granite);
+  color: #ffffff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 2px;
+  font-family: var(--font-serif);
+  font-weight: 800;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 16px rgba(138, 28, 34, 0.4);
+  white-space: nowrap;
+}
+
+.btn-generate-plan:hover {
+  background: var(--accent-granite-hover);
+  transform: translateY(-1px);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-label.gold {
+  color: var(--accent-brass);
+}
+
+/* Красивые темно-графитовые поля вместо белых дефолтных */
+.form-input, .form-select {
+  width: 100%;
+  background: var(--bg-panel);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 3px;
+  font-family: var(--font-sans);
+  font-size: 0.88rem;
+  outline: none;
+  transition: all var(--transition);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.form-input:focus, .form-select:focus {
+  border-color: var(--accent-brass);
+  box-shadow: 0 0 12px var(--accent-brass-dim);
+  background: #181d27;
+}
+
+/* ==========================================================================
+   ЗАЩИТА АВТОРСКИХ ПРАВ (COPYRIGHT LOCK)
+   ========================================================================== */
 .copyright-mode-bar {
   display: flex;
   flex-direction: column;
@@ -96,52 +190,9 @@ body {
   font-weight: 700;
 }
 
-/* Форма Конструктора */
-.constructor-panel {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-accent);
-  border-radius: 4px;
-  padding: 28px;
-  box-shadow: var(--shadow-elevated);
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-.form-group.full-width { grid-column: 1 / -1; }
-
-.form-label {
-  display: block;
-  font-size: 0.76rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  margin-bottom: 6px;
-}
-
-.form-input, .form-select {
-  width: 100%;
-  background: var(--bg-panel);
-  border: 1px solid var(--border-hairline);
-  color: #fff;
-  padding: 10px 12px;
-  border-radius: 2px;
-  font-size: 0.86rem;
-  outline: none;
-}
-.form-input:focus, .form-select:focus {
-  border-color: var(--accent-brass);
-}
-
-/* ==========================================================================
-   СТИЛИ РЕЖИМА ЗАЩИТЫ АВТОРСКИХ ПРАВ (COPYRIGHT LOCK)
-   ========================================================================== */
 .protected-wrapper.copyright-locked {
   user-select: none !important;
   -webkit-user-select: none !important;
-  -moz-user-select: none !important;
   position: relative;
 }
 
@@ -175,21 +226,14 @@ body {
   letter-spacing: 3px;
 }
 
-/* Заблокированные кнопки скачивания */
 .btn-export-lockable.disabled-lock {
   opacity: 0.4 !important;
   cursor: not-allowed !important;
   filter: grayscale(100%);
 }
 
-/* Обычная верстка */
-.method-header {
-  background: rgba(10, 12, 16, 0.96);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--border-hairline);
-  padding: 14px 0;
-  position: sticky; top: 0; z-index: 100;
-}
+/* Общие стили */
+.method-header { background: rgba(10, 12, 16, 0.96); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border-hairline); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
 .header-content { display: flex; justify-content: space-between; align-items: center; }
 .logo-group { display: flex; align-items: center; gap: 14px; }
 .logo-badge { background: var(--accent-granite); color: #fff; font-family: var(--font-serif); font-weight: 800; font-size: 0.9rem; padding: 6px 12px; border-radius: 2px; text-decoration: none; }
@@ -199,11 +243,11 @@ body {
 .nav-btn { background: var(--bg-elevated); border: 1px solid var(--border-hairline); color: var(--text-muted); padding: 8px 16px; border-radius: 2px; text-decoration: none; font-size: 0.8rem; font-weight: 600; }
 .nav-btn.btn-primary { background: var(--accent-granite); color: #fff; }
 
-.method-hero { padding: 50px 0 35px; background: radial-gradient(circle at 50% 20%, rgba(26, 31, 40, 0.7) 0%, var(--bg-dark) 80%); border-bottom: 1px solid var(--border-hairline); text-align: center; }
+.method-hero { padding: 45px 0 35px; background: radial-gradient(circle at 50% 20%, rgba(26, 31, 40, 0.7) 0%, var(--bg-dark) 80%); border-bottom: 1px solid var(--border-hairline); text-align: center; }
 .hero-badge { display: inline-block; color: var(--accent-brass); font-size: 0.74rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid var(--border-accent); padding-bottom: 4px; margin-bottom: 14px; }
 .hero-title { font-family: var(--font-serif); font-size: 2.1rem; line-height: 1.25; margin-bottom: 14px; font-weight: 800; }
 .hero-title .highlight { color: var(--accent-brass); }
-.hero-desc { max-width: 760px; margin: 0 auto 20px; color: var(--text-muted); font-size: 0.95rem; }
+.hero-desc { max-width: 760px; margin: 0 auto 16px; color: var(--text-muted); font-size: 0.95rem; }
 
 .tabs-nav-wrapper { background: #080a0d; border-bottom: 1px solid var(--border-hairline); position: sticky; top: 61px; z-index: 90; }
 .tabs-container { display: flex; gap: 8px; overflow-x: auto; padding: 8px 0; }

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Методический кабинет педагога | Мемориальный комплекс СРМК</title>
-  <meta name="description" content="Интерактивный конструктор Уроков Мужества, карточек заданий и защита авторских прав методических материалов ГБПОУ СРМК.">
+  <meta name="description" content="Цифровой методический кабинет преподавателя: конструктор Уроков Мужества, карточки заданий и защита авторских прав ГБПОУ СРМК.">
   <meta name="theme-color" content="#0a0c0f">
 
   <!-- Шрифты -->
@@ -35,7 +35,7 @@
     </div>
   </header>
 
-  <!-- БАННЕР -->
+  <!-- БАННЕР HERO -->
   <section class="method-hero">
     <div class="container hero-content">
       <div class="hero-badge">ФГОС СПО • Интерактивный конструктор • Защита авторских прав</div>
@@ -59,7 +59,7 @@
     </div>
   </section>
 
-  <!-- ВКЛАДКИ -->
+  <!-- НАВИГАЦИЯ ПО ВКЛАДКАМ -->
   <nav class="tabs-nav-wrapper">
     <div class="container tabs-container">
       <button class="tab-btn active" data-tab="constructor" type="button">
@@ -83,31 +83,32 @@
   <main class="container method-main">
 
     <!-- ==========================================================================
-         ВКЛАДКА 0: ИНТЕРАКТИВНЫЙ КОНСТРУКТОР УРОКА (ВВОД СВОИХ ДАННЫХ)
+         ВКЛАДКА 0: ИНТЕРАКТИВНЫЙ КОНСТРУКТОР УРОКА
          ========================================================================== -->
     <section class="tab-content active" id="tab-constructor">
       
-      <div class="section-topbar">
-        <div>
-          <h3 class="block-title">Конструктор индивидуального плана занятия</h3>
-          <p class="block-subtitle">Внесите свои данные — система автоматически перестроит технологическую карту и карточки заданий</p>
+      <div class="constructor-card">
+        
+        <div class="constructor-header">
+          <div>
+            <h3 class="block-title">Конструктор индивидуального плана занятия</h3>
+            <p class="block-subtitle">Внесите свои данные — система автоматически перестроит технологическую карту и карточки заданий</p>
+          </div>
+          <button class="btn-generate-plan" onclick="Methodology.applyConstructorData()" type="button">
+            ⚡ Сформировать индивидуальный план
+          </button>
         </div>
-        <button class="action-btn btn-primary" onclick="Methodology.applyConstructorData()" type="button">
-          ⚡ Сформировать индивидуальный план
-        </button>
-      </div>
 
-      <div class="constructor-panel">
         <div class="form-grid">
           
           <div class="form-group">
             <label class="form-label">ФИО Преподавателя / Разработчика:*</label>
-            <input type="text" id="constructTeacherName" class="form-input" value="Генте Александра Владимировна">
+            <input type="text" id="constructTeacherName" class="form-input" value="Генте Александра Владимировна" placeholder="Введите ФИО">
           </div>
 
           <div class="form-group">
             <label class="form-label">Должность и категория:*</label>
-            <input type="text" id="constructTeacherRole" class="form-input" value="Преподаватель истории высшей категории">
+            <input type="text" id="constructTeacherRole" class="form-input" value="Преподаватель истории высшей категории" placeholder="Должность">
           </div>
 
           <div class="form-group">
@@ -122,32 +123,33 @@
 
           <div class="form-group">
             <label class="form-label">Учебная группа и курс:*</label>
-            <input type="text" id="constructGroup" class="form-input" value="Группа ИС-241 (1 курс)">
+            <input type="text" id="constructGroup" class="form-input" value="Группа ИС-241 (1 курс)" placeholder="Например: ИС-241">
           </div>
 
           <div class="form-group full-width">
             <label class="form-label">Тема урока / патриотического часа:*</label>
-            <input type="text" id="constructTopic" class="form-input" value="«Они учились здесь. Они шагнули в вечность: ратный подвиг 20 выпускников СРМК»">
+            <input type="text" id="constructTopic" class="form-input" value="«Они учились здесь. Они шагнули в вечность: ратный подвиг 20 выпускников СРМК»" placeholder="Тема занятия">
           </div>
 
-          <!-- Настройка авторских вопросов к карточкам -->
+          <!-- Настройка авторских вопросов -->
           <div class="form-group full-width">
-            <label class="form-label" style="color:var(--accent-brass);">Ваши авторские вопросы к Карточке №1 (Днепровский плацдарм):</label>
+            <label class="form-label gold">Авторские вопросы к Карточке №1 (Днепровский плацдарм):</label>
             <input type="text" id="constructQ1" class="form-input" value="1. Почему водовоз Шамиля Назырова на передовой называют «Машиной жизни»?">
           </div>
 
           <div class="form-group full-width">
-            <label class="form-label" style="color:var(--accent-brass);">Ваши авторские вопросы к Карточке №2 (Запорожский щит):</label>
-            <input type="text" id="constructQ2" class="form-input" value="1. Как навыки сапера Константина Луценко спасали экипажи бронетехники?">
+            <label class="form-label gold">Авторские вопросы к Карточке №2 (Запорожский щит):</label>
+            <input type="text" id="constructQ2" class="form-input" value="1. Как навыки сапера Константина Луценко спасали экипажи танков?">
           </div>
 
         </div>
+
       </div>
 
     </section>
 
     <!-- ==========================================================================
-         ВКЛАДКА 1: ТЕХНОЛОГИЧЕСКАЯ КАРТА (С ЗАЩИТОЙ ИЛИ РЕДАКТИРОВАНИЕМ)
+         ВКЛАДКА 1: ТЕХНОЛОГИЧЕСКАЯ КАРТА (ФГОС СПО)
          ========================================================================== -->
     <section class="tab-content" id="tab-tech-maps">
       
@@ -166,7 +168,6 @@
         </div>
       </div>
 
-      <!-- Контейнер бланка с водяными знаками (при защите) -->
       <div class="paper-card protected-wrapper" id="techMapContainer">
         
         <div class="copyright-watermark-overlay" id="watermarkOverlay" style="display:none;">
@@ -251,7 +252,7 @@
     </section>
 
     <!-- ==========================================================================
-         ВКЛАДКА 2: КАРТОЧКИ МИКРОГРУПП (С АВТОРСКИМИ ВОПРОСАМИ)
+         ВКЛАДКА 2: КАРТОЧКИ МИКРОГРУПП
          ========================================================================== -->
     <section class="tab-content" id="tab-group-cards">
       
@@ -326,7 +327,7 @@
       </div>
     </section>
 
-    <!-- ВКЛАДКИ 3 и 4 ОСТАЮТСЯ АНАЛОГИЧНЫМИ -->
+    <!-- ВКЛАДКИ 3 И 4 -->
     <section class="tab-content" id="tab-integration">
       <div class="paper-card">
         <h3 class="block-title">Матрица интеграции в спецкурсы СПО</h3>
