@@ -103,12 +103,7 @@ const GRAND_MEMORY_BOOK_PART_1 = [
   }
 ].map(book => ({
   ...book,
-  pages: book.pages.map((page, index) => ({
-    spreadNum: `Разворот ${['I', 'II', 'III', 'IV'][index]} (Стр. ${index * 2 + 1}–${index * 2 + 2})`,
-    chapterTitle: page[0],
-    leftHtml: `<div class="page-header-meta"><span>${book.volNum}</span><span>${page[2]}</span></div><div class="page-visual-frame"><img src="${book.photo}" alt="${book.name}"></div><div class="page-quote-box">«Память о человеке продолжается в его делах.»</div><div class="page-number-footer">Стр. ${index * 2 + 1}</div>`,
-    rightHtml: `<div class="page-header-meta"><span>${book.chapterNum}</span><span>${page[2]}</span></div><h3 class="page-chapter-title">${page[0]}</h3><div class="page-story-text"><span class="drop-cap">${page[1][0]}</span>${page[1].slice(1)}</div><div class="page-number-footer">Стр. ${index * 2 + 2}</div>`
-  }))
+  pages: book.pages.map((page, index) => compileSpreadHTML(book, page, index))
 }));
 
 if (typeof module !== 'undefined' && module.exports) module.exports = { GRAND_MEMORY_BOOK_PART_1 };
