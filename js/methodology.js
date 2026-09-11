@@ -1,20 +1,111 @@
 /**
  * ============================================================================
- * ЛОГИКА МЕТОДИЧЕСКОГО КАБИНЕТА: js/methodology.js
- * Управление вкладками, экспорт в Word (.doc), копирование и печать
+ * ЛОГИКА МЕТОДИЧЕСКОГО КАБИНЕТА: js/methodology.js (v2.0)
+ * Конструктор данных + Защита авторских прав (Copyright Lock)
  * ============================================================================
  */
 
 'use strict';
 
 const Methodology = {
+  isCopyrightProtected: false,
+
   init() {
     this.bindTabs();
-    console.log("[Methodology] Цифровой методический кабинет инициализирован.");
+    this.bindProtectionEvents();
+    console.log("[Methodology] Модуль конструктора и защиты авторских прав запущен.");
   },
 
   /**
-   * 1. Переключение навигационных вкладок
+   * 1. Включение / Выключение режима защиты авторских прав
+   */
+  setCopyrightMode(isProtected) {
+    this.isCopyrightProtected = isProtected;
+
+    const editBtn = document.getElementById('btnModeEdit');
+    const protectBtn = document.getElementById('btnModeProtect');
+    const watermark = document.getElementById('watermarkOverlay');
+    const wrappers = document.querySelectorAll('.protected-wrapper');
+    const exportBtns = document.querySelectorAll('.btn-export-lockable');
+
+    if (isProtected) {
+      editBtn.classList.remove('active');
+      protectBtn.classList.add('active');
+
+      if (watermark) watermark.style.display = 'flex';
+
+      wrappers.forEach(w => w.classList.add('copyright-locked'));
+      exportBtns.forEach(b => b.classList.add('disabled-lock'));
+
+      this.showToast("🔒 Режим защиты авторских прав включен. Доступен ТОЛЬКО ПРОСМОТР.");
+    } else {
+      protectBtn.classList.remove('active');
+      editBtn.classList.add('active');
+
+      if (watermark) watermark.style.display = 'none';
+
+      wrappers.forEach(w => w.classList.remove('copyright-locked'));
+      exportBtns.forEach(b => b.classList.remove('disabled-lock'));
+
+      this.showToast("✏️ Режим конструктора включен. Вы можете редактировать и скачивать план.");
+    }
+  },
+
+  /**
+   * 2. Блокировка копирования при включенной защите
+   */
+  bindProtectionEvents() {
+    document.addEventListener('copy', (e) => {
+      if (this.isCopyrightProtected) {
+        e.preventDefault();
+        this.showToast("🔒 Материал защищен авторским правом ГБПОУ СРМК. Копирование запрещено.");
+      }
+    });
+
+    document.addEventListener('contextmenu', (e) => {
+      if (this.isCopyrightProtected) {
+        e.preventDefault();
+        this.showToast("🔒 Правая кнопка мыши заблокирована в режиме защиты авторских прав.");
+      }
+    });
+  },
+
+  /**
+   * 3. Применение авторских данных из Конструктора
+   */
+  applyConstructorData() {
+    if (this.isCopyrightProtected) {
+      this.showToast("Переключитесь в режим «Интерактивный конструктор» для редактирования!");
+      return;
+    }
+
+    const teacher = document.getElementById('constructTeacherName').value || 'Генте А. В.';
+    const role = document.getElementById('constructTeacherRole').value || 'Преподаватель';
+    const discipline = document.getElementById('constructDiscipline').value || 'История России';
+    const group = document.getElementById('constructGroup').value || 'Группа';
+    const topic = document.getElementById('constructTopic').value || 'Урок Мужества';
+    const q1 = document.getElementById('constructQ1').value;
+    const q2 = document.getElementById('constructQ2').value;
+
+    // Обновление заголовков и текста
+    document.getElementById('displayTeacher').textContent = teacher;
+    document.getElementById('displayRole').textContent = role;
+    document.getElementById('displayDiscipline').textContent = discipline;
+    document.getElementById('displayGroup').textContent = group;
+    document.getElementById('displayTopic').textContent = topic;
+    document.getElementById('mapOwnerSubtitle').textContent = `Разработчик: ${teacher} • Дисциплина: ${discipline} (${group})`;
+
+    if (q1) document.getElementById('displayQ1').textContent = q1;
+    if (q2) document.getElementById('displayQ2').textContent = q2;
+
+    this.showToast("⚡ Данные успешно применены ко всем материалам!");
+
+    // Автопереход на вкладку технологической карты
+    document.querySelector('.tab-btn[data-tab="tech-maps"]').click();
+  },
+
+  /**
+   * 4. Переключение вкладок
    */
   bindTabs() {
     const tabButtons = document.querySelectorAll('.tab-btn');
@@ -29,167 +120,92 @@ const Methodology = {
 
         btn.classList.add('active');
         const targetContent = document.getElementById(targetId);
-        if (targetContent) {
-          targetContent.classList.add('active');
-        }
+        if (targetContent) targetContent.classList.add('active');
       });
     });
   },
 
   /**
-   * 2. Быстрое копирование текста в буфер обмена
+   * 5. Скопировать текст (с проверкой защиты)
    */
-  async copyText(elementId, successMessage = "Скопировано в буфер обмена!") {
+  async copyText(elementId, successMessage = "Скопировано!") {
+    if (this.isCopyrightProtected) {
+      this.showToast("🔒 Скачивание и копирование заблокировано разработчиком.");
+      return;
+    }
+
     const el = document.getElementById(elementId);
     if (!el) return;
 
-    const textToCopy = el.innerText || el.textContent;
-
     try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(textToCopy);
-      } else {
-        // Fallback для устаревших контекстов
-        const textArea = document.createElement('textarea');
-        textArea.value = textToCopy;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        document.execCommand('copy');
-        textArea.remove();
-      }
+      await navigator.clipboard.writeText(el.innerText || el.textContent);
       this.showToast(successMessage);
     } catch (err) {
-      this.showToast("Не удалось скопировать текст.", "error");
+      this.showToast("Ошибка копирования.", "error");
     }
   },
 
-  /**
-   * 3. Копирование содержимого отдельной карточки микрогруппы
-   */
   copyCardText(cardId) {
+    if (this.isCopyrightProtected) {
+      this.showToast("🔒 Копирование карточек заблокировано в режиме защиты.");
+      return;
+    }
     const card = document.getElementById(cardId);
-    if (!card) return;
-
-    const groupTitle = card.querySelector('.group-tag')?.innerText || '';
-    const tvdTitle = card.querySelector('.tvd-tag')?.innerText || '';
-    const bodyText = card.querySelector('.task-card-body')?.innerText || '';
-
-    const fullCardText = `КАРТОЧКА ПОИСКОВОГО ЗАДАНИЯ\n${groupTitle}: «${tvdTitle}»\n\n${bodyText}\n\nМемориальный комплекс СРМК: https://phsquad.github.io/srmkmuseum/`;
-
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(fullCardText).then(() => {
-        this.showToast(`Карточка ${groupTitle} скопирована!`);
+    if (card && navigator.clipboard) {
+      navigator.clipboard.writeText(card.innerText).then(() => {
+        this.showToast("Карточка скопирована!");
       });
     }
   },
 
-  /**
-   * 4. Целевая печать отдельной карточки на А4
-   */
   printSingleCard(cardId) {
-    const card = document.getElementById(cardId);
-    if (!card) return;
-
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html lang="ru">
-      <head>
-        <meta charset="UTF-8">
-        <title>Печать карточки задания | ГБПОУ СРМК</title>
-        <style>
-          body { font-family: 'Times New Roman', serif; padding: 25px; line-height: 1.5; }
-          .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 16px; }
-          .header h2 { margin: 0; text-transform: uppercase; font-size: 16pt; }
-          .header p { margin: 4px 0 0; font-size: 11pt; }
-          .task-block { margin-bottom: 16px; font-size: 12pt; }
-          .task-label { font-weight: bold; text-transform: uppercase; font-size: 10pt; display: block; margin-bottom: 4px; }
-          ol { padding-left: 20px; }
-          li { margin-bottom: 6px; }
-          .footer { margin-top: 30px; border-top: 1px solid #ccc; padding-top: 8px; font-size: 9pt; text-align: center; color: #555; }
-        </style>
-      </head>
-      <body>
-        <div class="header">
-          <h2>ГБПОУ «Ставропольский региональный многопрофильный колледж»</h2>
-          <p>Всероссийская акция «Карта доблести» • Урок Мужества «Быть воином — жить вечно»</p>
-        </div>
-        ${card.querySelector('.task-card-body').innerHTML}
-        <div class="footer">
-          Цифровой музей СРМК: https://phsquad.github.io/srmkmuseum/ • Разработчик: А. В. Генте
-        </div>
-      </body>
-      </html>
-    `);
-    printWindow.document.close();
-    printWindow.focus();
-    setTimeout(() => {
-      printWindow.print();
-      printWindow.close();
-    }, 300);
+    if (this.isCopyrightProtected) {
+      this.showToast("🔒 Печать заблокирована в режиме защиты авторских прав.");
+      return;
+    }
+    window.print();
   },
 
   /**
-   * 5. Экспорт технологической карты в файл MS Word (.doc)
+   * 6. Экспорт в Word (.doc) (с проверкой защиты)
    */
   exportToWord(containerId, filename = 'Технологическая_карта_СРМК') {
+    if (this.isCopyrightProtected) {
+      this.showToast("🔒 Скачивание Word-файла заблокировано в режиме защиты!");
+      return;
+    }
+
     const container = document.getElementById(containerId);
     if (!container) return;
 
     const htmlContent = `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-      <head>
-        <meta charset='utf-8'>
-        <title>${filename}</title>
-        <style>
-          body { font-family: 'Calibri', 'Times New Roman', sans-serif; font-size: 11pt; }
-          table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-          th { background-color: #f2f2f2; border: 1px solid #999; padding: 8px; font-weight: bold; text-align: left; }
-          td { border: 1px solid #999; padding: 8px; vertical-align: top; }
-          h2, h3 { color: #8a1c22; }
-          .meta { margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
-        </style>
-      </head>
+      <head><meta charset='utf-8'><title>${filename}</title></head>
       <body>
         <div style="text-align: center;">
-          <p><strong>МИНИСТЕРСТВО ОБРАЗОВАНИЯ СТАВРОПОЛЬСКОГО КРАЯ</strong><br>ГБПОУ «Ставропольский региональный многопрофильный колледж»</p>
-          <h2>ТЕХНОЛОГИЧЕСКАЯ КАРТА УРОКА МУЖЕСТВА</h2>
-          <p><em>«Они учились здесь. Они шагнули в вечность»</em></p>
+          <h2>ГБПОУ «Ставропольский региональный многопрофильный колледж»</h2>
+          <h3>ИНДИВИДУАЛЬНАЯ ТЕХНОЛОГИЧЕСКАЯ КАРТА УРОКА</h3>
         </div>
         ${container.innerHTML}
-      </body>
-      </html>
+      </body></html>
     `;
 
-    const blob = new Blob(['\ufeff' + htmlContent], {
-      type: 'application/msword;charset=utf-8'
-    });
-
+    const blob = new Blob(['\ufeff' + htmlContent], { type: 'application/msword;charset=utf-8' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = `${filename}.doc`;
     link.click();
     URL.revokeObjectURL(link.href);
 
-    this.showToast("Файл Word (.doc) успешно скачан!");
+    this.showToast("Файл Word (.doc) с вашими данными скачан!");
   },
 
-  /**
-   * 6. Всплывающее Toast-уведомление
-   */
   showToast(message) {
     const toast = document.getElementById('methodToast');
     if (!toast) return;
-
     toast.textContent = message;
     toast.classList.add('active');
-
-    setTimeout(() => {
-      toast.classList.remove('active');
-    }, 2800);
+    setTimeout(() => toast.classList.remove('active'), 3200);
   }
 };
 
