@@ -39,10 +39,13 @@ const GRAND_MEMORY_BOOK_PART_3 = [
   }))
 }));
 
-window.GRAND_MEMORY_BOOK_ARCHIVE = [
+const GRAND_MEMORY_BOOK_ARCHIVE = [
+  MEMORY_BOOK_PROLOGUE,
   ...(typeof GRAND_MEMORY_BOOK_PART_1 !== 'undefined' ? GRAND_MEMORY_BOOK_PART_1 : []),
   ...(typeof GRAND_MEMORY_BOOK_PART_2 !== 'undefined' ? GRAND_MEMORY_BOOK_PART_2 : []),
   ...GRAND_MEMORY_BOOK_PART_3
 ];
+
+if (typeof window !== 'undefined') window.GRAND_MEMORY_BOOK_ARCHIVE = GRAND_MEMORY_BOOK_ARCHIVE;
 
 if (typeof module !== 'undefined' && module.exports) module.exports = { GRAND_MEMORY_BOOK_PART_3 };

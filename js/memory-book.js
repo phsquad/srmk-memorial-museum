@@ -9,6 +9,7 @@
 
 // 20 ПОЛНЫХ ИСТОРИЧЕСКИХ ГЛАВ В ФОРМАТЕ MARKDOWN
 const MEMORY_BOOK_ARCHIVE = [
+  MEMORY_BOOK_PROLOGUE,
   /* ==========================================================================
      ЛЕВАЯ ПЛИТА МЕМОРИАЛА (10 ГЕРОЕВ)
      ========================================================================== */
@@ -628,6 +629,10 @@ const MemoryBookApp = {
   currentHeroIndex: -1,
   lastFocusedElement: null,
 
+  getArchive() {
+    return window.GRAND_MEMORY_BOOK_ARCHIVE || MEMORY_BOOK_ARCHIVE;
+  },
+
   init() {
     this.audioEl = document.getElementById('bookAudioPlayer');
     this.renderChronicles();
@@ -636,7 +641,7 @@ const MemoryBookApp = {
     this.initAudioEvents();
     this.initScrollProgress();
     const linkedHero = window.location.hash.replace('#', '');
-    if (MEMORY_BOOK_ARCHIVE.some(hero => hero.id === linkedHero)) {
+    if (this.getArchive().some(hero => hero.id === linkedHero)) {
       this.openReader(linkedHero, false);
     }
     console.log("[MemoryBook] Архивно-маркдаун движок готов.");
@@ -646,13 +651,7 @@ const MemoryBookApp = {
     const feed = document.getElementById('storiesFeed');
     if (!feed) return;
 
-    const extendedBooks = window.GRAND_MEMORY_BOOK_ARCHIVE || [
-      ...(typeof GRAND_MEMORY_BOOK_PART_1 !== 'undefined' ? GRAND_MEMORY_BOOK_PART_1 : []),
-      ...(typeof GRAND_MEMORY_BOOK_PART_2 !== 'undefined' ? GRAND_MEMORY_BOOK_PART_2 : []),
-      ...(typeof GRAND_MEMORY_BOOK_PART_3 !== 'undefined' ? GRAND_MEMORY_BOOK_PART_3 : [])
-    ];
-    const extendedById = new Map(extendedBooks.map(hero => [hero.id, hero]));
-    const archive = MEMORY_BOOK_ARCHIVE.map(hero => ({ ...hero, ...(extendedById.get(hero.id) || {}) }));
+    const archive = this.getArchive();
 
     const query = (document.getElementById('bookSearchInput')?.value || '').toLowerCase().trim();
 
@@ -729,7 +728,7 @@ const MemoryBookApp = {
     const list = document.getElementById('tocList');
     if (!list) return;
 
-    list.innerHTML = MEMORY_BOOK_ARCHIVE.map(hero => `
+    list.innerHTML = this.getArchive().map(hero => `
       <a href="javascript:void(0)" onclick="MemoryBookApp.openReader('${hero.id}')" class="toc-item">
         <span>${hero.name}</span>
         <small style="color:var(--accent-brass);">${hero.plaque === 'left' ? 'Л' : 'П'}</small>
@@ -774,7 +773,7 @@ const MemoryBookApp = {
 
     window.addEventListener('hashchange', () => {
       const heroId = window.location.hash.replace('#', '');
-      if (MEMORY_BOOK_ARCHIVE.some(hero => hero.id === heroId)) this.openReader(heroId, false);
+      if (this.getArchive().some(hero => hero.id === heroId)) this.openReader(heroId, false);
     });
   },
 
@@ -836,14 +835,18 @@ const MemoryBookApp = {
   },
 
   openReader(heroId, updateHash = true) {
-    const hero = MEMORY_BOOK_ARCHIVE.find(h => h.id === heroId);
+    const archive = this.getArchive();
+    const hero = archive.find(h => h.id === heroId);
     if (!hero) return;
 
-    this.currentHeroIndex = MEMORY_BOOK_ARCHIVE.findIndex(h => h.id === heroId);
+    this.currentHeroIndex = archive.findIndex(h => h.id === heroId);
     this.lastFocusedElement = document.activeElement;
 
     document.getElementById('readerHeroTag').textContent = `${hero.chapterNum} • ${hero.name}`;
-    document.getElementById('markdownRenderContainer').innerHTML = this.parseMarkdown(hero.markdown);
+    const chapterContent = hero.markdown
+      ? this.parseMarkdown(hero.markdown)
+      : hero.pages.map(page => `<h2>${page.chapterTitle}</h2>${page.rightHtml}`).join('');
+    document.getElementById('markdownRenderContainer').innerHTML = chapterContent;
 
     const audioBtn = document.getElementById('readerAudioBtn');
     audioBtn.onclick = () => this.playHeroAudio(hero.id);
@@ -851,9 +854,9 @@ const MemoryBookApp = {
     const modal = document.getElementById('readerModal');
     modal.classList.add('active');
     modal.setAttribute('aria-hidden', 'false');
-    document.getElementById('readerPosition').textContent = `${hero.chapterNum} из ${MEMORY_BOOK_ARCHIVE.length}`;
+    document.getElementById('readerPosition').textContent = `${hero.chapterNum} из ${archive.length}`;
     document.getElementById('prevChapterBtn').disabled = this.currentHeroIndex === 0;
-    document.getElementById('nextChapterBtn').disabled = this.currentHeroIndex === MEMORY_BOOK_ARCHIVE.length - 1;
+    document.getElementById('nextChapterBtn').disabled = this.currentHeroIndex === archive.length - 1;
     document.body.style.overflow = 'hidden';
     document.getElementById('readerModal').querySelector('.reader-close')?.focus();
     if (updateHash) history.replaceState(null, '', `#${hero.id}`);
@@ -865,18 +868,18 @@ const MemoryBookApp = {
     modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = 'auto';
     if (this.lastFocusedElement && typeof this.lastFocusedElement.focus === 'function') this.lastFocusedElement.focus();
-    if (MEMORY_BOOK_ARCHIVE.some(hero => hero.id === window.location.hash.replace('#', ''))) history.replaceState(null, '', window.location.pathname + window.location.search);
+    if (this.getArchive().some(hero => hero.id === window.location.hash.replace('#', ''))) history.replaceState(null, '', window.location.pathname + window.location.search);
   },
 
   openAdjacentChapter(direction) {
     const nextIndex = this.currentHeroIndex + direction;
-    const nextHero = MEMORY_BOOK_ARCHIVE[nextIndex];
+    const nextHero = this.getArchive()[nextIndex];
     if (nextHero) this.openReader(nextHero.id);
   },
 
   // УПРАВЛЕНИЕ АУДИОГИДОМ (MP3)
   playHeroAudio(heroId) {
-    const hero = MEMORY_BOOK_ARCHIVE.find(h => h.id === heroId);
+    const hero = this.getArchive().find(h => h.id === heroId);
     if (!hero || !this.audioEl) return;
 
     this.currentPlayingId = heroId;

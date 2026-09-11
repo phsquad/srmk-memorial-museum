@@ -297,8 +297,7 @@ const ReaderEngine = {
     const query = (document.getElementById('shelfSearchInput')?.value || '').toLowerCase().trim();
     const filter = document.querySelector('.shelf-filter-btn.active')?.dataset.filter || 'all';
 
-    // Берем данные из FOLIO_LIBRARY + базовой базы heroesDatabase
-    const list = (typeof heroesDatabase !== 'undefined') ? heroesDatabase : FOLIO_LIBRARY;
+    const list = window.GRAND_MEMORY_BOOK_ARCHIVE || FOLIO_LIBRARY;
 
     const filtered = list.filter(hero => {
       let matchFilter = true;
@@ -315,7 +314,7 @@ const ReaderEngine = {
     });
 
     grid.innerHTML = filtered.map((hero, idx) => {
-      const volNum = `Том ${idx + 1}`;
+      const volNum = hero.volNum || `Том ${idx + 1}`;
       const photoSrc = hero.media?.photo || hero.photo || 'assets/images/memorial-bg.jpg';
       const specText = hero.education?.specialty || hero.specialty || 'Выпускник колледжа';
 
