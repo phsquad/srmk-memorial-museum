@@ -527,6 +527,52 @@ main {
 }
 
 /* ==========================================================================
+   3.5 СТИЛИ КНОПОК (BUTTON STYLES)
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border-radius: 2px;
+  font-weight: 700;
+  font-size: 0.86rem;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: var(--transition);
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--accent-granite);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 16px var(--accent-granite-dim);
+}
+
+.btn-primary:hover {
+  background: var(--accent-granite-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--accent-granite-dim);
+}
+
+.btn-secondary {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border-color: var(--border-hairline);
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent-brass);
+  color: var(--accent-brass);
+  background: var(--accent-brass-dim);
+  transform: translateY(-2px);
+}
+
+/* ==========================================================================
    4. ЗАЛЫ МУЗЕЯ (I, II, III, IV) — ЭКСПОЗИЦИОННЫЙ КАРКАС
    ========================================================================== */
 .section {
@@ -922,11 +968,12 @@ main {
   margin-bottom: 4px;
   /* 🔥 Фиксация высоты для предотвращения скачков */
   min-height: 2.4em;
-  line-height: 1.2;
+  line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .hero-card-years {
@@ -948,6 +995,7 @@ main {
   cursor: pointer;
   transition: var(--transition);
   letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 .hero-card-btn:hover {
@@ -2295,5 +2343,16 @@ body.large-text .section-title {
   .hero-card-btn {
     padding: 10px 8px;
     font-size: 0.78rem;
+  }
+  
+  /* Адаптация кнопок действий на главном экране */
+  .hero-actions {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .btn {
+    padding: 11px 18px;
+    font-size: 0.82rem;
   }
 }
