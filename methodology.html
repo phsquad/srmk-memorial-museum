@@ -27,7 +27,8 @@
         </div>
       </div>
       <div class="header-nav">
-        <a href="certificate.html" class="nav-btn">Генератор сертификатов</a>
+        <a href="memory-book.html" class="nav-btn">📖 Книга Памяти</a>
+        <a href="certificate.html" class="nav-btn">📜 Сертификаты</a>
         <a href="index.html" class="nav-btn btn-primary">← В виртуальный музей</a>
       </div>
     </div>
@@ -41,6 +42,12 @@
       <p class="hero-desc">
         Создайте свой собственный план занятия с нуля или изучите официальный эталонный образец ГБПОУ СРМК в режиме защищенного просмотра.
       </p>
+
+      <div class="hero-quick-stats" aria-label="Возможности кабинета">
+        <span class="stat-pill"><strong>4</strong> учебных контура</span>
+        <span class="stat-pill"><strong>20</strong> историй выпускников</span>
+        <span class="stat-pill"><strong>1</strong> план в Word</span>
+      </div>
 
       <!-- ПАНЕЛЬ ВЫБОРА РЕЖИМА -->
       <div class="mode-selection-bar">
@@ -69,6 +76,19 @@
       <button class="tab-btn" data-tab="fgos-view" type="button">
         <span class="tab-icon">📖</span> ФГОС и Паспорт ОК
       </button>
+    </div>
+  </nav>
+
+  <nav class="module-links" aria-label="Все модули музея">
+    <div class="container module-links-inner">
+      <span class="module-links-label">Модули комплекса</span>
+      <a href="memory-book.html">📖 Книга Памяти</a>
+      <a href="reader.html">📚 3D-читалка</a>
+      <a href="quiz.html">⚔️ Викторина</a>
+      <a href="desk-qr.html">🪑 Парта Героя</a>
+      <a href="guestbook.html">🕯 Стена Памяти</a>
+      <a href="certificate.html">📜 Сертификаты</a>
+      <a href="verify.html">🛡 Проверка</a>
     </div>
   </nav>
 
@@ -248,6 +268,13 @@
 
     <!-- ДРУГИЕ ВКЛАДКИ -->
     <section class="tab-content" id="tab-cards-view">
+      <div class="section-topbar">
+        <div>
+          <h3 class="block-title">Карточки исследовательских заданий</h3>
+          <p class="block-subtitle">Готовые точки входа в архив, Книгу Памяти и аудиогиды музея.</p>
+        </div>
+        <a class="action-btn btn-primary" href="memory-book.html">Открыть Книгу Памяти →</a>
+      </div>
       <div class="cards-grid-layout">
         <article class="task-card">
           <div class="task-card-header"><span class="group-tag">Группа №1</span><span class="tvd-tag">Днепровский плацдарм</span></div>
@@ -255,21 +282,35 @@
             <p><strong>Объекты:</strong> Шамиль Назыров, Николай Вечёрка, Максим Елагин.</p>
             <p id="cardQ1Display" style="margin-top:8px; color:var(--accent-brass);">1. Почему водовоз Шамиля Назырова называли «Машиной жизни»?</p>
           </div>
+          <div class="task-card-footer"><a class="mini-btn" href="memory-book.html#nazyrov-sh-r">Досье и аудиогид</a><a class="mini-btn" href="reader.html">Открыть фолиант</a></div>
+        </article>
+        <article class="task-card">
+          <div class="task-card-header"><span class="group-tag">Группа №2</span><span class="tvd-tag">Запорожский рубеж</span></div>
+          <div class="task-card-body">
+            <p><strong>Объекты:</strong> Николай Сополев, Владислав Петухов, Сергей Белов.</p>
+            <p id="cardQ2Display" style="margin-top:8px; color:var(--accent-brass);">2. Как профессиональная подготовка помогала выпускникам спасать товарищей?</p>
+          </div>
+          <div class="task-card-footer"><a class="mini-btn" href="memory-book.html#sopolev-n-s">Досье и аудиогид</a><a class="mini-btn" href="desk-qr.html">Парта Героя</a></div>
         </article>
       </div>
     </section>
 
     <section class="tab-content" id="tab-integration-view">
-      <div class="paper-card">
-        <h3 class="block-title">Матрица интеграции в спецкурсы СПО</h3>
-        <p style="color:var(--text-muted); margin-top:8px;">Методика использования материалов на сварке, МЧС, IT, автоделе и электроэнергетике.</p>
+      <div class="section-topbar"><div><h3 class="block-title">Матрица интеграции в спецкурсы СПО</h3><p class="block-subtitle">Подберите музейный ресурс под профиль группы и цель занятия.</p></div><a class="action-btn btn-primary" href="desk-qr.html">Создать QR-маршрут →</a></div>
+      <div class="integration-grid">
+        <article class="integration-card"><span class="integration-icon">🚒</span><h4>Пожарная безопасность</h4><p>Действия спасателя, цена решения и эвакуация раненых.</p><a href="reader.html">Аудиоочерки →</a></article>
+        <article class="integration-card"><span class="integration-icon">⚡</span><h4>Сварка и энергетика</h4><p>Надёжность, дисциплина и инженерная ответственность через биографии выпускников.</p><a href="memory-book.html">Архивные досье →</a></article>
+        <article class="integration-card"><span class="integration-icon">💻</span><h4>IT и цифровые профессии</h4><p>Проверка источников, цифровой след памяти и этика работы с данными.</p><a href="verify.html">Реестр документов →</a></article>
+        <article class="integration-card"><span class="integration-icon">🚗</span><h4>Автодело и механика</h4><p>Логистика, техническая точность и командная работа в полевых условиях.</p><a href="quiz.html">Закрепить викториной →</a></article>
       </div>
     </section>
 
     <section class="tab-content" id="tab-fgos-view">
-      <div class="paper-card">
-        <h3 class="block-title">Паспорт компетенций (ФГОС СПО)</h3>
-        <p style="color:var(--text-muted); margin-top:8px;">Критерии оценки по общим компетенциям ОК 01, ОК 04, ОК 06.</p>
+      <div class="section-topbar"><div><h3 class="block-title">Паспорт компетенций (ФГОС СПО)</h3><p class="block-subtitle">Наблюдаемые результаты, которые можно включить в план и оценить на рефлексии.</p></div><a class="action-btn btn-export" href="certificate.html">Оформить сертификат →</a></div>
+      <div class="competence-list">
+        <article class="competence-box"><span class="comp-badge">ОК 01</span><div><h4>Выбирать способы решения задач</h4><p>Формулирует исследовательский вопрос, выделяет факты и сопоставляет версии источников.</p></div><span class="assessment-mark">Наблюдение + защита</span></article>
+        <article class="competence-box"><span class="comp-badge">ОК 04</span><div><h4>Работать в команде</h4><p>Распределяет роли в микрогруппе, корректно использует архивные материалы и представляет общий результат.</p></div><span class="assessment-mark">Карточка группы</span></article>
+        <article class="competence-box"><span class="comp-badge">ОК 06</span><div><h4>Гражданская позиция</h4><p>Осмысляет связь истории колледжа с личной ответственностью и участвует в цифровом трибьюте.</p></div><span class="assessment-mark">Рефлексия</span></article>
       </div>
     </section>
 

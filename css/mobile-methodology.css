@@ -88,6 +88,12 @@
     -webkit-overflow-scrolling: touch;
   }
 
+  .module-links-inner {
+    padding: 0 16px;
+    gap: 12px;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .tab-btn {
     padding: 8px 14px;
     font-size: 0.78rem;
@@ -150,6 +156,15 @@
   }
 
   .task-card-footer {
+    align-items: stretch;
+  }
+
+  .mini-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .task-card-footer {
     flex-direction: column;
     gap: 6px;
   }
@@ -169,6 +184,22 @@
     flex-direction: column;
     gap: 8px;
     padding: 12px;
+  }
+
+  .competence-box {
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .assessment-mark {
+    border-left: 0;
+    border-top: 1px solid var(--border-accent);
+    padding: 8px 0 0;
+    width: 100%;
+  }
+
+  .integration-grid {
+    grid-template-columns: 1fr;
   }
 
   .comp-badge {

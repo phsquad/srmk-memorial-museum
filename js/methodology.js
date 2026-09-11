@@ -11,13 +11,22 @@ const Methodology = {
 
   init() {
     this.bindTabs();
-    console.log("[Methodology] Двухконтурный кабинет активен.");
+    const hash = window.location.hash.replace('#', '');
+    const validTabs = ['constructor-view', 'cards-view', 'integration-view', 'fgos-view'];
+    this.switchMode(hash === 'master' ? 'master' : 'constructor', false);
+    this.activateTab(validTabs.includes(hash) ? hash : 'constructor-view', false);
+
+    window.addEventListener('hashchange', () => {
+      const nextHash = window.location.hash.replace('#', '');
+      if (nextHash === 'master' || nextHash === 'constructor') this.switchMode(nextHash, false);
+      if (validTabs.includes(nextHash)) this.activateTab(nextHash, false);
+    });
   },
 
   /**
    * 1. Переключение между Конструктором с нуля и Защищенным Эталоном
    */
-  switchMode(mode) {
+  switchMode(mode, updateUrl = true) {
     this.currentMode = mode;
 
     const btnConst = document.getElementById('btnModeConstructor');
@@ -53,6 +62,8 @@ const Methodology = {
 
       this.showToast("✏️ Вы в режиме конструктора с нуля. Заполните форму.");
     }
+
+    if (updateUrl) history.replaceState(null, '', `#${mode}`);
   },
 
   /**
@@ -61,6 +72,8 @@ const Methodology = {
   clearConstructorForm() {
     document.getElementById('customLessonForm').reset();
     document.getElementById('userPlanResult').style.display = 'none';
+    document.getElementById('cardQ1Display').textContent = '1. Почему водовоз Шамиля Назырова называли «Машиной жизни»?';
+    document.getElementById('cardQ2Display').textContent = '2. Как профессиональная подготовка помогала выпускникам спасать товарищей?';
     this.showToast("🧹 Форма полностью очищена. Введите свои данные с нуля.");
   },
 
@@ -68,6 +81,9 @@ const Methodology = {
    * 3. Сформировать пользовательский индивидуальный план
    */
   generateCustomPlan() {
+    const form = document.getElementById('customLessonForm');
+    if (!form.reportValidity()) return;
+
     const teacher = document.getElementById('inputTeacher').value.trim() || 'ФИО Преподавателя';
     const role = document.getElementById('inputRole').value.trim() || 'Преподаватель СПО';
     const discipline = document.getElementById('inputDiscipline').value.trim() || 'Учебная дисциплина';
@@ -78,13 +94,14 @@ const Methodology = {
 
     const planContent = document.getElementById('userPlanContent');
     const resultBox = document.getElementById('userPlanResult');
+    const safe = value => this.escapeHtml(value);
 
     planContent.innerHTML = `
       <div class="meta-doc-header">
         <div><strong>Организация:</strong> ГБПОУ «Ставропольский региональный многопрофильный колледж»</div>
-        <div><strong>Разработчик:</strong> ${teacher} (${role})</div>
-        <div><strong>Дисциплина / Группа:</strong> ${discipline} • ${group}</div>
-        <div><strong>Тема урока:</strong> ${topic}</div>
+        <div><strong>Разработчик:</strong> ${safe(teacher)} (${safe(role)})</div>
+        <div><strong>Дисциплина / Группа:</strong> ${safe(discipline)} • ${safe(group)}</div>
+        <div><strong>Тема урока:</strong> ${safe(topic)}</div>
       </div>
 
       <div class="table-responsive">
@@ -92,15 +109,15 @@ const Methodology = {
           <thead>
             <tr>
               <th>Этап и время</th>
-              <th>Деятельность преподавателя (${teacher})</th>
-              <th>Деятельность студентов (${group})</th>
+              <th>Деятельность преподавателя (${safe(teacher)})</th>
+              <th>Деятельность студентов (${safe(group)})</th>
               <th>Интеграция ресурсов</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td><strong>1. Организация</strong><br><small>3 мин</small></td>
-              <td>Приветствие. Включение Колокола Памяти. Постановка целей по теме: «${topic}».</td>
+              <td>Приветствие. Включение Колокола Памяти. Постановка целей по теме: «${safe(topic)}».</td>
               <td>Восприятие темы, сканирование вводного QR-кода.</td>
               <td>Синтезатор колокола, сайт музея.</td>
             </tr>
@@ -123,8 +140,10 @@ const Methodology = {
 
     if (q1) {
       const q1El = document.getElementById('cardQ1Display');
-      if (q1El) q1El.textContent = q1;
+      if (q1El) q1El.textContent = `1. ${q1}`;
     }
+    const q2El = document.getElementById('cardQ2Display');
+    if (q2El) q2El.textContent = q2 ? `2. ${q2}` : '2. Как профессиональная подготовка помогала выпускникам спасать товарищей?';
 
     resultBox.style.display = 'block';
     resultBox.scrollIntoView({ behavior: 'smooth' });
@@ -132,25 +151,51 @@ const Methodology = {
     this.showToast("⚡ Ваш индивидуальный план успешно сформирован!");
   },
 
+  activateTab(tabName, updateUrl = true) {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+    document.querySelectorAll('.tab-content').forEach(content => {
+      content.classList.toggle('active', content.id === `tab-${tabName}`);
+    });
+    if (updateUrl) history.replaceState(null, '', `#${tabName}`);
+  },
+
   bindTabs() {
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-        btn.classList.add('active');
-        const target = document.getElementById(`tab-${btn.dataset.tab}`);
-        if (target) target.classList.add('active');
+        this.activateTab(btn.dataset.tab);
       });
     });
   },
 
+  escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    }[character]));
+  },
+
   async copyText(elementId, successMsg = "Скопировано!") {
     const el = document.getElementById(elementId);
-    if (el && navigator.clipboard) {
-      await navigator.clipboard.writeText(el.innerText || el.textContent);
-      this.showToast(successMsg);
+    if (!el) return;
+    const text = el.innerText || el.textContent;
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (error) {
+      const helper = document.createElement('textarea');
+      helper.value = text;
+      helper.style.position = 'fixed';
+      helper.style.opacity = '0';
+      document.body.appendChild(helper);
+      helper.select();
+      document.execCommand('copy');
+      helper.remove();
     }
+    this.showToast(successMsg);
   },
 
   exportToWord(containerId, filename = 'Мой_план_урока') {

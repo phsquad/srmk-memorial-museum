@@ -15,6 +15,7 @@
   --accent-granite-hover: #a8232b;
   --text-main: #f1f3f7;
   --text-muted: #9da6b3;
+  --text-tertiary: #77808d;
   --border-hairline: rgba(255, 255, 255, 0.08);
   --border-accent: rgba(197, 160, 89, 0.28);
   --shadow-elevated: 0 16px 40px rgba(0, 0, 0, 0.8);
@@ -220,11 +221,19 @@ body {
 .hero-title { font-family: var(--font-serif); font-size: 2.1rem; line-height: 1.25; margin-bottom: 14px; font-weight: 800; }
 .hero-title .highlight { color: var(--accent-brass); }
 .hero-desc { max-width: 760px; margin: 0 auto 16px; color: var(--text-muted); font-size: 0.95rem; }
+.hero-quick-stats { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+.stat-pill { border: 1px solid var(--border-hairline); background: rgba(24, 29, 38, 0.72); color: var(--text-muted); padding: 6px 12px; border-radius: 2px; font-size: 0.75rem; }
+.stat-pill strong { color: var(--accent-brass); font-family: var(--font-serif); margin-right: 4px; }
 
 .tabs-nav-wrapper { background: #080a0d; border-bottom: 1px solid var(--border-hairline); position: sticky; top: 61px; z-index: 90; }
 .tabs-container { display: flex; gap: 8px; overflow-x: auto; padding: 8px 0; }
 .tab-btn { background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 10px 18px; border-radius: 2px; font-size: 0.85rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .tab-btn.active { background: var(--bg-surface); color: var(--accent-brass); border: 1px solid var(--border-accent); }
+.module-links { background: var(--bg-dark); border-bottom: 1px solid var(--border-hairline); }
+.module-links-inner { display: flex; align-items: center; gap: 14px; min-height: 42px; overflow-x: auto; white-space: nowrap; }
+.module-links-label { color: var(--accent-brass); font-size: 0.68rem; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+.module-links a { color: var(--text-muted); font-size: 0.72rem; font-weight: 600; text-decoration: none; }
+.module-links a:hover { color: var(--text-main); }
 
 .method-main { padding: 36px 24px 70px; }
 .tab-content { display: none; }
@@ -249,6 +258,24 @@ body {
 
 .cards-grid-layout { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
 .task-card { background: var(--bg-surface); border: 1px solid var(--border-hairline); border-left: 4px solid var(--accent-brass); padding: 20px; border-radius: 2px; }
+.task-card-header, .task-card-footer { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.task-card-body { margin: 16px 0; color: var(--text-muted); font-size: 0.86rem; }
+.group-tag, .tvd-tag { color: var(--accent-brass); font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; }
+.tvd-tag { color: var(--text-muted); }
+.mini-btn { display: inline-flex; align-items: center; min-height: 34px; border: 1px solid var(--border-accent); color: var(--accent-brass); padding: 6px 10px; text-decoration: none; font-size: 0.72rem; font-weight: 700; transition: var(--transition); }
+.mini-btn:hover { color: #000; background: var(--accent-brass); }
+
+.integration-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.integration-card { background: var(--bg-surface); border: 1px solid var(--border-hairline); padding: 20px; min-height: 190px; }
+.integration-icon { font-size: 1.6rem; display: block; margin-bottom: 12px; }
+.integration-card h4, .competence-box h4 { color: var(--text-main); font-family: var(--font-serif); font-size: 1rem; margin-bottom: 8px; }
+.integration-card p, .competence-box p { color: var(--text-muted); font-size: 0.82rem; margin-bottom: 14px; }
+.integration-card a { color: var(--accent-brass); font-size: 0.78rem; font-weight: 700; text-decoration: none; }
+.competence-list { display: grid; gap: 12px; }
+.competence-box { display: grid; grid-template-columns: 76px 1fr auto; align-items: center; gap: 18px; background: var(--bg-surface); border: 1px solid var(--border-hairline); padding: 18px 20px; }
+.competence-box p { margin: 0; }
+.comp-badge { color: #000; background: var(--accent-brass); padding: 8px 6px; text-align: center; font-weight: 800; font-size: 0.78rem; }
+.assessment-mark { color: var(--text-muted); border-left: 1px solid var(--border-accent); padding-left: 16px; font-size: 0.72rem; white-space: nowrap; }
 
 .method-toast { position: fixed; bottom: 28px; right: 28px; background: rgba(14, 16, 22, 0.96); border: 1px solid var(--accent-brass); color: #fff; padding: 12px 20px; border-radius: 4px; font-size: 0.85rem; z-index: 1000; opacity: 0; transform: translateY(60px); transition: all 0.25s ease; }
 .method-toast.active { opacity: 1; transform: translateY(0); }
