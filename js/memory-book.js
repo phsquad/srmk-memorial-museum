@@ -1,103 +1,488 @@
 /**
  * ============================================================================
- * ДВИЖОК ЭЛЕКТРОННОЙ КНИГИ ПАМЯТИ: js/memory-book.js (v11.0 Master)
- * 20 подробных исторических очерков (Markdown), MP3-плеер и модальный ридер
+ * ДВИЖОК КНИГИ ПАМЯТИ: js/memory-book.js (v3.0 Professional)
+ * Интеграция с data.js • Карточки героев • Markdown рендеринг • Фильтры
  * ============================================================================
  */
 
 'use strict';
 
-// 20 ПОЛНЫХ ИСТОРИЧЕСКИХ ГЛАВ В ФОРМАТЕ MARKDOWN
-const MEMORY_BOOK_ARCHIVE = [
-  MEMORY_BOOK_PROLOGUE,
-  /* ==========================================================================
-     ЛЕВАЯ ПЛИТА МЕМОРИАЛА (10 ГЕРОЕВ)
-     ========================================================================== */
-  {
-    id: "petukhov-v-v",
-    plaque: "left",
-    chapterNum: "Глава I",
-    name: "Петухов Владислав Витальевич",
-    years: "18.11.1996 — 15.12.2022",
-    specialty: "Техническая эксплуатация оборудования (выпуск 2016 г.)",
-    military: "Рядовой, мотострелковые войска ВС РФ",
-    awards: "Орден Мужества (посмертно)",
-    location: "Донецкое направление (ДНР)",
-    audioFile: "assets/audio/guides/petukhov.mp3",
-    photo: "assets/images/heroes/petukhov.jpg",
-    shortSnippet: "Отражение контратаки превосходящих сил врага. Прикрыл собой эвакуацию группы раненых бойцов на Донецком рубеже.",
-    markdown: `
-# Владислав Витальевич Петухов (1996 — 2022)
-> *«Верность воинскому долгу и памяти студенческого братства.»*
+/**
+ * АЛЬТЕРНАТИВНЫЙ MARKDOWN КОНТЕНТ ДЛЯ СТРАНИЦЫ "О ПРОЕКТЕ"
+ */
+const ABOUT_MARKDOWN = `
+# 🏛 О проекте «Быть воином — жить вечно»
+
+> *«Высока, высока над землёй синева — это мирное небо над Родиной.*
+> *Но простые и строгие слышим слова: „Боевым награждается орденом"...»*
 
 ---
 
-### 🎓 I. Студенческая юность и мирное призвание
-Владислав родился 18 ноября 1996 года. В 2012 году он поступил в Ставропольский региональный многопрофильный колледж на специальность **«Техническая эксплуатация и обслуживание электрического и электромеханического оборудования»**. 
+## 📜 История создания Мемориала
 
-Преподаватели специальных дисциплин и мастера производственного обучения вспоминали Владислава как исключительного студента — собранного, сдержанного и невероятно дотошного к техническим деталям. На лабораторных и слесарных практикумах он часами оттачивал настройку сложных агрегатов. В 2016 году Владислав успешно защитил дипломный проект, получив квалификацию **техника-механика**. Работал на промышленных предприятиях края, где пользовался непререкаемым авторитетом в коллективе.
+**26 сентября 2025 года в 11:00** во дворе Ставропольского регионального многопрофильного колледжа состоялось торжественное открытие архитектурного монумента выпускникам СРМК, погибшим при исполнении воинского долга в ходе специальной военной операции.
 
-### ⚔️ II. Дорога на фронт
-С началом специальной военной операции Владислав Петухов посчитал делом чести и гражданской совести встать на защиту Отечества. Пройдя интенсивный курс боевого слаживания в мотострелковых подразделениях, рядовой Петухов был направлен на один из самых ответственных и напряженных секторов фронта — Донецкое направление.
-
-### ⭐️ III. Хроника бессмертного подвига
-**15 декабря 2022 года.** Опорный пункт мотострелковой роты в районе Донецкого рубежа подвергся ураганному артиллерийскому обстрелу, за которым последовала контратака штурмовой бронегруппы противника при поддержке тяжелой техники. 
-
-Создалась критическая обстановка: враг стремился обойти позиции с фланга и отрезать путь эвакуации санитарного транспорта с тяжелоранеными бойцами. Рядовой Владислав Петухов, мгновенно оценив тактическую угрозу, занял позицию на фланговом бруствере траншеи. Ведя непрерывный прицельный огонь из стрелкового оружия и ручных гранатометов, Владислав вызвал основной огонь бронетехники врага на себя. 
-
-Благодаря его бесстрашию и хладнокровию, маневр противника был сорван, а эвакуационная группа спасла жизни семерых раненых военнослужащих. В этом бою Владислав получил несовместимое с жизнью осколочное ранение.
-
-> **УКАЗ ПРЕЗИДЕНТА РОССИЙСКОЙ ФЕДЕРАЦИИ:**  
-> За мужество, отвагу и самоотверженность, проявленные при исполнении воинского долга, рядовой **Петухов Владислав Витальевич** награжден **Орденом Мужества** (посмертно).
-
-### 🏛 IV. Память в стенах колледжа
-Имя Владислава Петухова навечно открывает гранитный список Левой плиты Мемориала Славы во дворе ГБПОУ СРМК. Материалы о его жизни изучаются на уроках истории и классных часах.
-`
-  },
-  {
-    id: "yaryshev-m-v",
-    plaque: "left",
-    chapterNum: "Глава II",
-    name: "Ярышев Максим Викторович",
-    years: "21.02.1985 — 20.01.2024",
-    specialty: "Сварочное производство (выпуск 2004 г.)",
-    military: "Сержант, командир штурмового отделения",
-    awards: "Орден Мужества (посмертно), Медаль «За отвагу»",
-    location: "Авдеевский укрепленный район",
-    audioFile: "assets/audio/guides/yaryshev.mp3",
-    photo: "assets/images/heroes/yaryshev.jpg",
-    shortSnippet: "Штурм авдеевских дотов и укреплений. Командир штурмового отделения, кавалер медали «За отвагу».",
-    markdown: `
-# Максим Викторович Ярышев (1985 — 2024)
-> *«Профессия научила держать удар, а долг позвал на защиту Родины.»*
+### Почётные гости церемонии:
+- **Смагина Мария Викторовна** — Министр образования Ставропольского края
+- **Бледных Евгений Викторович** — директор ГБПОУ СРМК, кандидат исторических наук
+- **Ямпольский Дмитрий Анатольевич** — ветеран, участник СВО
+- **Семьи павших воинов**
 
 ---
 
-### 🎓 I. Годы становления мастера
-Максим родился 21 февраля 1985 года. В 2000 году поступил в колледж на специальность **«Сварочное производство»**. 
+## 🎯 Цели проекта
 
-Мастера производственного обучения помнят Максима как человека с редким характером: немногословный, физически крепкий, он брался за самые сложные сварочные соединения. Окончив колледж в 2004 году, он стал настоящим профессионалом, посвятив мирной профессии почти два десятилетия.
+1. **Сохранение памяти** о выпускниках колледжа, погибших при защите Отечества
+2. **Патриотическое воспитание** студентов на примерах героизма
+3. **Документирование биографий** героев для будущих поколений
+4. **Создание интерактивного архива** с возможностью изучения материалов
 
-### ⚔️ II. Воинский выбор
-В 2023 году, когда шли ожесточенные сражения на Донбассе, Максим Викторович принял добровольное решение уйти на передовую. Его жизненный опыт, закалка и лидерские качества привели к назначению на должность командира штурмового отделения.
+---
 
-### ⭐️ III. Штурм Авдеевского рубежа
-**Январь 2024 года.** Штурмовые отряды вели непрерывные наступательные бои за прорыв мощнейшего Авдеевского укрепрайона. 
+## 📊 Структура Мемориала Славы
 
-20 января 2024 года отделение сержанта Ярышева получило приказ овладеть бетонированным узлом сопротивления противника. Под шквальным пулеметным огнем и непрерывными ударами FPV-дронов Максим лично повел бойцов в обход позиций врага. Первым ворвавшись во вражеский окоп, сержант Ярышев ликвидировал пулеметную точку и организовал круговую оборону. Отражая третью контратаку, Максим получил смертельное ранение от близкого разрыва минометного снаряда.
+| Плита | Количество героев | Специальности |
+|-------|------------------|---------------|
+| Левая | 10 героев | Пожарная безопасность, Сварка, Механика |
+| Правая | 10 героев | IT, Электрооборудование, Автосервис |
 
-> **НАГРАДНОЙ СТАТУС:**  
-> За проявленный героизм сержант **Ярышев Максим Викторович** награжден государственной медалью **«За отвагу»** и **Орденом Мужества** (посмертно).
+---
 
-### 🏛 IV. Память в колледже
-Ежегодно в сварочных мастерских СРМК проводятся конкурсы профессионального мастерства имени Максима Ярышева.
-`
+## 🔗 Контакты и социальные сети
+
+- **ВКонтакте**: [ГБПОУ СРМК](https://vk.com/srmk_official)
+- **Telegram**: [Новости колледжа](https://t.me/srmk_news)
+- **YouTube**: [Канал СРМК](https://youtube.com/@srmk)
+
+> **Адрес**: г. Ставрополь, пр. Юности, д. 3  
+> **Координаты**: 45.0448, 41.9691
+`;
+
+/**
+ * ГЛАВНЫЙ МОДУЛЬ УПРАВЛЕНИЯ КНИГОЙ ПАМЯТИ
+ */
+const MemoryBookApp = {
+  currentHeroes: [],
+  currentPage: 1,
+  itemsPerPage: 9,
+  currentView: 'grid',
+  currentFilter: { specialty: 'all', year: 'all' },
+  
+  /**
+   * Инициализация приложения
+   */
+  init() {
+    console.log('📖 Книга Памяти v3.0 инициализирована');
+    
+    // Ждем загрузки данных
+    if (typeof heroesDatabase === 'undefined') {
+      console.error('❌ Data.js не загружен!');
+      return;
+    }
+    
+    this.cacheDOM();
+    this.bindEvents();
+    this.populateFilters();
+    this.renderHeroes(heroesDatabase);
+    this.updateStats();
+    this.initThemeToggle();
+    this.initAboutModal();
+    
+    // Показываем контент после загрузки
+    document.body.classList.add('loaded');
   },
-  {
-    id: "sopolev-n-s",
-    plaque: "left",
-    chapterNum: "Глава III",
-    name: "Сополев Николай Сергеевич",
+  
+  /**
+   * Кэширование DOM элементов
+   */
+  cacheDOM() {
+    this.dom = {
+      searchInput: document.getElementById('hero-search'),
+      specialtyFilter: document.getElementById('specialty-filter'),
+      yearFilter: document.getElementById('year-filter'),
+      heroesGrid: document.getElementById('heroes-grid'),
+      totalHeroes: document.getElementById('total-heroes'),
+      totalAwards: document.getElementById('total-awards'),
+      viewBtns: document.querySelectorAll('.view-btn'),
+      themeToggle: document.getElementById('theme-toggle'),
+      heroModal: document.getElementById('hero-modal'),
+      aboutModal: document.getElementById('about-modal'),
+      aboutTrigger: document.getElementById('about-trigger'),
+      closeModalBtns: document.querySelectorAll('.close-modal'),
+      tabBtns: document.querySelectorAll('.tab-btn')
+    };
+  },
+  
+  /**
+   * Привязка событий
+   */
+  bindEvents() {
+    // Поиск
+    if (this.dom.searchInput) {
+      this.dom.searchInput.addEventListener('input', (e) => this.handleSearch(e.target.value));
+    }
+    
+    // Фильтры
+    if (this.dom.specialtyFilter) {
+      this.dom.specialtyFilter.addEventListener('change', (e) => {
+        this.currentFilter.specialty = e.target.value;
+        this.applyFilters();
+      });
+    }
+    
+    if (this.dom.yearFilter) {
+      this.dom.yearFilter.addEventListener('change', (e) => {
+        this.currentFilter.year = e.target.value;
+        this.applyFilters();
+      });
+    }
+    
+    // Переключение вида
+    this.dom.viewBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.dom.viewBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        this.currentView = btn.dataset.view;
+        this.dom.heroesGrid.className = `heroes-grid view-${this.currentView}`;
+      });
+    });
+    
+    // Закрытие модальных окон
+    this.dom.closeModalBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.dom.heroModal.close();
+        this.dom.aboutModal.close();
+      });
+    });
+    
+    // Закрытие по клику вне контента
+    this.dom.heroModal.addEventListener('click', (e) => {
+      if (e.target === this.dom.heroModal) this.dom.heroModal.close();
+    });
+    
+    this.dom.aboutModal.addEventListener('click', (e) => {
+      if (e.target === this.dom.aboutModal) this.dom.aboutModal.close();
+    });
+    
+    // Закрытие по ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        this.dom.heroModal.close();
+        this.dom.aboutModal.close();
+      }
+    });
+    
+    // Вкладки в модальном окне
+    this.dom.tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => this.switchTab(btn.dataset.tab));
+    });
+    
+    // Кнопка "О проекте"
+    if (this.dom.aboutTrigger) {
+      this.dom.aboutTrigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.dom.aboutModal.showModal();
+      });
+    }
+    
+    // Мобильное меню
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const mainNav = document.querySelector('.main-nav');
+    if (mobileMenuBtn && mainNav) {
+      mobileMenuBtn.addEventListener('click', () => {
+        const expanded = mobileMenuBtn.getAttribute('aria-expanded') === 'true';
+        mobileMenuBtn.setAttribute('aria-expanded', (!expanded).toString());
+        mainNav.classList.toggle('active');
+      });
+    }
+  },
+  
+  /**
+   * Заполнение фильтров данными
+   */
+  populateFilters() {
+    // Специальности
+    const specSelect = this.dom.specialtyFilter;
+    if (specSelect) {
+      Object.values(SPECIALTIES_TAXONOMY).forEach(spec => {
+        const option = document.createElement('option');
+        option.value = spec.id;
+        option.textContent = `${spec.icon} ${spec.name}`;
+        specSelect.appendChild(option);
+      });
+    }
+    
+    // Годы призыва (извлекаем из данных)
+    const yearSelect = this.dom.yearFilter;
+    if (yearSelect) {
+      const years = [...new Set(heroesDatabase.map(h => {
+        const eduPeriod = h.education?.period || '';
+        const match = eduPeriod.match(/(\d{4})/);
+        return match ? match[1] : null;
+      }).filter(Boolean))].sort();
+      
+      years.forEach(year => {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        yearSelect.appendChild(option);
+      });
+    }
+  },
+  
+  /**
+   * Применение фильтров
+   */
+  applyFilters() {
+    let filtered = [...heroesDatabase];
+    
+    // Фильтр по специальности
+    if (this.currentFilter.specialty !== 'all') {
+      filtered = filtered.filter(h => h.specTag === this.currentFilter.specialty);
+    }
+    
+    // Фильтр по году
+    if (this.currentFilter.year !== 'all') {
+      filtered = filtered.filter(h => {
+        const eduPeriod = h.education?.period || '';
+        return eduPeriod.includes(this.currentFilter.year);
+      });
+    }
+    
+    // Поиск
+    const searchTerm = this.dom.searchInput?.value.toLowerCase() || '';
+    if (searchTerm) {
+      filtered = filtered.filter(h => 
+        h.name.toLowerCase().includes(searchTerm) ||
+        h.military?.rank?.toLowerCase().includes(searchTerm) ||
+        h.education?.specialty?.toLowerCase().includes(searchTerm)
+      );
+    }
+    
+    this.renderHeroes(filtered);
+    this.updateStats();
+  },
+  
+  /**
+   * Обработка поиска
+   */
+  handleSearch(term) {
+    this.applyFilters();
+  },
+  
+  /**
+   * Рендеринг карточек героев
+   */
+  renderHeroes(heroes) {
+    this.currentHeroes = heroes;
+    const grid = this.dom.heroesGrid;
+    
+    if (!grid) return;
+    
+    if (heroes.length === 0) {
+      grid.innerHTML = '<div class="no-results"><p>Герои не найдены</p></div>';
+      return;
+    }
+    
+    grid.innerHTML = heroes.map(hero => this.createHeroCard(hero)).join('');
+    
+    // Добавляем обработчики кликов на карточки
+    grid.querySelectorAll('.hero-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const heroId = card.dataset.heroId;
+        this.openHeroModal(heroId);
+      });
+      
+      // Доступность с клавиатуры
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          const heroId = card.dataset.heroId;
+          this.openHeroModal(heroId);
+        }
+      });
+    });
+  },
+  
+  /**
+   * Создание HTML карточки героя
+   */
+  createHeroCard(hero) {
+    const specialty = SPECIALTIES_TAXONOMY[hero.specTag?.toUpperCase()] || { icon: '🎓', color: '#6b7280' };
+    const awardsCount = hero.awards?.length || 0;
+    
+    return `
+      <article class="hero-card" 
+               data-hero-id="${hero.id}" 
+               tabindex="0" 
+               role="button"
+               aria-label="Открыть информацию о герое: ${hero.name}"
+               itemscope itemtype="https://schema.org/Person">
+        
+        <div class="card-image-wrapper">
+          <img src="${hero.media?.photo || 'assets/images/placeholder.jpg'}" 
+               alt="Фото: ${hero.name}" 
+               itemprop="image"
+               loading="lazy"
+               onerror="this.src='assets/images/placeholder.jpg'">
+          <div class="card-overlay">
+            <span class="specialty-badge" style="background: ${specialty.color}">
+              ${specialty.icon}
+            </span>
+          </div>
+        </div>
+        
+        <div class="card-content">
+          <h3 class="card-name" itemprop="name">${hero.name}</h3>
+          
+          <p class="card-dates" itemprop="birthDate">${hero.dates?.years || ''}</p>
+          
+          <p class="card-rank">${hero.military?.rank || ''}</p>
+          
+          <div class="card-badges">
+            ${hero.awards?.slice(0, 2).map(award => `
+              <span class="award-badge" title="${award}">🎖️</span>
+            `).join('') || ''}
+            ${awardsCount > 2 ? `<span class="award-more">+${awardsCount - 2}</span>` : ''}
+          </div>
+          
+          <div class="card-footer">
+            <span class="candle-count">
+              <span class="candle-icon">🕯️</span>
+              <span>1</span>
+            </span>
+          </div>
+        </div>
+      </article>
+    `;
+  },
+  
+  /**
+   * Открытие модального окна героя
+   */
+  openHeroModal(heroId) {
+    const hero = MuseumAPI.getHeroById(heroId);
+    if (!hero) return;
+    
+    const modal = this.dom.heroModal;
+    const specialty = SPECIALTIES_TAXONOMY[hero.specTag?.toUpperCase()] || { name: 'Не указано', gradient: '' };
+    
+    // Заполнение данных
+    document.getElementById('modal-img').src = hero.media?.photo || 'assets/images/placeholder.jpg';
+    document.getElementById('modal-img').alt = hero.name;
+    document.getElementById('modal-title').textContent = hero.name;
+    document.getElementById('modal-dates').textContent = hero.dates?.years || '';
+    document.getElementById('modal-rank').textContent = `${hero.military?.rank || ''} • ${hero.military?.unit || ''}`;
+    
+    // Бейджи наград
+    const badgesContainer = document.getElementById('modal-badges');
+    badgesContainer.innerHTML = hero.awards?.map(award => `
+      <span class="award-badge-full">🎖️ ${award}</span>
+    `).join('') || '';
+    
+    // Рендеринг Markdown контента
+    document.getElementById('modal-bio').innerHTML = DataHelpers.parseMarkdown(
+      `**${hero.education?.specialty || ''}**\n\n${hero.education?.period ? `Период обучения: ${hero.education.period}` : ''}\n\n${hero.memorialStatus || ''}`
+    );
+    
+    document.getElementById('modal-deed').innerHTML = DataHelpers.parseMarkdown(hero.deed || 'Нет данных');
+    
+    const quoteEl = document.getElementById('modal-quote');
+    if (hero.quote) {
+      quoteEl.textContent = hero.quote;
+      quoteEl.style.display = 'block';
+    } else {
+      quoteEl.style.display = 'none';
+    }
+    
+    // Показываем кнопку цитаты только если есть цитата
+    const quoteTab = modal.querySelector('[data-tab="quote"]');
+    if (quoteTab) {
+      quoteTab.style.display = hero.quote ? 'block' : 'none';
+    }
+    
+    // Переключаемся на первую вкладку
+    this.switchTab('bio');
+    
+    // Открываем модальное окно
+    modal.showModal();
+    document.body.style.overflow = 'hidden';
+  },
+  
+  /**
+   * Переключение вкладок
+   */
+  switchTab(tabName) {
+    const tabs = ['bio', 'deed', 'quote'];
+    
+    this.dom.tabBtns.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+    
+    tabs.forEach(tab => {
+      const pane = document.getElementById(`tab-${tab}`);
+      if (pane) {
+        pane.classList.toggle('active', tab === tabName);
+      }
+    });
+  },
+  
+  /**
+   * Обновление статистики
+   */
+  updateStats() {
+    if (this.dom.totalHeroes) {
+      this.dom.totalHeroes.textContent = this.currentHeroes.length;
+    }
+    
+    if (this.dom.totalAwards) {
+      const totalAwards = this.currentHeroes.reduce((sum, h) => sum + (h.awards?.length || 0), 0);
+      this.dom.totalAwards.textContent = totalAwards;
+    }
+  },
+  
+  /**
+   * Инициализация переключателя темы
+   */
+  initThemeToggle() {
+    const toggle = this.dom.themeToggle;
+    const sunIcon = toggle?.querySelector('.icon-sun');
+    const moonIcon = toggle?.querySelector('.icon-moon');
+    
+    if (!toggle) return;
+    
+    // Проверяем сохраненную тему
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.body.classList.toggle('theme-dark', savedTheme === 'dark');
+    this.updateThemeIcons(savedTheme === 'dark', sunIcon, moonIcon);
+    
+    toggle.addEventListener('click', () => {
+      const isDark = document.body.classList.toggle('theme-dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      this.updateThemeIcons(isDark, sunIcon, moonIcon);
+    });
+  },
+  
+  updateThemeIcons(isDark, sunIcon, moonIcon) {
+    if (sunIcon && moonIcon) {
+      sunIcon.style.display = isDark ? 'none' : 'block';
+      moonIcon.style.display = isDark ? 'block' : 'none';
+    }
+  },
+  
+  /**
+   * Инициализация модального окна "О проекте"
+   */
+  initAboutModal() {
+    const contentEl = document.getElementById('about-content');
+    if (contentEl && typeof ABOUT_MARKDOWN !== 'undefined') {
+      contentEl.innerHTML = DataHelpers.parseMarkdown(ABOUT_MARKDOWN);
+    }
+  }
+};
+
+// Автозапуск после загрузки DOM
+document.addEventListener('DOMContentLoaded', () => MemoryBookApp.init());
     years: "20.12.2000 — 2023",
     specialty: "Пожарная безопасность (выпуск 2020 г.)",
     military: "Гвардии рядовой, номер расчета 247-го гв. ДШП ВДВ",
@@ -949,6 +1334,148 @@ const MemoryBookApp = {
       const progress = (window.scrollY / total) * 100;
       if (bar) bar.style.width = `${progress}%`;
     }, { passive: true });
+  },
+
+  // ОТКРЫТИЕ ДЕТАЛЬНОЙ СТРАНИЦЫ ГЕРОЯ (МОДАЛЬНОЕ ОКНО С ВКЛАДКАМИ)
+  openHeroDetail(heroId) {
+    const hero = this.getArchive().find(h => h.id === heroId);
+    if (!hero) return;
+
+    const modal = document.getElementById('heroDetailModal');
+    const mdParser = typeof DataHelpers !== 'undefined' ? DataHelpers.parseMarkdown : null;
+
+    // Заполняем данные героя
+    document.getElementById('detailHeroName').textContent = hero.name;
+    document.getElementById('detailHeroImage').src = hero.photoFile || 'assets/images/cover-master.jpg';
+    document.getElementById('detailHeroImage').alt = hero.name;
+    document.getElementById('detailHeroStatus').textContent = hero.status || 'Погиб в бою';
+    document.getElementById('detailBirthDate').textContent = hero.birthDate || '';
+    document.getElementById('detailDeathDate').textContent = hero.deathDate || '';
+    document.getElementById('detailRank').textContent = hero.rank || '';
+    document.getElementById('detailSpecialty').textContent = hero.specialty || '';
+
+    // Рендерим Markdown контент
+    const bioContent = document.getElementById('detailBiographyContent');
+    const deedContent = document.getElementById('detailDeedContent');
+    const quoteContent = document.getElementById('detailQuoteContent');
+    const quoteSource = document.getElementById('detailQuoteSource');
+
+    if (mdParser && hero.biography) {
+      bioContent.innerHTML = mdParser(hero.biography);
+    } else {
+      bioContent.innerHTML = hero.biography || '<p>Биография загружается...</p>';
+    }
+
+    if (mdParser && hero.deed) {
+      deedContent.innerHTML = mdParser(hero.deed);
+    } else {
+      deedContent.innerHTML = hero.deed || '<p>Описание подвига загружается...</p>';
+    }
+
+    if (hero.quote) {
+      quoteContent.textContent = hero.quote.replace(/[">]/g, '');
+      quoteSource.textContent = hero.quoteSource || '';
+    }
+
+    // Награды (мини)
+    const awardsContainer = document.getElementById('detailAwardsMini');
+    awardsContainer.innerHTML = '';
+    if (hero.awards && hero.awards.length > 0) {
+      hero.awards.forEach(award => {
+        const badge = document.createElement('div');
+        badge.className = 'award-badge';
+        badge.title = award;
+        badge.textContent = this.getAwardIcon(award);
+        awardsContainer.appendChild(badge);
+      });
+    }
+
+    // Галерея
+    this.renderDetailGallery(hero);
+
+    // Кнопка "Читать полную историю"
+    const btnReadFull = document.getElementById('btnReadFullStory');
+    btnReadFull.href = `hero-detail.html?id=${hero.id}`;
+
+    // Открываем модальное окно
+    this.lastFocusedElement = document.activeElement;
+    modal.showModal();
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    modal.querySelector('.modal-close-btn')?.focus();
+  },
+
+  closeHeroDetail() {
+    const modal = document.getElementById('heroDetailModal');
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    modal.close();
+    document.body.style.overflow = 'auto';
+    if (this.lastFocusedElement && typeof this.lastFocusedElement.focus === 'function') {
+      this.lastFocusedElement.focus();
+    }
+  },
+
+  renderDetailGallery(hero) {
+    const galleryGrid = document.getElementById('detailGalleryGrid');
+    galleryGrid.innerHTML = '';
+
+    const images = hero.gallery || [hero.photoFile];
+    if (!images || images.length === 0) {
+      galleryGrid.innerHTML = '<p>Галерея пуста</p>';
+      return;
+    }
+
+    images.forEach((img, idx) => {
+      const item = document.createElement('div');
+      item.className = 'gallery-item';
+      item.innerHTML = `<img src="${img}" alt="Фото ${idx + 1}" loading="lazy">`;
+      item.addEventListener('click', () => this.openLightbox(img, `Фото: ${hero.name}`));
+      galleryGrid.appendChild(item);
+    });
+  },
+
+  // ЛАЙТБОКС ДЛЯ ПРОСМОТРА ИЗОБРАЖЕНИЙ
+  openLightbox(imageSrc, caption) {
+    const modal = document.getElementById('lightboxModal');
+    document.getElementById('lightboxImage').src = imageSrc;
+    document.getElementById('lightboxCaption').textContent = caption;
+    modal.showModal();
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    modal.querySelector('.lightbox-close-btn')?.focus();
+  },
+
+  closeLightbox() {
+    const modal = document.getElementById('lightboxModal');
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    modal.close();
+  },
+
+  // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+  getAwardIcon(award) {
+    const icons = {
+      'Герой России': '🌟',
+      'Орден Мужества': '⭐️',
+      'Медаль За отвагу': '🎖',
+      'Орден Отечественной войны': '🏅',
+      'Медаль За победу над Германией': '🏆'
+    };
+    for (const key in icons) {
+      if (award.includes(key)) return icons[key];
+    }
+    return '🎖';
+  },
+
+  showToast(message, type = 'info') {
+    const toast = document.getElementById('bookToast');
+    toast.textContent = message;
+    toast.className = `book-toast show toast-${type}`;
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3000);
   }
 };
 

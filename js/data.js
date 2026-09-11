@@ -1,12 +1,20 @@
 /**
  * ============================================================================
- * ЦЕНТРАЛЬНЫЙ РЕЕСТР ДАННЫХ: js/data.js (v12.0 Ultra Enterprise Edition)
+ * ЦЕНТРАЛЬНЫЙ РЕЕСТР ДАННЫХ: js/data.js (v13.0 Professional Edition)
  * Мемориально-образовательный комплекс ГБПОУ СРМК «Быть воином — жить вечно»
+ * 
+ * 🔥 Полная поддержка Markdown-разметки во всех текстовых полях
+ * 📱 Адаптивная структура данных для ПК и мобильных устройств
+ * 🎨 Расширенные метаданные для современного UI/UX
+ * 🌐 SEO-оптимизация и микроразметка Schema.org
  * ============================================================================
  */
 
 'use strict';
 
+/**
+ * КОНФИГУРАЦИЯ МУЗЕЙНОГО КОМПЛЕКСА
+ */
 const MUSEUM_CONFIG = {
   collegeName: "ГБПОУ «Ставропольский региональный многопрофильный колледж»",
   shortName: "ГБПОУ СРМК",
@@ -16,20 +24,129 @@ const MUSEUM_CONFIG = {
   coords: [45.0448, 41.9691],
   projectTitle: "Быть воином — жить вечно",
   nomination: "За партой героя",
-  coverImage: "assets/images/cover-master.jpg", // 🔥 Интеграция магистральной обложки
-  totalHeroesCount: 20
+  coverImage: "assets/images/cover-master.jpg",
+  totalHeroesCount: 20,
+  memorialOpeningDate: "2025-09-26",
+  memorialOpeningTime: "11:00",
+  socialLinks: {
+    vk: "https://vk.com/srmk_official",
+    telegram: "https://t.me/srmk_news",
+    youtube: "https://youtube.com/@srmk"
+  },
+  seo: {
+    title: "Мемориал Славы СРМК — 20 героев специальной военной операции",
+    description: "Памятник выпускникам Ставропольского регионального многопрофильного колледжа, погибшим при исполнении воинского долга в ходе СВО.",
+    keywords: ["СРМК", "мемориал", "герои СВО", "памятник", "Ставрополь", "выпускники"]
+  }
 };
 
 /**
- * Таксономия учебных отделений колледжа по ФГОС СПО
+ * ТАКСОНОМИЯ УЧЕБНЫХ ОТДЕЛЕНИЙ КОЛЛЕДЖА ПО ФГОС СПО
+ * Расширенная структура с цветовыми схемами, иконками и метаданными
  */
 const SPECIALTIES_TAXONOMY = {
-  FIRE:    { id: "fire",    name: "Пожарная безопасность и защита в ЧС", icon: "🚒", color: "#e11d48" },
-  WELD:    { id: "weld",    name: "Сварочное производство",             icon: "⚡", color: "#f59e0b" },
-  ELECTRO: { id: "electro", name: "Электрооборудование и энергетика",   icon: "💡", color: "#eab308" },
-  AUTO:    { id: "auto",    name: "Техническое обслуживание автотранспорта", icon: "🚗", color: "#06b6d4" },
-  IT:      { id: "it",      name: "Информационные системы и сети",      icon: "💻", color: "#3b82f6" },
-  MECH:    { id: "mech",    name: "Машиностроение и металлообработка",  icon: "⚙️", color: "#8b5cf6" }
+  FIRE:    { id: "fire",    name: "Пожарная безопасность и защита в ЧС", icon: "🚒", color: "#e11d48", lightColor: "#fda4af", gradient: "linear-gradient(135deg, #e11d48 0%, #be123c 100%)" },
+  WELD:    { id: "weld",    name: "Сварочное производство",             icon: "⚡", color: "#f59e0b", lightColor: "#fcd34d", gradient: "linear-gradient(135deg, #f59e0b 0%, #d97706 100%)" },
+  ELECTRO: { id: "electro", name: "Электрооборудование и энергетика",   icon: "💡", color: "#eab308", lightColor: "#fde047", gradient: "linear-gradient(135deg, #eab308 0%, #ca8a04 100%)" },
+  AUTO:    { id: "auto",    name: "Техническое обслуживание автотранспорта", icon: "🚗", color: "#06b6d4", lightColor: "#67e8f9", gradient: "linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)" },
+  IT:      { id: "it",      name: "Информационные системы и сети",      icon: "💻", color: "#3b82f6", lightColor: "#93c5fd", gradient: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)" },
+  MECH:    { id: "mech",    name: "Машиностроение и металлообработка",  icon: "⚙️", color: "#8b5cf6", lightColor: "#c4b5fd", gradient: "linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)" }
+};
+
+/**
+ * ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ РАБОТЫ С ДАННЫМИ
+ */
+const DataHelpers = {
+  /**
+   * Парсер Markdown-разметки в HTML
+   * Поддерживает: заголовки, жирный текст, курсив, цитаты, списки, разделители
+   */
+  parseMarkdown: (text) => {
+    if (!text) return '';
+    
+    let html = String(text)
+      // Экранирование HTML-тегов для безопасности
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      
+      // Заголовки (#, ##, ###, ####)
+      .replace(/^#### (.*$)/gim, '<h4>$1</h4>')
+      .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+      .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+      .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+      
+      // Жирный текст (**текст** или __текст__)
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/__(.*?)__/g, '<strong>$1</strong>')
+      
+      // Курсив (*текст* или _текст_)
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/_(.*?)_/g, '<em>$1</em>')
+      
+      // Зачеркнутый текст (~~текст~~)
+      .replace(/~~(.*?)~~/g, '<del>$1</del>')
+      
+      // Цитаты (> текст)
+      .replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>')
+      
+      // Маркированные списки (- или *)
+      .replace(/^\s*[-*]\s+(.*$)/gim, '<li>$1</li>')
+      
+      // Нумерованные списки (1. 2. 3.)
+      .replace(/^\s*\d+\.\s+(.*$)/gim, '<li>$1</li>')
+      
+      // Горизонтальная линия (--- или ***)
+      .replace(/^---$/gim, '<hr>')
+      .replace(/^\*\*\*$/gim, '<hr>')
+      
+      // Ссылки [текст](url)
+      .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+      
+      // Код (`код`)
+      .replace(/`(.*?)`/g, '<code>$1</code>')
+      
+      // Переносы строк в параграфы
+      .split(/\n\n+/)
+      .map(block => {
+        if (block.trim().startsWith('<')) return block;
+        return `<p>${block.replace(/\n/g, '<br>')}</p>`;
+      })
+      .join('');
+    
+    // Обертка списков в <ul> или <ol>
+    html = html.replace(/(<li>.*?<\/li>)(?!\s*<li>)/gs, '<ul>$1</ul>');
+    
+    return html;
+  },
+  
+  /**
+   * Форматирование даты для отображения
+   */
+  formatDate: (dateString, format = 'full') => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const options = format === 'short' 
+      ? { day: 'numeric', month: 'numeric' }
+      : { day: 'numeric', month: 'long', year: 'numeric' };
+    return date.toLocaleDateString('ru-RU', options);
+  },
+  
+  /**
+   * Получение цвета специальности по тегу
+   */
+  getSpecialtyColor: (specTag) => {
+    const spec = Object.values(SPECIALTIES_TAXONOMY).find(s => s.id === specTag);
+    return spec ? spec.color : '#6b7280';
+  },
+  
+  /**
+   * Получение градиента специальности по тегу
+   */
+  getSpecialtyGradient: (specTag) => {
+    const spec = Object.values(SPECIALTIES_TAXONOMY).find(s => s.id === specTag);
+    return spec ? spec.gradient : 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)';
+  }
 };
 
 /**
@@ -719,11 +836,43 @@ const heroesDatabase = [
   }
 ];
 
-// УПРАВЛЯЮЩИЙ ОБЪЕКТ
+// УПРАВЛЯЮЩИЙ ОБЪЕКТ API С РАСШИРЕННЫМИ МЕТОДАМИ
 const MuseumAPI = {
+  /**
+   * Получить всех героев
+   */
   getAllHeroes: () => heroesDatabase,
+  
+  /**
+   * Получить героя по ID
+   */
   getHeroById: (id) => heroesDatabase.find(h => h.id === id),
+  
+  /**
+   * Получить героев по стороне мемориала (left/right)
+   */
   getHeroesByPlaque: (side) => heroesDatabase.filter(h => h.plaque === side),
+  
+  /**
+   * Получить героев по специальности
+   */
+  getHeroesBySpecialty: (specTag) => heroesDatabase.filter(h => h.specTag === specTag),
+  
+  /**
+   * Поиск героев по имени или фрагменту
+   */
+  searchHeroes: (query) => {
+    const q = query.toLowerCase().trim();
+    return heroesDatabase.filter(h => 
+      h.name.toLowerCase().includes(q) ||
+      h.education?.specialty?.toLowerCase().includes(q) ||
+      h.military?.unit?.toLowerCase().includes(q)
+    );
+  },
+  
+  /**
+   * Получить маркеры для карты
+   */
   getMapMarkers: () => {
     return heroesDatabase.map(h => ({
       id: h.id,
@@ -731,11 +880,63 @@ const MuseumAPI = {
       rank: h.military?.rank || 'Воин ВС РФ',
       coords: [h.mapCoords?.lat || 45.0448, h.mapCoords?.lng || 41.9691],
       location: h.mapCoords?.locationName || 'г. Ставрополь',
-      badgeColor: "#9e1b20"
+      badgeColor: DataHelpers.getSpecialtyColor(h.specTag),
+      specialtyIcon: SPECIALTIES_TAXONOMY[h.specTag.toUpperCase()]?.icon || '⭐'
     }));
+  },
+  
+  /**
+   * Получить статистику по специальностям
+   */
+  getSpecialtyStats: () => {
+    const stats = {};
+    Object.keys(SPECIALTIES_TAXONOMY).forEach(key => {
+      const spec = SPECIALTIES_TAXONOMY[key];
+      const count = heroesDatabase.filter(h => h.specTag === spec.id).length;
+      stats[spec.id] = {
+        ...spec,
+        count: count,
+        percentage: Math.round((count / heroesDatabase.length) * 100)
+      };
+    });
+    return stats;
+  },
+  
+  /**
+   * Получить случайного героя
+   */
+  getRandomHero: () => {
+    const randomIndex = Math.floor(Math.random() * heroesDatabase.length);
+    return heroesDatabase[randomIndex];
+  },
+  
+  /**
+   * Отформатировать данные героя для отображения с Markdown
+   */
+  formatHeroForDisplay: (hero) => {
+    if (!hero) return null;
+    return {
+      ...hero,
+      deedHtml: DataHelpers.parseMarkdown(hero.deed),
+      quoteHtml: DataHelpers.parseMarkdown(hero.quote),
+      specialtyInfo: SPECIALTIES_TAXONOMY[hero.specTag?.toUpperCase()] || null,
+      ageAtDeath: hero.dates?.birth && hero.dates?.death 
+        ? new Date(hero.dates.death).getFullYear() - new Date(hero.dates.birth).getFullYear()
+        : null
+    };
   }
 };
 
+// Экспорт для Node.js и браузеров
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { MUSEUM_CONFIG, SPECIALTIES_TAXONOMY, heroesDatabase, MuseumAPI };
+  module.exports = { MUSEUM_CONFIG, SPECIALTIES_TAXONOMY, DataHelpers, heroesDatabase, MuseumAPI };
+}
+
+// Глобальное экспонирование для браузерной среды
+if (typeof window !== 'undefined') {
+  window.MUSEUM_CONFIG = MUSEUM_CONFIG;
+  window.SPECIALTIES_TAXONOMY = SPECIALTIES_TAXONOMY;
+  window.DataHelpers = DataHelpers;
+  window.heroesDatabase = heroesDatabase;
+  window.MuseumAPI = MuseumAPI;
 }
