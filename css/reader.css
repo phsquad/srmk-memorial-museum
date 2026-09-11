@@ -30,6 +30,74 @@
   margin: 0; padding: 0;
 }
 
+/* Автоматические переносы слов для всех текстовых элементов */
+body {
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: normal;
+}
+
+/* Принудительные переносы для длинных слов в узких контейнерах */
+.page-story-text,
+.markdown-content,
+.article-content,
+.hero-bio-text,
+.quote-text {
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+/* Предотвращение переносов для заголовков и коротких элементов */
+h1, h2, h3, h4, h5, h6,
+.book-spine-title,
+.hero-name,
+.chapter-title {
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+  overflow-wrap: normal;
+  word-wrap: normal;
+}
+
+/* Особые правила для кода и технических блоков */
+code, pre, .code-block {
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+  overflow-wrap: normal;
+  word-wrap: normal;
+  word-break: normal;
+  white-space: pre-wrap;
+  max-width: 100%;
+}
+
+/* Таблицы с автопереносом */
+table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+td, th {
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
 body {
   background-color: var(--bg-main);
   color: var(--text-primary);

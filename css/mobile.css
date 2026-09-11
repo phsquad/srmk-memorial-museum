@@ -50,6 +50,92 @@
   -webkit-tap-highlight-color: transparent; /* Убирает синий квадрат при тапе */
 }
 
+/* Автоматические переносы для мобильных устройств */
+html {
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: normal;
+}
+
+/* Улучшенные переносы для основного текста на мобильных */
+.hero-bio-text,
+.hero-deed-text,
+.hero-quote-text,
+.markdown-content,
+.article-content,
+.page-story-text,
+.timeline-event-description,
+.card-description {
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto;
+  text-align: left; /* На мобильных лучше left-align для читаемости */
+  text-justify: inter-word;
+  line-height: 1.6;
+}
+
+/* Особые правила для очень узких экранов (<400px) */
+@media (max-width: 400px) {
+  .hero-bio-text,
+  .hero-deed-text,
+  .markdown-content {
+    font-size: 0.9rem;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+}
+
+/* Предотвращение переносов для заголовков и коротких элементов */
+h1, h2, h3, h4, h5, h6,
+.hero-name,
+.hero-card-title,
+.section-title,
+.filter-label,
+.book-spine-title,
+.chapter-title {
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+  overflow-wrap: normal;
+  word-wrap: normal;
+}
+
+/* Особые правила для кода и технических блоков */
+code, pre, .code-block {
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+  overflow-wrap: normal;
+  word-wrap: normal;
+  word-break: normal;
+  white-space: pre-wrap;
+  max-width: 100%;
+}
+
+/* Таблицы с автопереносом */
+table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+td, th {
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
 html {
   font-size: 15px;
   color-scheme: dark;

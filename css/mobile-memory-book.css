@@ -3,7 +3,46 @@
 /* ==========================================================================
    МОБИЛЬНЫЕ СТИЛИ КНИГИ ПАМЯТИ: css/mobile-memory-book.css
    ========================================================================== */
+
+/* Автоматические переносы для мобильных устройств */
 @media (max-width: 900px) {
+  body {
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+    hyphens: auto;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+
+  /* Улучшенные переносы для основного текста на мобильных */
+  .hero-bio-text,
+  .hero-deed-text,
+  .hero-quote-text,
+  .markdown-content,
+  .article-content,
+  .timeline-event-description {
+    -webkit-hyphens: auto;
+    -moz-hyphens: auto;
+    -ms-hyphens: auto;
+    hyphens: auto;
+    text-align: left; /* На мобильных лучше left-align для читаемости */
+    text-justify: inter-word;
+    line-height: 1.6;
+  }
+
+  /* Особые правила для очень узких экранов */
+  @media (max-width: 400px) {
+    .hero-bio-text,
+    .hero-deed-text,
+    .markdown-content {
+      font-size: 0.9rem;
+      -webkit-hyphens: auto;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+  }
 
   .book-header {
     padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
@@ -214,5 +253,26 @@
 
   .audio-timer {
     display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Дополнительные переносы для ультра-малых экранов */
+  .hero-bio-text,
+  .hero-deed-text,
+  .markdown-content {
+    -webkit-hyphens: auto;
+    hyphens: auto;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+}
+
+/* Поддержка reduced-motion для доступности */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

@@ -58,6 +58,81 @@
   box-sizing: border-box;
 }
 
+/* Автоматические переносы слов для всех текстовых элементов */
+html {
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: normal;
+}
+
+/* Принудительные переносы для длинных слов в узких контейнерах */
+.hero-bio-text,
+.hero-deed-text,
+.hero-quote-text,
+.markdown-content,
+.article-content,
+.page-story-text,
+.timeline-event-description,
+.map-popup-content,
+.card-description {
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+/* Предотвращение переносов для заголовков и коротких элементов */
+h1, h2, h3, h4, h5, h6,
+.hero-name,
+.hero-card-title,
+.section-title,
+.filter-label,
+.book-spine-title,
+.chapter-title {
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+  overflow-wrap: normal;
+  word-wrap: normal;
+}
+
+/* Особые правила для кода и технических блоков */
+code, pre, .code-block {
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+  overflow-wrap: normal;
+  word-wrap: normal;
+  word-break: normal;
+  white-space: pre-wrap;
+  max-width: 100%;
+}
+
+/* Таблицы с автопереносом */
+table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+td, th {
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  -ms-hyphens: auto;
+  hyphens: auto;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
 html {
   scroll-behavior: smooth;
   color-scheme: dark;
