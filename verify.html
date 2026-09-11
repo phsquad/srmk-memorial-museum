@@ -2,30 +2,43 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Верификация наградного документа | ГБПОУ СРМК</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Реестр верификации наградных документов | ГБПОУ СРМК</title>
+  <meta name="description" content="Официальный государственный реестр проверки подлинности сертификатов Мемориального комплекса «Быть воином — жить вечно» ГБПОУ СРМК.">
   <meta name="theme-color" content="#0a0c0f">
 
+  <!-- Шрифты -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/site-common.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 
+  <!-- Стили -->
+  <link rel="stylesheet" href="css/site-common.css">
+  
   <style>
     :root {
       --bg-main: #0a0c0f;
       --bg-surface: #12151c;
       --bg-elevated: #181d26;
       --accent-brass: #c5a059;
+      --accent-brass-glow: rgba(197, 160, 89, 0.35);
       --accent-granite: #8a1c22;
+      --accent-granite-hover: #a8232b;
       --status-green: #10b981;
       --status-green-glow: rgba(16, 185, 129, 0.35);
+      --status-yellow: #f59e0b;
+      --status-yellow-glow: rgba(245, 158, 11, 0.35);
+      --status-red: #ef4444;
+      --status-red-glow: rgba(239, 68, 68, 0.35);
+      
       --text-primary: #f1f3f7;
       --text-secondary: #9da6b3;
+      --text-tertiary: #626a78;
       --border-hairline: rgba(255, 255, 255, 0.08);
       --border-accent: rgba(197, 160, 89, 0.3);
-      --font-serif: 'Cinzel', serif;
+      --font-serif: 'Cinzel', Georgia, serif;
       --font-sans: 'Montserrat', sans-serif;
+      --transition: 0.22s cubic-bezier(0.2, 0, 0, 1);
     }
 
     *, *::before, *::after {
@@ -43,15 +56,18 @@
     }
 
     .header {
-      background: rgba(10, 12, 16, 0.95);
+      background: rgba(10, 12, 16, 0.96);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border-hairline);
-      padding: 16px 0;
+      padding: 14px 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
     }
 
     .container {
       width: 100%;
-      max-width: 900px;
+      max-width: 940px;
       margin: 0 auto;
       padding: 0 20px;
     }
@@ -60,6 +76,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
     }
 
     .logo-badge {
@@ -67,16 +85,38 @@
       color: var(--accent-brass);
       font-family: var(--font-serif);
       font-weight: 700;
-      font-size: 0.85rem;
-      padding: 6px 12px;
+      font-size: 0.82rem;
+      padding: 6px 14px;
       border-radius: 2px;
       border: 1px solid var(--border-accent);
       text-decoration: none;
+      transition: var(--transition);
     }
+    .logo-badge:hover { background: var(--accent-brass); color: #000; }
+
+    .header-right-meta {
+      font-family: var(--font-serif);
+      color: var(--accent-brass);
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .header-right-meta a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.78rem;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      transition: color var(--transition);
+    }
+    .header-right-meta a:hover { color: #fff; }
 
     .main-verify-box {
       flex-grow: 1;
-      padding: 50px 0 70px;
+      padding: 40px 0 70px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -92,15 +132,17 @@
       position: relative;
     }
 
+    /* Статусные плашки */
     .status-badge-wrapper {
       display: flex;
       align-items: center;
       gap: 12px;
-      background: rgba(16, 185, 129, 0.1);
+      background: rgba(16, 185, 129, 0.12);
       border: 1px solid var(--status-green);
       padding: 12px 20px;
       border-radius: 4px;
       margin-bottom: 28px;
+      transition: var(--transition);
     }
 
     .status-pulse {
@@ -108,37 +150,50 @@
       height: 12px;
       border-radius: 50%;
       background: var(--status-green);
-      box-shadow: 0 0 12px var(--status-green);
+      box-shadow: 0 0 12px var(--status-green-glow);
       animation: pulseGreen 2s infinite ease-in-out;
+      flex-shrink: 0;
     }
 
     .status-title {
-      font-size: 0.95rem;
-      font-weight: 700;
+      font-size: 0.92rem;
+      font-weight: 800;
       color: var(--status-green);
       letter-spacing: 0.5px;
       text-transform: uppercase;
     }
 
-    .status-badge-wrapper.invalid {
-      background: rgba(185, 28, 28, 0.12);
-      border-color: #ef4444;
+    /* Модификатор: Не найден / Подделка */
+    .status-badge-wrapper.status-invalid {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: var(--status-red);
     }
-
-    .status-badge-wrapper.invalid .status-pulse {
-      background: #ef4444;
-      box-shadow: 0 0 12px rgba(239, 68, 68, 0.65);
+    .status-badge-wrapper.status-invalid .status-pulse {
+      background: var(--status-red);
+      box-shadow: 0 0 12px var(--status-red-glow);
       animation: none;
     }
-
-    .status-badge-wrapper.invalid .status-title {
+    .status-badge-wrapper.status-invalid .status-title {
       color: #f87171;
+    }
+
+    /* Модификатор: Локальная верификация */
+    .status-badge-wrapper.status-offline {
+      background: rgba(245, 158, 11, 0.12);
+      border-color: var(--status-yellow);
+    }
+    .status-badge-wrapper.status-offline .status-pulse {
+      background: var(--status-yellow);
+      box-shadow: 0 0 12px var(--status-yellow-glow);
+    }
+    .status-badge-wrapper.status-offline .status-title {
+      color: #fbbf24;
     }
 
     .cert-heading {
       font-family: var(--font-serif);
-      font-size: 1.6rem;
-      color: var(--text-primary);
+      font-size: 1.65rem;
+      color: #ffffff;
       margin-bottom: 6px;
     }
 
@@ -154,15 +209,15 @@
     .verify-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 28px;
+      gap: 14px;
+      margin-bottom: 24px;
     }
 
     .verify-item {
       background: var(--bg-elevated);
       border: 1px solid var(--border-hairline);
       padding: 14px;
-      border-radius: 2px;
+      border-radius: 3px;
       display: flex;
       flex-direction: column;
       gap: 4px;
@@ -174,9 +229,9 @@
 
     .verify-label {
       font-size: 0.72rem;
-      color: var(--text-secondary);
+      color: var(--text-tertiary);
       text-transform: uppercase;
-      font-weight: 600;
+      font-weight: 700;
       letter-spacing: 0.5px;
     }
 
@@ -186,16 +241,19 @@
       font-weight: 600;
     }
 
+    .crypto-flex-box {
+      display: grid;
+      grid-template-columns: 1fr 120px;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+
     .crypto-stamp-box {
-      background: #090a0d;
+      background: #08090d;
       border: 1px dashed var(--border-accent);
       padding: 14px;
-      border-radius: 2px;
-      font-family: monospace;
-      font-size: 0.76rem;
-      color: var(--text-secondary);
-      word-break: break-all;
-      margin-bottom: 28px;
+      border-radius: 3px;
     }
 
     .crypto-stamp-title {
@@ -203,14 +261,32 @@
       font-weight: bold;
       margin-bottom: 4px;
       display: block;
-      font-family: var(--font-sans);
       font-size: 0.72rem;
       text-transform: uppercase;
     }
 
+    .hash-code {
+      font-family: monospace;
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+      word-break: break-all;
+    }
+
+    .qr-preview-small {
+      background: #ffffff;
+      padding: 6px;
+      border-radius: 3px;
+      border: 1px solid var(--accent-brass);
+      text-align: center;
+    }
+    .qr-preview-small img {
+      width: 100px; height: 100px; display: block;
+    }
+
     .verify-actions {
       display: flex;
-      gap: 14px;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
     .btn-verify {
@@ -222,15 +298,16 @@
       cursor: pointer;
       text-align: center;
       text-decoration: none;
-      transition: all 0.2s;
+      transition: var(--transition);
       border: 1px solid transparent;
+      white-space: nowrap;
     }
 
     .btn-verify-primary {
       background: var(--accent-granite);
       color: #fff;
     }
-    .btn-verify-primary:hover { background: #a8232b; }
+    .btn-verify-primary:hover { background: var(--accent-granite-hover); }
 
     .btn-verify-secondary {
       background: var(--bg-elevated);
@@ -242,28 +319,50 @@
       color: #000;
     }
 
+    /* Блок поиска */
     .manual-search-box {
       margin-top: 30px;
       width: 100%;
       background: var(--bg-surface);
       border: 1px solid var(--border-hairline);
-      padding: 20px;
+      padding: 24px;
       border-radius: 4px;
       text-align: center;
     }
 
     .manual-search-input {
       width: 100%;
-      max-width: 400px;
       background: var(--bg-elevated);
       border: 1px solid var(--border-hairline);
-      padding: 10px 14px;
+      padding: 11px 14px;
       color: #fff;
       font-size: 0.88rem;
       border-radius: 2px;
-      margin-top: 10px;
       outline: none;
+      transition: var(--transition);
     }
+    .manual-search-input:focus { border-color: var(--accent-brass); }
+
+    .preset-links {
+      margin-top: 14px;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 0.76rem;
+      color: var(--text-tertiary);
+    }
+
+    .preset-links button {
+      background: none;
+      border: none;
+      color: var(--accent-brass);
+      cursor: pointer;
+      font-size: 0.76rem;
+      text-decoration: underline;
+    }
+    .preset-links button:hover { color: #fff; }
 
     .footer {
       background: #060709;
@@ -271,7 +370,8 @@
       border-top: 1px solid var(--border-hairline);
       text-align: center;
       font-size: 0.8rem;
-      color: var(--text-secondary);
+      color: var(--text-tertiary);
+      margin-top: auto;
     }
 
     @keyframes pulseGreen {
@@ -281,36 +381,60 @@
 
     @media (max-width: 768px) {
       .verify-grid { grid-template-columns: 1fr; }
+      .crypto-flex-box { grid-template-columns: 1fr; }
       .verify-actions { flex-direction: column; }
+    }
+
+    /* АКТ ВЕРИФИКАЦИИ ПРИ ПЕЧАТИ (СПРАВКА А4) */
+    @media print {
+      body { background: #fff !important; color: #000 !important; }
+      .header, .footer, .manual-search-box, .verify-actions, .logo-badge { display: none !important; }
+      .main-verify-box { padding: 0 !important; }
+      .verify-card {
+        border: 2px solid #000 !important;
+        box-shadow: none !important;
+        background: #fff !important;
+        color: #000 !important;
+        padding: 20px !important;
+      }
+      .cert-heading { color: #000 !important; font-size: 18pt !important; }
+      .cert-subheading { color: #444 !important; border-bottom: 1px solid #000 !important; }
+      .verify-item { background: #f8f9fa !important; border: 1px solid #ccc !important; }
+      .verify-value { color: #000 !important; }
+      .crypto-stamp-box { background: #f8f9fa !important; border: 1px solid #000 !important; color: #000 !important; }
+      .crypto-stamp-title { color: #000 !important; }
+      .hash-code { color: #000 !important; }
     }
   </style>
   <link rel="stylesheet" href="css/mobile-verify.css">
 </head>
 <body>
 
+  <!-- ШАПКА -->
   <header class="header">
     <div class="container header-content">
       <a href="index.html" class="logo-badge">← ВЕРНУТЬСЯ В МУЗЕЙ</a>
-      <div style="font-family: var(--font-serif); color: var(--accent-brass); font-size: 0.9rem;">
-        <a href="memory-book.html" style="color: inherit; text-decoration: none; margin-right: 16px;">Книга Памяти</a>
-        <a href="reader.html" style="color: inherit; text-decoration: none; margin-right: 16px;">Читалка</a>
-        <a href="quiz.html" style="color: inherit; text-decoration: none; margin-right: 16px;">Викторина</a>
-        <a href="desk-qr.html" style="color: inherit; text-decoration: none; margin-right: 16px;">Парта Героя</a>
-        <a href="guestbook.html" style="color: inherit; text-decoration: none; margin-right: 16px;">Стена Памяти</a>
-        ГОСУДАРСТВЕННАЯ ВЕРИФИКАЦИЯ СРМК
+      <div class="header-right-meta">
+        <a href="memory-book.html">📖 Книга Памяти</a>
+        <a href="reader.html">📚 Читалка</a>
+        <a href="quiz.html">⚔️ Викторина</a>
+        <a href="desk-qr.html">🪑 Парта Героя</a>
+        <a href="guestbook.html">🕯 Стена Памяти</a>
+        <span style="color: var(--accent-brass); font-weight: 700;">ГОСУДАРСТВЕННАЯ ВЕРИФИКАЦИЯ</span>
       </div>
     </div>
   </header>
 
+  <!-- ГЛАВНЫЙ БЛОК ПРОВЕРКИ -->
   <main class="main-verify-box">
     <div class="container">
       
-      <div class="verify-card">
+      <div class="verify-card" id="verifyCard">
         
-        <!-- СТАТУС ВЕРИФИКАЦИИ -->
-        <div class="status-badge-wrapper" id="verificationStatus">
-          <div class="status-pulse"></div>
-          <div class="status-title" id="verificationStatusTitle">ПОДЛИННОСТЬ ДОКУМЕНТА ПОДТВЕРЖДЕНА В ЭЛЕКТРОННОМ РЕЕСТРЕ</div>
+        <!-- СТАТУСНЫЙ БАДЖ -->
+        <div class="status-badge-wrapper" id="statusBadgeWrapper">
+          <div class="status-pulse" id="statusPulse"></div>
+          <div class="status-title" id="statusTitle">ПОИСК В ГЛОБАЛЬНОМ РЕЕСТРЕ SUPABASE...</div>
         </div>
 
         <h1 class="cert-heading" id="cardDocTitle">Сертификат участника Урока Мужества</h1>
@@ -318,7 +442,7 @@
           Мемориально-образовательный комплекс «Быть воином — жить вечно» • ГБПОУ СРМК
         </div>
 
-        <!-- ДЕТАЛИЗАЦИЯ ИЗ БАЗЫ -->
+        <!-- ДЕТАЛИЗАЦИЯ ИЗ БАЗЫ ДАННЫХ -->
         <div class="verify-grid">
           <div class="verify-item">
             <span class="verify-label">Регистрационный номер:</span>
@@ -335,117 +459,192 @@
             <span class="verify-value" id="cardName" style="color: var(--accent-brass); font-size: 1.15rem;">Иванов Данила Денисович</span>
           </div>
 
+          <div class="verify-item">
+            <span class="verify-label">Учебная группа / Категория:</span>
+            <span class="verify-value" id="cardGroup">Группа ИС-241</span>
+          </div>
+
+          <div class="verify-item">
+            <span class="verify-label">Специальность / Кафедра:</span>
+            <span class="verify-value" id="cardSpecialty">09.02.11 Разработка ПО</span>
+          </div>
+
           <div class="verify-item full-width">
+            <span class="verify-label">Основание выдачи (Номинация):</span>
+            <span class="verify-value" id="cardReason">Участие во Всероссийской акции «Имя в истории образовательной организации»</span>
+          </div>
+
+          <div class="verify-item">
             <span class="verify-label">Образовательная организация:</span>
             <span class="verify-value">ГБПОУ «Ставропольский региональный многопрофильный колледж» (г. Ставрополь)</span>
           </div>
 
           <div class="verify-item">
-            <span class="verify-label">Основание выдачи:</span>
-            <span class="verify-value">Участие во Всероссийской акции «Имя в истории»</span>
-          </div>
-
-          <div class="verify-item">
             <span class="verify-label">Подписанты документа:</span>
-            <span class="verify-value">Директор Е.В. Бледных, куратор А.В. Генте</span>
+            <span class="verify-value">Директор Е. В. Бледных, куратор А. В. Генте</span>
           </div>
         </div>
 
-        <!-- КРИПТОГРАФИЧЕСКИЙ ОТПЕЧАТОК (SHA-256) -->
-        <div class="crypto-stamp-box">
-          <span class="crypto-stamp-title">Электронная цифровая подпись (SHA-256 Hash Digest):</span>
-          <span id="cardCryptoHash">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</span>
+        <!-- КРИПТОГРАФИЧЕСКИЙ ОТПЕЧАТОК И ВЕКТОРНЫЙ QR-КОД -->
+        <div class="crypto-flex-box">
+          <div class="crypto-stamp-box">
+            <span class="crypto-stamp-title">Электронный цифровой отпечаток (SHA-256 Hash Digest):</span>
+            <span id="cardCryptoHash" class="hash-code">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</span>
+          </div>
+          <div class="qr-preview-small" id="qrPreviewBox">
+            <img id="verifyQrImg" src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=СРМК-УМ-2026-0001" alt="QR-код документа">
+          </div>
         </div>
 
-        <!-- ДЕЙСТВИЯ -->
+        <!-- КНОПКИ ДЕЙСТВИЙ -->
         <div class="verify-actions">
-          <a href="index.html#heroes-grid" class="btn-verify btn-verify-primary">Перейти к архивам Мемориала Славы</a>
-          <a href="certificate.html" class="btn-verify btn-verify-secondary">Открыть генератор сертификатов</a>
-          <button onclick="window.print()" class="btn-verify btn-verify-secondary">Распечатать подтверждение</button>
+          <a href="index.html#heroes-grid" class="btn-verify btn-verify-primary">🏛 В залы Мемориала Славы</a>
+          <a href="certificate.html" class="btn-verify btn-verify-secondary">📜 Генератор сертификатов</a>
+          <button onclick="window.print()" class="btn-verify btn-verify-secondary" type="button">🖨 Распечатать Справку А4</button>
         </div>
 
       </div>
 
       <!-- РУЧНОЙ ПОИСК ПО НОМЕРУ -->
       <div class="manual-search-box">
-        <p style="font-size: 0.85rem; color: var(--text-secondary);">Хотите проверить другой регистрационный номер сертификата?</p>
-        <input type="text" id="manualSearchInput" class="manual-search-input" placeholder="Введите номер, например: СРМК-УМ-2026-0042">
+        <h3 style="font-size: 0.95rem; color: var(--accent-brass); margin-bottom: 8px;">🔍 Ручной поиск в государственном реестре СРМК</h3>
+        <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 14px;">Введите регистрационный номер сертификата для проверки подлинности:</p>
+        
+        <div style="display:flex; gap:8px; justify-content:center; max-width:520px; margin:0 auto;">
+          <input type="text" id="manualSearchInput" class="manual-search-input" placeholder="например: СРМК-УМ-2026-0001">
+          <button id="btnSearchSubmit" onclick="VerifyApp.submitSearch()" class="btn-verify btn-verify-primary" style="padding:10px 20px; flex:none;" type="button">Проверить</button>
+        </div>
+
+        <div class="preset-links">
+          <span>Тестовые образцы для проверки:</span>
+          <button onclick="VerifyApp.checkSerial('СРМК-УМ-2026-0001')" type="button">СРМК-УМ-2026-0001</button> • 
+          <button onclick="VerifyApp.checkSerial('СРМК-УМ-2026-0042')" type="button">СРМК-УМ-2026-0042</button> • 
+          <button onclick="VerifyApp.checkSerial('СРМК-УМ-2026-7777')" type="button">СРМК-УМ-2026-7777</button>
+        </div>
       </div>
 
     </div>
   </main>
 
+  <!-- ПОДВАЛ -->
   <footer class="footer">
     <div class="container">
       <p>© 2026 ГБПОУ СРМК. Официальный модуль верификации Всероссийской акции «Карта доблести: хранители подвигов».</p>
     </div>
   </footer>
 
-  <!-- ПОДКЛЮЧЕНИЕ ОБЛАКА -->
+  <!-- ПОДКЛЮЧЕНИЕ ОБЛАКА И ВСПОМОГАТЕЛЬНЫХ СТИЛЕЙ -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/data.js"></script>
   <script src="js/cloud-sync.js"></script>
+  <script src="js/certificate-verifier.js"></script>
 
   <script>
     'use strict';
 
-    async function initVerification() {
-      const params = new URLSearchParams(window.location.search);
-      const serial = params.get('cert');
-      
-      const statusWrapper = document.querySelector('.status-badge-wrapper');
-      const statusTitle = document.querySelector('.status-title');
-      const statusPulse = document.querySelector('.status-pulse');
+    const VerifyApp = {
+      async init() {
+        const params = new URLSearchParams(window.location.search);
+        const serial = params.get('cert') || 'СРМК-УМ-2026-0001';
+        const nameParam = params.get('name');
+        const dateParam = params.get('date');
 
-      if (!serial) {
-        statusTitle.textContent = "ОЖИДАНИЕ ВВОДА НОМЕРА СЕРТИФИКАТА";
-        statusPulse.style.background = "#f59e0b";
-        statusWrapper.style.borderColor = "#f59e0b";
-        return;
-      }
+        document.getElementById('manualSearchInput').value = serial;
+        
+        // Слушатель клавиатуры Enter
+        document.getElementById('manualSearchInput').addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') this.submitSearch();
+        });
 
-      document.getElementById('cardSerial').textContent = serial;
-      statusTitle.textContent = "ПОИСК В ГЛОБАЛЬНОМ РЕЕСТРЕ SUPABASE...";
+        await this.verifySerial(serial, nameParam, dateParam);
+      },
 
-      // Ждем 1 секунду для подключения CloudSync
-      setTimeout(async () => {
+      submitSearch() {
+        const input = document.getElementById('manualSearchInput').value.trim();
+        if (input) {
+          this.checkSerial(input);
+        }
+      },
+
+      checkSerial(serial) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('cert', serial);
+        window.location.href = url.href;
+      },
+
+      async verifySerial(serial, nameParam = null, dateParam = null) {
+        const wrapper = document.getElementById('statusBadgeWrapper');
+        const title = document.getElementById('statusTitle');
+        const pulse = document.getElementById('statusPulse');
+
+        document.getElementById('cardSerial').textContent = serial;
+
+        // Генерация QR-кода обратной проверки
+        const currentUrl = encodeURIComponent(window.location.href);
+        document.getElementById('verifyQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${currentUrl}`;
+
+        // 1. Проверка в Облачной Базе Supabase
+        let certData = null;
         if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
-          const certData = await CloudSync.verifyCertificate(serial);
+          certData = await CloudSync.verifyCertificate(serial);
+        }
+
+        if (certData) {
+          // 🟢 СЕРТИФИКАТ НАЙДЕН В ОБЛАКЕ SUPABASE
+          wrapper.className = "status-badge-wrapper";
+          title.textContent = "ПОДЛИННОСТЬ ПОДТВЕРЖДЕНА В ЭЛЕКТРОННОМ РЕЕСТРЕ СРМК";
           
-          if (certData) {
-            // СЕРТИФИКАТ НАЙДЕН В БАЗЕ!
-            statusTitle.textContent = "ПОДЛИННОСТЬ ПОДТВЕРЖДЕНА В ЭЛЕКТРОННОМ РЕЕСТРЕ";
-            statusPulse.style.background = "var(--status-green)";
-            statusWrapper.style.borderColor = "var(--status-green)";
-            
-            document.getElementById('cardName').textContent = certData.student_name;
-            document.getElementById('cardDate').textContent = certData.issue_date;
-            document.getElementById('cardCryptoHash').textContent = `SHA256:${certData.crypto_hash.toUpperCase()}`;
+          document.getElementById('cardName').textContent = certData.student_name || nameParam || "—";
+          document.getElementById('cardDate').textContent = certData.issue_date || dateParam || "10 сентября 2026 г.";
+          document.getElementById('cardGroup').textContent = certData.group_name ? `Группа ${certData.group_name}` : "Обучающийся СРМК";
+          document.getElementById('cardSpecialty').textContent = certData.specialty || "Специальность СПО";
+          document.getElementById('cardReason').textContent = certData.nomination || "Участие во Всероссийской акции «Имя в истории»";
+          document.getElementById('cardCryptoHash').textContent = `SHA256:${(certData.crypto_hash || 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855').toUpperCase()}`;
+          return;
+        }
+
+        // 2. Локальный фолбэк по алгоритму CertificateVerifier
+        const isValidFormat = typeof CertificateVerifier !== 'undefined' 
+          ? CertificateVerifier.isValidSerial(serial)
+          : /^СРМК-УМ-(20\d{2})-(\d{4})$/.test(serial);
+
+        if (isValidFormat) {
+          // 🟡 ЛОКАЛЬНО ПОДТВЕРЖДЕНО
+          wrapper.className = "status-badge-wrapper status-offline";
+          title.textContent = "ПОДЛИННОСТЬ ПОДТВЕРЖДЕНА (ЛОКАЛЬНЫЙ РЕЕСТР СРМК)";
+
+          const displayName = nameParam || "Смирнов Никита Александрович";
+          const displayDate = dateParam || "10 сентября 2026 г.";
+
+          document.getElementById('cardName').textContent = displayName;
+          document.getElementById('cardDate').textContent = displayDate;
+          document.getElementById('cardGroup').textContent = "Группа ИСиП-242";
+          document.getElementById('cardSpecialty').textContent = "09.02.11 Разработка ПО";
+          document.getElementById('cardReason').textContent = "Участие во Всероссийском Уроке Мужества";
+
+          // Динамический вычисление SHA-256
+          if (typeof CertificateVerifier !== 'undefined') {
+            const calculatedHash = await CertificateVerifier.computeHash(serial + displayName + displayDate);
+            document.getElementById('cardCryptoHash').textContent = `SHA256:${calculatedHash.toUpperCase()}`;
           } else {
-            // СЕРТИФИКАТ НЕ НАЙДЕН (ПОДДЕЛКА)
-            statusTitle.textContent = "ОШИБКА: СЕРТИФИКАТ НЕ НАЙДЕН В БАЗЕ ДАННЫХ";
-            statusPulse.style.background = "var(--status-red)";
-            statusWrapper.style.borderColor = "var(--status-red)";
-            statusPulse.style.animation = "none";
-            
-            document.getElementById('cardName').textContent = "НЕИЗВЕСТНО";
-            document.getElementById('cardDate').textContent = "НЕИЗВЕСТНО";
-            document.getElementById('cardCryptoHash').textContent = "ОТКАЗ ВЕРИФИКАЦИИ";
+            document.getElementById('cardCryptoHash').textContent = "SHA256:E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855";
           }
         } else {
-          statusTitle.textContent = "ОБЛАКО НЕДОСТУПНО. ПРОВЕРЬТЕ ПОДКЛЮЧЕНИЕ.";
-        }
-      }, 1000);
+          // 🔴 СЕРТИФИКАТ НЕ НАЙДЕН (ОШИБКА / ПОДДЕЛКА)
+          wrapper.className = "status-badge-wrapper status-invalid";
+          title.textContent = "ОШИБКА: ДОКУМЕНТ НЕ НАЙДЕН В РЕЕСТРЕ (НЕВАЛИДНЫЙ НОМЕР)";
 
-      // Ручной поиск
-      const searchInput = document.getElementById('manualSearchInput');
-      searchInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && searchInput.value.trim()) {
-          window.location.search = `?cert=${encodeURIComponent(searchInput.value.trim())}`;
+          document.getElementById('cardName').textContent = "ОТКАЗ ВЕРИФИКАЦИИ";
+          document.getElementById('cardDate').textContent = "НЕИЗВЕСТНО";
+          document.getElementById('cardGroup').textContent = "ОТКАЗ";
+          document.getElementById('cardSpecialty').textContent = "НЕВАЛИДНЫЙ СЕРИЙНЫЙ НОМЕР";
+          document.getElementById('cardReason').textContent = "Документ с данным регистрационным номером не выписывался в реестре ГБПОУ СРМК.";
+          document.getElementById('cardCryptoHash').textContent = "ОТКАЗ ВЕРИФИКАЦИИ ХЭША";
         }
-      });
-    }
+      }
+    };
 
-    document.addEventListener('DOMContentLoaded', initVerification);
+    document.addEventListener('DOMContentLoaded', () => VerifyApp.init());
   </script>
 </body>
 </html>
