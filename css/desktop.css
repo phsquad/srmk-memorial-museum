@@ -1,10 +1,10 @@
 @charset "UTF-8";
 
 /* ==========================================================================
-   1. ДИЗАЙН-ТОКЕНЫ, ПЕРЕМЕННЫЕ И СБРОС (DESKTOP MASTER ENGINE)
+   1. ДИЗАЙН-ТОКЕНЫ, ПЕРЕМЕННЫЕ И СБРОС (DESKTOP MASTER ENGINE v12.0)
    ========================================================================== */
 :root {
-  /* Палитра: Обсидиан, Мемориальный гранит, Оружейная латунь и Живой огонь */
+  /* Палитра Chiaroscuro: Обсидиан, Мемориальный гранит, Оружейная латунь и Живой огонь */
   --bg-main: #0a0c0f;
   --bg-surface: #12151b;
   --bg-elevated: #181d26;
@@ -413,7 +413,7 @@ main {
 }
 
 /* ==========================================================================
-   3. ГЛАВНЫЙ ЭКРАН (HERO SECTION & SCROLLYTELLING)
+   3. ГЛАВНЫЙ ЭКРАН (HERO SECTION & GRID BACKGROUND)
    ========================================================================== */
 .hero-section {
   padding: 105px 0 85px;
@@ -569,7 +569,7 @@ main {
 }
 
 /* ==========================================================================
-   4. ЗАЛЫ МУЗЕЯ (I, II, III, IV) — ЭКСПОЗИЦИОННЫЙ КАРКАС
+   4. ЭКСПОЗИЦИОННЫЕ ЗАЛЫ (ОБЩИЙ КАРКАС)
    ========================================================================== */
 .section {
   padding: 85px 0;
@@ -741,7 +741,7 @@ main {
 }
 
 /* ==========================================================================
-   6. ЗАЛ II: «ЗА ПАРТОЙ ГЕРОЯ» — ПОИСК, ФИЛЬТРЫ И 4-КОЛОНОЧНАЯ СЕТКА
+   6. ЗАЛ II: «ЗА ПАРТОЙ ГЕРОЯ» — ПОИСК, ФИЛЬТРЫ И ГАЛЕРЕЯ
    ========================================================================== */
 .search-wrapper {
   max-width: 560px;
@@ -1238,7 +1238,7 @@ main {
 }
 
 /* ==========================================================================
-   9. МОДАЛЬНОЕ ОКНО ДОСЬЕ, TTS-КАРАОКЕ И МЕДИЙНЫЙ СЕРВИС
+   9. МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ И ОНЛАЙН-ДИКТОР
    ========================================================================== */
 .modal {
   position: fixed;
@@ -1637,7 +1637,7 @@ main {
 }
 
 /* ==========================================================================
-   10. СТИКИ-АУДИОПЛЕЕР
+   10. СТИКИ-АУДИОПЛЕЕР С ЭРГОНОМИКОЙ ПРИ ЧТЕНИИ
    ========================================================================== */
 .audio-bar {
   position: fixed;
@@ -1804,7 +1804,7 @@ main {
 }
 
 /* ==========================================================================
-   12. ПАНЕЛЬ УПРАВЛЕНИЯ (CMS v2.0 PRO DASHBOARD)
+   12. ПАНЕЛЬ УПРАВЛЕНИЯ (CMS v3.0 ULTRA ENTERPRISE DASHBOARD)
    ========================================================================== */
 .admin-dashboard {
   position: fixed;
@@ -1980,8 +1980,57 @@ main {
   padding: 0 14px; border-radius: 2px; cursor: pointer; font-size: 0.78rem;
 }
 
+/* СТИЛИ АДМИН-ТОСТА */
+.admin-toast {
+  transition: all 0.3s var(--ease-smooth);
+}
+
 /* ==========================================================================
-   13. ПОДВАЛ (FOOTER)
+   13. СТИЛИ РАМКИ МАГИСТРАЛЬНОЙ ОБЛОЖКИ 3:2 (MASTER COVER FRAME)
+   ========================================================================== */
+.master-cover-frame {
+  position: relative;
+  width: 100%;
+  max-width: 1080px;
+  aspect-ratio: 3 / 2; /* Строгие пропорции 3:2 */
+  margin: 0 auto 30px;
+  border-radius: 4px;
+  border: 2px solid var(--accent-brass);
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(197, 160, 89, 0.25);
+  transition: transform 0.4s var(--transition), box-shadow 0.4s var(--transition), border-color 0.4s ease;
+  background: var(--bg-surface);
+}
+
+.master-cover-frame:hover {
+  transform: translateY(-4px) scale(1.008);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.98), 0 0 50px rgba(197, 160, 89, 0.45);
+  border-color: var(--accent-brass-hover);
+}
+
+.master-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: contrast(1.05) brightness(1.02);
+  transition: filter 0.4s ease;
+}
+
+.master-cover-frame:hover .master-cover-img {
+  filter: contrast(1.1) brightness(1.05);
+}
+
+/* Глянцевый блик и виньетка */
+.cover-glow-overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 45%, rgba(138, 28, 34, 0.2) 100%);
+  pointer-events: none;
+}
+
+/* ==========================================================================
+   14. ПОДВАЛ (FOOTER)
    ========================================================================== */
 .footer {
   background: #060709;
@@ -2021,7 +2070,7 @@ main {
 }
 
 /* ==========================================================================
-   14. КЛЮЧЕВЫЕ АНИМАЦИИ И РЕЖИМЫ ДОСТУПНОСТИ (ГОСТ РФ)
+   15. КЛЮЧЕВЫЕ АНИМАЦИИ И РЕЖИМЫ ДОСТУПНОСТИ (ГОСТ РФ)
    ========================================================================== */
 @keyframes candleFlicker {
   0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
@@ -2050,7 +2099,7 @@ main {
   to { transform: translateY(0); }
 }
 
-/* Высокий контраст */
+/* Высокий контраст по ГОСТ РФ */
 body.high-contrast {
   --bg-main: #000000;
   --bg-surface: #101010;
@@ -2065,7 +2114,7 @@ body.high-contrast {
   filter: contrast(130%);
 }
 
-/* Увеличенный шрифт */
+/* Увеличенный шрифт по ГОСТ РФ */
 body.large-text {
   font-size: 19px;
 }
@@ -2077,7 +2126,7 @@ body.large-text .section-title {
 }
 
 /* ==========================================================================
-   15. ПЕЧАТЬ: ЧИСТЫЙ РАЗДАТОЧНЫЙ ЛИСТ («УРОК МУЖЕСТВА»)
+   16. СТРОГИЕ ПРАВИЛА ПЕЧАТИ (@MEDIA PRINT) — ЧИСТЫЙ РАЗДАТОЧНЫЙ ЛИСТ
    ========================================================================== */
 @media print {
   body {
@@ -2090,7 +2139,7 @@ body.large-text .section-title {
   .battle-section, .memory-section, .audio-bar, .modal-close,
   .dossier-nav-bar, .dossier-btn-audio, .dossier-candle-btn, .dossier-action-btn,
   .dossier-btn-tts, .admin-dashboard, .dossier-thumbnails-track, .memorial-toast,
-  .floating-flower-anim, #ambientSparksCanvas {
+  .floating-flower-anim, #ambientSparksCanvas, .master-cover-frame {
     display: none !important;
   }
 
