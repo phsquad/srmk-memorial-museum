@@ -60,6 +60,20 @@ const AWARDS_DATABASE = {
     established: "1995 г.",
     criteria: "За мужество и отвагу, проявленные в боевых действиях."
   },
+  "орден святого георгия": {
+    name: "Орден Святого Георгия IV степени",
+    badge: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Order_of_St._George_4th_Class_Russia.png/300px-Order_of_St._George_4th_Class_Russia.png",
+    ribbon: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Ribbon_of_the_Order_of_Saint_Geory.svg/800px-Ribbon_of_the_Order_of_Saint_Geory.svg.png",
+    established: "1769 г. (восстановлен в 2000 г.)",
+    criteria: "За особые боевые заслуги перед Отечеством, проявленные в ходе выполнения воинского долга."
+  },
+  "медаль кутузова": {
+    name: "Медаль Кутузова",
+    badge: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Medal_Kutuzov_RF.png/300px-Medal_Kutuzov_RF.png",
+    ribbon: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Medal_Kutuzov_ribbon.png/800px-Medal_Kutuzov_ribbon.png",
+    established: "1994 г.",
+    criteria: "За мужество и самоотверженность, проявленные при защите Отечества."
+  },
   "ветеран боевых действий": {
     name: "Ветеран боевых действий",
     badge: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Combat_Veteran_badge_RF.png/300px-Combat_Veteran_badge_RF.png",
@@ -200,9 +214,21 @@ const ArchiveService = {
 
   _checkImageExists(url) {
     return new Promise((resolve) => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2500);
+
       const img = new Image();
-      img.onload = () => resolve(true);
-      img.onerror = () => resolve(false);
+      
+      img.onload = () => {
+        clearTimeout(timeoutId);
+        resolve(true);
+      };
+      
+      img.onerror = () => {
+        clearTimeout(timeoutId);
+        resolve(false);
+      };
+
       img.src = url;
     });
   },
