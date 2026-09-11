@@ -297,7 +297,8 @@ body {
   gap: 10px;
 }
 
-.btn {
+.btn,
+a.btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -312,31 +313,50 @@ body {
   cursor: pointer;
   transition: var(--transition);
   border: 1px solid transparent;
+  /* 🔥 Полный сброс пользовательских стилей браузера для кнопок и ссылок-кнопок */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  font-family: var(--font-sans);
 }
 
-.btn-primary {
+.btn-primary,
+a.btn-primary,
+button.btn-primary {
   background: var(--accent-granite);
   color: #ffffff;
   border-color: rgba(255, 255, 255, 0.15);
   box-shadow: 0 4px 16px var(--accent-granite-dim);
 }
 
+.btn-primary:hover,
+a.btn-primary:hover,
+.btn-primary:focus-visible,
+a.btn-primary:focus-visible,
 .btn-primary:active {
   background: var(--accent-granite-hover);
   transform: scale(0.98);
+  outline: none;
 }
 
-.btn-secondary {
+.btn-secondary,
+a.btn-secondary,
+button.btn-secondary {
   background: var(--bg-surface);
   color: var(--text-primary);
   border-color: var(--border-hairline);
 }
 
+.btn-secondary:hover,
+a.btn-secondary:hover,
+.btn-secondary:focus-visible,
+a.btn-secondary:focus-visible,
 .btn-secondary:active {
   border-color: var(--accent-brass);
   color: var(--accent-brass);
   background: var(--accent-brass-dim);
   transform: scale(0.98);
+  outline: none;
 }
 
 /* ==========================================================================
@@ -632,6 +652,21 @@ body {
   border-radius: 2px;
   cursor: pointer;
   transition: var(--transition);
+  /* 🔥 Полный сброс пользовательских стилей браузера */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  font-family: var(--font-sans);
+  text-align: center;
+  text-decoration: none;
+}
+
+.hero-card-btn:hover,
+.hero-card-btn:focus-visible {
+  border-color: var(--accent-brass);
+  color: var(--accent-brass);
+  background: var(--accent-brass-dim);
+  outline: none;
 }
 
 .hero-card-btn:active {
