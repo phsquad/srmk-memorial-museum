@@ -147,6 +147,12 @@ main {
   font-weight: 500;
   cursor: pointer;
   transition: var(--transition);
+  /* 🔥 Сброс пользовательских стилей браузера */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-decoration: none;
+  font-family: var(--font-sans);
 }
 
 .access-btn:hover, .access-btn:focus-visible {
@@ -154,6 +160,7 @@ main {
   border-color: var(--accent-brass);
   background: var(--accent-brass-dim);
   outline: none;
+  text-decoration: none;
 }
 
 .access-meta {
@@ -298,13 +305,22 @@ main {
   align-items: center;
   gap: 6px;
   transition: var(--transition);
+  /* 🔥 Сброс пользовательских стилей браузера */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-decoration: none;
+  font-family: var(--font-sans);
 }
 
 .btn-dropdown-toggle:hover,
-.modules-dropdown.active .btn-dropdown-toggle {
+.modules-dropdown.active .btn-dropdown-toggle,
+.btn-dropdown-toggle:focus-visible {
   border-color: var(--accent-brass);
   color: var(--accent-brass);
   background: var(--bg-card);
+  outline: none;
+  text-decoration: none;
 }
 
 .arrow-icon {
@@ -364,13 +380,21 @@ main {
   gap: 5px;
   white-space: nowrap;
   transition: var(--transition);
+  /* 🔥 Сброс пользовательских стилей браузера для ссылок-кнопок */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  font-family: var(--font-sans);
 }
 
-.btn-header-cert:hover {
+.btn-header-cert:hover,
+.btn-header-cert:focus-visible {
   background: var(--accent-brass);
   color: #000000;
   box-shadow: 0 0 14px var(--accent-brass-glow);
   transform: translateY(-1px);
+  outline: none;
+  text-decoration: none;
 }
 
 .passport-btn {
@@ -384,12 +408,21 @@ main {
   font-weight: 600;
   white-space: nowrap;
   transition: var(--transition);
+  /* 🔥 Сброс пользовательских стилей браузера */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-decoration: none;
+  font-family: var(--font-sans);
 }
 
-.passport-btn:hover {
+.passport-btn:hover,
+.passport-btn:focus-visible {
   color: var(--text-primary);
   border-color: var(--border-medium);
   background: rgba(255, 255, 255, 0.03);
+  outline: none;
+  text-decoration: none;
 }
 
 .contest-badge {
@@ -551,25 +584,43 @@ main {
   color: #ffffff;
   border-color: rgba(255, 255, 255, 0.15);
   box-shadow: 0 4px 16px var(--accent-granite-dim);
+  /* 🔥 Сброс пользовательских стилей браузера для кнопок-ссылок */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-decoration: none;
+  font-family: var(--font-sans);
 }
 
-.btn-primary:hover {
+.btn-primary:hover,
+.btn-primary:focus-visible {
   background: var(--accent-granite-hover);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px var(--accent-granite-dim);
+  outline: none;
+  text-decoration: none;
 }
 
 .btn-secondary {
   background: var(--bg-surface);
   color: var(--text-primary);
   border-color: var(--border-hairline);
+  /* 🔥 Сброс пользовательских стилей браузера */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-decoration: none;
+  font-family: var(--font-sans);
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover,
+.btn-secondary:focus-visible {
   border-color: var(--accent-brass);
   color: var(--accent-brass);
   background: var(--accent-brass-dim);
   transform: translateY(-2px);
+  outline: none;
+  text-decoration: none;
 }
 
 /* ==========================================================================
@@ -634,13 +685,21 @@ main {
   font-size: 0.8rem;
   font-weight: 600;
   transition: var(--transition);
+  /* 🔥 Сброс пользовательских стилей браузера */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-decoration: none;
+  font-family: var(--font-sans);
 }
 
-.plaque-toggle-btn.active, .plaque-toggle-btn:hover {
+.plaque-toggle-btn.active, .plaque-toggle-btn:hover, .plaque-toggle-btn:focus-visible {
   background: var(--bg-elevated);
   color: var(--accent-brass);
   border-color: var(--border-accent);
   box-shadow: 0 0 14px var(--accent-brass-dim);
+  outline: none;
+  text-decoration: none;
 }
 
 .memorial-stand-container {
@@ -726,6 +785,10 @@ main {
   word-wrap: break-word;
   overflow-wrap: break-word;
   word-break: break-word;
+  /* 🔥 Сброс пользовательских стилей для интерактивных элементов */
+  appearance: none;
+  -webkit-appearance: none;
+  text-decoration: none;
 }
 
 .plaque-item:hover, .plaque-item:focus-visible {
@@ -734,6 +797,7 @@ main {
   color: #ffffff;
   transform: translateX(4px);
   outline: none;
+  text-decoration: none;
 }
 
 .plaque-arrow {
@@ -827,12 +891,20 @@ main {
   font-weight: 500;
   cursor: pointer;
   transition: var(--transition);
+  /* 🔥 Сброс пользовательских стилей браузера */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-decoration: none;
+  font-family: var(--font-sans);
 }
 
-.chip-btn:hover {
+.chip-btn:hover, .chip-btn:focus-visible {
   border-color: var(--border-accent);
   color: var(--accent-brass);
   background: var(--accent-brass-dim);
+  outline: none;
+  text-decoration: none;
 }
 
 .specialty-filters-bar {
@@ -853,13 +925,21 @@ main {
   font-size: 0.8rem;
   font-weight: 600;
   transition: var(--transition);
+  /* 🔥 Сброс пользовательских стилей браузера */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-decoration: none;
+  font-family: var(--font-sans);
 }
 
-.spec-filter-btn.active, .spec-filter-btn:hover {
+.spec-filter-btn.active, .spec-filter-btn:hover, .spec-filter-btn:focus-visible {
   background: var(--bg-elevated);
   color: var(--accent-brass);
   border-color: var(--border-accent);
   box-shadow: 0 0 12px var(--accent-brass-dim);
+  outline: none;
+  text-decoration: none;
 }
 
 .heroes-grid {
@@ -992,17 +1072,27 @@ main {
   border-radius: 2px;
   font-size: 0.82rem;
   font-weight: 700;
+  font-family: var(--font-sans);
   cursor: pointer;
   transition: var(--transition);
   letter-spacing: 0.3px;
   white-space: nowrap;
+  /* 🔥 Полный сброс пользовательских стилей браузера */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-decoration: none;
+  text-align: center;
+  line-height: 1.4;
 }
 
-.hero-card-btn:hover {
+.hero-card-btn:hover,
+.hero-card-btn:focus-visible {
   background: var(--accent-granite);
   color: #ffffff;
   border-color: var(--accent-granite);
   box-shadow: 0 4px 14px var(--accent-granite-dim);
+  outline: none;
 }
 
 /* ==========================================================================
@@ -1026,13 +1116,21 @@ main {
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
+  /* 🔥 Сброс пользовательских стилей браузера */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-decoration: none;
+  font-family: var(--font-sans);
 }
 
-.theatre-btn.active, .theatre-btn:hover {
+.theatre-btn.active, .theatre-btn:hover, .theatre-btn:focus-visible {
   background: var(--bg-elevated);
   color: var(--accent-brass);
   border-color: var(--border-accent);
   box-shadow: 0 0 14px var(--accent-brass-dim);
+  outline: none;
+  text-decoration: none;
 }
 
 .battle-timeline-grid {
