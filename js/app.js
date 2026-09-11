@@ -403,29 +403,45 @@ const App = {
       ? ArchiveService.buildDynamicGallery(hero)
       : [{ url: mainPhoto, caption: "Основной портрет", desc: "", type: "portrait" }];
 
-    // Асинхронная подгрузка знаков наград
+    // Асинхронная подгрузка знаков наград для отображения на карточке и в галерее
     let awardsHTML = '';
+    let awardsGalleryHTML = '';
     if (hero.awards && Array.isArray(hero.awards)) {
-      awardsHTML = (await Promise.all(hero.awards.map(async (awardTitle) => {
+      const awardElements = await Promise.all(hero.awards.map(async (awardTitle) => {
         if (typeof HeraldryResolver !== 'undefined') {
           const awardData = await HeraldryResolver.resolveAwardImages(awardTitle);
-          return `
-            <div class="award-tag" title="${awardData.established ? `Учреждена: ${awardData.established}` : ''}">
-              ${awardData.badgeUrl ? `<img src="${awardData.badgeUrl}" alt="" class="award-badge-mini" onerror="this.style.display='none'">` : ''}
-              <span>${this.escapeHtml(awardData.name)}</span>
-            </div>
-          `;
+          const badgeHtml = awardData.badgeUrl ? `<img src="${awardData.badgeUrl}" alt="${this.escapeHtml(awardData.name)}" class="award-badge-hero" title="${awardData.established ? `Учреждена: ${awardData.established}` : ''}">` : '';
+          return {
+            name: awardData.name,
+            badge: badgeHtml,
+            established: awardData.established || ''
+          };
         } else if (typeof ArchiveService !== 'undefined') {
           const visual = ArchiveService.getAwardVisual(awardTitle);
-          return `
-            <div class="award-tag" title="${visual.criteria || ''}">
-              ${visual.badge ? `<img src="${visual.badge}" alt="" class="award-badge-mini">` : ''}
-              <span>${this.escapeHtml(visual.name)}</span>
-            </div>
-          `;
+          const badgeHtml = visual.badge ? `<img src="${visual.badge}" alt="${this.escapeHtml(visual.name)}" class="award-badge-hero">` : '';
+          return {
+            name: visual.name,
+            badge: badgeHtml,
+            established: visual.criteria || ''
+          };
         }
-        return `<span class="award-tag">${this.escapeHtml(awardTitle)}</span>`;
-      }))).join('');
+        return {
+          name: awardTitle,
+          badge: '',
+          established: ''
+        };
+      }));
+      
+      // Отображение наград в виде иконок под фото
+      awardsGalleryHTML = `<div class="hero-awards-gallery">${awardElements.map(a => `<div class="award-icon-wrapper" title="${a.name}${a.established ? ' • ' + a.established : ''}">${a.badge}<span class="award-name-tooltip">${a.name}</span></div>`).join('')}</div>`;
+      
+      // Отображение наград списком с описанием
+      awardsHTML = awardElements.map(a => `
+        <div class="award-tag" title="${a.established}">
+          ${a.badge.replace('award-badge-hero', 'award-badge-mini')}
+          <span>${this.escapeHtml(a.name)}</span>
+        </div>
+      `).join('');
     }
 
     const qrTargetUrl = `${window.location.origin}${window.location.pathname}#hero-${hero.id}`;
@@ -447,6 +463,8 @@ const App = {
               ${galleryItems[0].desc ? `<br><small style="opacity:0.8;">${this.escapeHtml(galleryItems[0].desc)}</small>` : ''}
             </div>
           </div>
+
+          ${awardsGalleryHTML}
 
           ${galleryItems.length > 1 ? `
             <div class="dossier-thumbnails-track">
