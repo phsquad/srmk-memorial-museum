@@ -607,6 +607,7 @@
             init() {
                 this.loadProgress();
                 this.renderStartBadges();
+                this.renderLocalLeaderboard(); // Добавлено: загрузка таблицы лидеров при старте
                 
                 this.els.startBtn.addEventListener('click', () => this.startGame());
                 this.els.restartBtn.addEventListener('click', () => this.resetGame());
