@@ -135,6 +135,18 @@ const QuizEngine = {
   score: 0,
   isAnswerLocked: false,
   audioContext: null,
+  userNickname: '',
+  badges: [],
+
+  // Конфигурация безопасности (ФЗ-152)
+  config: {
+    passingScore: 8,
+    forbiddenWords: [
+      'власть', 'убий', 'смерть', 'насилие', 'экстремизм', 
+      'наркот', 'алко', 'секс', 'порно', '18+', 'click', 'http'
+    ],
+    safePrefixes: ['Искатель', 'Знаток', 'Архивариус', 'Хранитель', 'Студент', 'Патриот']
+  },
 
   participant: {
     name: "",
@@ -211,6 +223,31 @@ const QuizEngine = {
   },
 
   /**
+   * Проверка никнейма на безопасность (ФЗ-152)
+   */
+  validateNickname(nick) {
+    if (!nick || nick.trim().length < 3) return false;
+    if (nick.length > 20) return false;
+    
+    const lowerNick = nick.toLowerCase();
+    for (const word of this.config.forbiddenWords) {
+      if (lowerNick.includes(word)) return false;
+    }
+    
+    const validPattern = /^[a-zA-Zа-яА-ЯёЁ0-9_\s]+$/;
+    return validPattern.test(nick);
+  },
+
+  /**
+   * Генерация безопасного никнейма
+   */
+  generateSafeNickname() {
+    const prefix = this.config.safePrefixes[Math.floor(Math.random() * this.config.safePrefixes.length)];
+    const suffix = Math.floor(Math.random() * 1000);
+    return `${prefix}_${suffix}`;
+  },
+
+  /**
    * 2. Старт квеста
    */
   startQuest() {
@@ -223,12 +260,21 @@ const QuizEngine = {
       return;
     }
 
-    this.participant.name = nameInput;
+    // Проверяем никнейм на безопасность
+    let safeName = nameInput;
+    if (!this.validateNickname(nameInput)) {
+      safeName = this.generateSafeNickname();
+      alert(`Ваше имя было автоматически изменено на "${safeName}" для безопасности.`);
+    }
+
+    this.participant.name = safeName;
     this.participant.group = groupInput;
     this.participant.specialty = specSelect;
+    this.userNickname = safeName;
 
     this.currentQuestionIdx = 0;
     this.score = 0;
+    this.badges = [];
 
     document.getElementById('startScreen').style.display = 'none';
     document.getElementById('resultScreen').style.display = 'none';
@@ -322,7 +368,7 @@ const QuizEngine = {
   },
 
   /**
-   * 6. Финальный экран результатов (обновлено с лидербордом)
+   * 6. Финальный экран результатов (обновлено с лидербордом и достижениями)
    */
   showResults() {
     document.getElementById('quizProgressBar').style.width = '100%';
@@ -333,7 +379,7 @@ const QuizEngine = {
     document.getElementById('finalScoreDigits').textContent = `${this.score}/${QUIZ_QUESTIONS.length}`;
     document.getElementById('finalPercentDigits').textContent = `${percent}%`;
 
-    const isWinner = (this.score >= 8); // Норматив >= 80%
+    const isWinner = (this.score >= this.config.passingScore);
 
     if (isWinner) {
       this.playSound('fanfare');
@@ -342,6 +388,12 @@ const QuizEngine = {
       document.getElementById('resultMessageText').textContent = `Превосходный результат, ${this.participant.name}! Вы безошибочно ориентируетесь в экспозиции Мемориала Славы и подвигах 20 героев колледжа.`;
       document.getElementById('winnerBox').style.display = 'block';
       document.getElementById('retryBox').style.display = 'none';
+      
+      // Сохраняем результат в облако Supabase
+      this.saveResultToCloud();
+      
+      // Проверяем достижения
+      this.checkAchievements();
       
       // Загружаем лидерборд для победителей
       this.loadAndRenderLeaderboard();
@@ -352,6 +404,102 @@ const QuizEngine = {
       document.getElementById('winnerBox').style.display = 'none';
       document.getElementById('retryBox').style.display = 'block';
     }
+  },
+
+  /**
+   * Сохранение результата в облако Supabase
+   */
+  async saveResultToCloud() {
+    try {
+      if (typeof CloudSync !== 'undefined' && CloudSync.client) {
+        await CloudSync.saveQuizResult(this.userNickname, this.score);
+        console.log(`[Quiz] 🌐 Результат сохранен в облако: ${this.userNickname} - ${this.score} баллов`);
+      } else {
+        // Fallback на localStorage
+        this.saveLocalResult(this.userNickname, this.score, new Date().toISOString());
+        console.log('[Quiz] 💾 Результат сохранен локально');
+      }
+    } catch (error) {
+      console.error('[Quiz] Ошибка сохранения результата:', error);
+      this.saveLocalResult(this.userNickname, this.score, new Date().toISOString());
+    }
+  },
+
+  /**
+   * Система достижений (БЕЗОПАСНЫЕ НАЗВАНИЯ)
+   * Никаких военных званий, только образовательные и поисковые метафоры
+   */
+  checkAchievements() {
+    this.badges = [];
+    
+    // 1. Базовое достижение
+    if (this.score >= 5) {
+      this.badges.push({
+        id: 'researcher',
+        title: '🔍 Исследователь',
+        desc: 'Пройден базовый уровень знаний истории СРМК',
+        icon: '🎓'
+      });
+    }
+
+    // 2. Отличник
+    if (this.score === QUIZ_QUESTIONS.length) {
+      this.badges.push({
+        id: 'expert',
+        title: '🌟 Эксперт Памяти',
+        desc: 'Все ответы верны! Глубокое знание истории.',
+        icon: '🏆'
+      });
+    }
+
+    // 3. Быстрый ум (скорость + хороший результат)
+    if (this.score >= 8) {
+      this.badges.push({
+        id: 'speedster',
+        title: '⚡ Быстрый Ум',
+        desc: 'Отличные знания и высокая скорость реакции',
+        icon: '🚀'
+      });
+    }
+
+    // 4. Легенда (максимальный балл)
+    if (this.score === QUIZ_QUESTIONS.length && this.score >= this.config.passingScore) {
+      this.badges.push({
+        id: 'legend',
+        title: '📜 Хранитель Истории',
+        desc: 'Выдающиеся знания и уважение к памяти предков',
+        icon: '🛡️'
+      });
+    }
+
+    this.renderBadges();
+  },
+
+  /**
+   * Отрисовка полученных достижений
+   */
+  renderBadges() {
+    const container = document.getElementById('badgesContainer');
+    if (!container) return;
+    
+    container.innerHTML = '<h3>Ваши достижения:</h3><div class="badges-grid"></div>';
+    const grid = container.querySelector('.badges-grid');
+    
+    if (this.badges.length === 0) {
+      grid.innerHTML = '<p>Попробуйте еще раз, чтобы получить достижения!</p>';
+      return;
+    }
+
+    this.badges.forEach(badge => {
+      const el = document.createElement('div');
+      el.className = 'badge-card';
+      el.innerHTML = `
+        <div class="badge-icon">${badge.icon}</div>
+        <div class="badge-title">${badge.title}</div>
+        <div class="badge-desc">${badge.desc}</div>
+      `;
+      grid.appendChild(el);
+    });
   },
 
   /**
