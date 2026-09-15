@@ -1,21 +1,102 @@
 /* =========================================
    QUIZ.CSS - Стили для Викторины "Герои СРМК"
-   Версия: 2.0 (Full Redesign)
+   Версия: 3.0 (Dark Theme - matching index.html)
    ========================================= */
 
 :root {
     --primary-gold: #d4af37;
-    --primary-gold-hover: #b5952f;
-    --bg-cream: #f9f7f1;
-    --text-dark: #2c2c2c;
-    --text-muted: #666;
-    --border-light: #e0e0e0;
-    --shadow-soft: 0 4px 20px rgba(0,0,0,0.08);
-    --shadow-gold: 0 4px 15px rgba(212, 175, 55, 0.3);
-    --danger-red: #d32f2f;
-    --success-green: #388e3c;
+    --primary-gold-hover: #f9df86;
+    --bg-dark: #0a0c0f;
+    --bg-card: #1a1f29;
+    --text-main: #e0e0e0;
+    --text-muted: #8899a6;
+    --border-dark: #2a3f5f;
+    --shadow-soft: 0 4px 20px rgba(0,0,0,0.4);
+    --shadow-gold: 0 4px 15px rgba(212, 175, 55, 0.4);
+    --danger-red: #f44336;
+    --success-green: #4caf50;
     --font-heading: 'Cinzel', serif;
     --font-body: 'Montserrat', sans-serif;
+}
+
+/* Темная тема по умолчанию */
+body.dark-theme .quiz-container,
+body.dark-theme .quiz-card,
+body.dark-theme .question-card,
+body.dark-theme .result-card {
+    background: var(--bg-card);
+    color: var(--text-main);
+    border-color: var(--border-dark);
+}
+
+body.dark-theme h1,
+body.dark-theme h2,
+body.dark-theme h3 {
+    color: var(--primary-gold);
+}
+
+body.dark-theme .quiz-intro,
+body.dark-theme .rules-box,
+body.dark-theme .input-group label {
+    color: var(--text-muted);
+}
+
+body.dark-theme .input-group input {
+    background: #0a0c0f;
+    border-color: var(--border-dark);
+    color: var(--text-main);
+}
+
+body.dark-theme .input-group input:focus {
+    border-color: var(--primary-gold);
+}
+
+body.dark-theme .option-btn {
+    background: rgba(255,255,255,0.05);
+    border-color: var(--border-dark);
+    color: var(--text-main);
+}
+
+body.dark-theme .option-btn:hover:not([disabled]) {
+    background: rgba(212, 175, 55, 0.15);
+    border-color: var(--primary-gold);
+}
+
+body.dark-theme .leaderboard-table th {
+    background: rgba(212, 175, 55, 0.1);
+    color: var(--primary-gold);
+}
+
+body.dark-theme .leaderboard-table td {
+    border-bottom-color: var(--border-dark);
+    color: var(--text-muted);
+}
+
+body.dark-theme .badge-card {
+    background: var(--bg-card);
+    border-color: var(--border-dark);
+}
+
+body.dark-theme .badge-card.unlocked {
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(212, 175, 55, 0.1) 100%);
+    border-color: var(--primary-gold);
+}
+
+body.dark-theme .filter-btn {
+    background: var(--bg-card);
+    border-color: var(--border-dark);
+    color: var(--text-muted);
+}
+
+body.dark-theme .filter-btn:hover,
+body.dark-theme .filter-btn.active {
+    border-color: var(--primary-gold);
+    color: var(--primary-gold);
+}
+
+body.dark-theme .verify-section {
+    background: rgba(212, 175, 55, 0.05);
+    border-left-color: var(--primary-gold);
 }
 
 /* Общие контейнеры экранов */
@@ -33,18 +114,19 @@
 
 /* Карточки */
 .quiz-card, .question-card, .result-card {
-    background: #fff;
+    background: var(--bg-card);
     border-radius: 12px;
     padding: 2.5rem;
     box-shadow: var(--shadow-soft);
-    border: 1px solid var(--border-light);
+    border: 1px solid var(--border-dark);
     text-align: center;
+    color: var(--text-main);
 }
 
 /* Типографика */
 h1, h2, h3 {
     font-family: var(--font-heading);
-    color: var(--text-dark);
+    color: var(--primary-gold);
     margin-bottom: 1.5rem;
 }
 
@@ -65,29 +147,31 @@ h1, h2, h3 {
     display: block;
     font-weight: 600;
     margin-bottom: 0.5rem;
-    color: var(--text-dark);
+    color: var(--text-main);
 }
 
 .input-group input {
     width: 100%;
     padding: 1rem;
-    border: 2px solid var(--border-light);
+    border: 2px solid var(--border-dark);
     border-radius: 8px;
     font-family: var(--font-body);
     font-size: 1rem;
     transition: border-color 0.3s;
-    box-sizing: border-box; /* Важно для padding */
+    box-sizing: border-box;
+    background: rgba(0,0,0,0.2);
+    color: var(--text-main);
 }
 
 .input-group input:focus {
     outline: none;
     border-color: var(--primary-gold);
-    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
 }
 
 /* Блок правил */
 .rules-box {
-    background: var(--bg-cream);
+    background: rgba(212, 175, 55, 0.05);
     padding: 1.5rem;
     border-radius: 8px;
     text-align: left;
@@ -121,25 +205,25 @@ h1, h2, h3 {
 }
 
 .primary-btn {
-    background: linear-gradient(135deg, var(--primary-gold) 0%, #eacda3 100%);
-    color: #fff;
+    background: linear-gradient(135deg, var(--primary-gold) 0%, #f9df86 100%);
+    color: #0a0c0f;
     box-shadow: var(--shadow-gold);
 }
 
 .primary-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5);
 }
 
 .secondary-btn {
     background: transparent;
-    border: 2px solid var(--text-dark);
-    color: var(--text-dark);
+    border: 2px solid var(--primary-gold);
+    color: var(--primary-gold);
 }
 
 .secondary-btn:hover {
-    background: var(--text-dark);
-    color: #fff;
+    background: var(--primary-gold);
+    color: #0a0c0f;
 }
 
 /* --- ЭКРАН ИГРЫ --- */
@@ -149,13 +233,13 @@ h1, h2, h3 {
     align-items: center;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border-dark);
 }
 
 .progress-container {
     flex: 1;
     height: 8px;
-    background: #eee;
+    background: rgba(255,255,255,0.1);
     border-radius: 4px;
     margin-right: 1rem;
     overflow: hidden;
@@ -171,7 +255,7 @@ h1, h2, h3 {
 .timer-display {
     font-weight: 700;
     font-size: 1.2rem;
-    color: var(--text-dark);
+    color: var(--text-main);
     min-width: 80px;
     text-align: right;
 }
@@ -200,8 +284,8 @@ h1, h2, h3 {
 }
 
 .option-btn {
-    background: #fff;
-    border: 2px solid var(--border-light);
+    background: rgba(255,255,255,0.05);
+    border: 2px solid var(--border-dark);
     padding: 1rem;
     border-radius: 8px;
     font-size: 1rem;
@@ -211,24 +295,25 @@ h1, h2, h3 {
     font-family: var(--font-body);
     position: relative;
     overflow: hidden;
+    color: var(--text-main);
 }
 
 .option-btn:hover {
     border-color: var(--primary-gold);
-    background: #fffbf0;
+    background: rgba(212, 175, 55, 0.15);
 }
 
 .option-btn.correct {
-    background: #e8f5e9;
+    background: rgba(76, 175, 80, 0.2);
     border-color: var(--success-green);
-    color: var(--success-green);
+    color: #81c784;
     font-weight: bold;
 }
 
 .option-btn.wrong {
-    background: #ffebee;
+    background: rgba(244, 67, 54, 0.2);
     border-color: var(--danger-red);
-    color: var(--danger-red);
+    color: #e57373;
     opacity: 0.7;
 }
 
@@ -251,7 +336,7 @@ h1, h2, h3 {
 #resultMessage {
     font-size: 1.2rem;
     margin-bottom: 2rem;
-    color: var(--text-dark);
+    color: var(--text-main);
 }
 
 .action-buttons {
@@ -272,8 +357,9 @@ h1, h2, h3 {
     margin-top: 2rem;
     font-size: 1.2rem;
     text-align: left;
-    border-bottom: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border-dark);
     padding-bottom: 0.5rem;
+    color: var(--text-main);
 }
 
 .badges-grid {
@@ -284,8 +370,8 @@ h1, h2, h3 {
 }
 
 .badge-card {
-    background: #fff;
-    border: 2px solid #eee;
+    background: var(--bg-card);
+    border: 2px solid var(--border-dark);
     border-radius: 12px;
     padding: 1rem;
     text-align: center;
@@ -298,7 +384,7 @@ h1, h2, h3 {
     opacity: 1;
     filter: grayscale(0%);
     border-color: var(--primary-gold);
-    background: linear-gradient(135deg, #fff 0%, #fffbf0 100%);
+    background: linear-gradient(135deg, var(--bg-card) 0%, rgba(212, 175, 55, 0.1) 100%);
     transform: translateY(-5px);
     box-shadow: var(--shadow-gold);
 }
@@ -312,7 +398,7 @@ h1, h2, h3 {
 .badge-title {
     font-weight: 700;
     font-size: 0.9rem;
-    color: var(--text-dark);
+    color: var(--text-main);
     display: block;
     margin-bottom: 0.25rem;
 }
@@ -325,13 +411,13 @@ h1, h2, h3 {
 
 /* --- ЗАЛ СЛАВЫ (LEADERBOARD) --- */
 .hall-of-fame-section {
-    background: #fff;
+    background: var(--bg-card);
     border-radius: 12px;
     padding: 2rem;
     margin: 3rem auto;
     max-width: 900px;
     box-shadow: var(--shadow-soft);
-    border: 1px solid var(--border-light);
+    border: 1px solid var(--border-dark);
 }
 
 .leaderboard-controls {
@@ -344,8 +430,8 @@ h1, h2, h3 {
 
 .filter-btn {
     padding: 0.5rem 1.2rem;
-    border: 1px solid var(--border-light);
-    background: #fff;
+    border: 1px solid var(--border-dark);
+    background: var(--bg-card);
     color: var(--text-muted);
     border-radius: 20px;
     cursor: pointer;
@@ -361,7 +447,7 @@ h1, h2, h3 {
 
 .filter-btn.active {
     background: var(--primary-gold);
-    color: #fff;
+    color: #0a0c0f;
     border-color: var(--primary-gold);
 }
 
@@ -378,8 +464,8 @@ h1, h2, h3 {
 .leaderboard-table th {
     text-align: left;
     padding: 1rem;
-    background: var(--bg-cream);
-    color: var(--text-dark);
+    background: rgba(212, 175, 55, 0.1);
+    color: var(--primary-gold);
     font-weight: 600;
     font-size: 0.9rem;
     border-bottom: 2px solid var(--primary-gold);
@@ -387,7 +473,7 @@ h1, h2, h3 {
 
 .leaderboard-table td {
     padding: 1rem;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-dark);
     color: var(--text-muted);
     font-size: 0.95rem;
 }
@@ -408,7 +494,7 @@ h1, h2, h3 {
 
 /* --- ПРОВЕРКА СЕРТИФИКАТА --- */
 .verify-section {
-    background: var(--bg-cream);
+    background: rgba(212, 175, 55, 0.05);
     padding: 2rem;
     border-radius: 12px;
     margin: 2rem auto 4rem;
@@ -427,15 +513,17 @@ h1, h2, h3 {
     flex: 1;
     min-width: 250px;
     padding: 0.8rem;
-    border: 1px solid var(--border-light);
+    border: 1px solid var(--border-dark);
     border-radius: 6px;
     font-family: var(--font-body);
+    background: rgba(0,0,0,0.2);
+    color: var(--text-main);
 }
 
 .verify-btn {
     padding: 0.8rem 1.5rem;
-    background: var(--text-dark);
-    color: #fff;
+    background: var(--primary-gold);
+    color: #0a0c0f;
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -444,7 +532,7 @@ h1, h2, h3 {
 }
 
 .verify-btn:hover {
-    background: #000;
+    background: #f9df86;
 }
 
 .verify-result {
@@ -456,15 +544,15 @@ h1, h2, h3 {
 }
 
 .verify-valid {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+    background: rgba(76, 175, 80, 0.2);
+    color: #81c784;
+    border: 1px solid var(--success-green);
 }
 
 .verify-invalid {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+    background: rgba(244, 67, 54, 0.2);
+    color: #e57373;
+    border: 1px solid var(--danger-red);
 }
 
 /* Адаптивность для мобильных */
