@@ -49,18 +49,37 @@ const GuestbookEngine = {
    * 1. Загрузка данных (Облако Supabase ➔ LocalStorage Fallback)
    */
   async loadData() {
-    if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
-      const cloudData = await CloudSync.fetchTributes();
-      if (cloudData && Array.isArray(cloudData)) {
-        this.tributes = cloudData.map(t => this.normalizeTributeFields(t));
-        this.userFlames = JSON.parse(localStorage.getItem('srmk_user_flames_v3') || '{}');
-        return;
+    try {
+      if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
+        console.log('[Guestbook] 🌐 Загрузка посланий из облака Supabase...');
+        const cloudData = await CloudSync.fetchTributes();
+        
+        if (cloudData && Array.isArray(cloudData)) {
+          this.tributes = cloudData.map(t => this.normalizeTributeFields(t));
+          this.userFlames = JSON.parse(localStorage.getItem('srmk_user_flames_v3') || '{}');
+          
+          // Сохранить облачные данные в localStorage для офлайн-доступа
+          localStorage.setItem('srmk_guestbook_entries_v3', JSON.stringify(this.tributes));
+          
+          console.log(`[Guestbook] ✅ Загружено ${this.tributes.length} посланий из облака`);
+          return;
+        } else {
+          console.warn('[Guestbook] ⚠️ Облако не вернуло данных, используем локальные');
+        }
       }
+      
+      // Fallback: Загрузка локальных данных
+      console.log('[Guestbook] 📱 Загрузка посланий из localStorage...');
+      const raw = localStorage.getItem('srmk_guestbook_entries_v3');
+      this.tributes = raw ? JSON.parse(raw).map(t => this.normalizeTributeFields(t)) : [];
+      this.userFlames = JSON.parse(localStorage.getItem('srmk_user_flames_v3') || '{}');
+      
+    } catch (error) {
+      console.error('[Guestbook] ❌ Ошибка загрузки данных:', error);
+      // Экстренный fallback на пустой массив
+      this.tributes = [];
+      this.userFlames = {};
     }
-    // Fallback: Загрузка локальных данных
-    const raw = localStorage.getItem('srmk_guestbook_entries_v3');
-    this.tributes = raw ? JSON.parse(raw).map(t => this.normalizeTributeFields(t)) : [];
-    this.userFlames = JSON.parse(localStorage.getItem('srmk_user_flames_v3') || '{}');
   },
 
   /**
@@ -347,7 +366,7 @@ const GuestbookEngine = {
   /**
    * 8. ПОЛНОЦЕННАЯ ПАНЕЛЬ МОДЕРАЦИИ АРХИВА (Ctrl+Shift+M или Клик в подвале)
    */
-  openModeratorPrompt() {
+  async openModeratorPrompt() {
     const pwd = prompt("Введите пароль модератора Стены Памяти СРМК (2026):", "");
     if (pwd === this.adminPassword) {
       const choice = prompt(
@@ -356,22 +375,26 @@ const GuestbookEngine = {
         "2 — Присвоить статус «Верифицировано музеем» последнему посланию\n" +
         "3 — Удалить последнее послание из стены\n" +
         "4 — Сбросить локальный кэш записей\n" +
-        "5 — Скачать всю Стену Памяти в формате JSON\n\n" +
-        "Введите номер действия (1-5):", "1"
+        "5 — Скачать всю Стену Памяти в формате JSON\n" +
+        "6 — Синхронизировать с облаком Supabase\n\n" +
+        "Введите номер действия (1-6):", "1"
       );
 
       if (choice === "1" && this.tributes.length > 0) {
         this.tributes[0].is_pinned = !this.tributes[0].is_pinned;
+        await this.saveToCloud(this.tributes[0]); // Синхронизация с облаком
         this.saveStorage();
         this.renderWall();
         alert(`Послание от «${this.tributes[0].author}» ${this.tributes[0].is_pinned ? 'закреплено вверху' : 'откреплено'}.`);
       } else if (choice === "2" && this.tributes.length > 0) {
         this.tributes[0].is_verified = !this.tributes[0].is_verified;
+        await this.saveToCloud(this.tributes[0]); // Синхронизация с облаком
         this.saveStorage();
         this.renderWall();
         alert(`Посланию от «${this.tributes[0].author}» ${this.tributes[0].is_verified ? 'присвоен знак верификации' : 'снят знак верификации'}.`);
       } else if (choice === "3" && this.tributes.length > 0) {
         const removed = this.tributes.shift();
+        await CloudSync.deleteTribute(removed.id); // Удаление из облака
         this.saveStorage();
         this.renderWall();
         this.updateStats();
@@ -381,9 +404,54 @@ const GuestbookEngine = {
         location.reload();
       } else if (choice === "5") {
         this.exportTributesJSON();
+      } else if (choice === "6") {
+        await this.forceCloudSync();
       }
     } else if (pwd !== null) {
       alert("Отказ в доступе: Неверный пароль модератора.");
+    }
+  },
+
+  /**
+   * Сохранение отдельного послания в облако
+   */
+  async saveToCloud(tribute) {
+    if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
+      try {
+        await CloudSync.updateTribute(tribute);
+        console.log(`[Guestbook] ✅ Послание "${tribute.id}" обновлено в облаке`);
+      } catch (error) {
+        console.error('[Guestbook] ❌ Ошибка обновления в облаке:', error);
+      }
+    }
+  },
+
+  /**
+   * Принудительная синхронизация всех данных с облаком
+   */
+  async forceCloudSync() {
+    if (typeof CloudSync === 'undefined' || !CloudSync.isLive) {
+      alert("❌ CloudSync не подключен. Проверьте конфигурацию Supabase.");
+      return;
+    }
+
+    const confirmMsg = `Вы уверены, что хотите выгрузить все ${this.tributes.length} посланий в облако Supabase?\n\nЭто может занять несколько секунд.`;
+    if (!confirm(confirmMsg)) return;
+
+    try {
+      const batchSize = 50;
+      const batches = Math.ceil(this.tributes.length / batchSize);
+      
+      for (let i = 0; i < batches; i++) {
+        const batch = this.tributes.slice(i * batchSize, (i + 1) * batchSize);
+        await CloudSync.syncTributesBatch(batch);
+        console.log(`[Guestbook] 📤 Батч ${i + 1}/${batches} загружен`);
+      }
+
+      alert(`✅ Успешно синхронизировано ${this.tributes.length} посланий с облаком Supabase!`);
+    } catch (error) {
+      console.error('[Guestbook] ❌ Ошибка синхронизации:', error);
+      alert(`⚠️ Ошибка синхронизации: ${error.message}`);
     }
   },
 
@@ -422,8 +490,18 @@ const GuestbookEngine = {
   },
 
   saveStorage() {
+    // Сохраняем в localStorage для офлайн-доступа
     localStorage.setItem('srmk_guestbook_entries_v3', JSON.stringify(this.tributes));
     localStorage.setItem('srmk_user_flames_v3', JSON.stringify(this.userFlames));
+    
+    // Синхронизируем с облаком (асинхронно, не блокируя UI)
+    if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
+      // Отправляем только последние изменения (последние 10 записей)
+      const recentTributes = this.tributes.slice(0, 10);
+      CloudSync.syncTributesBatch(recentTributes).catch(err => {
+        console.error('[Guestbook] ⚠️ Не удалось синхронизировать с облаком:', err);
+      });
+    }
   },
 
   bindDOMEvents() {

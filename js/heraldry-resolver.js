@@ -1,7 +1,8 @@
 /**
  * ============================================================================
- * АВТОПОИСК И КЭШИРОВАНИЕ ГЕРАЛЬДИКИ: js/heraldry-resolver.js
- * Прямая интеграция с открытым API Wikimedia Commons / Wikipedia
+ * АВТОПОИСК И КЭШИРОВАНИЕ ГЕРАЛЬДИКИ: js/heraldry-resolver.js v2.0
+ * Интеграция с Wikimedia Commons API + Supabase heraldry_cache
+ * Приоритет: 1) Supabase Cloud Cache, 2) IndexedDB Local Cache, 3) API запрос
  * ============================================================================
  */
 
@@ -11,6 +12,7 @@ const HeraldryResolver = {
   DB_NAME: "SRMK_Heraldry_Cache_v2",
   STORE_NAME: "awards_store",
   db: null,
+  useSupabaseCache: true, // Флаг использования облачного кэша
 
   // Локальный эталонный реестр названий наград для точного поиска
   KNOWN_ENTITIES: {
@@ -48,7 +50,7 @@ const HeraldryResolver = {
 
   async init() {
     await this._initIndexedDB();
-    console.log("[HeraldryResolver] Геральдический модуль и IndexedDB готовы.");
+    console.log("[HeraldryResolver] Геральдический модуль v2.0 (Supabase Cache) готов.");
   },
 
   _initIndexedDB() {
@@ -70,6 +72,7 @@ const HeraldryResolver = {
 
   /**
    * Главный метод: получение изображений знака и планки
+   * Приоритет: Supabase → IndexedDB → API
    */
   async resolveAwardImages(awardTitle) {
     const rawKey = awardTitle.toLowerCase().trim();
@@ -84,12 +87,35 @@ const HeraldryResolver = {
       };
     }
 
-    // 1. Попытка извлечь из IndexedDB
-    const cached = await this._getFromCache(matchedKey);
-    if (cached) return cached;
+    // 1. Попытка извлечь из Supabase Cloud Cache
+    if (this.useSupabaseCache && typeof CloudSync !== 'undefined' && CloudSync.client) {
+      try {
+        const cloudCached = await this._getFromSupabaseCache(matchedKey);
+        if (cloudCached) {
+          console.log(`[Heraldry] 🌐 Найдено в облачном кэше: ${entity.name}`);
+          return cloudCached;
+        }
+      } catch (e) {
+        console.warn("[Heraldry] Ошибка чтения облачного кэша, fallback на локальный:", e);
+      }
+    }
 
-    // 2. Если нет в кэше — запрос к Wikimedia Commons API
+    // 2. Попытка извлечь из IndexedDB (локальный кэш)
+    const localCached = await this._getFromCache(matchedKey);
+    if (localCached) {
+      console.log(`[Heraldry] 💾 Найдено в локальном кэше: ${entity.name}`);
+      
+      // Асинхронно обновить облачный кэш, если локальная версия новее
+      if (this.useSupabaseCache && typeof CloudSync !== 'undefined' && CloudSync.client) {
+        this._syncToSupabaseCache(localCached).catch(() => {});
+      }
+      
+      return localCached;
+    }
+
+    // 3. Если нет в кэшах — запрос к Wikimedia Commons API
     try {
+      console.log(`[Heraldry] 🌐 Запрос к Wikimedia API: ${entity.query}`);
       const badgeUrl = await this._fetchCommonsImageUrl(entity.query, 400);
       const ribbonUrl = await this._fetchCommonsImageUrl(entity.ribbonQuery, 600);
 
@@ -102,8 +128,12 @@ const HeraldryResolver = {
         cachedAt: Date.now()
       };
 
-      // Сохраняем в кэш
+      // Сохраняем в оба кэша
       await this._saveToCache(result);
+      if (this.useSupabaseCache && typeof CloudSync !== 'undefined' && CloudSync.client) {
+        await this._syncToSupabaseCache(result);
+      }
+      
       return result;
     } catch (e) {
       console.warn("[Heraldry] Ошибка загрузки из сети, fallback:", e);
@@ -112,6 +142,64 @@ const HeraldryResolver = {
         badgeUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png",
         ribbonUrl: null
       };
+    }
+  },
+
+  /**
+   * Получение данных из Supabase heraldry_cache
+   */
+  async _getFromSupabaseCache(key) {
+    if (!CloudSync?.client) return null;
+    
+    const { data, error } = await CloudSync.client
+      .from('heraldry_cache')
+      .select('badge_url, ribbon_url, name, established, cached_at')
+      .eq('file_name', key)
+      .single();
+    
+    if (error || !data) return null;
+    
+    // Проверка актульности кэша (не старше 30 дней)
+    const cacheAge = Date.now() - new Date(data.cached_at).getTime();
+    const maxAge = 30 * 24 * 60 * 60 * 1000; // 30 дней
+    
+    if (cacheAge > maxAge) {
+      console.log(`[Heraldry] Облачный кэш устарел (${Math.round(cacheAge / 86400000)} дн.)`);
+      return null;
+    }
+    
+    return {
+      awardKey: key,
+      name: data.name,
+      badgeUrl: data.badge_url,
+      ribbonUrl: data.ribbon_url,
+      established: data.established,
+      cachedAt: new Date(data.cached_at).getTime()
+    };
+  },
+
+  /**
+   * Синхронизация данных в Supabase heraldry_cache
+   */
+  async _syncToSupabaseCache(data) {
+    if (!CloudSync?.client) return;
+    
+    try {
+      const { error } = await CloudSync.client
+        .from('heraldry_cache')
+        .upsert([{
+          file_name: data.awardKey,
+          badge_url: data.badgeUrl,
+          ribbon_url: data.ribbonUrl,
+          name: data.name,
+          established: data.established,
+          cached_at: new Date(data.cachedAt).toISOString()
+        }], { onConflict: 'file_name' });
+      
+      if (error) throw error;
+      console.log(`[Heraldry] ✅ Синхронизировано в облако: ${data.name}`);
+    } catch (e) {
+      console.warn("[Heraldry] Ошибка записи в облачный кэш:", e);
     }
   },
 
@@ -149,6 +237,51 @@ const HeraldryResolver = {
       tx.oncomplete = () => resolve();
       tx.onerror = () => resolve();
     });
+  },
+  
+  /**
+   * Метод для принудительной очистки облачного кэша (для админ-панели)
+   */
+  async clearSupabaseCache() {
+    if (!CloudSync?.client) return false;
+    
+    const { error } = await CloudSync.client
+      .from('heraldry_cache')
+      .delete()
+      .neq('file_name', ''); // Удалить все записи
+    
+    return !error;
+  },
+  
+  /**
+   * Метод для получения статистики кэша
+   */
+  async getCacheStats() {
+    const stats = {
+      supabaseCount: 0,
+      localCount: 0
+    };
+    
+    // Статистика Supabase
+    if (CloudSync?.client) {
+      const { count } = await CloudSync.client
+        .from('heraldry_cache')
+        .select('*', { count: 'exact', head: true });
+      stats.supabaseCount = count || 0;
+    }
+    
+    // Статистика IndexedDB
+    if (this.db) {
+      const tx = this.db.transaction([this.STORE_NAME], "readonly");
+      const store = tx.objectStore(this.STORE_NAME);
+      const req = store.count();
+      stats.localCount = await new Promise(resolve => {
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => resolve(0);
+      });
+    }
+    
+    return stats;
   }
 };
 

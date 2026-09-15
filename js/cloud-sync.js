@@ -176,8 +176,40 @@ const CloudSync = {
   // --- МЕТОДЫ КВИЗА (НОВОЕ) ---
   async saveQuizResult(name, score) {
     if (!this.isLive) return false;
-    await this.client.from('quiz_leaderboard').insert([{ student_name: name, score: score }]);
+    
+    const { error } = await this.client
+      .from('quiz_results')
+      .insert([{ student_name: name, score: score, date: new Date().toISOString() }]);
+    
+    if (error) {
+      console.error('[CloudSync] Ошибка сохранения результата квиза:', error);
+      return false;
+    }
+    
+    console.log('[CloudSync] ✅ Результат квиза сохранен:', name, score);
     return true;
+  },
+
+  async getLeaderboard(limit = 10) {
+    if (!this.isLive) {
+      // Fallback на localStorage
+      return JSON.parse(localStorage.getItem('srmk_quiz_results') || '[]');
+    }
+
+    const { data, error } = await this.client
+      .from('quiz_results')
+      .select('*')
+      .order('score', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error('[CloudSync] Ошибка загрузки лидерборда:', error);
+      return [];
+    }
+
+    console.log('[CloudSync] 🏆 Лидерборд загружен:', data.length, 'записей');
+    return data || [];
   }
 };
 
