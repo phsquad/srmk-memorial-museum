@@ -20,7 +20,11 @@
 }
 
 /* Темная тема по умолчанию */
-body.dark-theme .quiz-container,
+body.dark-theme .quiz-container {
+    background: transparent;
+    color: var(--text-main);
+}
+
 body.dark-theme .quiz-card,
 body.dark-theme .question-card,
 body.dark-theme .result-card {
@@ -592,4 +596,44 @@ h1, h2, h3 {
     .filter-btn { font-size: 0.8rem; padding: 0.4rem 0.8rem; }
     
     .badges-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* Отступ для контента под фиксированной шапкой */
+.quiz-container {
+    padding-top: 1rem;
+    min-height: calc(100vh - 80px);
+}
+
+/* Адаптивность под планшет (768px) */
+@media (max-width: 768px) {
+    .quiz-screen {
+        margin: 1rem auto;
+        padding: 0 0.5rem;
+    }
+    
+    .quiz-card, .question-card, .result-card {
+        padding: 1.5rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .action-buttons button,
+    .action-buttons a.secondary-btn {
+        width: 100%;
+        max-width: 280px;
+    }
+}
+
+/* Адаптивность под большие экраны */
+@media (min-width: 1200px) {
+    .quiz-screen {
+        max-width: 900px;
+    }
+    
+    .options-grid {
+        grid-template-columns: 1fr 1fr;
+    }
 }
