@@ -144,6 +144,9 @@ const QuizEngine = {
 
   init() {
     console.log("[QuizEngine] Исторический квест инициализирован.");
+    
+    // Инициализируем realtime-подписку на лидерборд при загрузке страницы
+    this.initLeaderboardRealtime();
   },
 
   /**
@@ -316,7 +319,7 @@ const QuizEngine = {
   },
 
   /**
-   * 6. Финальный экран результатов
+   * 6. Финальный экран результатов (обновлено с лидербордом)
    */
   showResults() {
     document.getElementById('quizProgressBar').style.width = '100%';
@@ -336,12 +339,145 @@ const QuizEngine = {
       document.getElementById('resultMessageText').textContent = `Превосходный результат, ${this.participant.name}! Вы безошибочно ориентируетесь в экспозиции Мемориала Славы и подвигах 20 героев колледжа.`;
       document.getElementById('winnerBox').style.display = 'block';
       document.getElementById('retryBox').style.display = 'none';
+      
+      // Загружаем лидерборд для победителей
+      this.loadAndRenderLeaderboard();
     } else {
       document.getElementById('resultCrest').textContent = '🎖';
       document.getElementById('resultTitle').textContent = 'ИСПЫТАНИЕ ЗАВЕРШЕНО';
       document.getElementById('resultMessageText').textContent = `Вы ответили правильно на ${this.score} из 10 вопросов (${percent}%). Для получения Сертификата Победителя повторите материал в Книге Памяти и пройдите квест снова.`;
       document.getElementById('winnerBox').style.display = 'none';
       document.getElementById('retryBox').style.display = 'block';
+    }
+  },
+
+  /**
+   * Сохранение локального результата (fallback)
+   */
+  saveLocalResult(name, score, date) {
+    let localResults = JSON.parse(localStorage.getItem('srmk_quiz_results') || '[]');
+    localResults.push({ name, score, date });
+    localResults.sort((a, b) => b.score - a.score);
+    localStorage.setItem('srmk_quiz_results', JSON.stringify(localResults.slice(0, 10)));
+  },
+
+  /**
+   * Загрузка и отображение лидерборда
+   */
+  async loadAndRenderLeaderboard() {
+    const leaderboardContainer = document.getElementById('leaderboardList');
+    if (!leaderboardContainer) {
+      console.warn('[Quiz] Контейнер лидерборда #leaderboardList не найден');
+      return;
+    }
+
+    leaderboardContainer.innerHTML = '<div class="loading">⏳ Загрузка лидеров...</div>';
+
+    try {
+      // Пытаемся загрузить из облака Supabase
+      let data = [];
+      if (typeof CloudSync !== 'undefined' && CloudSync.client) {
+        data = await CloudSync.getLeaderboard();
+        console.log('[Quiz] 🌐 Загружено из облака:', data.length, 'записей');
+      }
+      
+      if (data && data.length > 0) {
+        this.renderLeaderboardEntries(data, leaderboardContainer);
+      } else {
+        // Если облако пусто, пробуем локальное хранилище
+        const localData = JSON.parse(localStorage.getItem('srmk_quiz_results') || '[]');
+        if (localData.length > 0) {
+          console.log('[Quiz] 💾 Использовано локальное хранилище:', localData.length, 'записей');
+          this.renderLeaderboardEntries(localData, leaderboardContainer);
+        } else {
+          leaderboardContainer.innerHTML = '<p class="empty-state">Пока нет результатов. Стань первым!</p>';
+        }
+      }
+    } catch (error) {
+      console.error('[Quiz] ❌ Ошибка загрузки лидерборда:', error);
+      leaderboardContainer.innerHTML = '<p class="error">Не удалось загрузить таблицу лидеров.</p>';
+      
+      // Fallback на локальные данные при ошибке сети
+      const localData = JSON.parse(localStorage.getItem('srmk_quiz_results') || '[]');
+      if (localData.length > 0) {
+        this.renderLeaderboardEntries(localData, leaderboardContainer);
+      }
+    }
+  },
+
+  /**
+   * Рендеринг записей лидерборда
+   */
+  renderLeaderboardEntries(entries, container) {
+    container.innerHTML = '';
+    const topEntries = entries.slice(0, 10); // Топ 10
+
+    if (topEntries.length === 0) {
+      container.innerHTML = '<p class="empty-state">Пока нет результатов.</p>';
+      return;
+    }
+
+    const ul = document.createElement('ul');
+    ul.className = 'leaderboard-list';
+
+    topEntries.forEach((entry, index) => {
+      const li = document.createElement('li');
+      li.className = `leaderboard-item rank-${index + 1}`;
+      
+      // Нормализация полей (из облака или локально)
+      const name = entry.name || entry.student_name || 'Аноним';
+      const score = entry.score || 0;
+      const dateVal = entry.date || entry.created_at;
+      const dateObj = dateVal ? new Date(dateVal) : new Date();
+      const dateStr = dateObj.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+
+      li.innerHTML = `
+        <span class="rank">#${index + 1}</span>
+        <span class="name">${this.escapeHtml(name)}</span>
+        <span class="score">${score} баллов</span>
+        <span class="date">${dateStr}</span>
+      `;
+      ul.appendChild(li);
+    });
+
+    container.appendChild(ul);
+    console.log('[Quiz] ✅ Лидерборд отрисован:', topEntries.length, 'записей');
+  },
+
+  /**
+   * Экранирование HTML для безопасности
+   */
+  escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  },
+
+  /**
+   * Инициализация realtime-подписки на лидерборд
+   */
+  initLeaderboardRealtime() {
+    if (typeof CloudSync === 'undefined' || !CloudSync.client) return;
+    
+    try {
+      CloudSync.client
+        .channel('quiz_leaderboard_channel')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'quiz_results' },
+          () => {
+            console.log('[Quiz] 🔄 Realtime-обновление лидерборда');
+            this.loadAndRenderLeaderboard();
+          }
+        )
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            console.log('[Quiz] 📡 Подписка на обновления лидерборда активна');
+          }
+        });
+    } catch (e) {
+      console.warn('[Quiz] Не удалось подключить realtime:', e);
     }
   },
 
@@ -356,8 +492,18 @@ const QuizEngine = {
     }
 
     // Сохраняем результат в глобальную таблицу лидеров Supabase
-    if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
-      await CloudSync.saveQuizResult(this.participant.name, this.score);
+    try {
+      if (typeof CloudSync !== 'undefined' && CloudSync.client) {
+        await CloudSync.saveQuizResult(this.participant.name, this.score);
+        console.log('[Quiz] ✅ Результат сохранен в Supabase');
+      } else {
+        // Fallback на localStorage
+        this.saveLocalResult(this.participant.name, this.score, new Date().toISOString());
+        console.log('[Quiz] 💾 Результат сохранен локально');
+      }
+    } catch (error) {
+      console.error('[Quiz] ❌ Ошибка при сохранении:', error);
+      this.saveLocalResult(this.participant.name, this.score, new Date().toISOString());
     }
 
     const params = new URLSearchParams({
