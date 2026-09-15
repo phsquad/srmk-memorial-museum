@@ -1,0 +1,611 @@
+@charset "UTF-8";
+
+/* ==========================================================================
+   ЕДИНЫЙ ГЛОБАЛЬНЫЙ СТИЛЬ ДЛЯ ВСЕХ СТРАНИЦ САЙТА
+   Версия: 1.0 - Унифицированный дизайн
+   ========================================================================== */
+
+/* ============================================================================
+   1. ЦВЕТОВЫЕ ПЕРЕМЕННЫЕ И ДИЗАЙН-ТОКЕНЫ
+   ============================================================================ */
+:root {
+  /* Основная палитра - Тёмная тема с золотыми акцентами */
+  --bg-main: #0a0c0f;
+  --bg-surface: #12151b;
+  --bg-elevated: #181d26;
+  --bg-card: #151a24;
+  --bg-card-hover: #1d2330;
+  --bg-overlay: rgba(8, 10, 14, 0.94);
+  
+  /* Акцентные цвета */
+  --accent-brass: #c5a059;
+  --accent-brass-hover: #dfba6d;
+  --accent-brass-dim: rgba(197, 160, 89, 0.12);
+  --accent-brass-glow: rgba(197, 160, 89, 0.35);
+  
+  --accent-granite: #8b0000;
+  --accent-granite-hover: #a8232b;
+  --accent-granite-dim: rgba(138, 28, 34, 0.15);
+  --accent-granite-glow: rgba(138, 28, 34, 0.4);
+  
+  /* Цвета свечей и огня */
+  --candle-flame: #f59e0b;
+  --candle-glow: rgba(245, 158, 11, 0.5);
+  
+  /* Типографическая палитра */
+  --text-primary: #f1f3f7;
+  --text-secondary: #9da6b3;
+  --text-tertiary: #626a78;
+  --text-inverse: #0a0c0f;
+  
+  /* Границы и разделители */
+  --border-hairline: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.14);
+  --border-accent: rgba(197, 160, 89, 0.28);
+  --border-granite: rgba(138, 28, 34, 0.35);
+  
+  /* Тени и глубина */
+  --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.6);
+  --shadow-elevated: 0 18px 45px rgba(0, 0, 0, 0.85);
+  --shadow-glow: 0 0 30px var(--accent-brass-dim);
+  
+  /* Шрифты */
+  --font-heading: 'Cinzel', serif;
+  --font-body: 'Montserrat', sans-serif;
+  --font-book: 'Lora', 'Times New Roman', serif;
+  
+  /* Анимации */
+  --transition: 0.24s cubic-bezier(0.2, 0, 0, 1);
+  --ease-smooth: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* ============================================================================
+   2. БАЗОВЫЙ СБРОС И ОСНОВНЫЕ СТИЛИ
+   ============================================================================ */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+  font-size: 16px;
+  background-color: var(--bg-main);
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  line-height: 1.65;
+  overflow-x: hidden;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Скроллбар */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #202530;
+  border-radius: 4px;
+  border: 1px solid var(--border-hairline);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-brass);
+  box-shadow: 0 0 10px var(--accent-brass-glow);
+}
+
+::selection {
+  background: var(--accent-granite);
+  color: #ffffff;
+}
+
+/* ============================================================================
+   3. КОНТЕЙНЕРЫ
+   ============================================================================ */
+.container {
+  width: 100%;
+  max-width: 1260px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ============================================================================
+   4. ТИПОГРАФИКА
+   ============================================================================ */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+h1 { font-size: clamp(2rem, 4vw, 3rem); }
+h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
+h3 { font-size: clamp(1.3rem, 2vw, 1.6rem); }
+h4 { font-size: clamp(1.1rem, 1.5vw, 1.3rem); }
+
+p {
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+}
+
+a {
+  color: var(--accent-brass);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+a:hover {
+  color: var(--accent-brass-hover);
+}
+
+/* ============================================================================
+   5. КНОПКИ - ЕДИНЫЙ СТИЛЬ
+   ============================================================================ */
+.btn, button, .action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all var(--transition);
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+/* Первичная кнопка (золотая) */
+.btn-primary, button.primary, .btn-primary-style {
+  background: var(--accent-brass);
+  color: var(--text-inverse);
+  border-color: var(--accent-brass);
+  box-shadow: 0 4px 16px var(--accent-brass-dim);
+}
+
+.btn-primary:hover, button.primary:hover {
+  background: var(--accent-brass-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--accent-brass-glow);
+}
+
+/* Вторичная кнопка (прозрачная с рамкой) */
+.btn-secondary, button.secondary, .btn-secondary-style {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border-color: var(--border-hairline);
+}
+
+.btn-secondary:hover, button.secondary:hover {
+  border-color: var(--accent-brass);
+  color: var(--accent-brass);
+  background: var(--accent-brass-dim);
+  transform: translateY(-2px);
+}
+
+/* Акцентная кнопка (гранитовая) */
+.btn-accent, button.accent, .btn-accent-style {
+  background: var(--accent-granite);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 16px var(--accent-granite-dim);
+}
+
+.btn-accent:hover, button.accent:hover {
+  background: var(--accent-granite-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--accent-granite-glow);
+}
+
+/* Маленькие кнопки */
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+}
+
+/* Большие кнопки */
+.btn-lg {
+  padding: 16px 32px;
+  font-size: 1rem;
+}
+
+/* Отключенная кнопка */
+.btn:disabled, button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* ============================================================================
+   6. КАРТОЧКИ И ПАНЕЛИ
+   ============================================================================ */
+.card, .panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: var(--shadow-subtle);
+  transition: all var(--transition);
+}
+
+.card:hover, .panel:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-elevated);
+}
+
+.card-header, .panel-header {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.card-title, .panel-title {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.card-body, .panel-body {
+  color: var(--text-secondary);
+}
+
+/* ============================================================================
+   7. ФОРМЫ И ПОЛЯ ВВОДА
+   ============================================================================ */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+input[type="date"],
+textarea,
+select {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  outline: none;
+  transition: all var(--transition);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--accent-brass);
+  box-shadow: 0 0 0 3px var(--accent-brass-dim);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+/* ============================================================================
+   8. ТАБЛИЦЫ
+   ============================================================================ */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+th, td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+th {
+  background: var(--bg-surface);
+  color: var(--accent-brass);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+tr:hover {
+  background: var(--bg-card-hover);
+}
+
+/* ============================================================================
+   9. НАВИГАЦИЯ И МЕНЮ
+   ============================================================================ */
+.nav, .nav-menu {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.nav-link, .nav-item a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: all var(--transition);
+  border: 1px solid transparent;
+}
+
+.nav-link:hover, .nav-item a:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-link.active, .nav-item a.active {
+  color: var(--accent-brass);
+  background: var(--accent-brass-dim);
+  border-color: var(--accent-brass);
+  font-weight: 700;
+}
+
+/* ============================================================================
+   10. ШАПКА (HEADER) - БАЗОВЫЙ СТИЛЬ
+   ============================================================================ */
+.site-header, .header {
+  background: rgba(10, 12, 16, 0.96);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--border-hairline);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 14px 0;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.logo-badge {
+  background: var(--accent-granite);
+  color: #ffffff;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  border-radius: 4px;
+  text-decoration: none;
+  letter-spacing: 1.5px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: var(--transition);
+}
+
+.logo-badge:hover {
+  background: var(--accent-granite-hover);
+  transform: translateY(-1px);
+}
+
+/* ============================================================================
+   11. ПОДВАЛ (FOOTER) - БАЗОВЫЙ СТИЛЬ
+   ============================================================================ */
+.site-footer, footer {
+  background: #0f1218;
+  color: var(--text-secondary);
+  padding: 40px 0 20px;
+  border-top: 1px solid var(--border-hairline);
+  margin-top: auto;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.footer-section h4 {
+  color: var(--text-primary);
+  font-size: 1rem;
+  margin-bottom: 16px;
+}
+
+.footer-section ul {
+  list-style: none;
+}
+
+.footer-section ul li {
+  margin-bottom: 8px;
+}
+
+.footer-section a {
+  color: var(--text-secondary);
+}
+
+.footer-section a:hover {
+  color: var(--accent-brass);
+}
+
+.footer-bottom {
+  text-align: center;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-hairline);
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+}
+
+/* ============================================================================
+   12. УТИЛИТАРНЫЕ КЛАССЫ
+   ============================================================================ */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-accent { color: var(--accent-brass); }
+
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mt-4 { margin-top: 2rem; }
+
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 2rem; }
+
+.p-1 { padding: 0.5rem; }
+.p-2 { padding: 1rem; }
+.p-3 { padding: 1.5rem; }
+.p-4 { padding: 2rem; }
+
+.hidden { display: none !important; }
+.visible { display: block !important; }
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.gap-1 { gap: 0.5rem; }
+.gap-2 { gap: 1rem; }
+.gap-3 { gap: 1.5rem; }
+.gap-4 { gap: 2rem; }
+
+/* ============================================================================
+   13. АНИМАЦИИ
+   ============================================================================ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px var(--accent-brass-dim); }
+  50% { box-shadow: 0 0 20px var(--accent-brass-glow); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite ease-in-out;
+}
+
+.animate-glow {
+  animation: glow 2s infinite ease-in-out;
+}
+
+/* ============================================================================
+   14. АДАПТИВНОСТЬ
+   ============================================================================ */
+@media (max-width: 768px) {
+  :root {
+    font-size: 15px;
+  }
+  
+  .container {
+    padding: 0 16px;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .nav {
+    justify-content: center;
+    width: 100%;
+  }
+  
+  h1 { font-size: 1.8rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.2rem; }
+  
+  .btn, button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .footer-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .card, .panel {
+    padding: 16px;
+  }
+  
+  input, textarea, select {
+    font-size: 16px; /* Предотвращает зум на iOS */
+  }
+}
+
+/* ============================================================================
+   15. ПЕЧАТЬ
+   ============================================================================ */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  
+  .site-header, .site-footer, .btn, button {
+    display: none !important;
+  }
+  
+  a {
+    color: black;
+    text-decoration: underline;
+  }
+  
+  .card, .panel {
+    break-inside: avoid;
+    border: 1px solid #ccc;
+    box-shadow: none;
+  }
+}
