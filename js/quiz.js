@@ -145,8 +145,11 @@ const QuizEngine = {
   init() {
     console.log("[QuizEngine] Исторический квест инициализирован.");
     
+    // Загружаем лидерборд при старте
+    this.loadAndRenderLeaderboard();
+    
     // Инициализируем realtime-подписку на лидерборд при загрузке страницы
-    this.initLeaderboardRealtime();
+    // (будет вызвана внутри loadAndRenderLeaderboard)
   },
 
   /**
@@ -496,6 +499,9 @@ const QuizEngine = {
       if (typeof CloudSync !== 'undefined' && CloudSync.client) {
         await CloudSync.saveQuizResult(this.participant.name, this.score);
         console.log('[Quiz] ✅ Результат сохранен в Supabase');
+        
+        // После сохранения загружаем обновленный лидерборд
+        await this.loadAndRenderLeaderboard();
       } else {
         // Fallback на localStorage
         this.saveLocalResult(this.participant.name, this.score, new Date().toISOString());
@@ -516,6 +522,164 @@ const QuizEngine = {
     });
 
     window.location.href = `certificate.html?${params.toString()}`;
+  },
+
+  /**
+   * Загрузка и отображение лидерборда из Supabase
+   */
+  async loadAndRenderLeaderboard() {
+    const leaderboardContainer = document.getElementById('leaderboardEntries');
+    if (!leaderboardContainer) return;
+
+    leaderboardContainer.innerHTML = '<tr><td colspan="3" class="loading">⏳ Загрузка результатов...</td></tr>';
+
+    try {
+      let entries = [];
+
+      // Пробуем загрузить из облака
+      if (typeof CloudSync !== 'undefined' && CloudSync.client) {
+        const { data, error } = await CloudSync.client
+          .from('quiz_results')
+          .select('*')
+          .order('score', { ascending: false })
+          .order('completed_at', { ascending: true })
+          .limit(10);
+
+        if (error) {
+          console.error('[Quiz] ❌ Ошибка загрузки лидерборда:', error);
+          throw error;
+        }
+
+        entries = data || [];
+        console.log(`[Quiz] 🌐 Загружено ${entries.length} результатов из облака`);
+      }
+
+      // Если облако недоступно или пусто, используем локальные данные
+      if (entries.length === 0) {
+        const localData = localStorage.getItem('srmk_quiz_leaderboard_v2');
+        entries = localData ? JSON.parse(localData) : [];
+        console.log(`[Quiz] 💾 Загружено ${entries.length} результатов из локального хранилища`);
+      }
+
+      this.renderLeaderboardEntries(entries);
+      
+      // Подключаем realtime-подписку для обновления в реальном времени
+      this.initLeaderboardRealtime();
+
+    } catch (error) {
+      console.error('[Quiz] ❌ Критическая ошибка лидерборда:', error);
+      leaderboardContainer.innerHTML = '<tr><td colspan="3" class="error">⚠️ Не удалось загрузить результаты</td></tr>';
+    }
+  },
+
+  /**
+   * Отрисовка записей лидерборда
+   */
+  renderLeaderboardEntries(entries) {
+    const container = document.getElementById('leaderboardEntries');
+    if (!container) return;
+
+    if (entries.length === 0) {
+      container.innerHTML = '<tr><td colspan="3" class="empty">📭 Пока нет результатов. Будьте первыми!</td></tr>';
+      return;
+    }
+
+    let html = '';
+    entries.forEach((entry, index) => {
+      const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+      const date = new Date(entry.completed_at || entry.date).toLocaleDateString('ru-RU', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      });
+      
+      const safeName = this.escapeHtml(entry.student_name || entry.name || 'Аноним');
+      const safeGroup = this.escapeHtml(entry.group || '-');
+      
+      html += `
+        <tr class="leaderboard-entry ${index < 3 ? 'top-three' : ''}">
+          <td class="rank">${medal}</td>
+          <td class="student-info">
+            <div class="student-name">${safeName}</div>
+            <div class="student-group">${safeGroup}</div>
+          </td>
+          <td class="score">${entry.score}/10</td>
+        </tr>
+      `;
+    });
+
+    container.innerHTML = html;
+  },
+
+  /**
+   * Инициализация realtime-подписки на изменения лидерборда
+   */
+  initLeaderboardRealtime() {
+    if (typeof CloudSync === 'undefined' || !CloudSync.client) {
+      console.log('[Quiz] ⚠️ CloudSync недоступен, realtime-обновления отключены');
+      return;
+    }
+
+    // Отписываемся от предыдущей подписки если есть
+    if (this.leaderboardSubscription) {
+      CloudSync.client.channel(this.leaderboardSubscription).unsubscribe();
+    }
+
+    // Подписываемся на изменения в таблице quiz_results
+    this.leaderboardSubscription = CloudSync.client
+      .channel('quiz-leaderboard-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'quiz_results'
+        },
+        (payload) => {
+          console.log('[Quiz] 🔄 Получено обновление лидерборда:', payload.eventType);
+          // Перезагружаем лидерборд при любом изменении
+          this.loadAndRenderLeaderboard();
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('[Quiz] 📡 Realtime-подписка на лидерборд активна');
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('[Quiz] ❌ Ошибка realtime-подписки');
+        }
+      });
+  },
+
+  /**
+   * Экранирование HTML для защиты от XSS
+   */
+  escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  },
+
+  saveLocalResult(name, score, date) {
+    // Локальное сохранение как fallback
+    let leaderboard = [];
+    const localData = localStorage.getItem('srmk_quiz_leaderboard_v2');
+    if (localData) {
+      leaderboard = JSON.parse(localData);
+    }
+
+    leaderboard.push({
+      student_name: name,
+      score: score,
+      completed_at: date,
+      group: this.participant?.group || '-'
+    });
+
+    // Сортируем и оставляем топ-100
+    leaderboard.sort((a, b) => b.score - a.score || new Date(a.completed_at) - new Date(b.completed_at));
+    leaderboard = leaderboard.slice(0, 100);
+
+    localStorage.setItem('srmk_quiz_leaderboard_v2', JSON.stringify(leaderboard));
   },
 
   restartQuest() {
