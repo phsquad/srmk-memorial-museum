@@ -12,29 +12,16 @@
     
     <!-- Основные стили сайта -->
     <link rel="stylesheet" href="css/site-common.css">
+    <link rel="stylesheet" href="css/global-styles.css">
     
     <!-- Стили квиза -->
     <style>
         :root {
-            --quiz-bg: #1a1f29;
-            --quiz-card: #232936;
-            --quiz-accent: #d4af37;
-            --quiz-text: #e0e0e0;
+            --quiz-accent: var(--accent-brass);
             --quiz-success: #4caf50;
             --quiz-error: #f44336;
             --timer-warning: #ff9800;
             --timer-danger: #f44336;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            font-family: 'Montserrat', sans-serif;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
 
         /* Контейнер квиза */
@@ -47,13 +34,13 @@
             box-sizing: border-box;
         }
 
-        /* Карточка вопроса */
+        /* Карточка квиза - используем единый стиль карточек */
         .quiz-card {
-            background: var(--quiz-card);
-            border-radius: 12px;
+            background: var(--bg-card);
+            border-radius: 8px;
             padding: 30px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            border: 1px solid rgba(212, 175, 55, 0.1);
+            box-shadow: var(--shadow-subtle);
+            border: 1px solid var(--border-hairline);
             position: relative;
             overflow: hidden;
         }
@@ -127,21 +114,22 @@
         }
 
         .option-btn {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-hairline);
             padding: 15px 20px;
-            border-radius: 8px;
-            color: var(--quiz-text);
+            border-radius: 4px;
+            color: var(--text-primary);
             text-align: left;
             cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1rem;
+            transition: all var(--transition);
+            font-family: var(--font-body);
+            font-size: 0.95rem;
         }
 
         .option-btn:hover:not([disabled]) {
-            background: rgba(212, 175, 55, 0.1);
-            border-color: var(--quiz-accent);
+            background: var(--accent-brass-dim);
+            border-color: var(--accent-brass);
+            color: var(--accent-brass);
             transform: translateX(5px);
         }
 
@@ -179,9 +167,9 @@
             margin: 0 auto 20px;
             font-size: 2.5rem;
             font-weight: bold;
-            font-family: 'Cinzel', serif;
+            font-family: var(--font-heading);
             color: var(--quiz-accent);
-            background: rgba(212, 175, 55, 0.05);
+            background: var(--accent-brass-dim);
         }
 
         .badges-container {
@@ -195,7 +183,7 @@
         .badge {
             width: 50px;
             height: 50px;
-            background: #333;
+            background: var(--bg-surface);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -210,19 +198,20 @@
         .badge.unlocked {
             opacity: 1;
             filter: grayscale(0%);
-            background: linear-gradient(135deg, #d4af37, #f9df86);
-            color: #000;
-            border-color: #fff;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+            background: linear-gradient(135deg, var(--accent-brass), var(--accent-brass-hover));
+            color: var(--text-inverse);
+            border-color: var(--text-primary);
+            box-shadow: 0 0 15px var(--accent-brass-glow);
             transform: scale(1.1);
         }
 
         .hall-of-fame-preview {
-            background: rgba(0,0,0,0.2);
+            background: var(--bg-surface);
             padding: 15px;
             border-radius: 8px;
             margin-top: 20px;
             text-align: left;
+            border: 1px solid var(--border-hairline);
         }
 
         .hall-of-fame-table {
@@ -234,32 +223,39 @@
         .hall-of-fame-table th, .hall-of-fame-table td {
             padding: 8px;
             text-align: left;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid var(--border-hairline);
         }
         .hall-of-fame-table th { color: var(--quiz-accent); }
 
-        /* Кнопки действий */
+        /* Кнопки действий - используем единый стиль */
         .action-btn {
-            background: var(--quiz-accent);
-            color: #000;
+            background: var(--accent-brass);
+            color: var(--text-inverse);
             border: none;
             padding: 12px 30px;
-            border-radius: 30px;
-            font-weight: bold;
-            font-size: 1rem;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.9rem;
             cursor: pointer;
             margin: 10px;
-            transition: transform 0.2s;
+            transition: all var(--transition);
             text-transform: uppercase;
         }
         .action-btn:hover {
-            transform: scale(1.05);
-            background: #f9df86;
+            transform: translateY(-2px);
+            background: var(--accent-brass-hover);
+            box-shadow: 0 4px 16px var(--accent-brass-dim);
         }
         .action-btn.secondary {
-            background: transparent;
-            border: 2px solid var(--quiz-accent);
-            color: var(--quiz-accent);
+            background: var(--bg-surface);
+            border: 1px solid var(--border-hairline);
+            color: var(--text-primary);
+            text-transform: none;
+        }
+        .action-btn.secondary:hover {
+            border-color: var(--accent-brass);
+            color: var(--accent-brass);
+            background: var(--accent-brass-dim);
         }
 
         /* Уведомления */
@@ -268,16 +264,16 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background: var(--quiz-card);
-            border: 1px solid var(--quiz-accent);
+            background: var(--bg-card);
+            border: 1px solid var(--accent-brass);
             padding: 12px 24px;
-            border-radius: 30px;
-            color: #fff;
+            border-radius: 4px;
+            color: var(--text-primary);
             z-index: 1000;
             opacity: 0;
             transition: opacity 0.3s;
             pointer-events: none;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            box-shadow: var(--shadow-elevated);
         }
         .toast.show { opacity: 1; }
 
