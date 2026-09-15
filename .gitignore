@@ -1,11 +1,51 @@
-# Examples 1 and 2 show that only build artifacts, dependencies, and temp files should be in .gitignore
-# Current changes are all source/config files (.md, .css, .html, .js) which should not be ignored
-# No build artifacts, dependencies, or temp files detected in the changes
+```gitignore
+# Compiled and binary files
+*.pyc
+__pycache__/
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
 
-# Source files that should NOT be ignored:
-# README_NAVIGATION.md
-# css/header-common.css
-# includes/header.html
-# js/navigation.js
-# guestbook.html
-# index.html
+# Dependencies
+node_modules/
+venv/
+.venv/
+.env
+.env.local
+*.env.*
+
+# Build artifacts
+dist/
+build/
+target/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Cache directories
+.mypy_cache/
+.pytest_cache/
+.gradle/
+```
