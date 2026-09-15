@@ -1,0 +1,93 @@
+================================================================================
+ЕДИНАЯ СИСТЕМА НАВИГАЦИИ САЙТА ГБПОУ СРМК - КРАТКИЙ ОБЗОР
+================================================================================
+
+СОЗДАННЫЕ ФАЙЛЫ:
+-----------------
+1. includes/header.html         - Единый HTML-шаблон шапки сайта
+2. css/header-common.css        - Стили для единой шапки
+3. js/navigation.js             - Навигационный менеджер (JS модуль)
+4. README_NAVIGATION.md         - Полная документация системы
+
+ПРОВЕРЕННЫЕ СУЩЕСТВУЮЩИЕ СТРАНИЦЫ (10 файлов):
+----------------------------------------------
+✓ index.html          - Главная страница (3D-музей)
+✓ mobile.html         - Мобильная версия
+✓ memory-book.html    - Книга Памяти
+✓ reader.html         - 3D Фолиант-читалка
+✓ quiz.html           - Квест-викторина
+✓ desk-qr.html        - Конструктор «Парта Героя»
+✓ guestbook.html      - Стена Памяти
+✓ certificate.html    - Генератор сертификатов
+✓ methodology.html    - Методический кабинет
+✓ verify.html         - Реестр верификации
+
+ВСЕ ССЫЛКИ МЕЖДУ СТРАНИЦАМИ ПРОВЕРЕНЫ И РАБОТАЮТ!
+
+КАК ПОДКЛЮЧИТЬ ЕДИНУЮ ШАПКУ:
+-----------------------------
+
+ВАРИАНТ 1 (PHP сервер):
+  <?php include 'includes/header.html'; ?>
+
+ВАРИАНТ 2 (JavaScript fetch):
+  <div id="common-header-container"></div>
+  <script>
+  fetch('includes/header.html')
+    .then(r => r.text())
+    .then(data => {
+      document.getElementById('common-header-container').innerHTML = data;
+    });
+  </script>
+
+ВАРИАНТ 3 (Ручное копирование):
+  Скопируйте содержимое includes/header.html в каждую страницу
+
+ПОДКЛЮЧЕНИЕ СТИЛЕЙ:
+--------------------
+В <head> каждой страницы добавьте:
+  <link rel="stylesheet" href="css/header-common.css">
+
+ПОДКЛЮЧЕНИЕ JS МОДУЛЯ:
+-----------------------
+Перед </body> каждой страницы добавьте:
+  <script src="js/navigation.js"></script>
+
+ФУНКЦИИ NAVIGATION.JS:
+-----------------------
+- SiteNavigation.init()              - Автоинициализация
+- SiteNavigation.navigateTo(page)    - Переход на страницу
+- SiteNavigation.getPagePath(name)   - Получить путь к странице
+- SiteNavigation.pageExists(name)    - Проверка существования
+- SiteNavigation.toggleMobileMenu()  - Управление мобильным меню
+
+ДОСТУПНЫЕ СТРАНИЦЫ ДЛЯ НАВИГАЦИИ:
+----------------------------------
+- main         → index.html
+- memoryBook   → memory-book.html
+- reader       → reader.html
+- quiz         → quiz.html
+- deskQr       → desk-qr.html
+- guestbook    → guestbook.html
+- certificate  → certificate.html
+- methodology  → methodology.html
+- verify       → verify.html
+- mobile       → mobile.html
+
+АДАПТИВНОСТЬ:
+--------------
+- Desktop (>1024px): Полное меню со всеми ссылками
+- Tablet (768-1024px): Скрытое меню + кнопка бургера
+- Mobile (<768px): Только логотип + кнопка бургера
+
+ЦВЕТОВАЯ СХЕМА:
+----------------
+- Золотой акцент: #c5a059
+- Гранитовый красный: #8a1c22
+- Основной фон: #0a0c0f
+- Текст: #f1f3f7 / #9da6b3
+
+================================================================================
+ВСЕ КОМПОНЕНТЫ ГОТОВЫ К ИСПОЛЬЗОВАНИЮ!
+Подробная документация: README_NAVIGATION.md
+================================================================================

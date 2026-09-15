@@ -1,0 +1,259 @@
+/* ============================================
+   ЕДИНЫЕ СТИЛИ ШАПКИ (Header Common Styles)
+   Подключается после site-common.css
+   ============================================ */
+
+/* Основная шапка сайта */
+.site-header {
+  background: rgba(10, 12, 15, 0.96);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(197, 160, 89, 0.2);
+  padding: 12px 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Логотип и название */
+.logo-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.3s ease;
+}
+
+.logo-group:hover {
+  opacity: 0.85;
+}
+
+.logo-badge {
+  background: linear-gradient(135deg, #c5a059 0%, #8a1c22 100%);
+  color: #fff;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 8px 14px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 8px rgba(197, 160, 89, 0.3);
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.org-name {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #9da6b3);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.site-title {
+  font-size: 0.95rem;
+  color: var(--accent-brass, #c5a059);
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+/* Основная навигация */
+.main-nav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: var(--text-secondary, #9da6b3);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 8px 14px;
+  border-radius: 6px;
+  transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.nav-link:hover {
+  color: var(--accent-brass, #c5a059);
+  background: rgba(197, 160, 89, 0.08);
+  border-color: rgba(197, 160, 89, 0.2);
+}
+
+.nav-link.active {
+  color: #fff;
+  background: rgba(197, 160, 89, 0.15);
+  border-color: var(--accent-brass, #c5a059);
+}
+
+/* Кнопки в шапке */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-return-museum {
+  text-decoration: none;
+  color: #fff;
+  background: linear-gradient(135deg, #c5a059 0%, #d4af37 100%);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 8px rgba(197, 160, 89, 0.3);
+  white-space: nowrap;
+}
+
+.btn-return-museum:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(197, 160, 89, 0.45);
+}
+
+/* Мобильная кнопка-бургер */
+.mobile-burger-btn {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  z-index: 1001;
+}
+
+.mobile-burger-btn span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--accent-brass, #c5a059);
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.mobile-burger-btn.active span:nth-child(1) {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+
+.mobile-burger-btn.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-burger-btn.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
+}
+
+/* Выдвижная мобильная панель */
+.mobile-drawer {
+  display: none;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 12, 15, 0.98);
+  backdrop-filter: blur(10px);
+  z-index: 999;
+  overflow-y: auto;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.mobile-drawer.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.drawer-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.drawer-section-label {
+  font-size: 0.75rem;
+  color: var(--text-tertiary, #626a78);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 12px 0 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 8px;
+}
+
+.drawer-link {
+  display: block;
+  text-decoration: none;
+  color: var(--text-primary, #f1f3f7);
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 14px 16px;
+  border-radius: 8px;
+  transition: all 0.25s ease;
+  border: 1px solid transparent;
+}
+
+.drawer-link:hover {
+  background: rgba(197, 160, 89, 0.1);
+  border-color: rgba(197, 160, 89, 0.2);
+  color: var(--accent-brass, #c5a059);
+}
+
+.drawer-link.highlight {
+  background: rgba(197, 160, 89, 0.15);
+  border-color: rgba(197, 160, 89, 0.3);
+  color: var(--accent-brass, #c5a059);
+  font-weight: 600;
+}
+
+/* Адаптивность */
+@media (max-width: 1024px) {
+  .main-nav {
+    display: none;
+  }
+  
+  .mobile-burger-btn {
+    display: flex;
+  }
+  
+  .header-actions {
+    gap: 8px;
+  }
+  
+  .btn-return-museum {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .logo-text {
+    display: none;
+  }
+  
+  .header-container {
+    gap: 12px;
+  }
+  
+  .btn-return-museum {
+    display: none;
+  }
+}
