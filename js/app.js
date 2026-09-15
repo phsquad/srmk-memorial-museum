@@ -126,16 +126,30 @@ const App = {
   },
 
   async loadCloudData() {
-    if (!window.CloudSync?.isLive) return;
-    const cloudData = await CloudSync.fetchAllCounters();
-    if (!cloudData) return;
-
-    AppState.candles = { ...AppState.candles, ...cloudData.candles };
-    AppState.flowersCount = cloudData.flowers;
-    localStorage.setItem('srmk_museum_candles_v3', JSON.stringify(AppState.candles));
-    this.updateMemorialStats();
-    this.renderCardsGrid();
-    this.renderMemorialPlaques();
+    if (!window.CloudSync?.isLive) {
+      console.warn('[App] CloudSync не активен. Работа в офлайн-режиме.');
+      return;
+    }
+    
+    try {
+      // 1. Загружаем счетчики свечей и цветов
+      const cloudData = await CloudSync.fetchAllCounters();
+      if (cloudData) {
+        AppState.candles = { ...AppState.candles, ...cloudData.candles };
+        AppState.flowersCount = cloudData.flowers;
+        localStorage.setItem('srmk_museum_candles_v3', JSON.stringify(AppState.candles));
+        console.log('[App] Счетчики синхронизированы с облаком');
+      }
+      
+      // 2. Обновляем отображение
+      this.updateMemorialStats();
+      this.renderCardsGrid();
+      this.renderMemorialPlaques();
+      
+    } catch (error) {
+      console.error('[App] Ошибка загрузки облачных данных:', error);
+      // Fallback на localStorage уже загружен в loadStorageData()
+    }
   },
 
   bindEvents() {

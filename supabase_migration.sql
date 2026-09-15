@@ -1,5 +1,6 @@
 -- ============================================================
--- SRMK Memorial Complex: Supabase Database Migration Script
+-- SRMK Memorial Complex: Supabase Database Migration Script v2.0
+-- Полная синхронизация с облаком для GitHub Pages
 -- ============================================================
 -- Инструкция:
 -- 1. Зайдите в Dashboard вашего проекта Supabase.
@@ -15,23 +16,18 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- Основной источник истины о персоналиях
 -- ============================================================
 CREATE TABLE IF NOT EXISTS heroes_database (
-  id TEXT PRIMARY KEY, -- ID героя (например, 'hero_001')
-  name TEXT NOT NULL,  -- ФИО
-  plaque TEXT CHECK (plaque IN ('left', 'right', 'general')), -- Расположение на стене
-  spec_tag TEXT,       -- Специальность (например, 'Авиамеханик')
-  
-  -- JSONB поля для гибкой структуры данных
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  plaque TEXT CHECK (plaque IN ('left', 'right', 'general', 'none')),
+  spec_tag TEXT,
   dates JSONB DEFAULT '{"birth": "", "death": ""}',
   education JSONB DEFAULT '{"school": "", "college": ""}',
   military JSONB DEFAULT '{"service": "", "rank": ""}',
-  awards TEXT[] DEFAULT '{}', -- Массив наград
-  deed TEXT,           -- Подвиг
-  quote TEXT,          -- Цитата
-  
-  -- Медиа и геолокация
-  media JSONB DEFAULT '{"photo": "", "audio": ""}',
-  map_coords JSONB DEFAULT '{"lat": 0, "lng": 0}',
-  
+  awards TEXT[] DEFAULT '{}',
+  deed TEXT,
+  quote TEXT,
+  media JSONB DEFAULT '{"photo": "", "audioGuide": "", "documents": []}',
+  map_coords JSONB DEFAULT '{"lat": 45.0448, "lng": 41.9691, "locationName": "г. Ставрополь"}',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );

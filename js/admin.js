@@ -454,7 +454,7 @@ const AdminCMS = {
     };
 
     heroesDatabase.unshift(newHero);
-    this.saveToLocalStorage();
+    await this.saveChanges(); // Используем новый метод с синхронизацией облака
     this.loadHeroIntoForm(newId);
     this.showAdminToast("Создан новый профиль героя. Заполните данные.", "info");
   },
@@ -468,7 +468,7 @@ const AdminCMS = {
       const idx = heroesDatabase.findIndex(h => h.id === this.originalHeroId || h.id === this.currentHeroId);
       if (idx !== -1) heroesDatabase.splice(idx, 1);
 
-      this.saveToLocalStorage();
+      this.saveChanges(); // Синхронизация с облаком
       this.currentHeroId = null;
       this.originalHeroId = null;
 
@@ -542,7 +542,7 @@ const AdminCMS = {
     this.currentHeroId = newIdInput;
     this.originalHeroId = newIdInput;
 
-    this.saveToLocalStorage();
+    this.saveChanges(); // Синхронизация с облаком
     this.renderSidebarList();
 
     // Синхронизация всех залов музея
@@ -566,8 +566,52 @@ const AdminCMS = {
     }
   },
 
+  async saveToCloud() {
+    if (typeof CloudSync === 'undefined' || !CloudSync.isLive) {
+      console.warn('[AdminCMS] CloudSync не активен. Данные сохранены только локально.');
+      return false;
+    }
+    
+    try {
+      // Сохраняем каждого героя из heroesDatabase в Supabase
+      const promises = heroesDatabase.map(hero => 
+        CloudSync.client.from('heroes_database').upsert([hero], { onConflict: 'id' })
+      );
+      
+      const results = await Promise.all(promises);
+      const errors = results.filter(r => r.error);
+      
+      if (errors.length > 0) {
+        console.error('[AdminCMS] Ошибки при сохранении в облако:', errors);
+        return false;
+      }
+      
+      console.log('[AdminCMS] Все герои успешно синхронизированы с облаком Supabase');
+      return true;
+    } catch (error) {
+      console.error('[AdminCMS] Критическая ошибка синхронизации:', error);
+      return false;
+    }
+  },
+
   saveToLocalStorage() {
     localStorage.setItem('srmk_admin_db_state', JSON.stringify(heroesDatabase));
+  },
+  
+  async saveChanges() {
+    // 1. Сначала сохраняем локально (для надежности)
+    this.saveToLocalStorage();
+    
+    // 2. Затем пытаемся сохранить в облако
+    const savedToCloud = await this.saveToCloud();
+    
+    if (savedToCloud) {
+      this.showAdminToast('Данные сохранены в облаке Supabase и локально', 'success');
+    } else {
+      this.showAdminToast('Данные сохранены только локально (офлайн-режим)', 'warning');
+    }
+    
+    return savedToCloud;
   },
 
   applyLocalStorageOverrides() {
@@ -703,16 +747,16 @@ if (typeof module !== 'undefined' && module.exports) {
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       try {
         const parsed = JSON.parse(event.target.result);
         if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].id) {
           heroesDatabase.length = 0;
           parsed.forEach(h => heroesDatabase.push(h));
-          this.saveToLocalStorage();
+          await this.saveChanges(); // Синхронизация с облаком + локально
           this.renderSidebarList();
           if (window.App && typeof App.renderCardsGrid === 'function') App.renderCardsGrid();
-          alert("Импорт завершен! Загружено героев: " + parsed.length);
+          alert(`Импорт завершен! Загружено героев: ${parsed.length}`);
         } else {
           alert("Ошибка: Неверный формат JSON файла.");
         }
