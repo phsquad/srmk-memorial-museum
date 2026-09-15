@@ -123,6 +123,7 @@
 
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/cloud-sync.js"></script>
 
   <!-- Основной контент -->
   <main class="quiz-container">
@@ -390,21 +391,6 @@
                 info: "До 70% коллектива составляли женщины и подростки."
             }
         ];
-
-        /**
-         * КОНФИГУРАЦИЯ SUPABASE
-         * Подключение к облачной базе данных для синхронизации результатов
-         */
-        const SUPABASE_URL = 'https://qtafcczydgyrganrpkof.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0YWZjY3p5ZGd5cmdhbnJwa29mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwNTg5MDEsImV4cCI6MjEwNDYzNDkwMX0.i_hFegr6BHix6eFEasgyICDE6Lcy5wbwbU6dArG-wFg';
-        const SUPABASE_TABLE = 'quiz_results';
-
-        // Инициализация Supabase клиента (если библиотека загружена)
-        let supabaseClient = null;
-        if (window.supabase) {
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            console.log('[Supabase] Клиент инициализирован');
-        }
 
         /**
          * ОСНОВНОЙ КЛАСС ВИКТОРИНЫ
@@ -701,36 +687,25 @@
 
             async sendToCloud() {
                 this.els.cloudStatus.textContent = 'Синхронизация...';
-                
-                // Проверка наличия fetch и конфигурации
-                if (!window.fetch || SUPABASE_CONFIG.url.includes('example')) {
-                    this.els.cloudStatus.textContent = 'Облако отключено (режим демо).';
+
+                if (typeof CloudSync === 'undefined' || !CloudSync.isLive) {
+                    this.els.cloudStatus.textContent = 'Облако недоступно. Результат сохранён на устройстве.';
                     return;
                 }
 
                 try {
-                    const record = {
-                        player_name: this.els.nameInput.value,
-                        score: this.score,
-                        played_at: new Date().toISOString()
-                    };
+                    const saved = await CloudSync.saveQuizResult(
+                        this.els.nameInput.value.trim(),
+                        this.score,
+                        null,
+                        this.questions.length
+                    );
 
-                    const response = await fetch(`${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'apikey': SUPABASE_CONFIG.key,
-                            'Authorization': `Bearer ${SUPABASE_CONFIG.key}`,
-                            'Prefer': 'return=minimal'
-                        },
-                        body: JSON.stringify(record)
-                    });
-
-                    if (response.ok) {
+                    if (saved) {
                         this.els.cloudStatus.textContent = '✅ Результат сохранен в Зале Славы (Онлайн)';
                         this.els.cloudStatus.style.color = 'var(--quiz-success)';
                     } else {
-                        throw new Error('Network response was not ok');
+                        throw new Error('CloudSync rejected the result');
                     }
                 } catch (error) {
                     console.warn('Cloud sync failed:', error);

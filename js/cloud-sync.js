@@ -120,12 +120,14 @@ const CloudSync = {
   },
   async pushCandle(heroId) {
     if (!this.isLive) return null;
-    const { data } = await this.client.rpc('increment_hero_candle', { target_hero_id: heroId });
+    const { data, error } = await this.client.rpc('increment_hero_candle', { target_hero_id: heroId });
+    if (error) console.error('[CloudSync] Не удалось зажечь свечу:', error);
     return data;
   },
   async pushFlower(heroId, count = 2) {
     if (!this.isLive) return null;
-    const { data } = await this.client.rpc('increment_hero_flower', { target_hero_id: heroId, qty: count });
+    const { data, error } = await this.client.rpc('increment_hero_flower', { target_hero_id: heroId, qty: count });
+    if (error) console.error('[CloudSync] Не удалось возложить цветы:', error);
     return data;
   },
 
@@ -169,15 +171,36 @@ const CloudSync = {
   },
   async verifyCertificate(serial) {
     if (!this.isLive) return null;
-    const { data } = await this.client.from('certificates_registry').select('*').eq('serial', serial).single();
+    const { data, error } = await this.client.from('certificates_registry').select('*').eq('serial', serial).maybeSingle();
+    if (error) console.error('[CloudSync] Ошибка проверки сертификата:', error);
     return data;
   },
 
   // --- МЕТОДЫ КВИЗА (НОВОЕ) ---
-  async saveQuizResult(name, score) {
+  async saveQuizResult(name, score, group = null, totalQuestions = 10) {
     if (!this.isLive) return false;
-    await this.client.from('quiz_leaderboard').insert([{ student_name: name, score: score }]);
-    return true;
+    const { error } = await this.client.from('quiz_results').insert([{
+      student_name: name,
+      group_name: group,
+      score,
+      total_questions: totalQuestions
+    }]);
+    if (error) console.error('[CloudSync] Ошибка сохранения результата викторины:', error);
+    return !error;
+  },
+  async getQuizResults(limit = 10) {
+    if (!this.isLive) return null;
+    const { data, error } = await this.client
+      .from('quiz_results')
+      .select('student_name, group_name, score, total_questions, completed_at')
+      .order('score', { ascending: false })
+      .order('completed_at', { ascending: true })
+      .limit(limit);
+    if (error) {
+      console.error('[CloudSync] Ошибка загрузки рейтинга:', error);
+      return null;
+    }
+    return data || [];
   }
 };
 
