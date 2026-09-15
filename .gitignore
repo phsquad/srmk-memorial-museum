@@ -1,32 +1,47 @@
-*.pyc
-__pycache__/
+```gitignore
+# Dependencies
+node_modules/
+
+# Logs and temp files
 *.log
+*.tmp
+
+# Environment
 .env
 .env.local
+*.env.*
+
+# Editors
 .vscode/
-node_modules/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+.env
+.env.local
+.env.*
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Build directories
 dist/
 build/
-*.tmp
-*.swp
-*.swo
-*.out
-*.exe
-*.dll
-*.so
-*.a
-*.class
-.mypy_cache/
-.pytest_cache/
-.coverage
-coverage/
-htmlcov/
 target/
-.gradle/
-.zig-cache/
-zig-cache/
+*.egg-info/
+
+# OS generated files
 .DS_Store
 Thumbs.db
+
+# Compression
 *.zip
 *.gz
 *.tar
@@ -49,3 +64,4 @@ Thumbs.db
 *.tar.bz2
 *.tar.xz
 *.tar.zst
+```
