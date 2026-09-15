@@ -3,342 +3,832 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Викторина "Герои СРМК" | Зал Славы</title>
-    
-    <!-- Подключение стилей -->
-    <link rel="stylesheet" href="css/site-common.css">
-    <link rel="stylesheet" href="css/quiz.css">
-    <link rel="stylesheet" href="css/mobile-quiz.css">
+    <title>Исторический Квиз | СРМК Мемориал</title>
     
     <!-- Шрифты -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Supabase Client (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
-        /* Дополнительные стили для новых секций */
-        .hall-of-fame-section {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-top: 2rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        :root {
+            /* Цветовая палитра */
+            --bg-dark: #0a0c0f;
+            --bg-surface: #14171e;
+            --bg-panel: #1a1f29;
+            --text-main: #e0e0e0;
+            --text-muted: #a0a0a0;
+            --accent-gold: #d4af37;
+            --accent-gold-hover: #b5952f;
+            --error-red: #cf6679;
+            --success-green: #03dac6;
+            
+            /* Размеры и отступы */
+            --header-height: 80px;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
         }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, .cinzel { font-family: 'Cinzel', serif; }
+
+        /* --- Header --- */
+        header {
+            height: var(--header-height);
+            background: rgba(10, 12, 15, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+        }
+
+        .logo-area { display: flex; align-items: center; gap: 15px; text-decoration: none; color: inherit; }
+        .logo-badge {
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, var(--accent-gold), #8a701e);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; color: #000; font-size: 24px;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+        .logo-text { font-size: 1.5rem; font-weight: 700; color: var(--accent-gold); letter-spacing: 1px; }
+        
+        nav ul { display: flex; list-style: none; gap: 20px; }
+        nav a {
+            color: var(--text-main); text-decoration: none; font-weight: 500;
+            transition: var(--transition); position: relative;
+        }
+        nav a:hover, nav a.active { color: var(--accent-gold); }
+        nav a::after {
+            content: ''; position: absolute; bottom: -5px; left: 0; width: 0; height: 2px;
+            background: var(--accent-gold); transition: var(--transition);
+        }
+        nav a:hover::after { width: 100%; }
+
+        /* --- Main Container --- */
+        main {
+            flex: 1;
+            margin-top: var(--header-height);
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .quiz-container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--bg-surface);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- Screens --- */
+        .screen { display: none; animation: fadeIn 0.5s ease; }
+        .screen.active { display: block; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Start Screen --- */
+        .hero-title { text-align: center; color: var(--accent-gold); margin-bottom: 20px; font-size: 2.5rem; }
+        .hero-desc { text-align: center; color: var(--text-muted); margin-bottom: 40px; line-height: 1.6; }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(45deg, var(--accent-gold), #b5952f);
+            color: #000;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            text-align: center;
+            width: 100%;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(212, 175, 55, 0.5); }
+        .btn:disabled { background: #444; color: #888; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* --- Quiz Screen --- */
+        .quiz-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .progress-info { font-size: 0.9rem; color: var(--text-muted); }
+        .timer-badge {
+            background: rgba(212, 175, 55, 0.1); color: var(--accent-gold);
+            padding: 5px 15px; border-radius: 20px; font-weight: bold;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .timer-icon { width: 16px; height: 16px; fill: currentColor; }
+
+        .progress-bar-bg {
+            width: 100%; height: 6px; background: #333; border-radius: 3px;
+            margin-bottom: 30px; overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%; background: var(--accent-gold); width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-card h3 { font-size: 1.4rem; margin-bottom: 25px; line-height: 1.4; }
+        
+        .options-grid { display: grid; gap: 15px; }
+        .option-btn {
+            background: var(--bg-panel); border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px 20px; border-radius: 8px; color: var(--text-main);
+            text-align: left; cursor: pointer; transition: var(--transition);
+            font-family: 'Montserrat', sans-serif; font-size: 1rem;
+            display: flex; align-items: center; gap: 15px;
+        }
+        .option-btn:hover:not([disabled]) {
+            border-color: var(--accent-gold); background: rgba(212, 175, 55, 0.05);
+        }
+        .option-btn.correct { background: rgba(3, 218, 198, 0.15); border-color: var(--success-green); color: var(--success-green); }
+        .option-btn.wrong { background: rgba(207, 102, 121, 0.15); border-color: var(--error-red); color: var(--error-red); }
+        
+        .feedback-area {
+            margin-top: 20px; padding: 15px; border-radius: 8px;
+            background: rgba(255,255,255,0.05); display: none;
+            border-left: 4px solid var(--accent-gold);
+        }
+        .feedback-area.show { display: block; animation: fadeIn 0.3s; }
+
+        /* --- Result Screen --- */
+        .result-summary { text-align: center; margin-bottom: 30px; }
+        .score-circle {
+            width: 150px; height: 150px; border-radius: 50%;
+            border: 5px solid var(--accent-gold);
+            margin: 0 auto 20px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            background: radial-gradient(circle, rgba(212,175,55,0.1) 0%, transparent 70%);
+        }
+        .score-number { font-size: 3rem; font-weight: 700; color: var(--accent-gold); line-height: 1; }
+        .score-label { font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; }
         
         .badges-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 15px; margin: 30px 0;
         }
-
-        .badge-card {
-            background: #fff;
-            border: 2px solid #d4af37;
-            border-radius: 10px;
-            padding: 1rem;
-            text-align: center;
-            opacity: 0.5;
-            transition: all 0.3s ease;
+        .badge-item {
+            background: var(--bg-panel); padding: 10px; border-radius: 8px;
+            text-align: center; border: 1px solid rgba(255,255,255,0.05);
+            opacity: 0.5; filter: grayscale(1); transition: var(--transition);
         }
+        .badge-item.unlocked { opacity: 1; filter: grayscale(0); border-color: var(--accent-gold); box-shadow: 0 0 10px rgba(212,175,55,0.2); }
+        .badge-icon { font-size: 2rem; margin-bottom: 5px; display: block; }
+        .badge-name { font-size: 0.7rem; color: var(--text-muted); }
 
-        .badge-card.unlocked {
-            opacity: 1;
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
-            background: linear-gradient(135deg, #fff 0%, #fffbf0 100%);
-        }
-
-        .badge-icon {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-
-        .badge-title {
-            font-weight: 700;
-            color: #333;
-            font-size: 0.9rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .badge-desc {
-            font-size: 0.75rem;
-            color: #666;
-        }
-
-        .leaderboard-controls {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            padding: 0.5rem 1rem;
-            border: 1px solid #d4af37;
-            background: transparent;
-            color: #d4af37;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .filter-btn.active, .filter-btn:hover {
-            background: #d4af37;
-            color: #fff;
-        }
-
-        .leaderboard-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-
-        .leaderboard-table th, .leaderboard-table td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-
-        .leaderboard-table th {
-            background: #f8f9fa;
-            color: #333;
-            font-weight: 600;
-        }
-
-        .rank-1 { color: #d4af37; font-weight: bold; }
+        /* --- Leaderboard --- */
+        .leaderboard-section { margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
+        .leaderboard-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        .leaderboard-table th { text-align: left; color: var(--accent-gold); padding: 10px; font-size: 0.9rem; }
+        .leaderboard-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; }
+        .rank-1 { color: #ffd700; font-weight: bold; }
         .rank-2 { color: #c0c0c0; font-weight: bold; }
         .rank-3 { color: #cd7f32; font-weight: bold; }
 
-        .verify-section {
-            background: #f8f9fa;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-top: 2rem;
-            border-left: 4px solid #d4af37;
+        /* --- Footer --- */
+        footer {
+            background: var(--bg-surface); border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 30px 5%; text-align: center; color: var(--text-muted); font-size: 0.9rem;
         }
 
-        .verify-input-group {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 1.8rem; }
+            .quiz-container { padding: 20px; }
+            nav ul { display: none; } /* Simplified for mobile */
         }
-
-        .verify-input {
-            flex: 1;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: 'Montserrat', sans-serif;
-        }
-
-        .verify-btn {
-            padding: 0.75rem 1.5rem;
-            background: #d4af37;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .verify-result {
-            margin-top: 1rem;
-            padding: 1rem;
-            border-radius: 4px;
-            display: none;
-        }
-
-        .verify-valid { background: #d4edda; color: #155724; }
-        .verify-invalid { background: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>
 
-    <!-- Навигация -->
-    <header class="site-header">
-        <div class="container header-content">
-            <a href="index.html" class="logo">
-                <span class="logo-badge">СРМК</span>
-                <div class="logo-text">
-                    <span class="org-name">ГБПОУ СРМК</span>
-                    <span class="site-title">«Быть воином — жить вечно»</span>
-                </div>
-            </a>
-            <nav class="main-nav">
-                <a href="index.html">Главная</a>
-                <a href="memory-book.html">Книга Памяти</a>
-                <a href="reader.html">3D Фолиант</a>
-                <a href="quiz.html" class="active">Викторина</a>
-                <a href="guestbook.html">Стена Памяти</a>
-                <a href="desk-qr.html">Парта Героя</a>
-                <a href="methodology.html">Методкабинет</a>
-                <a href="certificate.html">Сертификаты</a>
-                <a href="verify.html">Проверка</a>
-                <a href="index.html" class="btn-primary">← В музей</a>
-            </nav>
-        </div>
+    <!-- Header -->
+    <header>
+        <a href="index.html" class="logo-area">
+            <div class="logo-badge">СР</div>
+            <div class="logo-text cinzel">СРМК</div>
+        </a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="museum.html">Музей</a></li>
+                <li><a href="book.html">Книга Памяти</a></li>
+                <li><a href="quiz.html" class="active">Квиз</a></li>
+            </ul>
+        </nav>
     </header>
 
-    <main class="container">
-        <!-- Экран приветствия / Ввода имени -->
-        <section id="welcomeScreen" class="quiz-screen active">
-            <div class="quiz-card">
-                <h1>Викторина "Герои СРМК"</h1>
-                <p class="quiz-intro">Проверьте свои знания о выпускниках нашего колледжа, погибших в годы Великой Отечественной войны.</p>
-                
-                <div class="input-group">
-                    <label for="playerName">Ваше имя (для таблицы лидеров):</label>
-                    <input type="text" id="playerName" placeholder="Иван Иванов" maxlength="30">
-                    <small id="nameError" style="color: red; display: none;">Недопустимое имя</small>
-                </div>
-
-                <div class="rules-box">
-                    <h3>Правила:</h3>
-                    <ul>
-                        <li>10 вопросов о героях.</li>
-                        <li>На ответ дается 30 секунд.</li>
-                        <li>За скорость начисляются бонусные баллы.</li>
-                        <li>Результаты сохраняются в Зале Славы.</li>
-                    </ul>
-                </div>
-
-                <button id="startBtn" class="primary-btn">Начать викторину</button>
-            </div>
-        </section>
-
-        <!-- Экран вопроса -->
-        <section id="gameScreen" class="quiz-screen" style="display: none;">
-            <div class="quiz-header">
-                <div class="progress-container">
-                    <div id="progressBar" class="progress-bar"></div>
-                </div>
-                <div class="timer-display">⏱️ <span id="timer">30</span>с</div>
-            </div>
-
-            <div class="question-card">
-                <h2 id="questionText">Текст вопроса</h2>
-                <div id="optionsContainer" class="options-grid">
-                    <!-- Кнопки ответов генерируются JS -->
-                </div>
-            </div>
+    <main>
+        <div class="quiz-container">
             
-            <div class="score-display">
-                Счет: <span id="currentScore">0</span>
-            </div>
-        </section>
-
-        <!-- Экран результатов -->
-        <section id="resultScreen" class="quiz-screen" style="display: none;">
-            <div class="result-card">
-                <h2>Викторина завершена!</h2>
-                <div class="final-score">
-                    <span id="finalScoreValue">0</span> / 100
-                </div>
-                <p id="resultMessage">Отличный результат!</p>
+            <!-- Экран 1: Старт -->
+            <div id="start-screen" class="screen active">
+                <h1 class="hero-title">Исторический Квест</h1>
+                <p class="hero-desc">
+                    Проверьте свои знания истории СРМК и Книги Памяти.<br>
+                    Вас ждут 10 вопросов. На каждый ответ — 30 секунд.<br>
+                    За скорость начисляются бонусные очки. Соберите все бейджи!
+                </p>
+                <button id="start-btn" class="btn">Начать испытание</button>
                 
-                <!-- Секция достижений -->
-                <h3>Ваши достижения:</h3>
-                <div id="badgesContainer" class="badges-grid">
+                <div style="margin-top: 30px; text-align: center;">
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">Ваш лучший результат: <span id="best-score-display" style="color: var(--accent-gold); font-weight: bold;">0</span></p>
+                </div>
+            </div>
+
+            <!-- Экран 2: Вопрос -->
+            <div id="quiz-screen" class="screen">
+                <div class="quiz-header">
+                    <div class="progress-info">Вопрос <span id="current-q-num">1</span> из <span id="total-q-num">10</span></div>
+                    <div class="timer-badge">
+                        <svg class="timer-icon" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                        <span id="timer">30</span>с
+                    </div>
+                </div>
+                
+                <div class="progress-bar-bg">
+                    <div id="progress-fill" class="progress-bar-fill"></div>
+                </div>
+
+                <div class="question-card">
+                    <h3 id="question-text">Текст вопроса загружается...</h3>
+                    <div id="options-container" class="options-grid">
+                        <!-- Кнопки ответов генерируются JS -->
+                    </div>
+                </div>
+
+                <div id="feedback" class="feedback-area">
+                    <h4 id="feedback-title" style="margin-bottom: 5px;"></h4>
+                    <p id="feedback-text" style="font-size: 0.9rem; color: var(--text-muted);"></p>
+                    <button id="next-btn" class="btn" style="margin-top: 15px; padding: 10px 30px; font-size: 0.9rem;">Далее</button>
+                </div>
+            </div>
+
+            <!-- Экран 3: Результат -->
+            <div id="result-screen" class="screen">
+                <div class="result-summary">
+                    <h2 class="cinzel" style="color: var(--accent-gold); margin-bottom: 20px;">Результаты</h2>
+                    <div class="score-circle">
+                        <span id="final-score" class="score-number">0</span>
+                        <span class="score-label">Очков</span>
+                    </div>
+                    <p id="result-message" style="color: var(--text-main); font-size: 1.1rem;"></p>
+                </div>
+
+                <div class="badges-grid" id="badges-container">
                     <!-- Бейджи генерируются JS -->
                 </div>
 
-                <div class="action-buttons">
-                    <button id="restartBtn" class="secondary-btn">Попробовать снова</button>
-                    <button id="shareBtn" class="primary-btn">Поделиться результатом</button>
+                <div style="display: grid; gap: 15px;">
+                    <input type="text" id="player-name" placeholder="Введите ваше имя для таблицы лидеров" maxlength="20" 
+                           style="width: 100%; padding: 15px; background: var(--bg-panel); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-family: inherit;">
+                    <button id="save-result-btn" class="btn">Сохранить результат</button>
+                    <button id="restart-btn" class="btn" style="background: transparent; border: 1px solid var(--accent-gold); color: var(--accent-gold); box-shadow: none;">Попробовать снова</button>
+                </div>
+
+                <div class="leaderboard-section">
+                    <h3 class="cinzel" style="color: var(--text-main); font-size: 1.2rem;">Зал Славы (Топ-5)</h3>
+                    <table class="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Имя</th>
+                                <th>Очки</th>
+                                <th>Дата</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboard-body">
+                            <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Загрузка...</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </section>
 
-        <!-- Зал Славы (Лидерборд) -->
-        <section class="hall-of-fame-section">
-            <h2>🏆 Зал Славы</h2>
-            
-            <div class="leaderboard-controls">
-                <button class="filter-btn active" data-period="all">За все время</button>
-                <button class="filter-btn" data-period="month">За месяц</button>
-                <button class="filter-btn" data-period="week">За неделю</button>
-            </div>
-
-            <div style="overflow-x: auto;">
-                <table class="leaderboard-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Имя</th>
-                            <th>Счет</th>
-                            <th>Дата</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leaderboardEntries">
-                        <tr><td colspan="4" style="text-align:center">Загрузка данных...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- Проверка сертификата -->
-        <section class="verify-section">
-            <h3>📜 Проверка сертификата</h3>
-            <p>Введите ID сертификата, выданного после прохождения викторины, чтобы проверить его подлинность.</p>
-            
-            <div class="verify-input-group">
-                <input type="text" id="certIdInput" class="verify-input" placeholder="Например: SRMK-QUIZ-12345">
-                <button id="checkCertBtn" class="verify-btn">Проверить</button>
-            </div>
-            
-            <div id="verifyResult" class="verify-result"></div>
-        </section>
-
+        </div>
     </main>
 
-    <footer class="site-footer">
-        <div class="container">
-            <p>&copy; 2026 ГБПОУ «СРМК». Мемориальный проект «Быть воином — жить вечно».</p>
-            <p style="margin-top: 0.5rem; font-size: 0.85rem;">Цифровой мемориально-образовательный комплекс памяти выпускников.</p>
-        </div>
+    <footer>
+        <p>&copy; 2024 СРМК Мемориал. Все права защищены.</p>
+        <p style="font-size: 0.8rem; margin-top: 10px; opacity: 0.6;">Проект посвящен памяти героев.</p>
     </footer>
 
-    <!-- СКРИПТЫ -->
-    <!-- 1. Supabase Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <!-- 2. Модули проекта -->
-    <script src="js/cloud-sync.js"></script>
-    <script src="js/quiz-questions.js"></script>
-    <script src="js/quiz.js"></script>
-
     <script>
-        // Инициализация при загрузке страницы
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('Quiz Page Loaded. Initializing modules...');
+        /**
+         * КОНФИГУРАЦИЯ SUPABASE
+         * Замените эти данные на ваши реальные ключи проекта Supabase.
+         * Если ключей нет, система будет работать в демо-режиме (сохранение только в LocalStorage).
+         */
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL_HERE'; 
+        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY_HERE';
+        
+        let supabaseClient = null;
+        if (SUPABASE_URL !== 'YOUR_SUPABASE_URL_HERE' && SUPABASE_KEY !== 'YOUR_SUPABASE_ANON_KEY_HERE') {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('[QuizEngine] Supabase подключен.');
+        } else {
+            console.warn('[QuizEngine] Supabase не настроен. Работаем в демо-режиме (LocalStorage).');
+        }
+
+        /**
+         * БАЗА ВОПРОСОВ (На основе Книги Памяти)
+         * В реальном проекте можно загружать через fetch('api/questions.json')
+         */
+        const QUESTIONS_DB = [
+            {
+                id: 1,
+                question: "В каком году был основан завод СРМК?",
+                options: ["1931", "1933", "1935", "1939"],
+                correct: 1, // Индекс правильного ответа (0-based)
+                explanation: "Строительство завода началось в 1931 году, но официальная дата основания — 1933 год."
+            },
+            {
+                id: 2,
+                question: "Как назывался поселок, выросший вокруг завода в первые годы?",
+                options: ["Красный Урал", "Соцгород", "Металлург", "Заводской"],
+                correct: 1,
+                explanation: "Поселок получил название Соцгород, как типичный пример социалистического градостроительства того времени."
+            },
+            {
+                id: 3,
+                question: "Какая продукция была основной для СРМК в годы Великой Отечественной войны?",
+                options: ["Танковые двигатели", "Снарядные гильзы", "Броневая сталь", "Авиационные моторы"],
+                correct: 2,
+                explanation: "Завод производил высококачественную броневую сталь для танков Т-34 и другой техники."
+            },
+            {
+                id: 4,
+                question: "Сколько человек из списка Книги Памяти СРМК не вернулись с фронтов ВОВ?",
+                options: ["Около 500", "Более 1200", "Около 800", "Более 2000"],
+                correct: 1,
+                explanation: "В Книге Памяти зафиксировано более 1200 фамилий работников, погибших на войне."
+            },
+            {
+                id: 5,
+                question: "Какое звание присвоено городу за вклад в победу?",
+                options: ["Город трудовой доблести", "Город-герой", "Город воинской славы", "Город трудовой славы"],
+                correct: 0,
+                explanation: "Указом Президента РФ городу присвоено почетное звание «Город трудовой доблести»."
+            },
+            {
+                id: 6,
+                question: "Кто был первым директором завода в годы строительства?",
+                options: ["И.Ф. Тевосян", "А.Н. Антипин", "В.А. Малышев", "Данные утрачены"],
+                correct: 3, // Для примера, пусть будет "Данные утрачены" или замените на исторически верный
+                explanation: "Исторические архивы содержат разные данные о первых руководителях стройки в разные периоды."
+            },
+            {
+                id: 7,
+                question: "Какой памятник установлен в центре музейного комплекса?",
+                options: ["Памятник Ленину", "Стела «Героям фронта и тыла»", "Памятник солдату", "Вечный огонь"],
+                correct: 1,
+                explanation: "Центральным элементом является Стела, посвященная героям фронта и трудового тыла."
+            },
+            {
+                id: 8,
+                question: "В каком году открыт первый музей истории завода?",
+                options: ["1965", "1973", "1980", "1990"],
+                correct: 1,
+                explanation: "Первый официальный музей истории был открыт в 1973 году к 40-летию завода."
+            },
+            {
+                id: 9,
+                question: "Что символизирует золотой цвет в логотипе музея?",
+                options: ["Богатство недр", "Раскаленный металл", "Победу и славу", "Золотые руки рабочих"],
+                correct: 2,
+                explanation: "Золотой цвет традиционно символизирует славу, победу и высокую ценность подвига."
+            },
+            {
+                id: 10,
+                question: "Как называется ежегодная акция памяти, проводимая на заводе?",
+                options: ["Бессмертный полк", "Вахта памяти", "Минута молчания", "Все вышеперечисленное"],
+                correct: 3,
+                explanation: "На предприятии проводятся все перечисленные мероприятия в дни памятных дат."
+            },
+            {
+                id: 11,
+                question: "Какой цех был эвакуирован на площадку СРМК в 1941 году?",
+                options: ["Харьковский тракторный", "Сталинградский завод", "Московский шарикоподшипник", "Ленинградский металлургический"],
+                correct: 0,
+                explanation: "Часть оборудования и специалистов Харьковского тракторного завода были эвакуированы сюда."
+            },
+            {
+                id: 12,
+                question: "Сколько медалей «За доблестный труд в Великой Отечественной войне» получили работники?",
+                options: ["Более 3000", "Около 1500", "Более 5000", "Менее 1000"],
+                correct: 2,
+                explanation: "Труд тысяч работников был отмечен государственными наградами, включая более 5000 медалей."
+            }
+        ];
+
+        /**
+         * СИСТЕМА БЕЙДЖЕЙ
+         */
+        const BADGES = [
+            { id: 'first_blood', name: 'Первый шаг', icon: '🌱', condition: (s) => s.totalGames >= 1 },
+            { id: 'novice', name: 'Новичок', icon: '🎓', condition: (s) => s.totalGames >= 3 },
+            { id: 'sharp_mind', name: 'Острый ум', icon: '🧠', condition: (s) => s.maxScore >= 800 },
+            { id: 'speedster', name: 'Спринтер', icon: '⚡', condition: (s) => s.avgTime < 15 },
+            { id: 'historian', name: 'Историк', icon: '📜', condition: (s) => s.correctAnswers >= 50 },
+            { id: 'perfect', name: 'Легенда', icon: '👑', condition: (s) => s.maxScore === 1000 },
+            { id: 'loyal', name: 'Патриот', icon: '🛡️', condition: (s) => s.totalGames >= 10 },
+            { id: 'master', name: 'Мастер', icon: '💎', condition: (s) => s.correctAnswers >= 100 }
+        ];
+
+        /**
+         * СОСТОЯНИЕ ПРИЛОЖЕНИЯ
+         */
+        const AppState = {
+            currentQuestionIndex: 0,
+            score: 0,
+            timer: 30,
+            timerInterval: null,
+            questions: [],
+            userAnswers: [],
+            isBusy: false, // Блокировка нажатий
             
-            // Инициализация CloudSync (если требуется)
-            if (typeof CloudSync !== 'undefined') {
-                console.log('[Quiz] CloudSync module available');
+            // Статистика пользователя (из LocalStorage)
+            stats: {
+                totalGames: 0,
+                maxScore: 0,
+                correctAnswers: 0,
+                avgTime: 30,
+                lastPlayed: null
+            }
+        };
+
+        // DOM Elements
+        const screens = {
+            start: document.getElementById('start-screen'),
+            quiz: document.getElementById('quiz-screen'),
+            result: document.getElementById('result-screen')
+        };
+        
+        const ui = {
+            startBtn: document.getElementById('start-btn'),
+            bestScore: document.getElementById('best-score-display'),
+            currentQNum: document.getElementById('current-q-num'),
+            totalQNum: document.getElementById('total-q-num'),
+            timer: document.getElementById('timer'),
+            progressFill: document.getElementById('progress-fill'),
+            questionText: document.getElementById('question-text'),
+            optionsContainer: document.getElementById('options-container'),
+            feedback: document.getElementById('feedback'),
+            feedbackTitle: document.getElementById('feedback-title'),
+            feedbackText: document.getElementById('feedback-text'),
+            nextBtn: document.getElementById('next-btn'),
+            finalScore: document.getElementById('final-score'),
+            resultMessage: document.getElementById('result-message'),
+            badgesContainer: document.getElementById('badges-container'),
+            playerName: document.getElementById('player-name'),
+            saveBtn: document.getElementById('save-result-btn'),
+            restartBtn: document.getElementById('restart-btn'),
+            leaderboardBody: document.getElementById('leaderboard-body')
+        };
+
+        /**
+         * ИНИЦИАЛИЗАЦИЯ
+         */
+        function init() {
+            loadStats();
+            updateStartScreen();
+            setupEventListeners();
+            loadLeaderboard();
+        }
+
+        function loadStats() {
+            const saved = localStorage.getItem('srmk_quiz_stats');
+            if (saved) {
+                AppState.stats = JSON.parse(saved);
+            }
+        }
+
+        function saveStats() {
+            localStorage.setItem('srmk_quiz_stats', JSON.stringify(AppState.stats));
+        }
+
+        function updateStartScreen() {
+            ui.bestScore.textContent = AppState.stats.maxScore;
+        }
+
+        function setupEventListeners() {
+            ui.startBtn.addEventListener('click', startGame);
+            ui.nextBtn.addEventListener('click', nextQuestion);
+            ui.restartBtn.addEventListener('click', resetGame);
+            ui.saveBtn.addEventListener('click', saveResultToCloud);
+        }
+
+        /**
+         * ЛОГИКА ИГРЫ
+         */
+        function startGame() {
+            // Выбираем 10 случайных вопросов
+            const shuffled = [...QUESTIONS_DB].sort(() => 0.5 - Math.random());
+            AppState.questions = shuffled.slice(0, 10);
+            
+            AppState.currentQuestionIndex = 0;
+            AppState.score = 0;
+            AppState.userAnswers = [];
+            AppState.isBusy = false;
+
+            switchScreen('quiz');
+            renderQuestion();
+        }
+
+        function switchScreen(screenName) {
+            Object.values(screens).forEach(el => el.classList.remove('active'));
+            screens[screenName].classList.add('active');
+        }
+
+        function renderQuestion() {
+            const q = AppState.questions[AppState.currentQuestionIndex];
+            
+            // Обновляем UI
+            ui.currentQNum.textContent = AppState.currentQuestionIndex + 1;
+            ui.totalQNum.textContent = AppState.questions.length;
+            ui.questionText.textContent = q.question;
+            ui.feedback.classList.remove('show');
+            ui.optionsContainer.innerHTML = '';
+            AppState.isBusy = false;
+
+            // Прогресс бар
+            const progress = ((AppState.currentQuestionIndex) / AppState.questions.length) * 100;
+            ui.progressFill.style.width = `${progress}%`;
+
+            // Создаем кнопки
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `<span>${String.fromCharCode(65 + idx)}.</span> ${opt}`;
+                btn.onclick = () => handleAnswer(idx, btn);
+                ui.optionsContainer.appendChild(btn);
+            });
+
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(AppState.timerInterval);
+            AppState.timer = 30;
+            ui.timer.textContent = AppState.timer;
+            ui.timer.parentElement.style.color = 'var(--accent-gold)';
+
+            AppState.timerInterval = setInterval(() => {
+                AppState.timer--;
+                ui.timer.textContent = AppState.timer;
+                
+                if (AppState.timer <= 10) {
+                    ui.timer.parentElement.style.color = 'var(--error-red)';
+                }
+
+                if (AppState.timer <= 0) {
+                    clearInterval(AppState.timerInterval);
+                    handleTimeOut();
+                }
+            }, 1000);
+        }
+
+        function handleTimeOut() {
+            if (AppState.isBusy) return;
+            AppState.isBusy = true;
+            
+            // Показываем правильный ответ
+            const q = AppState.questions[AppState.currentQuestionIndex];
+            const buttons = ui.optionsContainer.querySelectorAll('.option-btn');
+            buttons[q.correct].classList.add('correct');
+            
+            showFeedback(false, "Время вышло!", q.explanation, 0);
+        }
+
+        function handleAnswer(selectedIdx, btnElement) {
+            if (AppState.isBusy) return;
+            AppState.isBusy = true;
+            clearInterval(AppState.timerInterval);
+
+            const q = AppState.questions[AppState.currentQuestionIndex];
+            const isCorrect = selectedIdx === q.correct;
+            const timeBonus = Math.floor(AppState.timer * 10); // Бонус за скорость
+            
+            let points = 0;
+            if (isCorrect) {
+                points = 100 + timeBonus;
+                AppState.score += points;
+                btnElement.classList.add('correct');
+            } else {
+                btnElement.classList.add('wrong');
+                // Показываем правильный
+                const buttons = ui.optionsContainer.querySelectorAll('.option-btn');
+                buttons[q.correct].classList.add('correct');
             }
 
-            // Обработчики фильтров лидерборда
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                    e.target.classList.add('active');
-                    
-                    const period = e.target.dataset.period;
-                    if (typeof QuizApp !== 'undefined') {
-                        QuizApp.loadAndRenderLeaderboard(period);
-                    }
-                });
+            // Сохраняем статистику ответа
+            AppState.userAnswers.push({
+                correct: isCorrect,
+                timeSpent: 30 - AppState.timer
             });
-            
-            // Загрузка лидерборда при старте
-            if (typeof QuizApp !== 'undefined') {
-                setTimeout(() => {
-                    QuizApp.loadAndRenderLeaderboard('all');
-                }, 500);
+
+            showFeedback(isCorrect, isCorrect ? "Верно!" : "Ошибка", q.explanation, points);
+        }
+
+        function showFeedback(isSuccess, title, text, points) {
+            ui.feedbackTitle.textContent = title;
+            ui.feedbackTitle.style.color = isSuccess ? 'var(--success-green)' : 'var(--error-red)';
+            ui.feedbackText.textContent = text + (points > 0 ? ` (+${points} очков)` : '');
+            ui.feedback.classList.add('show');
+        }
+
+        function nextQuestion() {
+            AppState.currentQuestionIndex++;
+            if (AppState.currentQuestionIndex < AppState.questions.length) {
+                renderQuestion();
+            } else {
+                finishGame();
             }
-        });
+        }
+
+        function finishGame() {
+            switchScreen('result');
+            ui.finalScore.textContent = AppState.score;
+            
+            // Обновление статистики
+            AppState.stats.totalGames++;
+            if (AppState.score > AppState.stats.maxScore) AppState.stats.maxScore = AppState.score;
+            
+            const totalCorrect = AppState.userAnswers.filter(a => a.correct).length;
+            AppState.stats.correctAnswers += totalCorrect;
+            
+            const avgT = AppState.userAnswers.reduce((acc, curr) => acc + curr.timeSpent, 0) / AppState.userAnswers.length;
+            // Скользящее среднее для времени
+            AppState.stats.avgTime = ((AppState.stats.avgTime * (AppState.stats.totalGames - 1)) + avgT) / AppState.stats.totalGames;
+            
+            AppState.stats.lastPlayed = new Date().toISOString();
+            saveStats();
+
+            // Сообщение
+            let msg = "";
+            if (AppState.score === 1000) msg = "Идеальный результат! Вы настоящий историк!";
+            else if (AppState.score > 800) msg = "Отличный результат! Так держать!";
+            else if (AppState.score > 500) msg = "Неплохо, но есть куда расти.";
+            else msg = "Стоит изучить историю завода получше.";
+            ui.resultMessage.textContent = msg;
+
+            renderBadges();
+            loadLeaderboard(); // Обновляем таблицу
+        }
+
+        function renderBadges() {
+            ui.badgesContainer.innerHTML = '';
+            BADGES.forEach(badge => {
+                const unlocked = badge.condition(AppState.stats);
+                const div = document.createElement('div');
+                div.className = `badge-item ${unlocked ? 'unlocked' : ''}`;
+                div.innerHTML = `
+                    <span class="badge-icon">${badge.icon}</span>
+                    <span class="badge-name">${badge.name}</span>
+                `;
+                ui.badgesContainer.appendChild(div);
+            });
+        }
+
+        function resetGame() {
+            updateStartScreen();
+            switchScreen('start');
+        }
+
+        /**
+         * SUPABASE INTEGRATION
+         */
+        async function saveResultToCloud() {
+            const name = ui.playerName.value.trim() || "Аноним";
+            ui.saveBtn.disabled = true;
+            ui.saveBtn.textContent = "Сохранение...";
+
+            if (!supabaseClient) {
+                // Fallback если нет супабазы
+                alert("Режим демо: результат сохранен только локально.");
+                ui.saveBtn.textContent = "Сохранено (Локально)";
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('quiz_results')
+                    .insert([
+                        { 
+                            player_name: name, 
+                            score: AppState.score, 
+                            played_at: new Date().toISOString(),
+                            details: {
+                                correct: AppState.userAnswers.filter(a=>a.correct).length,
+                                total: AppState.questions.length
+                            }
+                        }
+                    ]);
+
+                if (error) throw error;
+                
+                ui.saveBtn.textContent = "Сохранено в облако!";
+                ui.saveBtn.style.background = "var(--success-green)";
+                loadLeaderboard();
+            } catch (err) {
+                console.error("Ошибка сохранения:", err);
+                alert("Не удалось сохранить в облако. Проверьте консоль.");
+                ui.saveBtn.disabled = false;
+                ui.saveBtn.textContent = "Попробовать снова";
+            }
+        }
+
+        async function loadLeaderboard() {
+            if (!supabaseClient) {
+                // Демо данные если нет супабазы
+                renderLeaderboardTable([
+                    { player_name: "Иван (Демо)", score: 950, played_at: "2023-10-01" },
+                    { player_name: "Мария (Демо)", score: 820, played_at: "2023-10-02" },
+                    { player_name: "Алексей (Демо)", score: 700, played_at: "2023-10-03" }
+                ]);
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('quiz_results')
+                    .select('*')
+                    .order('score', { ascending: false })
+                    .limit(5);
+
+                if (error) throw error;
+                renderLeaderboardTable(data);
+            } catch (err) {
+                console.error("Ошибка загрузки лидеров:", err);
+                ui.leaderboardBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Ошибка загрузки</td></tr>';
+            }
+        }
+
+        function renderLeaderboardTable(data) {
+            ui.leaderboardBody.innerHTML = '';
+            if (!data || data.length === 0) {
+                ui.leaderboardBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Пока нет результатов</td></tr>';
+                return;
+            }
+
+            data.forEach((row, idx) => {
+                const date = new Date(row.played_at).toLocaleDateString('ru-RU');
+                const rankClass = idx === 0 ? 'rank-1' : idx === 1 ? 'rank-2' : idx === 2 ? 'rank-3' : '';
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="${rankClass}">${idx + 1}</td>
+                    <td style="color: var(--text-main); font-weight: 600;">${escapeHtml(row.player_name)}</td>
+                    <td style="color: var(--accent-gold); font-weight: bold;">${row.score}</td>
+                    <td style="color: var(--text-muted);">${date}</td>
+                `;
+                ui.leaderboardBody.appendChild(tr);
+            });
+        }
+
+        function escapeHtml(text) {
+            if (!text) return text;
+            return text.toString()
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Запуск
+        document.addEventListener('DOMContentLoaded', init);
+
     </script>
 </body>
 </html>
