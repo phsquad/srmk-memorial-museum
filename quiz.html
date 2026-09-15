@@ -126,157 +126,102 @@
 
   <!-- Основной контент -->
   <main class="quiz-container">
-        
-        <!-- Экран приветствия / Старта -->
-        <div id="start-screen" class="quiz-card">
-            <h1 style="color: var(--quiz-accent); text-align: center; font-family: 'Cinzel', serif;">Исторический Квиз</h1>
-            <p style="text-align: center; margin-bottom: 30px; color: var(--text-muted);">
+    
+    <!-- Экран приветствия / Старта -->
+    <div id="start-screen" class="quiz-screen">
+        <div class="quiz-card">
+            <h1>Исторический Квиз</h1>
+            <p class="quiz-intro">
                 Проверьте свои знания истории СРМК. Вас ждет 10 вопросов из Книги Памяти.<br>
                 У вас есть 30 секунд на вопрос. Быстрые ответы приносят больше очков!
             </p>
             
-            <div style="text-align: center;">
-                <div style="margin-bottom: 20px;">
-                    <label for="player-name" style="display: block; margin-bottom: 10px;">Введите ваше имя для Зала Славы:</label>
-                    <input type="text" id="player-name" placeholder="Имя Героя" maxlength="20" 
-                           style="padding: 12px; border-radius: 8px; border: 1px solid #444; background: #111; color: #fff; width: 250px; text-align: center; font-size: 1.1rem;">
-                </div>
-                <button id="start-btn" class="action-btn">Начать испытание</button>
+            <div class="input-group" style="text-align: center; max-width: 300px; margin: 0 auto 2rem;">
+                <label for="player-name">Введите ваше имя для Зала Славы:</label>
+                <input type="text" id="player-name" placeholder="Имя Героя" maxlength="20">
             </div>
             
-            <div style="margin-top: 30px; border-top: 1px solid #333; padding-top: 20px;">
-                <h3 style="color: var(--quiz-accent); font-size: 1rem; text-align: center;">Ваши достижения</h3>
-                <div id="start-badges" class="badges-container">
+            <button id="start-btn" class="primary-btn">Начать испытание</button>
+            
+            <div class="badges-section" style="margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-dark);">
+                <h3 class="badges-section-title" style="text-align: center;">Ваши достижения</h3>
+                <div id="start-badges" class="badges-grid">
                     <!-- Бейджи загружаются JS -->
                 </div>
-                <p id="best-score-display" style="text-align: center; font-size: 0.9rem; color: var(--text-muted);"></p>
+                <p id="best-score-display" style="text-align: center; color: var(--text-muted); margin-top: 1rem;"></p>
             </div>
         </div>
+    </div>
 
-        <!-- Экран игры -->
-        <div id="game-screen" class="quiz-card" style="display: none;">
-            <div class="progress-container">
-                <div class="progress-labels">
-                    <span id="question-counter">Вопрос 1/10</span>
-                    <span id="current-score">Очки: 0</span>
+    <!-- Экран игры -->
+    <div id="game-screen" class="quiz-screen" style="display: none;">
+        <div class="question-card">
+            <div class="quiz-header">
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-fill"></div>
                 </div>
-                <div class="progress-bar-bg">
-                    <div id="progress-fill" class="progress-bar-fill"></div>
+                <div class="timer-display">
+                    <span id="timer-value">30</span>s
                 </div>
             </div>
-
-            <div class="timer-container">
-                <svg class="timer-icon" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
-                </svg>
-                <span id="timer-value" class="timer-value">30</span>
+            
+            <div class="progress-labels" style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.9rem;">
+                <span id="question-counter">Вопрос 1/10</span>
+                <span id="current-score">Очки: 0</span>
             </div>
 
-            <div id="question-text" class="question-text">
-                Загрузка вопроса...
-            </div>
+            <h2 id="question-text">Загрузка вопроса...</h2>
 
             <div id="options-container" class="options-grid">
                 <!-- Варианты ответов генерируются JS -->
             </div>
             
-            <div id="feedback-msg" style="margin-top: 15px; font-weight: bold; min-height: 24px; text-align: center;"></div>
+            <div id="feedback-msg" style="margin-top: 1.5rem; font-weight: bold; min-height: 24px; text-align: center;"></div>
         </div>
+    </div>
 
-        <!-- Экран результатов -->
-        <div id="result-screen" class="quiz-card result-screen">
-            <h2 style="color: var(--quiz-accent); font-family: 'Cinzel', serif;">Результаты</h2>
+    <!-- Экран результатов -->
+    <div id="result-screen" class="quiz-screen" style="display: none;">
+        <div class="result-card">
+            <h2>Результаты</h2>
             
-            <div class="score-circle" id="final-score">0</div>
-            <p id="result-message" style="font-size: 1.2rem; margin-bottom: 20px;"></p>
+            <div class="final-score" id="final-score">0</div>
+            <p id="result-message" style="font-size: 1.2rem; margin-bottom: 1.5rem; color: var(--text-main);"></p>
 
-            <h3 style="color: var(--text-muted); font-size: 1rem;">Полученные бейджи</h3>
-            <div id="earned-badges" class="badges-container">
+            <h3 class="badges-section-title">Полученные бейджи</h3>
+            <div id="earned-badges" class="badges-grid">
                 <!-- Бейджи -->
             </div>
 
-            <div class="hall-of-fame-preview">
-                <h4 style="margin: 0 0 10px 0; color: var(--quiz-accent);">Топ игроков (Локально)</h4>
-                <table class="hall-of-fame-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Имя</th>
-                            <th>Очки</th>
-                            <th>Дата</th>
-                        </tr>
-                    </thead>
-                    <tbody id="local-leaderboard">
-                        <!-- Таблица -->
-                    </tbody>
-                </table>
-                <p id="cloud-status" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 10px; text-align: center;"></p>
+            <div class="hall-of-fame-section">
+                <h4 style="margin: 0 0 1rem 0; color: var(--primary-gold);">Топ игроков (Локально)</h4>
+                <div class="leaderboard-table-wrapper">
+                    <table class="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Имя</th>
+                                <th>Очки</th>
+                                <th>Дата</th>
+                            </tr>
+                        </thead>
+                        <tbody id="local-leaderboard">
+                            <!-- Таблица -->
+                        </tbody>
+                    </table>
+                </div>
+                <p id="cloud-status" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 1rem; text-align: center;"></p>
             </div>
 
-            <div style="margin-top: 30px;">
-                <button id="restart-btn" class="action-btn">Играть снова</button>
-                <button id="share-btn" class="action-btn secondary">Поделиться</button>
-                <a href="index.html" class="action-btn secondary" style="text-decoration: none; display: inline-block; line-height: 46px;">← В музей</a>
+            <div class="action-buttons">
+                <button id="restart-btn" class="primary-btn">Играть снова</button>
+                <button id="share-btn" class="secondary-btn">Поделиться</button>
+                <a href="index.html" class="secondary-btn" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">← В музей</a>
             </div>
         </div>
+    </div>
 
-    </main>
-
-    <!-- Единый подвал как на index.html -->
-    <footer class="site-footer">
-      <div class="container footer-container">
-        <div class="footer-col">
-          <div class="footer-logo-group">
-            <div class="logo-badge">СРМК</div>
-            <div class="logo-text">
-              <span class="org-name">ГБПОУ СРМК • Ставрополь</span>
-              <span class="site-title">«Быть воином — жить вечно»</span>
-            </div>
-          </div>
-          <p class="footer-desc">Мемориально-образовательный комплекс, посвященный подвигу выпускников колледжа.</p>
-          <div class="footer-socials">
-            <a href="#" class="social-link" aria-label="ВКонтакте">VK</a>
-            <a href="#" class="social-link" aria-label="Telegram">TG</a>
-          </div>
-        </div>
-        <div class="footer-col">
-          <h4 class="footer-heading">Залы экспозиции</h4>
-          <ul class="footer-nav">
-            <li><a href="index.html#memorial">Мемориал Славы</a></li>
-            <li><a href="index.html#heroes-grid">За партой Героя</a></li>
-            <li><a href="index.html#battle-path">Хроника и Карта</a></li>
-            <li><a href="index.html#memory-hall">Эстафета памяти</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4 class="footer-heading">Цифровые модули</h4>
-          <ul class="footer-nav">
-            <li><a href="memory-book.html">Книга Памяти</a></li>
-            <li><a href="reader.html">3D Фолиант</a></li>
-            <li><a href="quiz.html">Квест-викторина</a></li>
-            <li><a href="certificate.html">Сертификат участника</a></li>
-            <li><a href="methodology.html">Методкабинет</a></li>
-            <li><a href="verify.html">Реестр верификации</a></li>
-            <li><a href="desk-qr.html">Парта Героя</a></li>
-            <li><a href="guestbook.html">Стена Памяти</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4 class="footer-heading">Контакты</h4>
-          <address class="footer-address">
-            <p>г. Ставрополь, ул. Ленина 1</p>
-            <p><a href="tel:+78652000000">+7 (8652) 00-00-00</a></p>
-            <p><a href="mailto:museum@srmk.ru">museum@srmk.ru</a></p>
-          </address>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <div class="container">
-          <p>&copy; 2026 ГБПОУ СРМК Мемориальный Музей. Все права защищены.</p>
-          <p>Проект в рамках Всероссийской акции «Карта доблести: хранители подвигов».</p>
-        </div>
-      </div>
-    </footer>
+  </main>
 
     <div id="toast" class="toast">Сообщение</div>
 
