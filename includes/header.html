@@ -1,0 +1,83 @@
+<!-- ============================================
+     ЕДИНАЯ НАВИГАЦИОННАЯ ШАПКА (COMMON HEADER)
+     Подключается на все страницы сайта
+     ============================================ -->
+
+<header class="site-header" id="siteHeader">
+  <div class="container header-container">
+    
+    <!-- ЛОГОТИП И НАЗВАНИЕ -->
+    <a href="index.html" class="logo-group" aria-label="На главную страницу музея">
+      <div class="logo-badge">СРМК</div>
+      <div class="logo-text">
+        <span class="org-name">ГБПОУ СРМК • Ставрополь</span>
+        <span class="site-title">«Быть воином — жить вечно»</span>
+      </div>
+    </a>
+
+    <!-- ОСНОВНАЯ НАВИГАЦИЯ ПО РАЗДЕЛАМ -->
+    <nav class="main-nav" id="desktopNav" aria-label="Навигация по разделам">
+      <a href="memory-book.html" class="nav-link">📖 Книга Памяти</a>
+      <a href="reader.html" class="nav-link">📚 3D Фолиант</a>
+      <a href="quiz.html" class="nav-link">⚔️ Викторина</a>
+      <a href="desk-qr.html" class="nav-link">🪑 Парта Героя</a>
+      <a href="guestbook.html" class="nav-link">🕯 Стена Памяти</a>
+      <a href="certificate.html" class="nav-link">📜 Сертификат</a>
+      <a href="methodology.html" class="nav-link">📑 Методкабинет</a>
+      <a href="verify.html" class="nav-link">🛡 Проверка</a>
+    </nav>
+
+    <!-- КНОПКА ВОЗВРАТА В МУЗЕЙ (для внутренних страниц) -->
+    <div class="header-actions">
+      <a href="index.html" class="btn-return-museum" title="Вернуться в главный музей">← В 3D-музей</a>
+      
+      <!-- КНОПКА МОБИЛЬНОГО МЕНЮ -->
+      <button class="mobile-burger-btn" id="mobileBurgerBtn" aria-label="Открыть мобильное меню" aria-expanded="false" type="button">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ВЫДВИЖНАЯ МОБИЛЬНАЯ ПАНЕЛЬ -->
+  <div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+    <div class="drawer-content">
+      <div class="drawer-section-label">Основные разделы</div>
+      <a href="index.html" class="drawer-link">🏛 Главный музей</a>
+      <a href="memory-book.html" class="drawer-link">📖 Электронная Книга Памяти</a>
+      <a href="reader.html" class="drawer-link">📚 3D Фолиант-читалка</a>
+      <a href="quiz.html" class="drawer-link">⚔️ Квест-викторина</a>
+      <a href="desk-qr.html" class="drawer-link">🪑 Конструктор «Парты Героя»</a>
+      <a href="guestbook.html" class="drawer-link">🕯 Стена Памяти</a>
+      <a href="certificate.html" class="drawer-link highlight">📜 Оформить Сертификат</a>
+      <a href="methodology.html" class="drawer-link">📑 Методический кабинет</a>
+      <a href="verify.html" class="drawer-link">🛡 Реестр верификации</a>
+      <a href="mobile.html" class="drawer-link">📱 Мобильная версия</a>
+    </div>
+  </div>
+</header>
+
+<script>
+(function() {
+  const burgerBtn = document.getElementById('mobileBurgerBtn');
+  const mobileDrawer = document.getElementById('mobileDrawer');
+  
+  if (burgerBtn && mobileDrawer) {
+    burgerBtn.addEventListener('click', function() {
+      const isExpanded = this.getAttribute('aria-expanded') === 'true';
+      this.setAttribute('aria-expanded', !isExpanded);
+      mobileDrawer.setAttribute('aria-hidden', isExpanded);
+      mobileDrawer.classList.toggle('active');
+      this.classList.toggle('active');
+    });
+    
+    document.addEventListener('click', function(e) {
+      if (!mobileDrawer.contains(e.target) && !burgerBtn.contains(e.target)) {
+        burgerBtn.setAttribute('aria-expanded', 'false');
+        mobileDrawer.setAttribute('aria-hidden', 'true');
+        mobileDrawer.classList.remove('active');
+        burgerBtn.classList.remove('active');
+      }
+    });
+  }
+})();
+</script>
