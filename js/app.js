@@ -175,7 +175,7 @@ const App = {
 
     if (this.dom.btnGeneralTour) {
       this.dom.btnGeneralTour.addEventListener('click', () => {
-        this.playAudio('assets/audio/guides/general-tour.mp3', 'Вводная экскурсия музея СРМК', 'Обзор экспозиции');
+        this.startGeneralTour();
       });
     }
 
@@ -934,6 +934,17 @@ const App = {
       .catch(() => {
         audioPlayBtn.textContent = '▶';
       });
+  },
+
+  startGeneralTour() {
+    const overview = 'Добро пожаловать в виртуальный мемориальный музей ГБПОУ СРМК «Быть воином — жить вечно». Экспозиция хранит память о двадцати выпускниках колледжа, погибших при защите Отечества. Откройте Мемориал Славы, личные архивные досье, Книгу Памяти и интерактивную карту боевого пути героев.';
+
+    if (window.TTSNarrator) {
+      TTSNarrator.speakText(overview);
+      return;
+    }
+
+    this.playAudio('assets/audio/guides/general-tour.mp3', 'Вводная экскурсия музея СРМК', 'Обзор экспозиции');
   },
 
   /* ==========================================================================
