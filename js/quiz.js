@@ -7,6 +7,29 @@
 
 'use strict';
 
+/**
+ * МОДУЛЬ БЕЗОПАСНОГО ХРАНИЛИЩА
+ */
+const SafeStorage = {
+  get: (key) => {
+    try {
+      return localStorage.getItem(key);
+    } catch (e) {
+      console.warn('LocalStorage недоступен:', e);
+      return null;
+    }
+  },
+  set: (key, value) => {
+    try {
+      localStorage.setItem(key, value);
+      return true;
+    } catch (e) {
+      console.warn('Не удалось сохранить в LocalStorage:', e);
+      return false;
+    }
+  }
+};
+
 const QUIZ_QUESTIONS = [
   {
     theme: "Специальности и позывные",
@@ -355,9 +378,37 @@ const QuizEngine = {
       btn.style.pointerEvents = 'none';
     }
 
-    // Сохраняем результат в глобальную таблицу лидеров Supabase
+    // Сохраняем результат в локальное хранилище
+    const localResults = JSON.parse(SafeStorage.get('quizResults') || '[]');
+    localResults.push({
+      name: this.participant.name,
+      group: this.participant.group,
+      score: this.score,
+      date: new Date().toISOString()
+    });
+    SafeStorage.set('quizResults', JSON.stringify(localResults));
+
+    // Сохраняем бейджи если победа
+    if (this.score >= 8) {
+      const earnedBadges = JSON.parse(SafeStorage.get('quizBadges') || '[]');
+      if (!earnedBadges.find(b => b.id === 'winner')) {
+        earnedBadges.push({
+          id: 'winner',
+          icon: '🏆',
+          title: 'Победитель квиза',
+          desc: `Набрано ${this.score}/10 баллов`
+        });
+        SafeStorage.set('quizBadges', JSON.stringify(earnedBadges));
+      }
+    }
+
+    // Сохраняем результат в глобальную таблицу лидеров Supabase через CloudSync
     if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
-      await CloudSync.saveQuizResult(this.participant.name, this.score);
+      try {
+        await CloudSync.saveQuizResult(this.participant.name, this.score, this.participant.group);
+      } catch (e) {
+        console.warn('Не удалось сохранить в Supabase:', e);
+      }
     }
 
     const params = new URLSearchParams({
@@ -383,7 +434,120 @@ const QuizEngine = {
     toast.textContent = msg;
     toast.classList.add('active');
     setTimeout(() => toast.classList.remove('active'), 2800);
+  },
+
+  /**
+   * 8. Загрузка бейджей игрока из localStorage
+   */
+  loadBadges() {
+    const badgesContainer = document.getElementById('startBadges');
+    if (!badgesContainer) return;
+
+    const earnedBadges = JSON.parse(SafeStorage.get('quizBadges') || '[]');
+    
+    if (earnedBadges.length === 0) {
+      badgesContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">Пока нет достижений. Пройдите квиз!</p>';
+      return;
+    }
+
+    badgesContainer.innerHTML = earnedBadges.map(badge => `
+      <div class="badge-card unlocked">
+        <span class="badge-icon">${badge.icon}</span>
+        <span class="badge-title">${badge.title}</span>
+        <span class="badge-desc">${badge.desc}</span>
+      </div>
+    `).join('');
+  },
+
+  /**
+   * 9. Загрузка таблицы лидеров из Supabase
+   */
+  async loadLeaderboard() {
+    const tbody = document.getElementById('leaderboardBody');
+    const statusEl = document.getElementById('cloudStatus');
+    if (!tbody) return;
+
+    // Пробуем загрузить из Supabase через CloudSync
+    if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
+      try {
+        const results = await CloudSync.getQuizResults(10);
+        if (results && results.length > 0) {
+          tbody.innerHTML = results.map((r, i) => `
+            <tr>
+              <td class="rank-cell rank-${i + 1}">${i + 1}</td>
+              <td>${this.escapeHtml(r.name)}</td>
+              <td>${this.escapeHtml(r.group || '-')}</td>
+              <td style="color: var(--primary-gold); font-weight: bold;">${r.score}/10</td>
+              <td style="color: var(--text-muted);">${new Date(r.created_at).toLocaleDateString('ru-RU')}</td>
+            </tr>
+          `).join('');
+          statusEl.textContent = '✓ Данные загружены из облака (Supabase)';
+          return;
+        }
+      } catch (e) {
+        console.warn('Не удалось загрузить данные из Supabase:', e);
+      }
+    }
+
+    // Fallback: локальные данные
+    const localResults = JSON.parse(SafeStorage.get('quizResults') || '[]');
+    localResults.sort((a, b) => b.score - a.score || new Date(a.date) - new Date(b.date));
+    const top10 = localResults.slice(0, 10);
+
+    if (top10.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Пока нет результатов. Будьте первыми!</td></tr>';
+      statusEl.textContent = 'Локальный режим (нет подключения к облаку)';
+      return;
+    }
+
+    tbody.innerHTML = top10.map((r, i) => `
+      <tr>
+        <td class="rank-cell rank-${i + 1}">${i + 1}</td>
+        <td>${this.escapeHtml(r.name)}</td>
+        <td>${this.escapeHtml(r.group || '-')}</td>
+        <td style="color: var(--primary-gold); font-weight: bold;">${r.score}/10</td>
+        <td style="color: var(--text-muted);">${new Date(r.date).toLocaleDateString('ru-RU')}</td>
+      </tr>
+    `).join('');
+    statusEl.textContent = 'Локальные результаты (подключите Supabase для синхронизации)';
+  },
+
+  /**
+   * 10. Экранирование HTML для безопасности
+   */
+  escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 };
 
-document.addEventListener('DOMContentLoaded', () => QuizEngine.init());
+document.addEventListener('DOMContentLoaded', () => {
+  console.log("[QuizEngine] Исторический квест инициализирован.");
+  
+  // Привязка кнопок
+  const startBtn = document.getElementById('startQuestBtn');
+  if (startBtn) {
+    startBtn.addEventListener('click', () => QuizEngine.startQuest());
+  }
+  
+  const nextBtn = document.getElementById('nextQuestionBtn');
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => QuizEngine.nextQuestion());
+  }
+  
+  const restartBtn = document.getElementById('restartQuestBtn');
+  if (restartBtn) {
+    restartBtn.addEventListener('click', () => QuizEngine.restartQuest());
+  }
+  
+  const claimCertBtn = document.getElementById('btnClaimCert');
+  if (claimCertBtn) {
+    claimCertBtn.addEventListener('click', () => QuizEngine.claimCertificate());
+  }
+  
+  // Загрузка бейджей и таблицы лидеров
+  QuizEngine.loadBadges();
+  QuizEngine.loadLeaderboard();
+});

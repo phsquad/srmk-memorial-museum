@@ -1,0 +1,393 @@
+/* ЕДИНЫЕ СТИЛИ НАВИГАЦИОННОЙ ШАПКИ ДЛЯ ВСЕХ СТРАНИЦ */
+
+/* === БАЗОВЫЕ СТИЛИ ШАПКИ === */
+.site-header {
+  background: linear-gradient(135deg, #1a1f2e 0%, #0f1218 100%);
+  border-bottom: 2px solid rgba(197, 160, 89, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* === ЛОГОТИП === */
+.logo-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logo-badge {
+  background: linear-gradient(135deg, #c5a059 0%, #8a6e3a 100%);
+  color: #0a0c0f;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  letter-spacing: 1px;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.org-name {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.7rem;
+  color: #9da6b3;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.site-title {
+  font-family: 'Cinzel', serif;
+  font-size: 0.95rem;
+  color: #f1f3f7;
+  font-weight: 600;
+}
+
+/* === ОСНОВНАЯ НАВИГАЦИЯ === */
+.main-nav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav-link {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #e0e0e0;
+  text-decoration: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+  background: rgba(197, 160, 89, 0.15);
+  color: #c5a059;
+}
+
+/* === ПАНЕЛЬ ДЕЙСТВИЙ === */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* === ВЫПАДАЮЩЕЕ МЕНЮ МОДУЛЕЙ === */
+.modules-dropdown {
+  position: relative;
+}
+
+.btn-dropdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(197, 160, 89, 0.1);
+  border: 1px solid rgba(197, 160, 89, 0.3);
+  color: #c5a059;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.5rem 0.85rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-dropdown-toggle:hover {
+  background: rgba(197, 160, 89, 0.2);
+  border-color: #c5a059;
+}
+
+.arrow-icon {
+  transition: transform 0.2s ease;
+}
+
+.btn-dropdown-toggle[aria-expanded="true"] .arrow-icon {
+  transform: rotate(180deg);
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #1a1f2e;
+  border: 1px solid rgba(197, 160, 89, 0.3);
+  border-radius: 8px;
+  min-width: 280px;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+}
+
+.modules-dropdown:hover .dropdown-menu,
+.btn-dropdown-toggle[aria-expanded="true"] + .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  text-decoration: none;
+  color: #e0e0e0;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background: rgba(197, 160, 89, 0.15);
+}
+
+.item-icon {
+  font-size: 1.5rem;
+}
+
+.dropdown-item strong {
+  display: block;
+  font-size: 0.9rem;
+  color: #f1f3f7;
+}
+
+.dropdown-item small {
+  font-size: 0.75rem;
+  color: #9da6b3;
+}
+
+/* === КНОПКА СЕРТИФИКАТА === */
+.btn-header-cert {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #c5a059 0%, #8a6e3a 100%);
+  color: #0a0c0f;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-header-cert:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(197, 160, 89, 0.4);
+}
+
+/* === ПАСПОРТ ПРОЕКТА === */
+.passport-btn {
+  background: transparent;
+  border: 1px solid rgba(197, 160, 89, 0.3);
+  color: #c5a059;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.8rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.passport-btn:hover {
+  background: rgba(197, 160, 89, 0.1);
+  border-color: #c5a059;
+}
+
+/* === КАРТА ДОБЛЕСТИ === */
+.contest-badge {
+  background: linear-gradient(135deg, #8a1c22 0%, #a8232b 100%);
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.contest-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(138, 28, 34, 0.4);
+}
+
+/* === МОБИЛЬНОЕ МЕНЮ (БУРГЕР) === */
+.mobile-burger-btn {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 28px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.mobile-burger-btn span {
+  display: block;
+  width: 100%;
+  height: 3px;
+  background: #c5a059;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.mobile-burger-btn[aria-expanded="true"] span:nth-child(1) {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+
+.mobile-burger-btn[aria-expanded="true"] span:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-burger-btn[aria-expanded="true"] span:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
+}
+
+/* === ВЫДВИЖНАЯ МОБИЛЬНАЯ ПАНЕЛЬ === */
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 300px;
+  height: 100vh;
+  background: linear-gradient(180deg, #1a1f2e 0%, #0f1218 100%);
+  border-left: 2px solid rgba(197, 160, 89, 0.3);
+  z-index: 1001;
+  transition: right 0.3s ease;
+  overflow-y: auto;
+  box-shadow: -5px 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.mobile-drawer[aria-hidden="false"] {
+  right: 0;
+}
+
+.drawer-content {
+  padding: 1.5rem 1rem;
+}
+
+.drawer-section-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #9da6b3;
+  letter-spacing: 1px;
+  margin: 1rem 0 0.75rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(197, 160, 89, 0.2);
+}
+
+.drawer-section-label:first-child {
+  margin-top: 0;
+}
+
+.drawer-link {
+  display: block;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  color: #e0e0e0;
+  text-decoration: none;
+  padding: 0.75rem 0;
+  transition: all 0.2s ease;
+}
+
+.drawer-link:hover {
+  color: #c5a059;
+  padding-left: 0.5rem;
+}
+
+.drawer-link.highlight {
+  color: #c5a059;
+  font-weight: 600;
+}
+
+.drawer-buttons-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.drawer-btn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.75rem;
+  border-radius: 4px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.drawer-btn:not(.gold) {
+  background: transparent;
+  border: 1px solid rgba(197, 160, 89, 0.3);
+  color: #c5a059;
+}
+
+.drawer-btn.gold {
+  background: linear-gradient(135deg, #8a1c22 0%, #a8232b 100%);
+  border: none;
+  color: #fff;
+}
+
+.drawer-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* === АДАПТИВНОСТЬ === */
+@media (max-width: 1024px) {
+  .main-nav {
+    display: none;
+  }
+
+  .mobile-burger-btn {
+    display: flex;
+  }
+
+  .passport-btn,
+  .contest-badge {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-container {
+    padding: 0.5rem 1rem;
+  }
+
+  .org-name {
+    display: none;
+  }
+
+  .btn-header-cert span {
+    display: none;
+  }
+}
