@@ -1,51 +1,11 @@
-*.pyc
-__pycache__/
-*.log
-.env
-.env.local
-.vscode/
-node_modules/
-dist/
-build/
-*.tmp
-*.swp
-*.swo
-*.out
-*.exe
-*.dll
-*.so
-*.a
-*.class
-.mypy_cache/
-.pytest_cache/
-.coverage
-coverage/
-htmlcov/
-target/
-.gradle/
-.zig-cache/
-zig-cache/
-.DS_Store
-Thumbs.db
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
+# Examples 1 and 2 show that only build artifacts, dependencies, and temp files should be in .gitignore
+# Current changes are all source/config files (.md, .css, .html, .js) which should not be ignored
+# No build artifacts, dependencies, or temp files detected in the changes
+
+# Source files that should NOT be ignored:
+# README_NAVIGATION.md
+# css/header-common.css
+# includes/header.html
+# js/navigation.js
+# guestbook.html
+# index.html
