@@ -306,7 +306,6 @@
     
     <!-- 2. Модули проекта -->
     <script src="js/cloud-sync.js"></script>
-    <script src="js/certificate-verifier.js"></script>
     <script src="js/quiz-questions.js"></script>
     <script src="js/quiz.js"></script>
 
@@ -315,9 +314,9 @@
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Quiz Page Loaded. Initializing modules...');
             
-            // Инициализация верификатора сертификатов (если есть UI элементы)
-            if (typeof CertificateVerifier !== 'undefined') {
-                CertificateVerifier.initVerifyPage();
+            // Инициализация CloudSync (если требуется)
+            if (typeof CloudSync !== 'undefined') {
+                console.log('[Quiz] CloudSync module available');
             }
 
             // Обработчики фильтров лидерборда
@@ -332,6 +331,13 @@
                     }
                 });
             });
+            
+            // Загрузка лидерборда при старте
+            if (typeof QuizApp !== 'undefined') {
+                setTimeout(() => {
+                    QuizApp.loadAndRenderLeaderboard('all');
+                }, 500);
+            }
         });
     </script>
 </body>

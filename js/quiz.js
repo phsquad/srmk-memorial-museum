@@ -12,7 +12,7 @@ const QuizApp = {
   // Состояние приложения
   currentQuestionIdx: 0,
   score: 0,
-  totalQuestions: 10, // Количество вопросов в одной игре
+  totalQuestions: 20, // Количество вопросов в одной игре (все вопросы из QUIZ_QUESTIONS)
   timer: null,
   timeLeft: 30,
   isAnswerLocked: false,
@@ -197,8 +197,13 @@ const QuizApp = {
     this.timeLeft = 30;
     this.startTime = Date.now();
     
-    // Получаем случайный вопрос (или по порядку)
-    const question = QUIZ_QUESTIONS[this.currentQuestionIdx % QUIZ_QUESTIONS.length];
+    // Перемешиваем вопросы при каждом запуске викторины
+    if (this.currentQuestionIdx === 0 && !this.shuffledQuestions) {
+      this.shuffledQuestions = [...QUIZ_QUESTIONS].sort(() => Math.random() - 0.5);
+    }
+    
+    // Получаем вопрос из перемешанного массива
+    const question = this.shuffledQuestions[this.currentQuestionIdx];
     
     // Обновляем UI
     document.getElementById('questionText').textContent = question.text;
@@ -248,7 +253,7 @@ const QuizApp = {
     clearInterval(this.timer);
     this.isAnswerLocked = true;
     
-    const question = QUIZ_QUESTIONS[this.currentQuestionIdx % QUIZ_QUESTIONS.length];
+    const question = this.shuffledQuestions[this.currentQuestionIdx];
     this.answers.push({
       questionId: question.id,
       theme: question.theme,
@@ -277,7 +282,7 @@ const QuizApp = {
     this.isAnswerLocked = true;
     
     const timeSpent = Math.floor((Date.now() - this.startTime) / 1000);
-    const question = QUIZ_QUESTIONS[this.currentQuestionIdx % QUIZ_QUESTIONS.length];
+    const question = this.shuffledQuestions[this.currentQuestionIdx];
     const isCorrect = (selectedIdx === question.correct);
     
     // Подсчет очков с бонусом за скорость
@@ -482,6 +487,10 @@ const QuizApp = {
    * Рестарт викторины
    */
   restartQuiz() {
+    // Сброс перемешанных вопросов для новой игры
+    this.shuffledQuestions = null;
+    this.currentQuestionIdx = 0;
+    
     document.getElementById('resultScreen').style.display = 'none';
     document.getElementById('welcomeScreen').style.display = 'block';
     document.getElementById('playerName').value = '';
