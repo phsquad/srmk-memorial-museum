@@ -1,1 +1,1 @@
-Nothing needs to be added to .gitignore since the changes only include source files (.html, .js) and the existing .gitignore file is empty. No build artifacts, dependencies, or temporary files are present in the change list.
+(js/quiz.js is just a source file, no build artifacts, dependencies, or temp files in the changes)

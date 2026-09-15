@@ -410,6 +410,253 @@ const QuizEngine = {
    * Сохранение результата в облако Supabase
    */
   async saveResultToCloud() {
+    const resultData = {
+      nickname: this.userNickname,
+      score: this.score,
+      total: QUIZ_QUESTIONS.length,
+      percent: Math.round((this.score / QUIZ_QUESTIONS.length) * 100),
+      date: new Date().toISOString(),
+      badges_earned: JSON.stringify(this.badges)
+    };
+
+    try {
+      // Сохраняем в Supabase
+      if (typeof CloudSync !== 'undefined' && CloudSync.client) {
+        const { error } = await CloudSync.client
+          .from('quiz_results')
+          .insert([resultData]);
+        
+        if (error) {
+          console.error('[QuizEngine] Ошибка сохранения в облако:', error);
+          this.saveLocalResult(resultData);
+        } else {
+          console.log('[QuizEngine] ✅ Результат сохранён в облако Supabase');
+        }
+      } else {
+        this.saveLocalResult(resultData);
+      }
+    } catch (e) {
+      console.error('[QuizEngine] Ошибка сети:', e);
+      this.saveLocalResult(resultData);
+    }
+  },
+
+  /**
+   * Резервное сохранение в localStorage
+   */
+  saveLocalResult(data) {
+    const results = JSON.parse(localStorage.getItem('srmk_quiz_results') || '[]');
+    results.push(data);
+    localStorage.setItem('srmk_quiz_results', JSON.stringify(results));
+    console.log('[QuizEngine] 💾 Результат сохранён локально');
+  },
+
+  /**
+   * Загрузка и отображение лидерборда
+   */
+  async loadAndRenderLeaderboard() {
+    const leaderboardContainer = document.getElementById('leaderboardEntries');
+    if (!leaderboardContainer) return;
+
+    leaderboardContainer.innerHTML = '<tr><td colspan="4" style="text-align:center;">Загрузка...</td></tr>';
+
+    try {
+      let topResults = [];
+
+      // Пробуем загрузить из Supabase
+      if (typeof CloudSync !== 'undefined' && CloudSync.client) {
+        const { data, error } = await CloudSync.client
+          .from('quiz_results')
+          .select('nickname, score, total, percent, date, badges_earned')
+          .order('percent', { ascending: false })
+          .order('date', { ascending: false })
+          .limit(10);
+
+        if (!error && data) {
+          topResults = data;
+          console.log('[QuizEngine] 🌐 Лидерборд загружен из облака');
+        }
+      }
+
+      // Fallback на localStorage если облако недоступно
+      if (topResults.length === 0) {
+        const localResults = JSON.parse(localStorage.getItem('srmk_quiz_results') || '[]');
+        topResults = localResults
+          .sort((a, b) => b.percent - a.percent || new Date(b.date) - new Date(a.date))
+          .slice(0, 10);
+        console.log('[QuizEngine] 💾 Лидерборд загружен локально');
+      }
+
+      this.renderLeaderboardEntries(topResults);
+      this.initLeaderboardRealtime();
+    } catch (e) {
+      console.error('[QuizEngine] Ошибка загрузки лидерборда:', e);
+      leaderboardContainer.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#ef4444;">Ошибка загрузки</td></tr>';
+    }
+  },
+
+  /**
+   * Отрисовка записей лидерборда
+   */
+  renderLeaderboardEntries(results) {
+    const container = document.getElementById('leaderboardEntries');
+    if (!container) return;
+
+    if (results.length === 0) {
+      container.innerHTML = '<tr><td colspan="4" style="text-align:center;">Пока нет результатов. Станьте первым!</td></tr>';
+      return;
+    }
+
+    container.innerHTML = results.map((entry, index) => {
+      const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+      const badges = entry.badges_earned ? JSON.parse(entry.badges_earned) : [];
+      const badgeIcons = badges.map(b => this.getBadgeIcon(b)).join(' ');
+      
+      return `
+        <tr>
+          <td style="font-size:1.2em;">${medal}</td>
+          <td style="font-weight:600;">${this.escapeHtml(entry.nickname)}</td>
+          <td style="color:#f59e0b;font-weight:bold;">${entry.score}/${entry.total} (${entry.percent}%)</td>
+          <td>${badgeIcons}</td>
+        </tr>
+      `;
+    }).join('');
+  },
+
+  /**
+   * Иконки для бейджей
+   */
+  getBadgeIcon(badgeId) {
+    const icons = {
+      'first_blood': '⚡',
+      'perfect_score': '🏆',
+      'speed_demon': '🚀',
+      'history_master': '📚',
+      'legend': '👑'
+    };
+    return icons[badgeId] || '🎖';
+  },
+
+  /**
+   * Realtime-подписка на обновления лидерборда
+   */
+  initLeaderboardRealtime() {
+    if (typeof CloudSync === 'undefined' || !CloudSync.client) return;
+
+    CloudSync.client
+      .channel('quiz_leaderboard')
+      .on('postgres_changes', 
+        { event: '*', schema: 'public', table: 'quiz_results' },
+        () => {
+          console.log('[QuizEngine] 🔄 Лидерборд обновлён в реальном времени');
+          this.loadAndRenderLeaderboard();
+        }
+      )
+      .subscribe();
+  },
+
+  /**
+   * Проверка достижений
+   */
+  checkAchievements() {
+    const now = new Date();
+    
+    // Первая кровь - первый идеальный результат
+    if (this.score === QUIZ_QUESTIONS.length) {
+      this.badges.push('perfect_score');
+    }
+
+    // Спринтер - быстрое прохождение (< 2 минут на 10 вопросов)
+    // (требуется дополнительная логика отслеживания времени)
+    
+    // Историк - 100% результат
+    if (this.score === QUIZ_QUESTIONS.length && !this.badges.includes('history_master')) {
+      this.badges.push('history_master');
+    }
+
+    this.renderBadges();
+  },
+
+  /**
+   * Отрисовка бейджей
+   */
+  renderBadges() {
+    const container = document.getElementById('badgesContainer');
+    if (!container) return;
+
+    if (this.badges.length === 0) {
+      container.style.display = 'none';
+      return;
+    }
+
+    container.style.display = 'block';
+    container.innerHTML = `
+      <h3 style="margin-bottom:1rem;color:#fbbf24;">🎯 Ваши достижения:</h3>
+      <div class="badges-grid" style="display:flex;gap:1rem;flex-wrap:wrap;">
+        ${this.badges.map(badgeId => {
+          const badge = this.getBadgeData(badgeId);
+          return `
+            <div class="badge-card" style="
+              background:linear-gradient(135deg, #1f2937 0%, #374151 100%);
+              border:2px solid #fbbf24;
+              border-radius:12px;
+              padding:1rem;
+              min-width:150px;
+              text-align:center;
+              box-shadow:0 4px 6px rgba(0,0,0,0.3);
+            ">
+              <div style="font-size:2.5rem;margin-bottom:0.5rem;">${badge.icon}</div>
+              <div style="font-weight:bold;color:#fbbf24;margin-bottom:0.25rem;">${badge.name}</div>
+              <div style="font-size:0.85rem;color:#9ca3af;">${badge.description}</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  },
+
+  /**
+   * Данные бейджей
+   */
+  getBadgeData(badgeId) {
+    const badges = {
+      'first_blood': {
+        name: 'Первая кровь',
+        icon: '⚡',
+        description: 'Первый идеальный результат'
+      },
+      'perfect_score': {
+        name: 'Отличник',
+        icon: '🏆',
+        description: '10/10 правильных ответов'
+      },
+      'speed_demon': {
+        name: 'Спринтер',
+        icon: '🚀',
+        description: 'Прохождение менее чем за 2 минуты'
+      },
+      'history_master': {
+        name: 'Историк',
+        icon: '📚',
+        description: 'Превосходное знание истории'
+      },
+      'legend': {
+        name: 'Легенда СРМК',
+        icon: '👑',
+        description: 'Все достижения получены'
+      }
+    };
+    return badges[badgeId] || { name: 'Бейдж', icon: '🎖', description: '' };
+  },
+
+  /**
+   * Защита от XSS
+   */
+  escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  },ud() {
     try {
       if (typeof CloudSync !== 'undefined' && CloudSync.client) {
         await CloudSync.saveQuizResult(this.userNickname, this.score);
