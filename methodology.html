@@ -17,20 +17,106 @@
 </head>
 <body class="dark-theme">
 
-  <!-- ШАПКА -->
-  <header class="method-header">
-    <div class="container header-content">
-      <div class="logo-group">
-        <a href="index.html" class="logo-badge">СРМК</a>
-        <div class="header-titles">
-          <span class="sub-title">Педагогический банк данных</span>
-          <h1 class="main-title">Цифровой методический кабинет</h1>
+  <!-- ЕДИНАЯ НАВИГАЦИОННАЯ ШАПКА -->
+  <header class="site-header" id="siteHeader">
+    <div class="container header-container">
+      
+      <!-- ЛОГОТИП И НАЗВАНИЕ -->
+      <a href="index.html" class="logo-group" aria-label="На главную страницу музея">
+        <div class="logo-badge">СРМК</div>
+        <div class="logo-text">
+          <span class="org-name">ГБПОУ СРМК • Ставрополь</span>
+          <span class="site-title">«Быть воином — жить вечно»</span>
         </div>
+      </a>
+
+      <!-- ОСНОВНАЯ НАВИГАЦИЯ ПО 4 ЗАЛАМ ЭКСПОЗИЦИИ -->
+      <nav class="main-nav" id="desktopNav" aria-label="Навигация по залам">
+        <a href="index.html#memorial" class="nav-link">Мемориал</a>
+        <a href="index.html#heroes-grid" class="nav-link">За партой Героя</a>
+        <a href="index.html#battle-path" class="nav-link">Хроника и Карта</a>
+        <a href="index.html#memory-hall" class="nav-link">Эстафета</a>
+      </nav>
+
+      <!-- ПАНЕЛЬ ДЕЙСТВИЙ И ЦИФРОВЫХ МОДУЛЕЙ -->
+      <div class="header-actions">
+        <!-- ВЫПАДАЮЩЕЕ МЕНЮ ЦИФРОВЫХ МОДУЛЕЙ -->
+        <div class="modules-dropdown" id="modulesDropdown">
+          <button class="btn-dropdown-toggle" id="btnDropdownToggle" type="button" aria-expanded="false" aria-controls="dropdownMenu">
+            <span>🏛 Модули</span>
+            <span class="arrow-icon" aria-hidden="true">▾</span>
+          </button>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="memory-book.html" class="dropdown-item">
+              <span class="item-icon">📖</span>
+              <div><strong>Книга Памяти</strong><small>Летопись 20 героев</small></div>
+            </a>
+            <a href="reader.html" class="dropdown-item">
+              <span class="item-icon">📚</span>
+              <div><strong>3D Фолиант</strong><small>Читалка с перелистыванием</small></div>
+            </a>
+            <a href="quiz.html" class="dropdown-item">
+              <span class="item-icon">⚔️</span>
+              <div><strong>Квест-викторина</strong><small>10 интерактивных вопросов</small></div>
+            </a>
+            <a href="methodology.html" class="dropdown-item active">
+              <span class="item-icon">📑</span>
+              <div><strong>Методкабинет</strong><small>Банк уроков для педагогов</small></div>
+            </a>
+            <a href="verify.html" class="dropdown-item">
+              <span class="item-icon">🛡</span>
+              <div><strong>Реестр верификации</strong><small>Проверка сертификатов</small></div>
+            </a>
+            <a href="desk-qr.html" class="dropdown-item">
+              <span class="item-icon">🪑</span>
+              <div><strong>Парта Героя</strong><small>Конструктор табличек А4</small></div>
+            </a>
+            <a href="guestbook.html" class="dropdown-item">
+              <span class="item-icon">🕯</span>
+              <div><strong>Стена Памяти</strong><small>Послания и лампады</small></div>
+            </a>
+          </div>
+        </div>
+
+        <!-- КНОПКА СЕРТИФИКАТА -->
+        <a href="certificate.html" class="btn-header-cert" title="Оформить наградной лист">
+          <span>📜</span> Сертификат
+        </a>
+
+        <!-- ПАСПОРТ И КАРТА ДОБЛЕСТИ -->
+        <button class="passport-btn" id="btnOpenPassport" type="button">Паспорт проекта</button>
+        <a href="https://карта-доблести.рф" target="_blank" rel="noopener noreferrer" class="contest-badge">Карта Доблести РФ</a>
+
+        <!-- КНОПКА МОБИЛЬНОГО МЕНЮ (БУРГЕР) -->
+        <button class="mobile-burger-btn" id="mobileBurgerBtn" aria-label="Открыть мобильное меню" aria-expanded="false" aria-controls="mobileDrawer" type="button">
+          <span></span><span></span><span></span>
+        </button>
       </div>
-      <div class="header-nav">
-        <a href="memory-book.html" class="nav-btn">📖 Книга Памяти</a>
-        <a href="certificate.html" class="nav-btn">📜 Сертификаты</a>
-        <a href="index.html" class="nav-btn btn-primary">← В виртуальный музей</a>
+    </div>
+
+    <!-- ВЫДВИЖНАЯ МОБИЛЬНАЯ ПАНЕЛЬ МЕНЮ -->
+    <div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+      <div class="drawer-content">
+        <div class="drawer-section-label">Залы экспозиции</div>
+        <a href="index.html#memorial" class="drawer-link">🏛 Мемориал Славы</a>
+        <a href="index.html#heroes-grid" class="drawer-link">🎓 За партой Героя</a>
+        <a href="index.html#battle-path" class="drawer-link">🗺 Хроника и Карта</a>
+        <a href="index.html#memory-hall" class="drawer-link">🕯 Эстафета памяти</a>
+
+        <div class="drawer-section-label">Цифровые модули и сервисы</div>
+        <a href="memory-book.html" class="drawer-link">📖 Электронная Книга Памяти</a>
+        <a href="reader.html" class="drawer-link">📚 3D Фолиант-читалка</a>
+        <a href="quiz.html" class="drawer-link">⚔️ Квест-викторина «Дорогами мужества»</a>
+        <a href="certificate.html" class="drawer-link">📜 Оформить Сертификат участника</a>
+        <a href="methodology.html" class="drawer-link highlight">📑 Методический кабинет педагога</a>
+        <a href="verify.html" class="drawer-link">🛡 Реестр верификации</a>
+        <a href="desk-qr.html" class="drawer-link">🪑 Конструктор «Парты Героя»</a>
+        <a href="guestbook.html" class="drawer-link">🕯 Стена Памяти и отзывы</a>
+
+        <div class="drawer-buttons-row">
+          <button class="drawer-btn" id="drawerPassportBtn" type="button">Паспорт проекта</button>
+          <a href="https://карта-доблести.рф" target="_blank" rel="noopener noreferrer" class="drawer-btn gold">Карта Доблести РФ</a>
+        </div>
       </div>
     </div>
   </header>

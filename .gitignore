@@ -1,1 +1,1 @@
-Nothing needs to be added to .gitignore since only a source file (guestbook.html) was modified and there are no build artifacts, dependencies, or temporary files in the changes.
+Nothing should be ignored based on the provided file changes, as they only include HTML source files (.html) which are not build artifacts, dependencies, or temporary files.
