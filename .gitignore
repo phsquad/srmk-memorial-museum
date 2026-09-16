@@ -1,7 +1,38 @@
-```
-# Images - thumbs directory
-assets/images/heroes/thumbs/
+# Image files are source assets, no ignores needed for this change list
 
+# Dependencies
+node_modules/
+# Environment
+.env
+.env.local
+.env.
+# Editors
+.vscode/
+.idea/
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
+dist/
+build/
+target/
+# Python specific
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+# System files
+.DS_Store
+Thumbs.db
+# Coverage
+coverage/
+htmlcov/
+.coverage
 # Compressed files
 *.zip
 *.gz
@@ -25,4 +56,3 @@ assets/images/heroes/thumbs/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
-```
