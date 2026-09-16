@@ -1,12 +1,25 @@
 /**
  * ============================================================================
  * ВИРТУАЛЬНЫЙ МЕМОРИАЛЬНЫЙ КОМПЛЕКС ГБПОУ СРМК: «БЫТЬ ВОИНОМ — ЖИТЬ ВЕЧНО»
- * Главный управляющий контроллер экспозиции (js/app.js v14.0 Ultra Master)
+ * Главный управляющий контроллер экспозиции (js/app.js v16.0 Ultra Master)
+ * 
+ * Включает:
+ * 1. Управление состояниями залов музея (I–IV), поиском и фильтрацией
+ * 2. Интерактивное досье героя без битых картинок и черных квадратов
+ * 3. Автономное отображение орденов, медалей и планок РФ через векторные SVG
+ * 4. 2.5D Мемориал Славы с параллаксом и точками зажжения свечей
+ * 5. Интерактивную Яндекс Карту API v2.1 с векторными лучами подвига
+ * 6. Процедурный синтезатор звуков и Колокола Памяти (Web Audio API)
+ * 7. Автопилот-презентацию «Урок Мужества» и свайп-жесты для смартфонов
+ * 8. Полную синхронизацию с облаком Supabase Realtime (с защитой от TypeError)
  * ============================================================================
  */
 
 'use strict';
 
+/**
+ * 1. ГЛОБАЛЬНОЕ СОСТОЯНИЕ ПРИЛОЖЕНИЯ (APP STATE)
+ */
 const AppState = {
   activeSpecialty: 'all',
   activePlaqueView: 'all',
@@ -14,26 +27,39 @@ const AppState = {
   searchQuery: '',
   currentHeroId: null,
 
+  // Аудио и системная озвучка
   isAudioPlaying: false,
   isTTSPlaying: false,
   audioContext: null,
 
+  // Интерактивный режим «Урок Мужества» (Автопилот-презентация)
   isPresentationRunning: false,
   presentationTimer: null,
 
+  // Яндекс Карты v2.1
   mapInstance: null,
   mapMarkers: {},
   mapPolylines: [],
 
+  // Мемориальные хранилища
   candles: {},
   flowersCount: 0,
 
+  // Сенсорные жесты (Touch Swipes)
   touchStartX: 0,
   touchStartY: 0,
   touchEndX: 0,
   touchEndY: 0
 };
 
+/**
+ * Векторный аватар-заглушка по умолчанию (SVG Data URI)
+ */
+const FALLBACK_HERO_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500' viewBox='0 0 400 500'%3E%3Crect width='400' height='500' fill='%2312151b'/%3E%3Ccircle cx='200' cy='180' r='64' fill='%23181d26' stroke='%23c5a059' stroke-width='2'/%3E%3Cpath d='M200 130 L208 155 L235 155 L213 172 L221 198 L200 182 L179 198 L187 172 L165 155 L192 155 Z' fill='%23c5a059'/%3E%3Cpath d='M100 360 C100 280, 300 280, 300 360 Z' fill='%238a1c22' opacity='0.7'/%3E%3Ctext x='50%25' y='82%25' dominant-baseline='middle' text-anchor='middle' fill='%23c5a059' font-family='sans-serif' font-weight='bold' font-size='14'%3EГБПОУ СРМК%3C/text%3E%3Ctext x='50%25' y='90%25' dominant-baseline='middle' text-anchor='middle' fill='%239da6b3' font-family='sans-serif' font-size='11'%3EНАВЕЧНО В СТРОЮ%3C/text%3E%3C/svg%3E";
+
+/**
+ * 2. ТОЧКА ВХОДА И ИНИЦИАЛИЗАЦИЯ
+ */
 document.addEventListener('DOMContentLoaded', () => {
   App.init();
 });
@@ -44,44 +70,55 @@ const App = {
     this.loadStorageData();
     this.loadCloudData();
 
+    // Первичная отрисовка выставочных залов
     this.renderMemorialPlaques();
     this.renderSpecialtyFilters();
     this.renderCardsGrid();
     this.updateMemorialStats();
 
+    // Привязка событий, жесткого роутинга и тач-жестов
     this.bindEvents();
     this.initTouchGestures();
     this.checkDeepLink();
 
+    // Асинхронный запуск тяжелых графических модулей
     setTimeout(() => {
       this.initInteractiveMapSafe();
       this.initAmbientParticles();
     }, 150);
 
-    console.log(`[Музей СРМК v14.0 Master] Ядро запущенно. База содержит ${typeof heroesDatabase !== 'undefined' ? heroesDatabase.length : 0} героев.`);
+    console.log(`[Музей СРМК v16.0 Master] Ядро запущено. Героев в базе: ${typeof heroesDatabase !== 'undefined' ? heroesDatabase.length : 0}`);
   },
 
+  /**
+   * Кэширование DOM-селекторов с защитой от отсутствующих элементов
+   */
   cacheDOM() {
     this.dom = {
+      // Зал I: Мемориал Славы
       leftPlaque: document.getElementById('leftPlaqueNames'),
       rightPlaque: document.getElementById('rightPlaqueNames'),
       leftPlaqueZone: document.getElementById('leftPlaqueZone'),
       rightPlaqueZone: document.getElementById('rightPlaqueZone'),
 
+      // Зал II: Студенческая юность и поиск
       cardsContainer: document.getElementById('heroesCardsContainer'),
       searchInput: document.getElementById('heroSearchInput'),
       searchClearBtn: document.getElementById('searchClearBtn'),
       specialtyContainer: document.getElementById('specialtyFiltersContainer'),
 
+      // Мемориальные счетчики
       totalCandlesDisplay: document.getElementById('totalCandlesCount'),
       statHeroCandles: document.getElementById('heroTotalCandlesStat'),
       flowersDisplay: document.getElementById('flowersCountDisplay'),
 
+      // Модальное окно досье
       heroModal: document.getElementById('heroModal'),
       modalOverlay: document.getElementById('modalOverlay'),
       modalCloseBtn: document.getElementById('modalCloseBtn'),
       modalBody: document.getElementById('modalHeroContent'),
 
+      // Аудиоплеер экскурсий
       audioBar: document.getElementById('audioPlayerBar'),
       audioElement: document.getElementById('mainAudioElement'),
       audioPlayBtn: document.getElementById('audioPlayPauseBtn'),
@@ -95,6 +132,9 @@ const App = {
     };
   },
 
+  /**
+   * Загрузка локальных данных устройства
+   */
   loadStorageData() {
     try {
       AppState.candles = JSON.parse(localStorage.getItem('srmk_museum_candles_v3') || '{}');
@@ -110,6 +150,9 @@ const App = {
     }
   },
 
+  /**
+   * Загрузка облачных данных из Supabase в реальном времени
+   */
   async loadCloudData() {
     if (!window.CloudSync?.isLive) return;
     try {
@@ -125,11 +168,15 @@ const App = {
       this.renderCardsGrid();
       this.renderMemorialPlaques();
     } catch (e) {
-      console.warn("[App] Ошибка загрузки облачных данных:", e);
+      console.warn("[App] Ошибка загрузки облачной метрики:", e);
     }
   },
 
+  /**
+   * Привязка глобальных событий
+   */
   bindEvents() {
+    // Живой дебаунс-поиск по базе (100 мс)
     if (this.dom.searchInput) {
       let debounceTimer;
       this.dom.searchInput.addEventListener('input', (e) => {
@@ -141,9 +188,11 @@ const App = {
       });
     }
 
+    // Закрытие модального окна
     if (this.dom.modalCloseBtn) this.dom.modalCloseBtn.addEventListener('click', () => this.closeModal());
     if (this.dom.modalOverlay) this.dom.modalOverlay.addEventListener('click', () => this.closeModal());
 
+    // Горячие клавиши (Esc, Стрелки навигации, P - печать, Пробел - диктор)
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         if (this.dom.heroModal?.classList.contains('active')) this.closeModal();
@@ -169,7 +218,7 @@ const App = {
   },
 
   /* ==========================================================================
-     ЗАЛ I: ПЛИТЫ МЕМОРИАЛА
+     3. ЗАЛ I: ПЛИТЫ МЕМОРИАЛА
      ========================================================================== */
   renderMemorialPlaques() {
     const { leftPlaque, rightPlaque } = this.dom;
@@ -221,7 +270,7 @@ const App = {
   },
 
   /* ==========================================================================
-     ЗАЛ II: ФИЛЬТРЫ И СЕТКА КАРТОЧЕК
+     4. ЗАЛ II: ФИЛЬТРЫ И СЕТКА КАРТОЧЕК
      ========================================================================== */
   renderSpecialtyFilters() {
     const container = this.dom.specialtyContainer;
@@ -305,7 +354,8 @@ const App = {
     }
 
     filtered.forEach(hero => {
-      const photoSrc = hero.media?.photo || ArchiveService.generateFallbackAvatar(hero);
+      const fallbackAvatar = (typeof ArchiveService !== 'undefined') ? ArchiveService.generateFallbackAvatar(hero) : FALLBACK_HERO_AVATAR;
+      const photoSrc = hero.media?.photo || fallbackAvatar;
       const yearsText = hero.dates?.years || `${hero.dates?.birth || ''} — ${hero.dates?.death || ''}`;
       const specialtyText = hero.education?.specialty || "Выпускник колледжа";
       const candleCount = AppState.candles[hero.id] || 0;
@@ -316,7 +366,7 @@ const App = {
         medalsHTML = `
           <div style="display:flex; gap:6px; margin-top:8px; align-items:center; flex-wrap:wrap;">
             ${hero.awards.map(a => {
-              const visual = ArchiveService.getAwardVisual(a);
+              const visual = (typeof ArchiveService !== 'undefined') ? ArchiveService.getAwardVisual(a) : { badge: fallbackAvatar, name: a };
               return `<img src="${visual.badge}" alt="${this.escapeHtml(visual.name)}" title="${this.escapeHtml(visual.name)}" style="width:26px; height:26px; object-fit:contain; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));">`;
             }).join('')}
           </div>
@@ -330,7 +380,7 @@ const App = {
       
       card.innerHTML = `
         <div class="hero-card-img-wrap">
-          <img src="${photoSrc}" alt="${this.escapeHtml(hero.name)}" class="hero-card-img" loading="lazy" onerror="this.src='${ArchiveService.generateFallbackAvatar(hero)}'">
+          <img src="${photoSrc}" alt="${this.escapeHtml(hero.name)}" class="hero-card-img" loading="lazy" onerror="this.onerror=null; this.src='${fallbackAvatar}';">
           <span class="hero-card-badge">СВО</span>
           ${candleCount > 0 ? `<span class="hero-candle-badge" title="Зажжено свечей памяти">🕯 ${candleCount}</span>` : ''}
         </div>
@@ -350,7 +400,7 @@ const App = {
   },
 
   /* ==========================================================================
-     МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ (100% БЕЗ ЧЕРНЫХ КВАДРАТОВ И ОБРЕЗКИ ТЕКСТА)
+     5. МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ (ЧИСТАЯ ВЕРСТКА БЕЗ СРЕЗАННЫХ БЛОКОВ И ЧЕРНЫХ КВАДРАТОВ)
      ========================================================================== */
   openModal(id) {
     const hero = heroesDatabase.find(h => h.id === id);
@@ -365,7 +415,8 @@ const App = {
     const prevHero = heroesDatabase[currentIndex - 1] || heroesDatabase[heroesDatabase.length - 1];
     const nextHero = heroesDatabase[currentIndex + 1] || heroesDatabase[0];
 
-    const mainPhoto = hero.media?.photo || ArchiveService.generateFallbackAvatar(hero);
+    const fallbackAvatar = (typeof ArchiveService !== 'undefined') ? ArchiveService.generateFallbackAvatar(hero) : FALLBACK_HERO_AVATAR;
+    const mainPhoto = hero.media?.photo || fallbackAvatar;
     const audioSrc = hero.media?.audioGuide || "";
     const yearsText = hero.dates?.years || `${hero.dates?.birth || ''} — ${hero.dates?.death || ''}`;
     const rankText = hero.military ? `${hero.military.rank || 'Воин ВС РФ'} ${hero.military.unit ? `• ${hero.military.unit}` : ''}` : "Воин ВС РФ";
@@ -373,18 +424,23 @@ const App = {
     const candleCount = AppState.candles[hero.id] || 0;
 
     // Сборка галереи миниатюр (Портрет + Знаки орденов + Планки + Мемориал)
-    const galleryItems = ArchiveService.buildDynamicGallery(hero);
+    const galleryItems = (typeof ArchiveService !== 'undefined')
+      ? ArchiveService.buildDynamicGallery(hero)
+      : [{ url: mainPhoto, caption: `Портрет: ${hero.name}`, desc: "", type: "portrait" }];
 
-    // Сборка наградного блока справа
+    // Сборка наградного блока справа с векторными медалями и планками
     const awardsHTML = (hero.awards || []).map(awardTitle => {
-      const visual = ArchiveService.getAwardVisual(awardTitle);
+      const visual = (typeof ArchiveService !== 'undefined') 
+        ? ArchiveService.getAwardVisual(awardTitle) 
+        : { name: awardTitle, badge: fallbackAvatar, ribbon: null, established: 'Государственная награда РФ', criteria: '' };
+
       return `
         <div class="award-card-item" style="display:flex; align-items:center; gap:14px; padding:12px 16px; margin-bottom:10px; background:#181d26; border:1px solid rgba(197,160,89,0.35); border-radius:4px; box-shadow:0 4px 14px rgba(0,0,0,0.5);">
           <img src="${visual.badge}" alt="${this.escapeHtml(visual.name)}" style="width:44px; height:44px; object-fit:contain; flex-shrink:0; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6));">
           <div style="flex-grow:1;">
             <strong style="display:block; color:#ffffff; font-size:0.92rem; font-family:'Cinzel', serif; line-height:1.25;">${this.escapeHtml(visual.name)}</strong>
-            <span style="display:block; color:#c5a059; font-size:0.76rem; margin-top:2px;">${visual.established || 'Государственная награда РФ'}</span>
-            <small style="display:block; color:#9da6b3; font-size:0.75rem; margin-top:4px; line-height:1.35;">${visual.criteria || 'За мужество и отвагу при исполнении воинского долга.'}</small>
+            <span style="display:block; color:#c5a059; font-size:0.76rem; margin-top:2px;">${this.escapeHtml(visual.established || 'Государственная награда РФ')}</span>
+            <small style="display:block; color:#9da6b3; font-size:0.75rem; margin-top:4px; line-height:1.35;">${this.escapeHtml(visual.criteria || 'За мужество и отвагу при исполнении воинского долга.')}</small>
           </div>
           ${visual.ribbon && visual.ribbon !== visual.badge ? `<img src="${visual.ribbon}" alt="Планка" style="width:54px; height:18px; object-fit:contain; border-radius:2px; border:1px solid rgba(255,255,255,0.2);" title="Орденская планка">` : ''}
         </div>
@@ -405,21 +461,21 @@ const App = {
         <!-- ЛЕВАЯ КОЛОНКА: ФОТО, ГАЛЕРЕЯ И ДЕЙСТВИЯ -->
         <div class="dossier-sidebar">
           <div class="dossier-gallery-main">
-            <img src="${mainPhoto}" alt="${this.escapeHtml(hero.name)}" id="dossierMainImage" class="dossier-img" onerror="this.src='${ArchiveService.generateFallbackAvatar(hero)}'">
+            <img src="${mainPhoto}" alt="${this.escapeHtml(hero.name)}" id="dossierMainImage" class="dossier-img" onerror="this.onerror=null; this.src='${fallbackAvatar}';">
             <div class="dossier-gallery-caption" id="dossierImageCaption">
               <strong>${this.escapeHtml(galleryItems[0].caption || '')}</strong>
               ${galleryItems[0].desc ? `<br><small style="opacity:0.8;">${this.escapeHtml(galleryItems[0].desc)}</small>` : ''}
             </div>
           </div>
 
-          <!-- МИНИАТЮРЫ ГАЛЕРЕИ (БЕЗ ЧЕРНЫХ КВАДРАТОВ) -->
+          <!-- МИНИАТЮРЫ ГАЛЕРЕИ (ЧИСТАЯ ЛЕНТА С СОХРАНЕНИЕМ ПРОПОРЦИЙ) -->
           <div class="dossier-thumbnails-track">
             ${galleryItems.map((item, idx) => `
               <button class="dossier-thumb-btn ${idx === 0 ? 'active' : ''} ${item.type || ''}" 
                       onclick="App.switchGalleryPhoto('${item.url}', '${item.caption.replace(/'/g, "\\'")}', '${(item.desc || '').replace(/'/g, "\\'")}', this)" 
                       type="button" 
                       title="${this.escapeHtml(item.caption)}">
-                <img src="${item.url}" alt="" onerror="this.src='${ArchiveService.generateFallbackAvatar(hero)}'">
+                <img src="${item.url}" alt="" onerror="this.onerror=null; this.src='${fallbackAvatar}';">
               </button>
             `).join('')}
           </div>
