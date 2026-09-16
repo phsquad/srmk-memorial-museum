@@ -24,15 +24,15 @@
   <meta property="og:description" content="Мемориальная экспозиция и оцифрованные архивы 20 выпускников Ставропольского регионального многопрофильного колледжа.">
   <meta property="og:image" content="assets/images/cover-master.jpg">
 
-  <!-- Шрифтовые гарнитуры -->
+  <!-- Шрифты -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Стили -->
   <link rel="stylesheet" href="css/site-common.css">
-  <link rel="stylesheet" href="css/desktop.css">
   <link rel="stylesheet" href="css/header-common.css">
+  <link rel="stylesheet" href="css/desktop.css">
 </head>
 <body class="dark-theme">
 
@@ -50,8 +50,8 @@
     </div>
   </aside>
 
-  <!-- 2. ГЛАВНАЯ НАВИГАЦИОННАЯ ШАПКА -->
-  <header class="header" id="siteHeader">
+  <!-- 2. ЕДИНАЯ НАВИГАЦИОННАЯ ШАПКА -->
+  <header class="site-header" id="siteHeader">
     <div class="container header-container">
       
       <!-- ЛОГОТИП И НАЗВАНИЕ -->
@@ -64,8 +64,8 @@
       </a>
 
       <!-- ОСНОВНАЯ НАВИГАЦИЯ ПО 4 ЗАЛАМ ЭКСПОЗИЦИИ -->
-      <nav class="nav" id="desktopNav" aria-label="Навигация по залам">
-        <a href="#memorial" class="nav-link">Мемориал</a>
+      <nav class="main-nav" id="desktopNav" aria-label="Навигация по залам">
+        <a href="#memorial" class="nav-link active">Мемориал</a>
         <a href="#heroes-grid" class="nav-link">За партой Героя</a>
         <a href="#battle-path" class="nav-link">Хроника и Карта</a>
         <a href="#memory-hall" class="nav-link">Эстафета</a>
@@ -196,7 +196,7 @@
     <section id="memorial" class="section memorial-section">
       <div class="container">
         
-        <!-- 🔥 МАГИСТРАЛЬНАЯ ОБЛОЖКА 3:2 НА ГЛАВНОМ ЭКРАНЕ ЗАЛА -->
+        <!-- МАГИСТРАЛЬНАЯ ОБЛОЖКА 3:2 -->
         <div class="master-cover-frame">
           <img src="assets/images/cover-master.jpg" alt="Подвиг воинов-героев СРМК" class="master-cover-img" loading="lazy">
           <div class="cover-glow-overlay"></div>
@@ -218,7 +218,7 @@
 
         <div class="memorial-stand-container">
           <div class="memorial-stand-canvas" id="memorialStand">
-            <img src="assets/images/memorial-bg.jpg" alt="Памятник выпускникам СРМК" class="memorial-bg-img" onerror="this.src='https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1600&q=80'">
+            <img src="assets/images/memorial-bg.jpg" alt="Памятник выпускникам СРМК" class="memorial-bg-img" onerror="this.src='assets/images/cover-master.jpg'">
 
             <div class="plaque-interactive-zone left-zone" id="leftPlaqueZone">
               <div class="plaque-title">Левая плита мемориала</div>
@@ -426,32 +426,12 @@
     </section>
   </main>
 
-  <!-- МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ (Контент генерируется в app.js) -->
+  <!-- МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ (Генерируется в app.js) -->
   <div class="modal" id="heroModal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-overlay" id="modalOverlay"></div>
     <div class="modal-dialog">
       <button class="modal-close" id="modalCloseBtn" type="button" aria-label="Закрыть">&times;</button>
       <div class="modal-body" id="modalHeroContent"></div>
-    </div>
-  </div>
-
-  <!-- МОДАЛЬНОЕ ОКНО ПАСПОРТА МУЗЕЯ -->
-  <div class="modal" id="passportModal" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal-overlay" id="passportModalOverlay"></div>
-    <div class="modal-dialog" style="max-width: 760px;">
-      <button class="modal-close" id="passportModalCloseBtn" type="button" aria-label="Закрыть">&times;</button>
-      <div class="modal-body">
-        <h2 style="font-family: var(--font-serif); color: var(--accent-brass); margin-bottom: 16px;">Паспорт виртуального музея</h2>
-        <table style="width:100%; border-collapse: collapse; font-size: 0.88rem; color: #d8deea;">
-          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass); width: 35%;">Проект:</td><td style="padding: 10px 8px;">«Быть воином — жить вечно»</td></tr>
-          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Организация:</td><td style="padding: 10px 8px;">ГБПОУ «Ставропольский региональный многопрофильный колледж»</td></tr>
-          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Номинация:</td><td style="padding: 10px 8px;">«За партой героя» (Всероссийская акция «Карта доблести»)</td></tr>
-          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Руководитель:</td><td style="padding: 10px 8px;">Е. В. Бледных, директор ГБПОУ СРМК, канд. ист. наук</td></tr>
-          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Куратор:</td><td style="padding: 10px 8px;">А. В. Генте, преподаватель истории высшей кат.</td></tr>
-          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Разработчик:</td><td style="padding: 10px 8px;">А. И. Андреев, студент 2 курса «ИСиП»</td></tr>
-          <tr><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Фонд памяти:</td><td style="padding: 10px 8px;">20 выпускников колледжа, увековеченных на Мемориале Славы</td></tr>
-        </table>
-      </div>
     </div>
   </div>
 
@@ -479,7 +459,7 @@
     </div>
   </div>
 
-  <!-- ПОДВАЛ (FOOTER) -->
+  <!-- ПОДВАЛ -->
   <footer class="footer">
     <div class="container footer-container">
       <div class="footer-col">
@@ -511,116 +491,22 @@
     </div>
   </footer>
 
-  <!-- ==========================================================================
-       ПОДКЛЮЧЕНИЕ СКРИПТОВ (СТРОГИЙ ПОРЯДОК ЗАГРУЗКИ)
-       ========================================================================== -->
-  <!-- 1. Внешние SDK и API -->
+  <!-- СКРИПТЫ -->
   <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
-  <!-- 2. База данных и источники -->
   <script src="js/data.js"></script>
   <script src="js/sources.js"></script>
-
-  <!-- 3. Облачный мост, защита и геральдика -->
   <script src="js/cloud-sync.js"></script>
   <script src="js/tts-narrator.js"></script>
   <script src="js/anti-cheat-tribute.js"></script>
   <script src="js/heraldry-resolver.js"></script>
   <script src="js/tech-modules.js"></script>
-
-  <!-- 4. Основной контроллер выставки и панель CMS -->
   <script src="js/app.js"></script>
   <script src="js/admin.js"></script>
+  <script src="js/navigation.js"></script>
 
   <!-- Интерактивные триггеры страницы -->
   <script>
-    // Навигация модулей и мобильная панель
-    const modulesDropdown = document.getElementById('modulesDropdown');
-    const dropdownToggle = document.getElementById('btnDropdownToggle');
-    const mobileBurgerBtn = document.getElementById('mobileBurgerBtn');
-    const mobileDrawer = document.getElementById('mobileDrawer');
-    const drawerPassportBtn = document.getElementById('drawerPassportBtn');
-
-    function setModulesDropdown(open) {
-      if (!modulesDropdown || !dropdownToggle) return;
-      modulesDropdown.classList.toggle('active', open);
-      dropdownToggle.setAttribute('aria-expanded', String(open));
-    }
-
-    function setMobileDrawer(open) {
-      if (!mobileDrawer || !mobileBurgerBtn) return;
-      mobileDrawer.classList.toggle('active', open);
-      mobileDrawer.setAttribute('aria-hidden', String(!open));
-      mobileBurgerBtn.setAttribute('aria-expanded', String(open));
-      mobileBurgerBtn.setAttribute('aria-label', open ? 'Закрыть мобильное меню' : 'Открыть мобильное меню');
-    }
-
-    function closeMobileDrawer() {
-      setMobileDrawer(false);
-    }
-
-    if (dropdownToggle) {
-      dropdownToggle.addEventListener('click', (event) => {
-        event.stopPropagation();
-        setModulesDropdown(!modulesDropdown.classList.contains('active'));
-      });
-    }
-
-    if (modulesDropdown) {
-      modulesDropdown.querySelectorAll('.dropdown-item').forEach(item => {
-        item.addEventListener('click', () => setModulesDropdown(false));
-      });
-    }
-
-    if (mobileBurgerBtn) {
-      mobileBurgerBtn.addEventListener('click', () => {
-        setModulesDropdown(false);
-        setMobileDrawer(!mobileDrawer.classList.contains('active'));
-      });
-    }
-
-    if (mobileDrawer) {
-      mobileDrawer.querySelectorAll('.drawer-link').forEach(link => {
-        link.addEventListener('click', closeMobileDrawer);
-      });
-    }
-
-    if (drawerPassportBtn) {
-      drawerPassportBtn.addEventListener('click', () => {
-        closeMobileDrawer();
-        togglePassport(true);
-      });
-    }
-
-    document.addEventListener('click', (event) => {
-      if (modulesDropdown && !modulesDropdown.contains(event.target)) setModulesDropdown(false);
-    });
-
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
-        setModulesDropdown(false);
-        closeMobileDrawer();
-      }
-    });
-
-    // Паспорт проекта
-    const passportModal = document.getElementById('passportModal');
-    const btnPassport = document.getElementById('btnOpenPassport');
-    const btnPassportClose = document.getElementById('passportModalCloseBtn');
-    const passportOverlay = document.getElementById('passportModalOverlay');
-
-    function togglePassport(show) {
-      if (passportModal) {
-        passportModal.classList.toggle('active', show);
-        document.body.style.overflow = show ? 'hidden' : 'auto';
-      }
-    }
-
-    if (btnPassport) btnPassport.addEventListener('click', () => togglePassport(true));
-    if (btnPassportClose) btnPassportClose.addEventListener('click', () => togglePassport(false));
-    if (passportOverlay) passportOverlay.addEventListener('click', () => togglePassport(false));
-
     // Смарт-чипы поиска
     document.querySelectorAll('.chip-btn').forEach(btn => {
       btn.addEventListener('click', () => {

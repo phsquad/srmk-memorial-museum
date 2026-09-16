@@ -2,14 +2,20 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>Генератор сертификатов | Мемориальный комплекс СРМК</title>
+  <meta name="description" content="Официальный генератор наградных бланков и сертификатов участников Урока Мужества ГБПОУ СРМК.">
   <meta name="theme-color" content="#0a0c0f">
 
+  <!-- Шрифты -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet">
+  
+  <!-- Стили -->
   <link rel="stylesheet" href="css/site-common.css">
+  <link rel="stylesheet" href="css/header-common.css">
+  <link rel="stylesheet" href="css/mobile-certificate.css">
 
   <style>
     :root {
@@ -40,54 +46,11 @@
       flex-direction: column;
     }
 
-    .app-header {
-      background: rgba(14, 17, 23, 0.95);
-      border-bottom: 1px solid var(--border-color);
-      padding: 14px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .app-title-group {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .app-badge {
-      background: var(--accent-granite);
-      color: #fff;
-      font-family: var(--font-serif);
-      font-weight: 700;
-      font-size: 0.85rem;
-      padding: 6px 12px;
-      border-radius: 2px;
-    }
-
-    .app-title {
-      font-size: 1.05rem;
-      font-family: var(--font-serif);
-      color: var(--accent-brass);
-    }
-
-    .btn-back-museum {
-      color: var(--text-muted);
-      text-decoration: none;
-      font-size: 0.84rem;
-      font-weight: 600;
-      transition: color 0.2s;
-    }
-    .btn-back-museum:hover { color: #fff; }
-
     .generator-workspace {
       display: grid;
       grid-template-columns: 440px 1fr;
       flex-grow: 1;
-      height: calc(100vh - 65px);
+      height: calc(100vh - var(--header-height-desktop, 64px));
     }
 
     .controls-sidebar {
@@ -428,7 +391,7 @@
 
     @media print {
       body { background: none !important; color: #000 !important; }
-      .app-header, .controls-sidebar, .preview-canvas-wrapper > :not(.preview-scale-box) { display: none !important; }
+      .site-header, .controls-sidebar, .preview-canvas-wrapper > :not(.preview-scale-box) { display: none !important; }
       .generator-workspace { display: block !important; height: auto !important; }
       .preview-canvas-wrapper { background: none !important; padding: 0 !important; display: block !important; }
       .preview-scale-box { transform: none !important; gap: 0 !important; }
@@ -440,29 +403,112 @@
         print-color-adjust: exact !important;
       }
     }
-
-    @media (max-width: 1024px) {
-      .generator-workspace { grid-template-columns: 1fr; height: auto; }
-      .controls-sidebar { border-right: none; border-bottom: 1px solid var(--border-color); }
-      .preview-scale-box { transform: scale(0.65); }
-    }
   </style>
-  <link rel="stylesheet" href="css/mobile-certificate.css">
-  <link rel="stylesheet" href="css/header-common.css">
 </head>
 <body>
 
-  <header class="app-header">
-    <div class="app-title-group">
-      <div class="app-badge">СРМК</div>
-      <h1 class="app-title">Генератор наградных сертификатов Мемориального комплекса</h1>
+  <!-- ЕДИНАЯ НАВИГАЦИОННАЯ ШАПКА -->
+  <header class="site-header" id="siteHeader">
+    <div class="container header-container">
+      
+      <!-- ЛОГОТИП И НАЗВАНИЕ -->
+      <a href="index.html" class="logo-group" aria-label="На главную страницу музея">
+        <div class="logo-badge">СРМК</div>
+        <div class="logo-text">
+          <span class="org-name">ГБПОУ СРМК • Ставрополь</span>
+          <span class="site-title">«Быть воином — жить вечно»</span>
+        </div>
+      </a>
+
+      <!-- ОСНОВНАЯ НАВИГАЦИЯ ПО 4 ЗАЛАМ ЭКСПОЗИЦИИ -->
+      <nav class="main-nav" id="desktopNav" aria-label="Навигация по залам">
+        <a href="index.html#memorial" class="nav-link">Мемориал</a>
+        <a href="index.html#heroes-grid" class="nav-link">За партой Героя</a>
+        <a href="index.html#battle-path" class="nav-link">Хроника и Карта</a>
+        <a href="index.html#memory-hall" class="nav-link">Эстафета</a>
+      </nav>
+
+      <!-- ПАНЕЛЬ ДЕЙСТВИЙ И ЦИФРОВЫХ МОДУЛЕЙ -->
+      <div class="header-actions">
+        <!-- ВЫПАДАЮЩЕЕ МЕНЮ ЦИФРОВЫХ МОДУЛЕЙ -->
+        <div class="modules-dropdown" id="modulesDropdown">
+          <button class="btn-dropdown-toggle" id="btnDropdownToggle" type="button" aria-expanded="false" aria-controls="dropdownMenu">
+            <span>🏛 Модули</span>
+            <span class="arrow-icon" aria-hidden="true">▾</span>
+          </button>
+          <div class="dropdown-menu" id="dropdownMenu">
+            <a href="memory-book.html" class="dropdown-item">
+              <span class="item-icon">📖</span>
+              <div><strong>Книга Памяти</strong><small>Летопись 20 героев</small></div>
+            </a>
+            <a href="reader.html" class="dropdown-item">
+              <span class="item-icon">📚</span>
+              <div><strong>3D Фолиант</strong><small>Читалка с перелистыванием</small></div>
+            </a>
+            <a href="quiz.html" class="dropdown-item">
+              <span class="item-icon">⚔️</span>
+              <div><strong>Квест-викторина</strong><small>10 интерактивных вопросов</small></div>
+            </a>
+            <a href="methodology.html" class="dropdown-item">
+              <span class="item-icon">📑</span>
+              <div><strong>Методкабинет</strong><small>Банк уроков для педагогов</small></div>
+            </a>
+            <a href="verify.html" class="dropdown-item">
+              <span class="item-icon">🛡</span>
+              <div><strong>Реестр верификации</strong><small>Проверка сертификатов</small></div>
+            </a>
+            <a href="desk-qr.html" class="dropdown-item">
+              <span class="item-icon">🪑</span>
+              <div><strong>Парта Героя</strong><small>Конструктор табличек А4</small></div>
+            </a>
+            <a href="guestbook.html" class="dropdown-item">
+              <span class="item-icon">🕯</span>
+              <div><strong>Стена Памяти</strong><small>Послания и лампады</small></div>
+            </a>
+          </div>
+        </div>
+
+        <!-- КНОПКА СЕРТИФИКАТА -->
+        <a href="certificate.html" class="btn-header-cert" title="Оформить наградной лист">
+          <span>📜</span> Сертификат
+        </a>
+
+        <!-- ПАСПОРТ И КАРТА ДОБЛЕСТИ -->
+        <button class="passport-btn" id="btnOpenPassport" type="button">Паспорт проекта</button>
+        <a href="https://карта-доблести.рф" target="_blank" rel="noopener noreferrer" class="contest-badge">Карта Доблести РФ</a>
+
+        <!-- КНОПКА МОБИЛЬНОГО МЕНЮ (БУРГЕР) -->
+        <button class="mobile-burger-btn" id="mobileBurgerBtn" aria-label="Открыть мобильное меню" aria-expanded="false" aria-controls="mobileDrawer" type="button">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
     </div>
-    <a href="reader.html" class="btn-back-museum">📚 Читалка</a>
-    <a href="quiz.html" class="btn-back-museum">⚔️ Викторина</a>
-    <a href="desk-qr.html" class="btn-back-museum">🪑 Парта Героя</a>
-    <a href="guestbook.html" class="btn-back-museum">🕯 Стена Памяти</a>
-    <a href="memory-book.html" class="btn-back-museum">📖 Книга Памяти</a>
-    <a href="index.html" class="btn-back-museum">← Вернуться в Музей</a>
+
+    <!-- ВЫДВИЖНАЯ МОБИЛЬНАЯ ПАНЕЛЬ МЕНЮ -->
+    <div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+      <div class="drawer-content">
+        <div class="drawer-section-label">Залы экспозиции</div>
+        <a href="index.html#memorial" class="drawer-link">🏛 Мемориал Славы</a>
+        <a href="index.html#heroes-grid" class="drawer-link">🎓 За партой Героя</a>
+        <a href="index.html#battle-path" class="drawer-link">🗺 Хроника и Карта</a>
+        <a href="index.html#memory-hall" class="drawer-link">🕯 Эстафета памяти</a>
+
+        <div class="drawer-section-label">Цифровые модули и сервисы</div>
+        <a href="memory-book.html" class="drawer-link">📖 Электронная Книга Памяти</a>
+        <a href="reader.html" class="drawer-link">📚 3D Фолиант-читалка</a>
+        <a href="quiz.html" class="drawer-link">⚔️ Квест-викторина «Дорогами мужества»</a>
+        <a href="certificate.html" class="drawer-link highlight">📜 Оформить Сертификат участника</a>
+        <a href="methodology.html" class="drawer-link">📑 Методический кабинет педагога</a>
+        <a href="verify.html" class="drawer-link">🛡 Реестр верификации</a>
+        <a href="desk-qr.html" class="drawer-link">🪑 Конструктор «Парты Героя»</a>
+        <a href="guestbook.html" class="drawer-link">🕯 Стена Памяти и отзывы</a>
+
+        <div class="drawer-buttons-row">
+          <button class="drawer-btn" id="drawerPassportBtn" type="button">Паспорт проекта</button>
+          <a href="https://карта-доблести.рф" target="_blank" rel="noopener noreferrer" class="drawer-btn gold">Карта Доблести РФ</a>
+        </div>
+      </div>
+    </div>
   </header>
 
   <main class="generator-workspace">
@@ -470,7 +516,12 @@
     <!-- ЛЕВАЯ ПАНЕЛЬ: НАСТРОЙКИ И ВВОД -->
     <aside class="controls-sidebar">
       
-      <!-- Выбор роли: Студент vs Преподаватель -->
+      <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 6px;">
+        <span style="font-size: 0.68rem; color: var(--accent-brass); text-transform: uppercase; font-weight: 700; letter-spacing: 1.5px;">Официальный реестр</span>
+        <h2 style="font-family: var(--font-serif); font-size: 1.15rem; color: #fff;">Генератор сертификатов</h2>
+      </div>
+
+      <!-- Выбор категории: Студент vs Преподаватель -->
       <div class="control-group">
         <label class="control-label">Категория награждаемого:</label>
         <div class="segmented-control">
@@ -514,17 +565,12 @@
           <select id="selectStudentSpecialty" class="form-select">
             <option value="09.02.11 Разработка и управление программным обеспечением" selected>09.02.11 Разработка и управление программным обеспечением</option>
             <option value="15.02.19 Сварочное производство">15.02.19 Сварочное производство</option>
-            <option value="13.02.13 Эксплуатация и обслуживание электрического и электромеханического оборудования (по отраслям)">13.02.13 Эксплуатация и обслуживание электрического и электромеханического оборудования</option>
+            <option value="13.02.13 Эксплуатация и обслуживание электрического и электромеханического оборудования (по отраслям)">13.02.13 Эксплуатация и обслуживание электрического оборудования</option>
             <option value="09.02.06 Сетевое и системное администрирование">09.02.06 Сетевое и системное администрирование</option>
             <option value="15.02.16 Технология машиностроения">15.02.16 Технология машиностроения</option>
             <option value="20.02.04 Пожарная безопасность">20.02.04 Пожарная безопасность</option>
-            <option value="23.02.07 Техническое обслуживание и ремонт автотранспортных средств">23.02.07 Техническое обслуживание и ремонт автотранспортных средств</option>
+            <option value="23.02.07 Техническое обслуживание и ремонт автотранспортных средств">23.02.07 Техническое обслуживание автотранспорта</option>
             <option value="40.02.02 Правоохранительная деятельность">40.02.02 Правоохранительная деятельность</option>
-            <option value="38.02.01 Экономика и бухгалтерский учет (по отраслям)">38.02.01 Экономика и бухгалтерский учет (по отраслям)</option>
-            <option value="29.02.10 Конструирование, моделирование и технология изготовления изделий легкой промышленности (по видам)">29.02.10 Конструирование, моделирование и технология изделий легкой промышленности</option>
-            <option value="40.02.04 Юриспруденция">40.02.04 Юриспруденция</option>
-            <option value="15.01.05 Сварщик (ручной и частично механизированной сварки (наплавки))">15.01.05 Сварщик (ручной и частично механизированной сварки)</option>
-            <option value="13.01.10 Электромонтер по ремонту и обслуживанию электрооборудования (по отраслям)">13.01.10 Электромонтер по ремонту и обслуживанию электрооборудования</option>
           </select>
         </div>
       </div>
@@ -533,7 +579,7 @@
       <div id="studentBatchFields" style="display: none;">
         <div class="control-group">
           <label class="control-label">Список студентов (По одному на строку):</label>
-          <textarea id="inputBatchList" class="form-textarea" rows="6">Иванову Даниле Денисовичу
+          <textarea id="inputBatchList" class="form-textarea" rows="5">Иванову Даниле Денисовичу
 Смирновой Алине Викторовне
 Кузнецову Артему Павловичу
 Васильеву Дмитрию Олеговичу</textarea>
@@ -545,19 +591,9 @@
         <div class="control-group" style="margin-top: 10px;">
           <label class="control-label">Специальность для всей группы:</label>
           <select id="selectBatchSpecialty" class="form-select">
-            <option value="09.02.11 Разработка и управление программным обеспечением">09.02.11 Разработка и управление программным обеспечением</option>
             <option value="15.02.19 Сварочное производство" selected>15.02.19 Сварочное производство</option>
-            <option value="13.02.13 Эксплуатация и обслуживание электрического и электромеханического оборудования (по отраслям)">13.02.13 Эксплуатация и обслуживание электрического и электромеханического оборудования</option>
-            <option value="09.02.06 Сетевое и системное администрирование">09.02.06 Сетевое и системное администрирование</option>
-            <option value="15.02.16 Технология машиностроения">15.02.16 Технология машиностроения</option>
+            <option value="09.02.11 Разработка и управление программным обеспечением">09.02.11 Разработка ПО</option>
             <option value="20.02.04 Пожарная безопасность">20.02.04 Пожарная безопасность</option>
-            <option value="23.02.07 Техническое обслуживание и ремонт автотранспортных средств">23.02.07 Техническое обслуживание и ремонт автотранспортных средств</option>
-            <option value="40.02.02 Правоохранительная деятельность">40.02.02 Правоохранительная деятельность</option>
-            <option value="38.02.01 Экономика и бухгалтерский учет (по отраслям)">38.02.01 Экономика и бухгалтерский учет (по отраслям)</option>
-            <option value="29.02.10 Конструирование, моделирование и технология изготовления изделий легкой промышленности (по видам)">29.02.10 Конструирование, моделирование и технология изделий легкой промышленности</option>
-            <option value="40.02.04 Юриспруденция">40.02.04 Юриспруденция</option>
-            <option value="15.01.05 Сварщик (ручной и частично механизированной сварки (наплавки))">15.01.05 Сварщик (ручной и частично механизированной сварки)</option>
-            <option value="13.01.10 Электромонтер по ремонту и обслуживанию электрооборудования (по отраслям)">13.01.10 Электромонтер по ремонту и обслуживанию электрооборудования</option>
           </select>
         </div>
       </div>
@@ -580,7 +616,7 @@
         </div>
       </div>
 
-      <!-- Основание награждения (Динамически меняется в зависимости от роли) -->
+      <!-- Основание награждения -->
       <div class="control-group">
         <label class="control-label">Основание награждения (Активность музея):</label>
         <select id="selectNomination" class="form-select"></select>
@@ -611,19 +647,20 @@
 
   </main>
 
-  <!-- SUPABASE REALTIME CLOUD SDK -->
+  <!-- СКРИПТЫ -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/cloud-sync.js"></script>
   <script src="js/certificate-verifier.js"></script>
+  <script src="js/navigation.js"></script>
+
   <script>
     'use strict';
 
     const CertEngine = {
-      role: 'student',         // 'student' | 'teacher'
-      mode: 'single',          // 'single' | 'batch'
-      theme: 'theme-parchment', // 'theme-parchment' | 'theme-clean'
+      role: 'student',
+      mode: 'single',
+      theme: 'theme-parchment',
 
-      // Номинации для студентов (строго по функционалу нашего музея)
       studentNominations: {
         'student_lesson': {
           title: 'Участие во Всероссийском Уроке Мужества',
@@ -640,14 +677,9 @@
         'student_memory_watch': {
           title: 'Несение почетной Вахты Памяти',
           text: 'за образцовое несение почетной Вахты Памяти у Мемориала Славы колледжа, проведение мемориальных митингов и верность традициям студенческого братства СРМК.'
-        },
-        'student_map_tvd': {
-          title: 'Топографический анализ рубежей боевой славы',
-          text: 'за глубокий анализ картографических и архивных первоисточников при реконструкции боевого пути выпускников колледжа на интерактивной карте ТВД (Днепр, Запорожье, Донбасс, Курск).'
         }
       },
 
-      // Номинации для преподавателей и наставников
       teacherNominations: {
         'teacher_mentor': {
           title: 'Наставничество и кураторство проекта',
@@ -656,14 +688,6 @@
         'teacher_tech_map': {
           title: 'Разработка инновационной технологической карты',
           text: 'за разработку, методическое сопровождение и внедрение инновационной технологической карты Урока Мужества на базе интерактивного цифрового комплекса <strong>«Быть воином — жить вечно»</strong>.'
-        },
-        'teacher_patriot_upbringing': {
-          title: 'Личный вклад в патриотическое воспитание',
-          text: 'за многолетний добросовестный труд, личный вклад в гражданско-патриотическое воспитание молодежи Ставрополья, сохранение исторической правды и увековечение подвига героев-выпускников СПО.'
-        },
-        'teacher_history_integration': {
-          title: 'Интеграция музейных архивов в учебный процесс',
-          text: 'за активное внедрение оцифрованных архивных свидетельств Мемориала Славы СРМК в учебный курс «История России» и цикл занятий «Разговоры о важном».'
         }
       },
 
@@ -686,7 +710,7 @@
         if (group) document.getElementById('inputStudentGroup').value = group;
         if (specialty) {
           const specialtySelect = document.getElementById('selectStudentSpecialty');
-          if ([...specialtySelect.options].some(option => option.value === specialty)) {
+          if ([...specialtySelect.options].some(option => option.value.includes(specialty))) {
             specialtySelect.value = specialty;
           }
         }
@@ -697,19 +721,15 @@
       },
 
       bindControls() {
-        // Переключение роли (Студент / Преподаватель)
         document.getElementById('roleStudentBtn').addEventListener('click', () => this.setRole('student'));
         document.getElementById('roleTeacherBtn').addEventListener('click', () => this.setRole('teacher'));
 
-        // Переключение тем
         document.getElementById('themeParchmentBtn').addEventListener('click', (e) => this.setTheme('theme-parchment', e.target));
         document.getElementById('themeCleanBtn').addEventListener('click', (e) => this.setTheme('theme-clean', e.target));
 
-        // Переключение режимов
         document.getElementById('modeSingleBtn').addEventListener('click', (e) => this.setMode('single', e.target));
         document.getElementById('modeBatchBtn').addEventListener('click', (e) => this.setMode('batch', e.target));
 
-        // Живые слушатели
         const inputs = [
           'inputStudentName', 'inputStudentGroup', 'selectStudentSpecialty',
           'inputBatchList', 'inputBatchGroup', 'selectBatchSpecialty',
@@ -721,13 +741,11 @@
           if (el) el.addEventListener('input', () => this.renderPreview());
         });
 
-        // Печать и запись в БД
         document.getElementById('btnPrintPDF').addEventListener('click', async () => {
           const btn = document.getElementById('btnPrintPDF');
           btn.innerHTML = '⏳ Регистрация в базе...';
           btn.style.pointerEvents = 'none';
 
-          // Собираем данные всех сгенерированных сертификатов с экрана
           const sheets = document.querySelectorAll('.certificate-sheet');
           const certsToRegister = [];
 
@@ -742,12 +760,7 @@
             const dateText = sheet.querySelector('.cert-sign-col.right div:last-child')?.textContent
               .replace('Дата: ', '').trim() || '';
 
-            // Генерируем криптографический хэш
-            const buffer = new TextEncoder().encode(serial + name + dateText + 'SRMK_VERIFY_SALT_2026');
-            const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-            const hashHex = Array.from(new Uint8Array(hashBuffer))
-              .map(byte => byte.toString(16).padStart(2, '0'))
-              .join('');
+            const hashHex = await CertificateVerifier.computeHash(serial + name + dateText);
 
             certsToRegister.push({
               serial,
@@ -760,12 +773,10 @@
             });
           }
 
-          // Отправляем пакет сертификатов в глобальное облако Supabase
           if (typeof CloudSync !== 'undefined' && CloudSync.isLive && certsToRegister.length > 0) {
             await CloudSync.registerCertificatesBatch(certsToRegister);
           }
 
-          // Возвращаем кнопку в исходное состояние и запускаем печать
           btn.innerHTML = '<span>🖨️</span> Распечатать / Сохранить в PDF';
           btn.style.pointerEvents = 'auto';
           window.print();
@@ -845,7 +856,6 @@
           return;
         }
 
-        // Режим студента
         if (this.mode === 'single') {
           const name = document.getElementById('inputStudentName').value || 'ФИО Обучающегося';
           const group = document.getElementById('inputStudentGroup').value || 'Группа';
@@ -853,7 +863,6 @@
           const metaHTML = `Обучающийся группы <span>${group}</span> • Специальность: <span>${spec}</span>`;
           container.appendChild(this.createSheetDOM(name, metaHTML, reasonHTML, dateStr, 'СЕРТИФИКАТ УЧАСТНИКА', 1));
         } else {
-          // Пакетный режим
           const rawText = document.getElementById('inputBatchList').value;
           const names = rawText.split('\n').map(n => n.trim()).filter(n => n.length > 0);
           const group = document.getElementById('inputBatchGroup').value || 'Группа';
@@ -938,7 +947,5 @@
 
     document.addEventListener('DOMContentLoaded', () => CertEngine.init());
   </script>
-  <!-- НАВИГАЦИОННЫЙ СКРИПТ -->
-  <script src="js/navigation.js"></script>
 </body>
 </html>
