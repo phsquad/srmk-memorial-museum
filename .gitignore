@@ -1,33 +1,19 @@
 ```
-# Backup files
-*.bak
-
-# Logs and temp files
-*.log
-*.tmp
-
-# Environment
-.env
-.env.local
-.env.*
-
-# Editors
-.vscode/
-.idea/
-
 # Dependencies
 node_modules/
-.venv/
-venv/
-__pycache__/
-*.pyc
 
 # Build artifacts
 dist/
-build/
-target/
 
-# OS generated files
-.DS_Store
-Thumbs.db
+# Logs
+*.log
+
+# Environment variables
+.env
+.env.local
+*.env.*
+
+# Backup files
+*.bak
+
 ```
