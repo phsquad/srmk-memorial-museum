@@ -8,6 +8,14 @@
 
 'use strict';
 
+// Logger для этого модуля
+const guestbookLogger = {
+  level: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 3 : 1,
+  log(...args) { if (this.level >= 3) console.log('[guestbookLogger]', ...args); },
+  warn(...args) { if (this.level >= 2) console.warn('[guestbookLogger]', ...args); },
+  error(...args) { if (this.level >= 1) console.error('[guestbookLogger]', ...args); }
+};
+
 const GuestbookEngine = {
   tributes: [],
   userFlames: {},

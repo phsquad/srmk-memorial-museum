@@ -6,6 +6,14 @@
 
 'use strict';
 
+// Logger для CloudSync
+const cloudLogger = {
+  level: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 3 : 1,
+  log(...args) { if (this.level >= 3) console.log('[CloudSync]', ...args); },
+  warn(...args) { if (this.level >= 2) console.warn('[CloudSync]', ...args); },
+  error(...args) { if (this.level >= 1) console.error('[CloudSync]', ...args); }
+};
+
 const CloudConfig = {
   // Реальные ключи проекта Supabase.
   SUPABASE_URL: "https://qtafcczydgyrganrpkof.supabase.co",
@@ -52,9 +60,9 @@ const CloudSync = {
         this.client = supabase.createClient(CloudConfig.SUPABASE_URL, CloudConfig.SUPABASE_ANON_KEY);
         this.isLive = true;
         this.subscribeRealtime();
-        console.log("[CloudSync] 🌐 OMNI-SYNC подключен. Все модули работают в реальном времени.");
+        cloudLogger.log("🌐 OMNI-SYNC подключен. Все модули работают в реальном времени.");
       } catch (err) {
-        console.warn("[CloudSync] Ошибка подключения к облаку:", err);
+        cloudLogger.warn("Ошибка подключения к облаку:", err);
       }
     }
   },
@@ -121,13 +129,13 @@ const CloudSync = {
   async pushCandle(heroId) {
     if (!this.isLive) return null;
     const { data, error } = await this.client.rpc('increment_hero_candle', { target_hero_id: heroId });
-    if (error) console.error('[CloudSync] Не удалось зажечь свечу:', error);
+    if (error) cloudLogger.error('Не удалось зажечь свечу:', error);
     return data;
   },
   async pushFlower(heroId, count = 2) {
     if (!this.isLive) return null;
     const { data, error } = await this.client.rpc('increment_hero_flower', { target_hero_id: heroId, qty: count });
-    if (error) console.error('[CloudSync] Не удалось возложить цветы:', error);
+    if (error) cloudLogger.error('Не удалось возложить цветы:', error);
     return data;
   },
 
@@ -136,7 +144,7 @@ const CloudSync = {
     if (!this.isLive) return null;
     const { data, error } = await this.client.from('guestbook_tributes').select('*').order('is_pinned', { ascending: false }).order('created_at', { ascending: false });
     if (error) {
-      console.error('[CloudSync] Ошибка загрузки Стены Памяти:', error);
+      cloudLogger.error('Ошибка загрузки Стены Памяти:', error);
       return null;
     }
     return data ? data.map(row => this.normalizeTribute(row)) : [];
@@ -144,7 +152,7 @@ const CloudSync = {
   async sendTribute(tributeObj) {
     if (!this.isLive) return false;
     const { error } = await this.client.from('guestbook_tributes').insert([this.serializeTribute(tributeObj)]);
-    if (error) console.error('[CloudSync] Ошибка публикации послания:', error);
+    if (error) cloudLogger.error('Ошибка публикации послания:', error);
     return !error;
   },
   async toggleFlame(tributeId, delta) {
@@ -166,13 +174,13 @@ const CloudSync = {
   async registerCertificatesBatch(certArray) {
     if (!this.isLive) return false;
     const { error } = await this.client.from('certificates_registry').insert(certArray);
-    if (error) console.error("Ошибка регистрации сертификатов:", error);
+    if (error) cloudLogger.error("Ошибка регистрации сертификатов:", error);
     return !error;
   },
   async verifyCertificate(serial) {
     if (!this.isLive) return null;
     const { data, error } = await this.client.from('certificates_registry').select('*').eq('serial', serial).maybeSingle();
-    if (error) console.error('[CloudSync] Ошибка проверки сертификата:', error);
+    if (error) cloudLogger.error('Ошибка проверки сертификата:', error);
     return data;
   },
 
@@ -185,7 +193,7 @@ const CloudSync = {
       score,
       total_questions: totalQuestions
     }]);
-    if (error) console.error('[CloudSync] Ошибка сохранения результата викторины:', error);
+    if (error) cloudLogger.error('Ошибка сохранения результата викторины:', error);
     return !error;
   },
   async getQuizResults(limit = 10) {
@@ -197,7 +205,7 @@ const CloudSync = {
       .order('completed_at', { ascending: true })
       .limit(limit);
     if (error) {
-      console.error('[CloudSync] Ошибка загрузки рейтинга:', error);
+      cloudLogger.error('Ошибка загрузки рейтинга:', error);
       return null;
     }
     return data || [];

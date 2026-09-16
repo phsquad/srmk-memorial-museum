@@ -7,6 +7,14 @@
 
 'use strict';
 
+// Logger для этого модуля
+const memoryLogger = {
+  level: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 3 : 1,
+  log(...args) { if (this.level >= 3) console.log('[memoryLogger]', ...args); },
+  warn(...args) { if (this.level >= 2) console.warn('[memoryLogger]', ...args); },
+  error(...args) { if (this.level >= 1) console.error('[memoryLogger]', ...args); }
+};
+
 // Функция для получения пути к изображению с поддержкой WebP
 function getHeroPhotoPath(filename) {
   // Проверка поддержки WebP браузером

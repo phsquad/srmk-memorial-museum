@@ -7,6 +7,14 @@
 
 'use strict';
 
+// Logger для этого модуля
+const heraldryLogger = {
+  level: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 3 : 1,
+  log(...args) { if (this.level >= 3) console.log('[heraldryLogger]', ...args); },
+  warn(...args) { if (this.level >= 2) console.warn('[heraldryLogger]', ...args); },
+  error(...args) { if (this.level >= 1) console.error('[heraldryLogger]', ...args); }
+};
+
 const HeraldryResolver = {
   DB_NAME: "SRMK_Heraldry_Cache_v2",
   STORE_NAME: "awards_store",

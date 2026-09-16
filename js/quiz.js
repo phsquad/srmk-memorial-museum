@@ -7,6 +7,14 @@
 
 'use strict';
 
+// Logger для этого модуля
+const quizLogger = {
+  level: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 3 : 1,
+  log(...args) { if (this.level >= 3) console.log('[quizLogger]', ...args); },
+  warn(...args) { if (this.level >= 2) console.warn('[quizLogger]', ...args); },
+  error(...args) { if (this.level >= 1) console.error('[quizLogger]', ...args); }
+};
+
 /**
  * МОДУЛЬ БЕЗОПАСНОГО ХРАНИЛИЩА
  */
@@ -15,7 +23,7 @@ const SafeStorage = {
     try {
       return localStorage.getItem(key);
     } catch (e) {
-      console.warn('LocalStorage недоступен:', e);
+      quizLogger.warn('LocalStorage недоступен:', e);
       return null;
     }
   },
@@ -24,7 +32,7 @@ const SafeStorage = {
       localStorage.setItem(key, value);
       return true;
     } catch (e) {
-      console.warn('Не удалось сохранить в LocalStorage:', e);
+      quizLogger.warn('Не удалось сохранить в LocalStorage:', e);
       return false;
     }
   }
@@ -166,7 +174,7 @@ const QuizEngine = {
   },
 
   init() {
-    console.log("[QuizEngine] Исторический квест инициализирован.");
+    quizLogger.log("Исторический квест инициализирован.");
   },
 
   /**
@@ -407,7 +415,7 @@ const QuizEngine = {
       try {
         await CloudSync.saveQuizResult(this.participant.name, this.score, this.participant.group);
       } catch (e) {
-        console.warn('Не удалось сохранить в Supabase:', e);
+        quizLogger.warn('Не удалось сохранить в Supabase:', e);
       }
     }
 
@@ -485,7 +493,7 @@ const QuizEngine = {
           return;
         }
       } catch (e) {
-        console.warn('Не удалось загрузить данные из Supabase:', e);
+        quizLogger.warn('Не удалось загрузить данные из Supabase:', e);
       }
     }
 
@@ -524,7 +532,7 @@ const QuizEngine = {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log("[QuizEngine] Исторический квест инициализирован.");
+  quizLogger.log("Исторический квест инициализирован.");
   
   // Привязка кнопок
   const startBtn = document.getElementById('startQuestBtn');

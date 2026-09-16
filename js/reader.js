@@ -13,6 +13,14 @@
 
 'use strict';
 
+// Logger для этого модуля
+const readerLogger = {
+  level: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 3 : 1,
+  log(...args) { if (this.level >= 3) console.log('[readerLogger]', ...args); },
+  warn(...args) { if (this.level >= 2) console.warn('[readerLogger]', ...args); },
+  error(...args) { if (this.level >= 1) console.error('[readerLogger]', ...args); }
+};
+
 const FOLIO_LIBRARY = [
   // Базовая заглушка на случай отсутствия загруженных внешних томов
   {
@@ -164,7 +172,7 @@ const ReaderEngine = {
 
       noise.start();
     } catch (e) {
-      console.warn("[Web Audio] Звуковой движок временно недоступен:", e);
+      readerLogger.warn("Звуковой движок временно недоступен:", e);
     }
   },
 

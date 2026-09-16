@@ -7,6 +7,20 @@
 
 'use strict';
 
+// Подключаем модуль логирования
+const LogLevel = window.LogLevel || { NONE: 0, ERROR: 1, WARN: 2, INFO: 3, DEBUG: 4 };
+const Logger = window.Logger || class {
+  constructor(level = LogLevel.INFO) {
+    this.level = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? level : LogLevel.WARN;
+    this.prefix = '[App]';
+  }
+  debug(...args) { if (this.level >= LogLevel.DEBUG) console.log(`${this.prefix} [DEBUG]`, ...args); }
+  info(...args) { if (this.level >= LogLevel.INFO) console.info(`${this.prefix} [INFO]`, ...args); }
+  warn(...args) { if (this.level >= LogLevel.WARN) console.warn(`${this.prefix} [WARN]`, ...args); }
+  error(...args) { if (this.level >= LogLevel.ERROR) console.error(`${this.prefix} [ERROR]`, ...args); }
+};
+const logger = new Logger(LogLevel.INFO);
+
 /**
  * 1. ГЛОБАЛЬНОЕ СОСТОЯНИЕ ПРИЛОЖЕНИЯ (APP STATE)
  */
@@ -75,7 +89,7 @@ const App = {
       this.initAmbientParticles();
     }, 150);
 
-    console.log(`[Музей СРМК] Ядро экспозиции v11.0 запущено. Героев в строю: ${typeof heroesDatabase !== 'undefined' ? heroesDatabase.length : 0}`);
+    logger.info(`Ядро экспозиции v11.0 запущено. Героев в строю: ${typeof heroesDatabase !== 'undefined' ? heroesDatabase.length : 0}`);
   },
 
   cacheDOM() {
@@ -860,7 +874,7 @@ const App = {
         });
 
       } catch (err) {
-        console.warn("[Музей] Яндекс Карты API инициализирован в ограниченном режиме:", err);
+        logger.warn("Яндекс Карты API инициализирован в ограниченном режиме:", err);
       }
     });
   },
