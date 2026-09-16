@@ -1,15 +1,22 @@
 /**
  * ============================================================================
- * ЛОГИКА МЕТОДИЧЕСКОГО КАБИНЕТА: js/methodology.js (v3.0 Dual-Mode)
+ * ЛОГИКА МЕТОДИЧЕСКОГО КАБИНЕТА: js/methodology.js (v4.0 ES6 Module)
  * ============================================================================
  */
 
 'use strict';
 
+// Импорт зависимостей из core.js и navigation.js
+import { CONFIG, formatDate } from './core.js';
+import { initNavigation } from './navigation.js';
+
 const Methodology = {
   currentMode: 'constructor', // 'constructor' | 'master'
 
   init() {
+    // Инициализация навигации
+    initNavigation();
+    
     this.bindTabs();
     const hash = window.location.hash.replace('#', '');
     const validTabs = ['constructor-view', 'cards-view', 'integration-view', 'fgos-view'];
@@ -237,4 +244,8 @@ const Methodology = {
   }
 };
 
+// Экспорт для использования в других модулях
+export { Methodology };
+
+// Инициализация при загрузке DOM
 document.addEventListener('DOMContentLoaded', () => Methodology.init());
