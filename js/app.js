@@ -945,15 +945,50 @@ const App = {
       });
   },
 
+ /* ==========================================================================
+     АУДИОЭКСКУРСИЯ И СИНТЕЗАТОРЫ ЗВУКА
+     ========================================================================== */
   startGeneralTour() {
-    const overview = 'Добро пожаловать в виртуальный мемориальный музей ГБПОУ СРМК «Быть воином — жить вечно». Экспозиция хранит память о двадцати выпускниках колледжа, погибших при защите Отечества. Откройте Мемориал Славы, личные архивные досье, Книгу Памяти и интерактивную карту боевого пути героев.';
+    const audioPath = 'assets/audio/guides/general-tour.mp3';
 
-    if (window.TTSNarrator) {
-      TTSNarrator.speakText(overview);
-      return;
+    // 1. Запуск аудиофайла записи через встроенный плеер
+    this.playAudio(audioPath, 'Вводная экскурсия музея СРМК', 'Обзор экспозиции');
+
+    // 2. Интерактивное центрирование карты на Ставрополе
+    if (AppState.mapInstance && typeof this.focusMap === 'function') {
+      this.focusMap([45.0448, 41.9691], 10);
     }
 
-    this.playAudio('assets/audio/guides/general-tour.mp3', 'Вводная экскурсия музея СРМК', 'Обзор экспозиции');
+    // 3. Динамическая подсветка карточек героев, упоминаемых в тексте экскурсии
+    const featuredHeroes = ['yaryshev-m-v', 'nazyrov-sh-r', 'vecherka-n-a', 'nazarenko-n-s'];
+    let highlightIdx = 0;
+
+    if (this._tourInterval) clearInterval(this._tourInterval);
+
+    this._tourInterval = setInterval(() => {
+      if (!AppState.isAudioPlaying) {
+        clearInterval(this._tourInterval);
+        return;
+      }
+
+      const heroId = featuredHeroes[highlightIdx];
+      const card = document.querySelector(`.hero-card button[onclick*="${heroId}"]`)?.closest('.hero-card');
+      
+      if (card) {
+        card.style.transition = 'transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease';
+        card.style.borderColor = 'var(--accent-brass, #c5a059)';
+        card.style.boxShadow = '0 0 20px rgba(197, 160, 89, 0.4)';
+        card.style.transform = 'translateY(-4px) scale(1.02)';
+
+        setTimeout(() => {
+          card.style.borderColor = '';
+          card.style.boxShadow = '';
+          card.style.transform = '';
+        }, 2800);
+      }
+
+      highlightIdx = (highlightIdx + 1) % featuredHeroes.length;
+    }, 4000);
   },
 
   /* ==========================================================================
@@ -966,24 +1001,35 @@ const App = {
       if (!AppState.audioContext) AppState.audioContext = new AudioCtx();
       
       const ctx = AppState.audioContext;
-      if (ctx.state === 'suspended') ctx.resume();
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
 
+      const now = ctx.currentTime;
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
 
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(freq * 1.25, ctx.currentTime + duration);
+      osc.frequency.setValueAtTime(freq, now);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(1, freq * 1.25), now + duration);
 
-      gain.gain.setValueAtTime(0.1, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
 
-      osc.start();
-      osc.stop(ctx.currentTime + duration);
-    } catch (e) {}
+      osc.start(now);
+      osc.stop(now + duration);
+
+      // Очистка аудио-узлов из памяти браузера
+      osc.onended = () => {
+        osc.disconnect();
+        gain.disconnect();
+      };
+    } catch (e) {
+      console.warn('[Web Audio] Ошибка синтезатора Chime:', e);
+    }
   },
 
   playMemorialBellSynthesizer() {
@@ -993,7 +1039,9 @@ const App = {
       if (!AppState.audioContext) AppState.audioContext = new AudioCtx();
       
       const ctx = AppState.audioContext;
-      if (ctx.state === 'suspended') ctx.resume();
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
 
       const overtones = [220, 330, 440, 554];
       const now = ctx.currentTime;
@@ -1016,8 +1064,16 @@ const App = {
 
         osc.start(now);
         osc.stop(now + decay);
+
+        // Очистка аудио-узлов из памяти браузера
+        osc.onended = () => {
+          osc.disconnect();
+          gain.disconnect();
+        };
       });
-    } catch (e) {}
+    } catch (e) {
+      console.warn('[Web Audio] Ошибка синтезатора Колокола:', e);
+    }
   },
 
   initAmbientParticles() {
