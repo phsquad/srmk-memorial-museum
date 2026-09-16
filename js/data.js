@@ -16,7 +16,7 @@ const MUSEUM_CONFIG = {
   coords: [45.0448, 41.9691],
   projectTitle: "Быть воином — жить вечно",
   nomination: "За партой героя",
-  coverImage: "assets/images/cover-master.jpg", // 🔥 Интеграция магистральной обложки
+  coverImage: "assets/images/cover-master.webp", // 🔥 Интеграция магистральной обложки (WebP оптимизировано)
   totalHeroesCount: 20
 };
 
@@ -46,7 +46,7 @@ const MEMORY_BOOK_PROLOGUE = {
   military: "20 павших героев СВО • Выпускники ГБПОУ СРМК",
   awards: "Ордена Мужества, Медали «За отвагу», Медали Суворова",
   location: "Двор ГБПОУ СРМК (г. Ставрополь, пр. Юности, 3)",
-  photo: "assets/images/cover-master.jpg", // 🔥 Обновлено на магистральную обложку
+  photo: "assets/images/cover-master.webp", // 🔥 Обновлено на магистральную обложку (WebP оптимизировано)
   audioFile: "assets/audio/guides/general-tour.mp3",
   shortSnippet: "Официальный акт открытия архитектурного монумента выпускникам СРМК, погибшим в ходе специальной военной операции.",
   markdown: `

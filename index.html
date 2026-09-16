@@ -22,7 +22,12 @@
   <meta property="og:locale" content="ru_RU">
   <meta property="og:title" content="Виртуальный музей ГБПОУ СРМК: «Быть воином — жить вечно»">
   <meta property="og:description" content="Мемориальная экспозиция и оцифрованные архивы 20 выпускников Ставропольского регионального многопрофильного колледжа.">
-  <meta property="og:image" content="assets/images/cover-master.jpg">
+  <meta property="og:image" content="assets/images/cover-master.webp">
+
+  <!-- Критические изображения: Preload для LCP оптимизации -->
+  <link rel="preload" as="image" href="assets/images/cover-master.webp" imagesrcset="assets/images/cover-master.webp 1920w, assets/images/cover-master.jpg 1920w" imagesizes="100vw" type="image/webp">
+  <link rel="preload" as="image" href="assets/images/memorial-bg.webp" imagesrcset="assets/images/memorial-bg.webp 1600w, assets/images/memorial-bg.jpg 1600w" imagesizes="100vw" type="image/webp">
+  <link rel="preload" as="image" href="assets/images/logo-srmk.webp" type="image/webp">
 
   <!-- Шрифтовые гарнитуры -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -198,7 +203,7 @@
         
         <!-- 🔥 МАГИСТРАЛЬНАЯ ОБЛОЖКА 3:2 НА ГЛАВНОМ ЭКРАНЕ ЗАЛА -->
         <div class="master-cover-frame">
-          <img src="assets/images/cover-master.jpg" alt="Подвиг воинов-героев СРМК" class="master-cover-img" loading="lazy">
+          <img src="assets/images/cover-master.webp" alt="Подвиг воинов-героев СРМК" class="master-cover-img" loading="eager" fetchpriority="high" onerror="this.src='assets/images/cover-master.jpg'; this.onerror=null;">
           <div class="cover-glow-overlay"></div>
         </div>
 
@@ -218,7 +223,7 @@
 
         <div class="memorial-stand-container">
           <div class="memorial-stand-canvas" id="memorialStand">
-            <img src="assets/images/memorial-bg.jpg" alt="Памятник выпускникам СРМК" class="memorial-bg-img" onerror="this.src='https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1600&q=80'">
+            <img src="assets/images/memorial-bg.webp" alt="Памятник выпускникам СРМК" class="memorial-bg-img" loading="eager" fetchpriority="high" onerror="this.src='assets/images/memorial-bg.jpg'; this.onerror='this.src=\"https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1600&q=80\"';">
 
             <div class="plaque-interactive-zone left-zone" id="leftPlaqueZone">
               <div class="plaque-title">Левая плита мемориала</div>
