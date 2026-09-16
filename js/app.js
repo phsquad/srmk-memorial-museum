@@ -1,25 +1,12 @@
 /**
  * ============================================================================
  * ВИРТУАЛЬНЫЙ МЕМОРИАЛЬНЫЙ КОМПЛЕКС ГБПОУ СРМК: «БЫТЬ ВОИНОМ — ЖИТЬ ВЕЧНО»
- * Главный управляющий контроллер экспозиции (js/app.js v15.0 Ultra Enterprise)
- * 
- * Включает:
- * 1. Управление состояниями залов музея (I–IV), поиском и фильтрацией
- * 2. Интерактивное досье героя без битых картинок и черных квадратов
- * 3. Автономное отображение орденов, медалей и планок РФ через SVG
- * 4. 2.5D Мемориал Славы с параллаксом и точками зажжения свечей
- * 5. Интерактивную Яндекс Карту API v2.1 с векторными лучами подвига
- * 6. Процедурный синтезатор звуков и Колокола Памяти (Web Audio API)
- * 7. Автопилот-презентацию «Урок Мужества» и свайп-жесты для смартфонов
- * 8. Полную синхронизацию с облаком Supabase Realtime
+ * Главный управляющий контроллер экспозиции (js/app.js v14.0 Ultra Master)
  * ============================================================================
  */
 
 'use strict';
 
-/**
- * 1. ГЛОБАЛЬНОЕ СОСТОЯНИЕ ПРИЛОЖЕНИЯ (APP STATE)
- */
 const AppState = {
   activeSpecialty: 'all',
   activePlaqueView: 'all',
@@ -27,39 +14,26 @@ const AppState = {
   searchQuery: '',
   currentHeroId: null,
 
-  // Аудио и системная озвучка
   isAudioPlaying: false,
   isTTSPlaying: false,
   audioContext: null,
 
-  // Интерактивный режим «Урок Мужества» (Автопилот-презентация)
   isPresentationRunning: false,
   presentationTimer: null,
 
-  // Яндекс Карты v2.1
   mapInstance: null,
   mapMarkers: {},
   mapPolylines: [],
 
-  // Мемориальные хранилища
   candles: {},
   flowersCount: 0,
 
-  // Сенсорные жесты (Touch Swipes)
   touchStartX: 0,
   touchStartY: 0,
   touchEndX: 0,
   touchEndY: 0
 };
 
-/**
- * Векторный аватар-заглушка по умолчанию (SVG Data URI)
- */
-const FALLBACK_HERO_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500' viewBox='0 0 400 500'%3E%3Crect width='400' height='500' fill='%2312151b'/%3E%3Ccircle cx='200' cy='180' r='64' fill='%23181d26' stroke='%23c5a059' stroke-width='2'/%3E%3Cpath d='M200 130 L208 155 L235 155 L213 172 L221 198 L200 182 L179 198 L187 172 L165 155 L192 155 Z' fill='%23c5a059'/%3E%3Cpath d='M100 360 C100 280, 300 280, 300 360 Z' fill='%238a1c22' opacity='0.7'/%3E%3Ctext x='50%25' y='82%25' dominant-baseline='middle' text-anchor='middle' fill='%23c5a059' font-family='sans-serif' font-weight='bold' font-size='14'%3EГБПОУ СРМК%3C/text%3E%3Ctext x='50%25' y='90%25' dominant-baseline='middle' text-anchor='middle' fill='%239da6b3' font-family='sans-serif' font-size='11'%3EНАВЕЧНО В СТРОЮ%3C/text%3E%3C/svg%3E";
-
-/**
- * 2. ТОЧКА ВХОДА И ИНИЦИАЛИЗАЦИЯ
- */
 document.addEventListener('DOMContentLoaded', () => {
   App.init();
 });
@@ -70,55 +44,44 @@ const App = {
     this.loadStorageData();
     this.loadCloudData();
 
-    // Первичная отрисовка выставочных залов
     this.renderMemorialPlaques();
     this.renderSpecialtyFilters();
     this.renderCardsGrid();
     this.updateMemorialStats();
 
-    // Привязка событий, жесткого роутинга и тач-жестов
     this.bindEvents();
     this.initTouchGestures();
     this.checkDeepLink();
 
-    // Асинхронный запуск тяжелых графических модулей
     setTimeout(() => {
       this.initInteractiveMapSafe();
       this.initAmbientParticles();
     }, 150);
 
-    console.log(`[Музей СРМК v15.0 Master] Ядро экспозиции успешно запущено. Героев в строю: ${typeof heroesDatabase !== 'undefined' ? heroesDatabase.length : 0}`);
+    console.log(`[Музей СРМК v14.0 Master] Ядро запущенно. База содержит ${typeof heroesDatabase !== 'undefined' ? heroesDatabase.length : 0} героев.`);
   },
 
-  /**
-   * Кэширование DOM-селекторов с защитой от отсутствующих элементов
-   */
   cacheDOM() {
     this.dom = {
-      // Зал I: Мемориал Славы
       leftPlaque: document.getElementById('leftPlaqueNames'),
       rightPlaque: document.getElementById('rightPlaqueNames'),
       leftPlaqueZone: document.getElementById('leftPlaqueZone'),
       rightPlaqueZone: document.getElementById('rightPlaqueZone'),
 
-      // Зал II: Студенческая юность и поиск
       cardsContainer: document.getElementById('heroesCardsContainer'),
       searchInput: document.getElementById('heroSearchInput'),
       searchClearBtn: document.getElementById('searchClearBtn'),
       specialtyContainer: document.getElementById('specialtyFiltersContainer'),
 
-      // Мемориальные счетчики
       totalCandlesDisplay: document.getElementById('totalCandlesCount'),
       statHeroCandles: document.getElementById('heroTotalCandlesStat'),
       flowersDisplay: document.getElementById('flowersCountDisplay'),
 
-      // Модальное окно досье
       heroModal: document.getElementById('heroModal'),
       modalOverlay: document.getElementById('modalOverlay'),
       modalCloseBtn: document.getElementById('modalCloseBtn'),
       modalBody: document.getElementById('modalHeroContent'),
 
-      // Аудиоплеер экскурсий
       audioBar: document.getElementById('audioPlayerBar'),
       audioElement: document.getElementById('mainAudioElement'),
       audioPlayBtn: document.getElementById('audioPlayPauseBtn'),
@@ -132,9 +95,6 @@ const App = {
     };
   },
 
-  /**
-   * Загрузка локальных данных устройства
-   */
   loadStorageData() {
     try {
       AppState.candles = JSON.parse(localStorage.getItem('srmk_museum_candles_v3') || '{}');
@@ -150,9 +110,6 @@ const App = {
     }
   },
 
-  /**
-   * Загрузка облачных данных из Supabase в реальном времени
-   */
   async loadCloudData() {
     if (!window.CloudSync?.isLive) return;
     try {
@@ -168,15 +125,11 @@ const App = {
       this.renderCardsGrid();
       this.renderMemorialPlaques();
     } catch (e) {
-      console.warn("[App] Ошибка загрузки облачной метрики:", e);
+      console.warn("[App] Ошибка загрузки облачных данных:", e);
     }
   },
 
-  /**
-   * Привязка глобальных событий
-   */
   bindEvents() {
-    // Живой дебаунс-поиск по базе (100 мс)
     if (this.dom.searchInput) {
       let debounceTimer;
       this.dom.searchInput.addEventListener('input', (e) => {
@@ -188,11 +141,9 @@ const App = {
       });
     }
 
-    // Закрытие модального окна
     if (this.dom.modalCloseBtn) this.dom.modalCloseBtn.addEventListener('click', () => this.closeModal());
     if (this.dom.modalOverlay) this.dom.modalOverlay.addEventListener('click', () => this.closeModal());
 
-    // Горячие клавиши (Esc, Стрелки навигации, P - печать, Пробел - диктор)
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         if (this.dom.heroModal?.classList.contains('active')) this.closeModal();
@@ -218,7 +169,7 @@ const App = {
   },
 
   /* ==========================================================================
-     3. ЗАЛ I: 2.5D МЕМОРИАЛ СЛАВЫ «ЗВЕЗДА ПАМЯТИ»
+     ЗАЛ I: ПЛИТЫ МЕМОРИАЛА
      ========================================================================== */
   renderMemorialPlaques() {
     const { leftPlaque, rightPlaque } = this.dom;
@@ -243,7 +194,7 @@ const App = {
 
       const candleCount = AppState.candles[hero.id] || 0;
       const candleBadge = candleCount > 0 ? `<span title="Зажжена свеча памяти">🕯 ${candleCount}</span> ` : '';
-      
+
       item.innerHTML = `
         <span class="plaque-hero-name">${candleBadge}${this.escapeHtml(hero.name)}</span>
         <span class="plaque-arrow">→</span>
@@ -270,7 +221,7 @@ const App = {
   },
 
   /* ==========================================================================
-     4. ЗАЛ II: СТУДЕНЧЕСКАЯ ЮНОСТЬ («ЗА ПАРТОЙ ГЕРОЯ») — СЕТКА И ФИЛЬТРЫ
+     ЗАЛ II: ФИЛЬТРЫ И СЕТКА КАРТОЧЕК
      ========================================================================== */
   renderSpecialtyFilters() {
     const container = this.dom.specialtyContainer;
@@ -312,7 +263,6 @@ const App = {
       return;
     }
 
-    // Полная очистка DOM для исключения утечек памяти
     while (container.firstChild) {
       container.removeChild(container.firstChild);
     }
@@ -347,8 +297,8 @@ const App = {
     if (filtered.length === 0) {
       container.innerHTML = `
         <div style="grid-column: 1/-1; text-align:center; padding: 50px 20px; color: var(--text-tertiary);">
-          <p style="font-size: 1.1rem; margin-bottom: 6px; color: #fff;">По вашему запросу герои не найдены</p>
-          <small>Попробуйте выбрать другое направление подготовки или сбросить поиск</small>
+          <p style="font-size: 1.1rem; margin-bottom: 6px; color: #fff;">Герои не найдены</p>
+          <small>Попробуйте сбросить поисковую строку</small>
         </div>
       `;
       return;
@@ -360,11 +310,11 @@ const App = {
       const specialtyText = hero.education?.specialty || "Выпускник колледжа";
       const candleCount = AppState.candles[hero.id] || 0;
 
-      // Отрисовка подлинных векторов медалей
+      // Отрисовка векторных знаков наград
       let medalsHTML = '';
       if (hero.awards && Array.isArray(hero.awards) && hero.awards.length > 0) {
         medalsHTML = `
-          <div style="display:flex; gap:6px; margin-top:10px; align-items:center; flex-wrap:wrap;">
+          <div style="display:flex; gap:6px; margin-top:8px; align-items:center; flex-wrap:wrap;">
             ${hero.awards.map(a => {
               const visual = ArchiveService.getAwardVisual(a);
               return `<img src="${visual.badge}" alt="${this.escapeHtml(visual.name)}" title="${this.escapeHtml(visual.name)}" style="width:26px; height:26px; object-fit:contain; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));">`;
@@ -400,7 +350,7 @@ const App = {
   },
 
   /* ==========================================================================
-     5. МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ (ПОЛНОСТЬЮ БЕЗ ЧЕРНЫХ КВАДРАТОВ)
+     МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ (100% БЕЗ ЧЕРНЫХ КВАДРАТОВ И ОБРЕЗКИ ТЕКСТА)
      ========================================================================== */
   openModal(id) {
     const hero = heroesDatabase.find(h => h.id === id);
@@ -425,16 +375,18 @@ const App = {
     // Сборка галереи миниатюр (Портрет + Знаки орденов + Планки + Мемориал)
     const galleryItems = ArchiveService.buildDynamicGallery(hero);
 
-    // Сборка наградного блока справа с подлинными лентами и медалями
+    // Сборка наградного блока справа
     const awardsHTML = (hero.awards || []).map(awardTitle => {
       const visual = ArchiveService.getAwardVisual(awardTitle);
       return `
-        <div class="award-tag" style="display:flex; align-items:center; gap:12px; padding:10px 14px; margin-bottom:10px; background:#181d26; border:1px solid rgba(197,160,89,0.35); border-radius:3px; box-shadow:0 4px 12px rgba(0,0,0,0.5);">
-          <img src="${visual.badge}" alt="${this.escapeHtml(visual.name)}" style="width:40px; height:40px; object-fit:contain; flex-shrink:0;">
-          <div>
-            <strong style="display:block; color:#ffffff; font-size:0.9rem; line-height:1.2;">${this.escapeHtml(visual.name)}</strong>
-            <small style="color:#c5a059; font-size:0.75rem; display:block; margin-top:2px;">${visual.established || 'Государственная награда РФ'}</small>
+        <div class="award-card-item" style="display:flex; align-items:center; gap:14px; padding:12px 16px; margin-bottom:10px; background:#181d26; border:1px solid rgba(197,160,89,0.35); border-radius:4px; box-shadow:0 4px 14px rgba(0,0,0,0.5);">
+          <img src="${visual.badge}" alt="${this.escapeHtml(visual.name)}" style="width:44px; height:44px; object-fit:contain; flex-shrink:0; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6));">
+          <div style="flex-grow:1;">
+            <strong style="display:block; color:#ffffff; font-size:0.92rem; font-family:'Cinzel', serif; line-height:1.25;">${this.escapeHtml(visual.name)}</strong>
+            <span style="display:block; color:#c5a059; font-size:0.76rem; margin-top:2px;">${visual.established || 'Государственная награда РФ'}</span>
+            <small style="display:block; color:#9da6b3; font-size:0.75rem; margin-top:4px; line-height:1.35;">${visual.criteria || 'За мужество и отвагу при исполнении воинского долга.'}</small>
           </div>
+          ${visual.ribbon && visual.ribbon !== visual.badge ? `<img src="${visual.ribbon}" alt="Планка" style="width:54px; height:18px; object-fit:contain; border-radius:2px; border:1px solid rgba(255,255,255,0.2);" title="Орденская планка">` : ''}
         </div>
       `;
     }).join('');
@@ -537,12 +489,12 @@ const App = {
               <span class="meta-label">Подразделение и звание:</span>
               <strong>${this.escapeHtml(rankText)}</strong>
             </div>
-            <div class="dossier-deed-text md-content">${this.parseMarkdown(this.escapeHtml(deedText))}</div>
+            <div class="dossier-deed-text md-content">${this.parseMarkdown(deedText)}</div>
           </div>
 
           ${hero.quote ? `
             <blockquote class="dossier-quote md-content">
-              «${this.parseMarkdown(this.escapeHtml(hero.quote))}»
+              «${this.parseMarkdown(hero.quote)}»
             </blockquote>
           ` : ''}
 
