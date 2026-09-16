@@ -1166,5 +1166,12 @@ const App = {
   }
 };
 
-window.AppState = AppState;
-window.App = App;
+// Экспорт для ES6 модулей и обратная совместимость
+export { AppState, App, FALLBACK_HERO_AVATAR };
+
+// Для обратной совместимости с глобальной областью видимости
+if (typeof window !== 'undefined') {
+  window.AppState = AppState;
+  window.App = App;
+  window.FALLBACK_HERO_AVATAR = FALLBACK_HERO_AVATAR;
+}

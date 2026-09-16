@@ -556,5 +556,12 @@ const GuestbookEngine = {
   }
 };
 
-window.GuestbookEngine = GuestbookEngine;
+// Экспорт для ES6 модулей и обратная совместимость
+export { GuestbookEngine };
+
+// Для обратной совместимости с глобальной областью видимости
+if (typeof window !== 'undefined') {
+  window.GuestbookEngine = GuestbookEngine;
+}
+
 document.addEventListener('DOMContentLoaded', () => GuestbookEngine.init());

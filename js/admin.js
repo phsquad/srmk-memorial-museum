@@ -753,5 +753,12 @@ if (typeof module !== 'undefined' && module.exports) {
   }
 };
 
-window.AdminCMS = AdminCMS;
+// Экспорт для ES6 модулей и обратная совместимость
+export { AdminCMS };
+
+// Для обратной совместимости с глобальной областью видимости
+if (typeof window !== 'undefined') {
+  window.AdminCMS = AdminCMS;
+}
+
 document.addEventListener('DOMContentLoaded', () => AdminCMS.init());
