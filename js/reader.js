@@ -1,13 +1,14 @@
 /**
  * ============================================================================
- * ДВИЖОК 3D-ЧИТАЛКИ И БИБЛИОТЕКИ: js/reader.js (v12.0 Ultra Enterprise Edition)
+ * ДВИЖОК 3D-ЧИТАЛКИ И БИБЛИОТЕКИ ФОЛИАНТОВ: js/reader.js (v13.0 Master)
+ * Мемориально-образовательный комплекс ГБПОУ СРМК «Быть воином — жить вечно»
  * 
  * Включает:
  * 1. Процедурный синтезатор шелеста страниц (Web Audio API)
- * 2. Автоматическое объединение томов (Пролог + 20 глав)
- * 3. Накатное глубокое связывание (Deep Linking) по хэшу URL
+ * 2. Адаптивное чтение без потери страниц на смартфонах и ПК
+ * 3. Накатное глубокое связывание (Deep Linking по хэшу URL)
  * 4. Защищенный Fallback-генератор разворотов на лету из heroesDatabase
- * 5. Мультимедийные MP3-плееры, смену тем, свайп-жесты и клавиатуру
+ * 5. Мультимедийные MP3-плееры, смену тем, свайп-жесты и печать разворота
  * ============================================================================
  */
 
@@ -16,11 +17,11 @@
 const FOLIO_LIBRARY = [
   // Базовая заглушка на случай отсутствия загруженных внешних томов
   {
-    id: "prologue-master-cover",
+    id: "prologue-memorial-opening",
     volNum: "ГЛАВНЫЙ ТОМ",
     chapterNum: "Вводная глава",
-    name: "Подвиг воинов-героев, защитников Отечества",
-    years: "1973 — 2026",
+    name: "Открытие Мемориала Славы СРМК",
+    years: "26 сентября 2025 года",
     specialty: "ГБПОУ «Ставропольский региональный многопрофильный колледж»",
     military: "Мемориал Славы СРМК",
     awards: "Ордена Мужества",
@@ -30,21 +31,22 @@ const FOLIO_LIBRARY = [
     pages: [
       {
         spreadNum: "Титульный разворот (Стр. 1–2)",
-        chapterTitle: "Глава 1. Быть воином — жить вечно",
+        chapterTitle: "Быть воином — жить вечно",
         leftHtml: `
           <div class="page-header-meta"><span>ГБПОУ СРМК</span><span>ЭЛЕКТРОННАЯ КНИГА ПАМЯТИ</span></div>
-          <div class="page-visual-frame" style="height: 380px;">
-            <img src="assets/images/cover-master.jpg" alt="Обложка Книги Памяти" style="object-fit: cover;">
+          <div class="page-visual-frame" style="height: 260px;">
+            <img src="assets/images/cover-master.jpg" alt="Обложка Книги Памяти" style="object-fit: cover; width:100%; height:100%;">
           </div>
-          <div class="page-number-footer">Лицевая обложка</div>
+          <div class="page-quote-box">«Память о человеке продолжается в его делах.»</div>
+          <div class="page-number-footer">Лицевая страница</div>
         `,
         rightHtml: `
           <div class="page-header-meta"><span>ПРОЛОГ</span><span>ВСТУПЛЕНИЕ</span></div>
           <h3 class="page-chapter-title">Быть воином — жить вечно</h3>
           <div class="page-story-text">
             <span class="drop-cap">Э</span>та книга — священная летопись подвига 20 выпускников Ставропольского регионального многопрофильного колледжа, отдавших свои жизни за свободу и независимость нашей Родины.
-            <p style="margin-top:14px;">Здесь переплетены мирный созидательный труд в учебных мастерских СРМК и высочайшая воинская доблесть на переднем крае. Каждая страница — свидетельство бессмертия духа нашего студенческого братства.</p>
-            <p style="margin-top:14px; font-weight:bold; color:#8a1c22;">Вечная слава воинам-героям, защитникам Отечества!</p>
+            <p style="margin-top:12px;">Здесь переплетены мирный созидательный труд в учебных мастерских СРМК и высочайшая воинская доблесть на переднем крае. Каждая страница — свидетельство бессмертия духа нашего студенческого братства.</p>
+            <p style="margin-top:12px; font-weight:bold; color:#8a1c22;">Вечная слава воинам-героям, защитникам Отечества!</p>
           </div>
           <div class="page-number-footer">Стр. 1</div>
         `
@@ -60,45 +62,6 @@ const ReaderEngine = {
   audioEl: null,
   isPlayingAudio: false,
 
-  // Манифест Главной Обложки
-  masterCoverTome: {
-    id: "prologue-master-cover",
-    volNum: "ГЛАВНЫЙ ТОМ",
-    chapterNum: "Вводная глава",
-    name: "Подвиг воинов-героев, защитников Отечества",
-    years: "1973 — 2026",
-    specialty: "ГБПОУ СРМК • Все отделения",
-    military: "Мемориал Славы СРМК",
-    awards: "Ордена Мужества",
-    plaque: "general",
-    photo: "assets/images/cover-master.jpg",
-    audioFile: "assets/audio/guides/general-tour.mp3",
-    pages: [
-      {
-        spreadNum: "Титульный разворот (Стр. 1–2)",
-        chapterTitle: "Глава 1. Быть воином — жить вечно",
-        leftHtml: `
-          <div class="page-header-meta"><span>ГБПОУ СРМК</span><span>ЭЛЕКТРОННАЯ КНИГА ПАМЯТИ</span></div>
-          <div class="page-visual-frame" style="height: 380px;">
-            <img src="assets/images/cover-master.jpg" alt="Обложка Книги Памяти" style="object-fit: cover;">
-          </div>
-          <div class="page-quote-box">«Быть воином — жить вечно»</div>
-          <div class="page-number-footer">Лицевая обложка</div>
-        `,
-        rightHtml: `
-          <div class="page-header-meta"><span>ПРОЛОГ</span><span>ВСТУПЛЕНИЕ</span></div>
-          <h3 class="page-chapter-title">Быть воином — жить вечно</h3>
-          <div class="page-story-text">
-            <span class="drop-cap">Э</span>та книга — священная летопись подвига 20 выпускников Ставропольского регионального многопрофильного колледжа, отдавших свои жизни за свободу и независимость нашей Родины.
-            <p style="margin-top:14px;">Здесь переплетены мирный созидательный труд в учебных мастерских СРМК и высочайшая воинская доблесть на переднем крае. Каждая страница — свидетельство бессмертия духа нашего студенческого братства.</p>
-            <p style="margin-top:14px; font-weight:bold; color:#8a1c22;">Вечная слава воинам-героям, защитникам Отечества!</p>
-          </div>
-          <div class="page-number-footer">Стр. 1</div>
-        `
-      }
-    ]
-  },
-
   init() {
     this.audioEl = document.getElementById('readerAudioElement');
     this.renderShelf();
@@ -109,19 +72,17 @@ const ReaderEngine = {
     if (linkedHero) {
       this.openBook(linkedHero, false);
     }
-    console.log("[ReaderEngine v12.0 Master] 3D-Фолиант успешно инициализирован.");
+    console.log("[ReaderEngine v13.0 Master] 3D-Фолиант успешно инициализирован.");
   },
 
   /**
-   * 1. Безопасное получение полного архива (Self-Healing Array Assembly)
+   * 1. Безопасное получение полного архива (21 глава)
    */
   getArchive() {
-    const base = window.GRAND_MEMORY_BOOK_ARCHIVE || FOLIO_LIBRARY;
-    const hasCover = base.some(b => b.id === 'prologue-master-cover');
-    if (!hasCover) {
-      return [this.masterCoverTome, ...base];
+    if (typeof window.GRAND_MEMORY_BOOK_ARCHIVE !== 'undefined' && Array.isArray(window.GRAND_MEMORY_BOOK_ARCHIVE)) {
+      return window.GRAND_MEMORY_BOOK_ARCHIVE;
     }
-    return base;
+    return FOLIO_LIBRARY;
   },
 
   /**
@@ -135,11 +96,10 @@ const ReaderEngine = {
       if (this.audioContext.state === 'suspended') this.audioContext.resume();
 
       const ctx = this.audioContext;
-      const bufferSize = ctx.sampleRate * 0.15; // 150 миллисекунд шуршания
+      const bufferSize = ctx.sampleRate * 0.15; // 150 мс шелеста
       const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
       const data = buffer.getChannelData(0);
 
-      // Генерируем экспоненциально затухающий белый шум
       for (let i = 0; i < bufferSize; i++) {
         data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.3));
       }
@@ -147,7 +107,6 @@ const ReaderEngine = {
       const noise = ctx.createBufferSource();
       noise.buffer = buffer;
 
-      // Полосовой фильтр (BiquadFilter) со скользящей частотой (800Hz ➔ 300Hz)
       const filter = ctx.createBiquadFilter();
       filter.type = 'bandpass';
       filter.frequency.setValueAtTime(800, ctx.currentTime);
@@ -197,9 +156,9 @@ const ReaderEngine = {
 
     grid.innerHTML = filtered.map((hero, idx) => {
       const volNum = hero.volNum || `Том ${idx + 1}`;
-      const photoSrc = hero.media?.photo || hero.photo || 'assets/images/cover-master.jpg';
-      const specText = hero.education?.specialty || hero.specialty || 'Выпускник колледжа';
-      const isMaster = hero.id === 'prologue-master-cover';
+      const photoSrc = hero.photo || hero.media?.photo || 'assets/images/cover-master.jpg';
+      const specText = hero.specialty || hero.education?.specialty || 'Выпускник колледжа';
+      const isMaster = hero.id === 'prologue-memorial-opening' || hero.id === 'prologue-master-cover';
 
       return `
         <article class="book-spine-card ${isMaster ? 'master-tome' : ''}" tabindex="0" role="button" aria-label="Открыть фолиант: ${hero.name}" 
@@ -218,16 +177,17 @@ const ReaderEngine = {
   },
 
   /**
-   * 4. Раскрытие книги (Поддержка Fallback-генератора на лету)
+   * 4. Раскрытие книги
    */
   openBook(heroId, updateHash = true) {
     const archive = this.getArchive();
     let book = archive.find(b => b.id === heroId);
 
-    // ⚡️ FALLBACK ГЕНЕРАТОР РАЗВОРОТОВ НА ЛЕТУ ИЗ HEROESDATABASE:
+    // Fallback-генератор из heroesDatabase на случай отсутствия тома в архиве
     if (!book && typeof heroesDatabase !== 'undefined') {
       const h = heroesDatabase.find(x => x.id === heroId);
       if (h) {
+        const photo = h.media?.photo || 'assets/images/cover-master.jpg';
         book = {
           id: h.id,
           volNum: "Том Летописи",
@@ -235,16 +195,17 @@ const ReaderEngine = {
           name: h.name,
           years: h.dates?.years || `${h.dates?.birth || ''} — ${h.dates?.death || ''}`,
           specialty: h.education?.specialty || "Выпускник СРМК",
-          photo: h.media?.photo || 'assets/images/cover-master.jpg',
+          photo: photo,
           audioFile: h.media?.audioGuide || `assets/audio/guides/${h.id}.mp3`,
           pages: [
             {
               spreadNum: "Разворот I (Стр. 1–2)",
+              chapterTitle: "Хроника ратного подвига",
               leftHtml: `
                 <div class="page-header-meta"><span>ГБПОУ СРМК</span><span>АРХИВНЫЙ МЕДАЛЬОН</span></div>
-                <div class="page-visual-frame"><img src="${h.media?.photo || 'assets/images/cover-master.jpg'}" alt="${h.name}" onerror="this.src='assets/images/cover-master.jpg'"></div>
+                <div class="page-visual-frame"><img src="${photo}" alt="${h.name}" onerror="this.src='assets/images/cover-master.jpg'"></div>
                 <div class="page-quote-box">«${h.quote || 'Верность воинскому долгу и памяти студенческого братства.'}»</div>
-                <p style="font-size:0.85rem; color:#444;"><strong>Профессия:</strong> ${h.education?.specialty || 'Выпускник колледжа'}<br><strong>Звание:</strong> ${h.military?.rank || 'Воин ВС РФ'}<br><strong>Рубеж:</strong> ${h.mapCoords?.locationName || 'ТВД'}</p>
+                <p style="font-size:0.85rem; color:#444; line-height:1.4;"><strong>Профессия:</strong> ${h.education?.specialty || 'Выпускник колледжа'}<br><strong>Звание:</strong> ${h.military?.rank || 'Воин ВС РФ'}<br><strong>Рубеж:</strong> ${h.mapCoords?.locationName || 'ТВД'}</p>
                 <div class="page-number-footer">Стр. 1</div>
               `,
               rightHtml: `
@@ -267,7 +228,7 @@ const ReaderEngine = {
     this.currentBook = book;
     this.currentSpreadIdx = 0;
 
-    document.getElementById('readerVolBadge').textContent = book.volNum;
+    document.getElementById('readerVolBadge').textContent = book.volNum || "Том Летописи";
     document.getElementById('readerHeroTitle').textContent = book.name;
 
     document.getElementById('shelfView').style.display = 'none';
@@ -297,22 +258,27 @@ const ReaderEngine = {
   },
 
   /**
-   * 5. Отрисовка текущего 3D-разворота
+   * 5. Отрисовка текущего разворота
    */
   renderSpread() {
-    if (!this.currentBook) return;
+    if (!this.currentBook || !this.currentBook.pages) return;
 
     const spread = this.currentBook.pages[this.currentSpreadIdx] || this.currentBook.pages[0];
     const leftEl = document.getElementById('pageLeftContent');
     const rightEl = document.getElementById('pageRightContent');
 
-    if (leftEl) leftEl.innerHTML = spread.leftHtml;
-    if (rightEl) rightEl.innerHTML = spread.rightHtml;
+    if (leftEl) leftEl.innerHTML = spread.leftHtml || '';
+    if (rightEl) rightEl.innerHTML = spread.rightHtml || '';
+
+    // Сброс прокрутки внутри страницы
+    leftEl?.scrollTo({ top: 0, behavior: 'instant' });
+    rightEl?.scrollTo({ top: 0, behavior: 'instant' });
+    document.getElementById('folioBookElement')?.scrollTo({ top: 0, behavior: 'instant' });
 
     const total = this.currentBook.pages.length;
-    document.getElementById('paginationDisplay').textContent = `${spread.spreadNum} из ${total}`;
+    document.getElementById('paginationDisplay').textContent = `${spread.spreadNum || `Разворот ${this.currentSpreadIdx + 1}`} из ${total}`;
 
-    // Генерация нави-точек разворотов
+    // Генерация точек пагинации
     const dotsTrack = document.getElementById('pageDotsTrack');
     if (dotsTrack) {
       dotsTrack.innerHTML = this.currentBook.pages.map((_, i) =>
@@ -328,7 +294,7 @@ const ReaderEngine = {
   },
 
   nextPage() {
-    if (!this.currentBook) return;
+    if (!this.currentBook || !this.currentBook.pages) return;
     if (this.currentSpreadIdx < this.currentBook.pages.length - 1) {
       this.currentSpreadIdx++;
       this.playPageTurnSound();
@@ -337,7 +303,7 @@ const ReaderEngine = {
   },
 
   prevPage() {
-    if (!this.currentBook) return;
+    if (!this.currentBook || !this.currentBook.pages) return;
     if (this.currentSpreadIdx > 0) {
       this.currentSpreadIdx--;
       this.playPageTurnSound();
@@ -346,14 +312,14 @@ const ReaderEngine = {
   },
 
   goToSpread(idx) {
-    if (!this.currentBook) return;
+    if (!this.currentBook || !this.currentBook.pages) return;
     this.currentSpreadIdx = idx;
     this.playPageTurnSound();
     this.renderSpread();
   },
 
   /**
-   * 6. Мультимедиа-плеер
+   * 6. Мультимедиа-плеер аудиогида очерка
    */
   toggleHeroAudio() {
     if (!this.currentBook || !this.audioEl) return;
@@ -371,7 +337,7 @@ const ReaderEngine = {
           btn.textContent = '❚❚ Пауза аудиогида';
         }
       }).catch(() => {
-        this.showToast('Аудиофайл очерка подготавливается к публикации в базе СРМК.');
+        this.showToast('Аудиофайл главы подготавливается к публикации.');
       });
     }
   },
@@ -390,13 +356,11 @@ const ReaderEngine = {
   },
 
   /**
-   * 7. Привязка обработчиков интерфейса
+   * 7. Привязка событий интерфейса и свайпов
    */
   bindEvents() {
-    // Живой поиск по полке
     document.getElementById('shelfSearchInput')?.addEventListener('input', () => this.renderShelf());
 
-    // Фильтрация полки (Левая / Правая плиты)
     document.querySelectorAll('.shelf-filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.shelf-filter-btn').forEach(b => b.classList.remove('active'));
@@ -405,7 +369,6 @@ const ReaderEngine = {
       });
     });
 
-    // Изменение цветовых тем книги памяти
     document.querySelectorAll('.theme-dot').forEach(dot => {
       dot.addEventListener('click', () => {
         document.querySelectorAll('.theme-dot').forEach(d => d.classList.remove('active'));
@@ -416,7 +379,6 @@ const ReaderEngine = {
       });
     });
 
-    // Управление горячими клавишами
     document.addEventListener('keydown', (e) => {
       if (!this.currentBook) return;
       if (e.key === 'ArrowRight') this.nextPage();
@@ -428,7 +390,6 @@ const ReaderEngine = {
       }
     });
 
-    // Реакция на изменение хэша URL (глубокие ссылки)
     window.addEventListener('hashchange', () => {
       const heroId = window.location.hash.replace('#', '');
       if (heroId && heroId !== this.currentBook?.id) {
@@ -436,18 +397,24 @@ const ReaderEngine = {
       }
     });
 
-    // Сенсорные жесты свайпа на мобильных устройствах
+    // Сенсорные свайпы для смартфонов
     let touchStartX = 0;
-    const bookEl = document.getElementById('folioBookElement');
-    if (bookEl) {
-      bookEl.addEventListener('touchstart', e => {
+    let touchStartY = 0;
+    const stage = document.querySelector('.book-stage-wrapper');
+    if (stage) {
+      stage.addEventListener('touchstart', e => {
         touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
       }, { passive: true });
 
-      bookEl.addEventListener('touchend', e => {
+      stage.addEventListener('touchend', e => {
         const deltaX = e.changedTouches[0].screenX - touchStartX;
-        if (deltaX < -60) this.nextPage(); // Свайп влево ➔ Вперед
-        if (deltaX > 60) this.prevPage();  // Свайп вправо ➔ Назад
+        const deltaY = e.changedTouches[0].screenY - touchStartY;
+
+        if (Math.abs(deltaX) > 60 && Math.abs(deltaY) < 50) {
+          if (deltaX < 0) this.nextPage();
+          if (deltaX > 0) this.prevPage();
+        }
       }, { passive: true });
     }
   },
@@ -464,7 +431,7 @@ const ReaderEngine = {
     if (!toast) return;
     toast.textContent = msg;
     toast.classList.add('active');
-    setTimeout(() => toast.classList.remove('active'), 2500);
+    setTimeout(() => toast.classList.remove('active'), 2800);
   }
 };
 

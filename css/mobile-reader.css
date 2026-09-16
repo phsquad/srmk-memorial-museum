@@ -1,7 +1,8 @@
 @charset "UTF-8";
 
 /* ==========================================================================
-   МОБИЛЬНЫЕ СТИЛИ 3D-ЧИТАЛКИ И ПОЛКИ: css/mobile-reader.css
+   МОБИЛЬНЫЕ СТИЛИ 3D-ЧИТАЛКИ: css/mobile-reader.css (v13.0 Master)
+   Мемориально-образовательный комплекс ГБПОУ СРМК «Быть воином — жить вечно»
    ========================================================================== */
 @media (max-width: 900px) {
 
@@ -19,6 +20,13 @@
     width: 100%;
     overflow-x: auto;
     padding-bottom: 2px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .header-btn {
+    flex-shrink: 0;
+    padding: 6px 12px;
+    font-size: 0.74rem;
   }
 
   .shelf-hero-banner {
@@ -27,33 +35,44 @@
 
   .hero-title {
     font-size: 1.65rem;
+    line-height: 1.25;
   }
 
   .shelf-toolbar {
     flex-direction: column;
     width: 100%;
+    gap: 10px;
+  }
+
+  .shelf-search {
+    width: 100%;
+    min-width: 100%;
   }
 
   .shelf-filters {
     width: 100%;
     overflow-x: auto;
     padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    justify-content: flex-start;
   }
 
   .shelf-filter-btn {
     white-space: nowrap;
     flex-shrink: 0;
+    padding: 8px 14px;
+    font-size: 0.76rem;
   }
 
-  /* Книжная полка на мобильном (2 колонки) */
+  /* Сетка полок на телефоне (2 колонки) */
   .bookshelf-tier {
     grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
-    padding: 12px 10px;
+    gap: 12px;
+    padding: 14px 8px;
   }
 
   .book-spine-card {
-    height: 300px;
+    height: 310px;
     padding: 14px 10px;
   }
 
@@ -64,62 +83,99 @@
 
   .book-spine-title {
     font-size: 0.88rem;
+    line-height: 1.2;
   }
 
   .book-spine-spec {
     font-size: 0.68rem;
     display: -webkit-box;
-    line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
 
-  /* 3D-читалка: 1 страница вместо 2 */
+  /* ==========================================================================
+     МОБИЛЬНЫЙ РЕЖИМ ЧИТАЛКИ (ПОЛНЫЙ ДОСТУП КО ВСЕМУ ТЕКСТУ БЕЗ СКРЫТИЯ СТРАНИЦ)
+     ========================================================================== */
   .reader-control-panel {
     padding: calc(8px + env(safe-area-inset-top, 0px)) 12px 8px;
   }
 
+  .control-panel-inner {
+    gap: 8px;
+  }
+
   .meta-hero-name {
     font-size: 0.88rem;
-    max-width: 150px;
+    max-width: 140px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
   .book-stage-wrapper {
-    padding: 10px;
+    padding: 10px 8px;
   }
 
+  /* Книга становится адаптивным вертикальным свитком */
   .folio-book-3d {
     width: 100%;
-    height: calc(100vh - 160px);
-    grid-template-columns: 1fr;
-    box-shadow: none;
+    height: calc(100vh - 145px);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9);
+    border-radius: 4px;
+  }
+
+  /* 🔥 ОБЕ СТРАНИЦЫ АКТИВНЫ И ОТОБРАЖАЮТСЯ ПОСЛЕДОВАТЕЛЬНО */
+  .book-page {
+    width: 100%;
+    padding: 20px 16px;
+    overflow: visible;
   }
 
   .page-left {
-    display: none; /* Скрываем левую страницу, листаем по одной */
+    border-right: none;
+    border-bottom: 1px dashed rgba(197, 160, 89, 0.35);
+    border-radius: 4px 4px 0 0;
   }
 
   .page-right {
-    border-radius: 4px;
-    padding: 20px 16px;
+    border-radius: 0 0 4px 4px;
   }
 
-  .book-spine-crease, .ribbon-bookmark {
+  .page-visual-frame {
+    height: 220px;
+  }
+
+  .page-chapter-title {
+    font-size: 1.25rem;
+    margin-bottom: 8px;
+  }
+
+  .page-story-text {
+    font-size: 0.92rem;
+    line-height: 1.65;
+  }
+
+  /* Скрытие декоративных 3D-элементов корешка на телефоне */
+  .book-spine-crease, 
+  .ribbon-bookmark {
     display: none;
   }
 
+  /* Компактные круглые кнопки перелистывания */
   .flip-nav-btn {
-    width: 42px;
-    height: 42px;
-    font-size: 1.1rem;
+    width: 38px;
+    height: 38px;
+    font-size: 1rem;
     background: rgba(14, 16, 22, 0.92);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.8);
   }
-  .prev-btn { left: 8px; }
-  .next-btn { right: 8px; }
+  .prev-btn { left: 6px; }
+  .next-btn { right: 6px; }
 
   .shortcut-tip {
     display: none;
@@ -129,5 +185,14 @@
 @media (max-width: 480px) {
   .bookshelf-tier {
     grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .book-spine-card {
+    height: 270px;
+  }
+
+  .meta-hero-name {
+    max-width: 110px;
   }
 }

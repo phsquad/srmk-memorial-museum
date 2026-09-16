@@ -1,7 +1,8 @@
 @charset "UTF-8";
 
 /* ==========================================================================
-   3D-ЧИТАЛКА И КНИЖНАЯ ПОЛКА: css/reader.css
+   3D-ЧИТАЛКА И КНИЖНАЯ ПОЛКА: css/reader.css (v13.0 Master)
+   Мемориально-образовательный комплекс ГБПОУ СРМК «Быть воином — жить вечно»
    ========================================================================== */
 :root {
   --bg-main: #0a0c0f;
@@ -47,7 +48,9 @@ body {
   padding: 0 24px;
 }
 
-/* Шапка */
+/* ==========================================================================
+   1. ШАПКА РАЗДЕЛА ЧИТАЛКИ
+   ========================================================================== */
 .reader-header {
   background: rgba(10, 12, 16, 0.96);
   backdrop-filter: blur(14px);
@@ -126,7 +129,7 @@ body {
 }
 
 /* ==========================================================================
-   1. КНИЖНАЯ ПОЛКА (BOOKSHELF)
+   2. КНИЖНАЯ ПОЛКА (BOOKSHELF)
    ========================================================================== */
 .shelf-view-section {
   padding-bottom: 80px;
@@ -140,6 +143,7 @@ body {
 }
 
 .hero-crest { font-size: 2rem; color: var(--accent-brass); margin-bottom: 8px; }
+
 .hero-badge {
   display: inline-block;
   color: var(--accent-brass);
@@ -151,6 +155,7 @@ body {
   padding-bottom: 3px;
   margin-bottom: 14px;
 }
+
 .hero-title {
   font-family: var(--font-serif);
   font-size: 2.4rem;
@@ -158,6 +163,7 @@ body {
   color: #ffffff;
   margin-bottom: 12px;
 }
+
 .hero-desc {
   max-width: 680px;
   margin: 0 auto 28px;
@@ -179,10 +185,12 @@ body {
   flex: 1;
   min-width: 280px;
 }
+
 .shelf-search span {
   position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
   color: var(--text-tertiary);
 }
+
 .shelf-search input {
   width: 100%;
   background: var(--bg-shelf-wall);
@@ -196,6 +204,7 @@ body {
 .shelf-search input:focus { border-color: var(--accent-brass); }
 
 .shelf-filters { display: flex; gap: 6px; }
+
 .shelf-filter-btn {
   background: var(--bg-shelf-wall);
   border: 1px solid var(--border-hairline);
@@ -207,13 +216,13 @@ body {
   cursor: pointer;
   transition: var(--transition);
 }
+
 .shelf-filter-btn.active, .shelf-filter-btn:hover {
   background: var(--accent-brass);
   color: #000;
   font-weight: 700;
 }
 
-/* Сетка книг на полке */
 .shelf-display-container {
   margin-top: 40px;
 }
@@ -222,15 +231,15 @@ body {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 30px;
-  padding: 20px;
+  padding: 24px;
   background: linear-gradient(180deg, #10141d 0%, #0c0e14 100%);
   border: 1px solid var(--border-hairline);
-  border-bottom: 12px solid #2b1f17; /* Деревянная полка */
+  border-bottom: 12px solid #2b1f17;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9);
   border-radius: 4px;
 }
 
-/* 3D-Том героя на полке */
+/* 3D-Том героя */
 .book-spine-card {
   height: 380px;
   background: linear-gradient(135deg, #181c26 0%, #10131a 100%);
@@ -316,7 +325,7 @@ body {
 }
 
 /* ==========================================================================
-   2. 3D-ЧИТАЛКА (BOOK FLIPBOOK)
+   3. 3D-ЧИТАЛКА (BOOK FLIPBOOK)
    ========================================================================== */
 .book-reader-section {
   position: fixed;
@@ -427,7 +436,7 @@ body {
 .prev-btn { position: absolute; left: 30px; }
 .next-btn { position: absolute; right: 30px; }
 
-/* 3D Книга */
+/* 3D Книга на десктопе */
 .folio-book-3d {
   width: 1000px;
   height: 640px;
@@ -439,7 +448,7 @@ body {
   transition: transform 0.4s ease;
 }
 
-/* Темы страниц */
+/* Темы разворотов */
 .folio-book-3d.theme-parchment .book-page {
   background: radial-gradient(circle at 50% 50%, #fdfaf2 0%, #f3ebd4 100%);
   color: #1a1714;
@@ -470,7 +479,6 @@ body {
   border-radius: 0 4px 4px 0;
 }
 
-/* Центральный сгиб корешка */
 .book-spine-crease {
   position: absolute;
   top: 0; left: 50%; transform: translateX(-50%);
@@ -480,7 +488,6 @@ body {
   z-index: 20;
 }
 
-/* Ляссе (Закладка) */
 .ribbon-bookmark {
   position: absolute;
   top: -6px; left: 49.5%;
@@ -492,7 +499,7 @@ body {
   pointer-events: none;
 }
 
-/* Типографика разворота */
+/* Типографика страниц */
 .page-header-meta {
   display: flex;
   justify-content: space-between;
@@ -515,7 +522,7 @@ body {
   margin-bottom: 14px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
-.page-visual-frame img { width: 100%; height: 100%; object-fit: cover; }
+.page-visual-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 .page-quote-box {
   background: rgba(138, 28, 34, 0.06);
@@ -542,7 +549,6 @@ body {
   text-align: justify;
 }
 
-/* Буквица (Drop Cap) */
 .drop-cap {
   float: left;
   font-family: var(--font-serif);
@@ -583,9 +589,7 @@ body {
   width: 10px; height: 10px; border: 0; padding: 0; border-radius: 50%; background: #333; cursor: pointer;
 }
 .page-dot.active { background: var(--accent-brass); transform: scale(1.3); }
-.page-dot:focus-visible { outline: 2px solid var(--accent-brass-hover); outline-offset: 3px; }
 
-/* Всплывающий тост */
 .reader-toast {
   position: fixed;
   bottom: 30px; right: 30px;
@@ -602,20 +606,70 @@ body {
 }
 .reader-toast.active { opacity: 1; transform: translateY(0); }
 
-/* Адаптивность для смартфонов (1 страница) */
-@media (max-width: 900px) {
-  .bookshelf-tier { grid-template-columns: repeat(2, 1fr); }
-  .folio-book-3d {
-    width: 100%; height: 80vh;
-    grid-template-columns: 1fr;
+/* ==========================================================================
+   4. ЧИСТАЯ ПЕЧАТЬ РАЗВОРОТА НА ПРИНТЕРЕ (@MEDIA PRINT)
+   ========================================================================== */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
   }
-  .page-left { display: none; } /* На смартфонах листается по одной странице */
-  .book-spine-crease, .ribbon-bookmark { display: none; }
-  .prev-btn { left: 10px; }
-  .next-btn { right: 10px; }
-  .shortcut-tip { display: none; }
-}
 
-@media (max-width: 550px) {
-  .bookshelf-tier { grid-template-columns: 1fr; }
+  .reader-header,
+  .shelf-view-section,
+  .reader-control-panel,
+  .reader-bottom-bar,
+  .flip-nav-btn,
+  .ribbon-bookmark,
+  .book-spine-crease,
+  .reader-toast {
+    display: none !important;
+  }
+
+  .book-reader-section {
+    position: static !important;
+    display: block !important;
+    background: #ffffff !important;
+  }
+
+  .book-stage-wrapper {
+    padding: 0 !important;
+    perspective: none !important;
+  }
+
+  .folio-book-3d {
+    width: 100% !important;
+    height: auto !important;
+    box-shadow: none !important;
+    border: 2px solid #000000 !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    background: #ffffff !important;
+    page-break-after: always !important;
+  }
+
+  .book-page {
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 15mm !important;
+  }
+
+  .page-left {
+    border-right: 1px solid #cccccc !important;
+  }
+
+  .page-header-meta {
+    color: #8a1c22 !important;
+    border-bottom: 1px solid #000000 !important;
+  }
+
+  .page-chapter-title, .drop-cap {
+    color: #8a1c22 !important;
+  }
+
+  .page-quote-box {
+    background: #f8f9fa !important;
+    border-left: 3px solid #000000 !important;
+    color: #000000 !important;
+  }
 }
