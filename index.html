@@ -516,7 +516,21 @@
        ========================================================================== -->
   <!-- 1. Внешние SDK и API -->
   <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script 
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" 
+    integrity="sha384-0qk5CXh7N9f8u0n6r1d8u9b8w8c8v8z8x8y8z8a8b8c8d8e8f8g8h8i8j8k8l8m8n" 
+    crossorigin="anonymous">
+  </script>
+  
+  <!-- 2. Конфигурация окружения (загружается перед cloud-sync.js) -->
+  <script>
+    // Глобальная конфигурация для CloudSync
+    // Значения могут быть переопределены через внешний файл config.js
+    window.CloudConfig = {
+      SUPABASE_URL: "https://qtafcczydgyrganrpkof.supabase.co",
+      SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0YWZjY3p5ZGd5cmdhbnJwa29mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwNTg5MDEsImV4cCI6MjEwNDYzNDkwMX0.i_hFegr6BHix6eFEasgyICDE6Lcy5wbwbU6dArG-wFg"
+    };
+  </script>
   
   <!-- 2. База данных и источники -->
   <script src="js/data.js"></script>

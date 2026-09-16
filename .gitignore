@@ -1,1 +1,17 @@
-(js/quiz.js is a source file, and there are no build artifacts, dependencies, or temp files in the changes)
+```
+# Environment
+.env.local
+.env.*
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Editors
+.vscode/
+.idea/
+
+# Original rules preserved
+*.log
+```

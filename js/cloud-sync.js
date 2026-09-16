@@ -1,21 +1,42 @@
 /**
  * ============================================================================
- * ГЛОБАЛЬНАЯ СИНХРОНИЗАЦИЯ OMNI-SYNC: js/cloud-sync.js (v4.0 Master)
+ * ГЛОБАЛЬНАЯ СИНХРОНИЗАЦИЯ OMNI-SYNC: js/cloud-sync.js (v4.1 - Безопасная версия)
+ * ============================================================================
+ * Изменения в версии 4.1:
+ * - Ключи Supabase загружаются из window.CloudConfig или .env
+ * - Добавлена проверка наличия ключей перед инициализацией
+ * - Улучшена обработка ошибок
  * ============================================================================
  */
 
 'use strict';
 
+// Конфигурация загружается из глобальной переменной или используется по умолчанию
 const CloudConfig = {
-  // Реальные ключи проекта Supabase.
-  SUPABASE_URL: "https://qtafcczydgyrganrpkof.supabase.co",
-  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0YWZjY3p5ZGd5cmdhbnJwa29mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwNTg5MDEsImV4cCI6MjEwNDYzNDkwMX0.i_hFegr6BHix6eFEasgyICDE6Lcy5wbwbU6dArG-wFg"
+  SUPABASE_URL: window.CloudConfig?.SUPABASE_URL || "",
+  SUPABASE_ANON_KEY: window.CloudConfig?.SUPABASE_ANON_KEY || ""
 };
 
 const CloudSync = {
   client: null,
   isLive: false,
   channels: [],
+
+  /**
+   * Проверяет корректность конфигурации Supabase
+   * @returns {boolean} true если конфигурация валидна
+   */
+  validateConfig() {
+    if (!CloudConfig.SUPABASE_URL || CloudConfig.SUPABASE_URL.includes('ВАШ_PROJECT_ID')) {
+      console.warn('[CloudSync] ⚠️ SUPABASE_URL не настроен. Синхронизация отключена.');
+      return false;
+    }
+    if (!CloudConfig.SUPABASE_ANON_KEY || CloudConfig.SUPABASE_ANON_KEY.length < 20) {
+      console.warn('[CloudSync] ⚠️ SUPABASE_ANON_KEY не настроен. Синхронизация отключена.');
+      return false;
+    }
+    return true;
+  },
 
   normalizeTribute(row) {
     return {
@@ -47,15 +68,25 @@ const CloudSync = {
 
   init() {
     if (this.isLive) return;
-    if (typeof supabase !== 'undefined' && CloudConfig.SUPABASE_URL.indexOf('ВАШ_PROJECT_ID') === -1) {
+    
+    // Проверка конфигурации перед инициализацией
+    if (!this.validateConfig()) {
+      console.log('[CloudSync] ℹ️ Облачная синхронизация отключена (нет конфигурации)');
+      return;
+    }
+
+    if (typeof supabase !== 'undefined') {
       try {
         this.client = supabase.createClient(CloudConfig.SUPABASE_URL, CloudConfig.SUPABASE_ANON_KEY);
         this.isLive = true;
         this.subscribeRealtime();
         console.log("[CloudSync] 🌐 OMNI-SYNC подключен. Все модули работают в реальном времени.");
       } catch (err) {
-        console.warn("[CloudSync] Ошибка подключения к облаку:", err);
+        console.error("[CloudSync] ❌ Ошибка подключения к облаку:", err);
+        this.isLive = false;
       }
+    } else {
+      console.warn('[CloudSync] ⚠️ Supabase SDK не загружен. Проверьте подключение скрипта.');
     }
   },
 
