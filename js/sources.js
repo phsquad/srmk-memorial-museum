@@ -1,29 +1,38 @@
 /**
  * ============================================================================
- * ГЕРАЛЬДИЧЕСКИЙ АТЛАС НАГРАД И ГАЛЕРЕЯ: js/sources.js (v11.0 Ultra Master)
+ * ГЕРАЛЬДИЧЕСКИЙ АТЛАС НАГРАД И МЕДИА-АРХИВ: js/sources.js (v12.0 Enterprise)
  * Мемориально-образовательный комплекс ГБПОУ СРМК «Быть воином — жить вечно»
  * 
  * Включает:
- * 1. Векторные SVG-рендеры подлинных государственных наград и орденских планок РФ
- * 2. Автоматический сборщик мультимедийной галереи без битых ссылок и черных квадратов
- * 3. Генератор мемориальных гербовых аватаров колледжа
+ * 1. 100% Автономные векторные SVG-рендеры всех наград и планок РФ (без внешних URL)
+ * 2. Многоуровневые стратегии защиты от битых ссылок, CORS и черных квадратов
+ * 3. Нечеткий резолвер названий наград из архивных указов (Fuzzy Resolver)
+ * 4. Автоматический сборщик мультимедийной галереи досье (buildDynamicGallery)
+ * 5. Генератор персональных гербовых аватаров и векторных памятников
  * ============================================================================
  */
 
 'use strict';
 
 /**
- * Хелпер создания 100% валидных SVG Data URI без проблем с кодировкой
+ * ВЕКТОРНЫЙ ХЕЛПЕР: Кодирование SVG в 100% валидный Data URI без сбоев парсинга
  */
 function createSvgDataUri(svgString) {
-  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString.trim())}`;
+  if (!svgString) return '';
+  try {
+    const cleanSvg = svgString.trim().replace(/\s+/g, ' ');
+    return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(cleanSvg)}`;
+  } catch (e) {
+    console.warn("[Sources] Ошибка кодирования SVG Data URI:", e);
+    return `data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2240%22%20fill%3D%22%23c5a059%22%2F%3E%3C%2Fsvg%3E`;
+  }
 }
 
 /**
- * 1. ВЕКТОРНЫЕ ИСХОДНИКИ ГОСУДАРСТВЕННЫХ НАГРАД И ПЛАНАТ ОРДЕНОВ РФ
+ * 1. ВЕКТОРНЫЙ АТЛАС НАГРАД РОССИЙСКОЙ ФЕДЕРАЦИИ (SVG DATA URI)
  */
 const HERALDIC_SVGS = {
-  // ОРДЕН МУЖЕСТВА (Серебряный рельефный крест с орлом)
+  // ОРДЕН МУЖЕСТВА (Серебряный рельефный крест с орлом и рельефом)
   ORDER_OF_COURAGE_BADGE: createSvgDataUri(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
       <defs>
@@ -48,7 +57,7 @@ const HERALDIC_SVGS = {
         <circle cx="150" cy="150" r="58" fill="url(#silverMetal)" stroke="#1e293b" stroke-width="3"/>
         <circle cx="150" cy="150" r="48" fill="#12151d" stroke="url(#goldShine)" stroke-width="2"/>
         <path d="M150 118 L154 132 L168 132 L157 141 L161 155 L150 146 L139 155 L143 141 L132 132 L146 132 Z" fill="url(#goldShine)"/>
-        <text x="150" y="178" text-anchor="middle" fill="#ffffff" font-family="'Cinzel', serif" font-weight="900" font-size="11" letter-spacing="2">МУЖЕСТВО</text>
+        <text x="150" y="178" text-anchor="middle" fill="#ffffff" font-family="'Cinzel', Georgia, serif" font-weight="900" font-size="11" letter-spacing="2">МУЖЕСТВО</text>
       </g>
     </svg>
   `),
@@ -63,7 +72,7 @@ const HERALDIC_SVGS = {
     </svg>
   `),
 
-  // МЕДАЛЬ «ЗА ОТВАГУ» (Серебряный круг с танком Т-35 и самолетами)
+  // МЕДАЛЬ «ЗА ОТВАГУ» (Серебряный диск с самолетами, красной эмалью и танком)
   MEDAL_FOR_COURAGE_BADGE: createSvgDataUri(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
       <defs>
@@ -93,7 +102,7 @@ const HERALDIC_SVGS = {
     </svg>
   `),
 
-  // ПЛАНКА МЕДАЛИ «ЗА ОТВАГУ» (Серая с синими полосками по краям)
+  // ПЛАНКА МЕДАЛИ «ЗА ОТВАГУ» (Серая с синими полосами по краям)
   MEDAL_FOR_COURAGE_RIBBON: createSvgDataUri(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 70" width="240" height="70">
       <rect width="240" height="70" rx="4" fill="#94a3b8" stroke="#111111" stroke-width="2"/>
@@ -103,7 +112,7 @@ const HERALDIC_SVGS = {
     </svg>
   `),
 
-  // МЕДАЛЬ СУВОРОВА (Золотисто-бронзовый барельеф)
+  // МЕДАЛЬ СУВОРОВА (Золотисто-бронзовый диск с профилем)
   MEDAL_OF_SUVOROV_BADGE: createSvgDataUri(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
       <defs>
@@ -128,7 +137,7 @@ const HERALDIC_SVGS = {
     </svg>
   `),
 
-  // ПЛАНКА МЕДАЛИ СУВОРОВА
+  // ПЛАНКА МЕДАЛИ СУВОРОВА (Красная с зелеными полосами по краям)
   MEDAL_OF_SUVOROV_RIBBON: createSvgDataUri(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 70" width="240" height="70">
       <rect width="240" height="70" rx="4" fill="#b91c1c" stroke="#111111" stroke-width="2"/>
@@ -161,7 +170,7 @@ const HERALDIC_SVGS = {
     </svg>
   `),
 
-  // ПЛАНКА МЕДАЛИ «ЗА ХРАБРОСТЬ»
+  // ПЛАНКА МЕДАЛИ «ЗА ХРАБРОСТЬ» (Георгиевская лента + триколор)
   MEDAL_FOR_BRAVERY_RIBBON: createSvgDataUri(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 70" width="240" height="70">
       <rect width="240" height="70" rx="4" fill="#111827" stroke="#111111" stroke-width="2"/>
@@ -173,7 +182,7 @@ const HERALDIC_SVGS = {
     </svg>
   `),
 
-  // ВЕТЕРАН БОЕВЫХ ДЕЙСТВИЙ
+  // ЗНАК «ВЕТЕРАН БОЕВЫХ ДЕЙСТВИЙ»
   VETERAN_BADGE: createSvgDataUri(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
       <defs>
@@ -194,26 +203,43 @@ const HERALDIC_SVGS = {
         <text x="150" y="208" text-anchor="middle" fill="#ffeaa7" font-family="'Montserrat', sans-serif" font-weight="800" font-size="11" letter-spacing="1.5">БОЕВЫХ ДЕЙСТВИЙ</text>
       </g>
     </svg>
+  `),
+
+  // УНИВЕРСАЛЬНАЯ ГОСУДАРСТВЕННАЯ МЕДАЛЬ РФ (FALLBACK)
+  GENERIC_STATE_MEDAL: createSvgDataUri(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+      <defs>
+        <radialGradient id="genericGold" cx="40%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#fffdf0"/>
+          <stop offset="60%" stop-color="#d4af37"/>
+          <stop offset="100%" stop-color="#806214"/>
+        </radialGradient>
+      </defs>
+      <circle cx="150" cy="150" r="120" fill="url(#genericGold)" stroke="#382705" stroke-width="4"/>
+      <circle cx="150" cy="150" r="110" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
+      <path d="M150 65 L165 110 L212 110 L174 138 L188 182 L150 155 L112 182 L126 138 L88 110 L135 110 Z" fill="#8a1c22" stroke="#fff" stroke-width="1"/>
+      <text x="150" y="215" text-anchor="middle" fill="#ffffff" font-family="'Cinzel', serif" font-weight="800" font-size="13" letter-spacing="2">НАГРАДА РФ</text>
+    </svg>
   `)
 };
 
 /**
- * 2. СВЯЗУЮЩАЯ БАЗА НАГРАД
+ * 2. РЕЕСТР НАГРАД С ФУНКЦИЕЙ НЕЧЕТКОГО ПОИСКА (FUZZY MATCHING)
  */
 const AWARDS_DATABASE = {
   "орден мужества": {
     name: "Орден Мужества",
     badge: HERALDIC_SVGS.ORDER_OF_COURAGE_BADGE,
     ribbon: HERALDIC_SVGS.ORDER_OF_COURAGE_RIBBON,
-    established: "Учрежден в 1994 г.",
-    criteria: "Высшая награда за самоотверженность, мужество и отвагу при исполнении воинского долга."
+    established: "Учрежден Указом Президента РФ в 1994 г.",
+    criteria: "Высшая государственная награда за самоотверженность, мужество и отвагу при исполнении воинского долга."
   },
   "медаль «за отвагу»": {
     name: "Медаль «За отвагу»",
     badge: HERALDIC_SVGS.MEDAL_FOR_COURAGE_BADGE,
     ribbon: HERALDIC_SVGS.MEDAL_FOR_COURAGE_RIBBON,
     established: "Учреждена в 1994 г.",
-    criteria: "Награда за личное мужество и отвагу, проявленные в боях при защите Отечества."
+    criteria: "Государственная награда за личное мужество и отвагу, проявленные в боях при защите Отечества."
   },
   "медаль суворова": {
     name: "Медаль Суворова",
@@ -234,7 +260,7 @@ const AWARDS_DATABASE = {
     badge: HERALDIC_SVGS.VETERAN_BADGE,
     ribbon: HERALDIC_SVGS.VETERAN_BADGE,
     established: "Государственный статус РФ",
-    criteria: "Знак отличия и статус за участие в боевых действиях по защите интересов страны."
+    criteria: "Знак отличия и государственный статус за участие в боевых действиях по защите интересов страны."
   }
 };
 
@@ -242,12 +268,12 @@ const ArchiveService = {
   _imageCache: new Map(),
 
   /**
-   * 3. СБОРЩИК ГАЛЕРЕИ В ДОСЬЕ ГЕРОЯ (БЕЗ ЧЕРНЫХ КВАДРАТОВ)
+   * 3. УМНЫЙ СБОРЩИК ГАЛЕРЕИ В ДОСЬЕ ГЕРОЯ (ГАРАНТИРОВАНО БЕЗ ЧЕРНЫХ КВАДРАТОВ)
    */
   buildDynamicGallery(hero) {
     const gallery = [];
 
-    // 1. Портрет героя
+    // 1. Портрет героя или векторный гербовый аватар
     const photoUrl = hero.media?.photo || hero.photo || this.generateFallbackAvatar(hero);
     gallery.push({
       url: photoUrl,
@@ -281,11 +307,11 @@ const ArchiveService = {
       });
     }
 
-    // 3. Памятник монумента СРМК
+    // 3. Мемориал колледжа
     gallery.push({
       url: "assets/images/cover-master.jpg",
       caption: "Мемориал Славы «Звезда Памяти»",
-      desc: `Памятная ${hero.plaque === 'left' ? 'левая' : 'правая'} плита во дворе ГБПОУ СРМК`,
+      desc: `Памятная ${hero.plaque === 'left' ? 'левая' : 'правая'} плита монумента ГБПОУ СРМК`,
       type: "memorial"
     });
 
@@ -293,35 +319,57 @@ const ArchiveService = {
   },
 
   /**
-   * 4. ПОИСК НАГРАДЫ ПО ТЕКСТОВОМУ ИМЕНИ
+   * 4. НЕЧЕТКИЙ ПОИСК НАГРАДЫ ПО ТЕКСТОВОЙ ФОРМУЛИРОВКЕ ИЗ ПРИКАЗА
    */
   getAwardVisual(awardTitle) {
-    if (!awardTitle) return { name: "Награда РФ", badge: HERALDIC_SVGS.ORDER_OF_COURAGE_BADGE, ribbon: HERALDIC_SVGS.ORDER_OF_COURAGE_RIBBON, criteria: "" };
-
-    const lower = awardTitle.toLowerCase().trim();
-    const key = Object.keys(AWARDS_DATABASE).find(k => lower.includes(k));
-
-    if (key) {
-      return AWARDS_DATABASE[key];
+    if (!awardTitle) {
+      return { 
+        name: "Государственная награда РФ", 
+        badge: HERALDIC_SVGS.ORDER_OF_COURAGE_BADGE, 
+        ribbon: HERALDIC_SVGS.ORDER_OF_COURAGE_RIBBON, 
+        established: "Государственная награда РФ",
+        criteria: "Награда за проявленный героизм." 
+      };
     }
 
+    const lower = awardTitle.toLowerCase().trim();
+
+    if (lower.includes('мужеств')) return AWARDS_DATABASE['орден мужества'];
+    if (lower.includes('отваг')) return AWARDS_DATABASE['медаль «за отвагу»'];
+    if (lower.includes('суворов')) return AWARDS_DATABASE['медаль суворова'];
+    if (lower.includes('храброст')) return AWARDS_DATABASE['медаль «за храбрость»'];
+    if (lower.includes('ветеран')) return AWARDS_DATABASE['ветеран боевых действий'];
+
+    // Fallback: возвращает качественную универсальную медаль
     return {
       name: awardTitle,
-      badge: HERALDIC_SVGS.ORDER_OF_COURAGE_BADGE,
+      badge: HERALDIC_SVGS.GENERIC_STATE_MEDAL,
       ribbon: HERALDIC_SVGS.ORDER_OF_COURAGE_RIBBON,
       established: "Государственная награда РФ",
-      criteria: "Награда Российской Федерации за проявленный героизм и самоотверженность."
+      criteria: "Награда Российской Федерации за проявленный героизм, стойкость и самоотверженность."
     };
   },
 
   /**
-   * 5. ГЕНЕРАТОР ГЕРБОВЫХ ВЕКТОРНЫХ АВАТАРОВ (SVG)
+   * 5. СМАРАТ-ПЕРЕХВАТ ОШИБОК ЗАГРУЗКИ КАРТИНОК (IMAGE FALLBACK)
+   */
+  attachSmartImageFallback(imgElement, hero) {
+    if (!imgElement) return;
+
+    imgElement.onerror = () => {
+      imgElement.onerror = null; // Предотвращает бесконечный цикл
+      imgElement.src = this.generateFallbackAvatar(hero || { name: "Герой СРМК" });
+    };
+  },
+
+  /**
+   * 6. ГЕНЕРАТОР ГЕРБОВЫХ ВЕКТОРНЫХ АВАТАРОВ (SVG)
    */
   generateFallbackAvatar(hero) {
-    const parts = (hero.name || "Герой СРМК").split(' ');
+    const parts = (hero?.name || "Герой СРМК").split(' ');
     const initials = ((parts[0] ? parts[0][0] : '') + (parts[1] ? parts[1][0] : '')).toUpperCase();
-    const specialtyName = hero.education?.specialty || hero.specialty || "Выпускник колледжа";
-    const yearsText = hero.dates?.years || hero.years || "Навечно в строю";
+    const specialtyName = hero?.education?.specialty || hero?.specialty || "Выпускник колледжа";
+    const yearsText = hero?.dates?.years || hero?.years || "Навечно в строю";
 
     const svg = `
       <svg xmlns="http://www.w3.org/2000/svg" width="400" height="500" viewBox="0 0 400 500">
@@ -339,6 +387,7 @@ const ArchiveService = {
         <rect width="400" height="500" fill="url(#bgGrad)"/>
         <rect x="14" y="14" width="372" height="472" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" stroke-opacity="0.3" rx="4"/>
 
+        <!-- Центральный орденский медальон -->
         <g transform="translate(200, 175)">
           <circle r="80" fill="#0f1218" stroke="url(#goldGrad)" stroke-width="2"/>
           <path d="M-46 -46 L46 46 M-46 46 L46 -46" stroke="#8a1c22" stroke-width="12" stroke-linecap="round"/>
@@ -346,6 +395,7 @@ const ArchiveService = {
           <text y="9" text-anchor="middle" fill="#ffffff" font-family="'Cinzel', Georgia, serif" font-weight="900" font-size="26" letter-spacing="2">${initials}</text>
         </g>
 
+        <!-- Георгиевская лента -->
         <g transform="translate(45, 295)">
           <rect width="310" height="8" fill="#f97316"/>
           <rect x="62" width="31" height="8" fill="#111111"/>
@@ -353,6 +403,7 @@ const ArchiveService = {
           <rect x="248" width="31" height="8" fill="#111111"/>
         </g>
 
+        <!-- Типографика -->
         <text x="200" y="340" text-anchor="middle" fill="#c5a059" font-family="'Montserrat', sans-serif" font-weight="700" font-size="14" letter-spacing="1">ГБПОУ СРМК</text>
         <text x="200" y="365" text-anchor="middle" fill="#9da6b3" font-family="'Montserrat', sans-serif" font-size="11">${specialtyName.length > 34 ? specialtyName.substring(0, 31) + '...' : specialtyName}</text>
         <text x="200" y="388" text-anchor="middle" fill="#606875" font-family="'Montserrat', sans-serif" font-size="11.5">${yearsText}</text>
