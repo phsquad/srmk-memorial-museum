@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>Виртуальный музей ГБПОУ СРМК | «Быть воином — жить вечно»</title>
-  <meta name="description" content="Интерактивный цифровой мемориал памяти 20 выпускников ГБПОУ СРМК, павших при защите Отечества. Всероссийская акция «Карта доблести: хранители подвигов».">
+  <meta name="description" content="Интерактивный цифровой мемориальный комплекс памяти 20 выпускников ГБПОУ СРМК, совершивших бессмертный подвиг при защите Отечества. Всероссийская акция «Карта доблести: хранители подвигов».">
   <meta name="theme-color" content="#0a0c0f">
 
-  <!-- УМНЫЙ ШЛЮЗ АВТООПРЕДЕЛЕНИЯ УСТРОЙСТВА -->
+  <!-- УМНЫЙ ШЛЮЗ АВТООПРЕДЕЛЕНИЯ УСТРОЙСТВА (SMART REDIRECT) -->
   <script>
     (function() {
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
@@ -17,26 +17,28 @@
     })();
   </script>
 
-  <!-- Open Graph -->
+  <!-- Open Graph & Социальные мета-теги -->
   <meta property="og:type" content="website">
   <meta property="og:locale" content="ru_RU">
   <meta property="og:title" content="Виртуальный музей ГБПОУ СРМК: «Быть воином — жить вечно»">
-  <meta property="og:description" content="Мемориальная экспозиция и оцифрованные архивы 20 выпускников Ставропольского регионального многопрофильного колледжа.">
+  <meta property="og:description" content="Мемориальная экспозиция, оцифрованные архивы и интерактивная карта боевого пути 20 героев-выпускников Ставропольского регионального многопрофильного колледжа.">
   <meta property="og:image" content="assets/images/cover-master.jpg">
 
-  <!-- Шрифты -->
+  <!-- Шрифтовые гарнитуры -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 
-  <!-- Стили -->
+  <!-- Стили экспозиции -->
   <link rel="stylesheet" href="css/site-common.css">
   <link rel="stylesheet" href="css/header-common.css">
   <link rel="stylesheet" href="css/desktop.css">
 </head>
 <body class="dark-theme">
 
-  <!-- 1. ПАНЕЛЬ ДОСТУПНОСТИ И СТАТУСА (ГОСТ РФ) -->
+  <!-- ==========================================================================
+       1. ПАНЕЛЬ ДОСТУПНОСТИ И ГОСУДАРСТВЕННОГО СТАТУСА (ГОСТ РФ)
+       ========================================================================== -->
   <aside class="accessibility-bar" aria-label="Панель специальных возможностей">
     <div class="container accessibility-container">
       <div class="access-controls">
@@ -45,12 +47,14 @@
       </div>
       <div class="access-meta">
         <span class="pulse-indicator" aria-hidden="true"></span>
-        <span>Федеральный проект «Карта доблести: хранители подвигов»</span>
+        <span>Федеральный проект «Карта доблести: хранители подвигов» • Номинация «За партой героя»</span>
       </div>
     </div>
   </aside>
 
-  <!-- 2. ЕДИНАЯ НАВИГАЦИОННАЯ ШАПКА -->
+  <!-- ==========================================================================
+       2. ЕДИНАЯ НАВИГАЦИОННАЯ ШАПКА САЙТА (64px)
+       ========================================================================== -->
   <header class="site-header" id="siteHeader">
     <div class="container header-container">
       
@@ -64,7 +68,7 @@
       </a>
 
       <!-- ОСНОВНАЯ НАВИГАЦИЯ ПО 4 ЗАЛАМ ЭКСПОЗИЦИИ -->
-      <nav class="main-nav" id="desktopNav" aria-label="Навигация по залам">
+      <nav class="main-nav" id="desktopNav" aria-label="Навигация по залам музея">
         <a href="#memorial" class="nav-link active">Мемориал</a>
         <a href="#heroes-grid" class="nav-link">За партой Героя</a>
         <a href="#battle-path" class="nav-link">Хроника и Карта</a>
@@ -73,6 +77,7 @@
 
       <!-- ПАНЕЛЬ ДЕЙСТВИЙ И ЦИФРОВЫХ МОДУЛЕЙ -->
       <div class="header-actions">
+        
         <!-- ВЫПАДАЮЩЕЕ МЕНЮ ЦИФРОВЫХ МОДУЛЕЙ -->
         <div class="modules-dropdown" id="modulesDropdown">
           <button class="btn-dropdown-toggle" id="btnDropdownToggle" type="button" aria-expanded="false" aria-controls="dropdownMenu">
@@ -111,12 +116,12 @@
           </div>
         </div>
 
-        <!-- КНОПКА СЕРТИФИКАТА -->
+        <!-- КНОПКА ГЕНЕРАЦИИ СЕРТИФИКАТА -->
         <a href="certificate.html" class="btn-header-cert" title="Оформить наградной лист">
           <span>📜</span> Сертификат
         </a>
 
-        <!-- ПАСПОРТ И КАРТА ДОБЛЕСТИ -->
+        <!-- ПАСПОРТ ПРОЕКТА И ВНЕШНЯЯ КАРТА ДОБЛЕСТИ -->
         <button class="passport-btn" id="btnOpenPassport" type="button">Паспорт проекта</button>
         <a href="https://карта-доблести.рф" target="_blank" rel="noopener noreferrer" class="contest-badge">Карта Доблести РФ</a>
 
@@ -127,7 +132,7 @@
       </div>
     </div>
 
-    <!-- ВЫДВИЖНАЯ МОБИЛЬНАЯ ПАНЕЛЬ МЕНЮ -->
+    <!-- ВЫДВИЖНАЯ МОБИЛЬНАЯ ПАНЕЛЬ МЕНЮ (DRAWER) -->
     <div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
       <div class="drawer-content">
         <div class="drawer-section-label">Залы экспозиции</div>
@@ -156,7 +161,9 @@
 
   <main id="mainContent">
 
-    <!-- ГЛАВНЫЙ ЭКРАН (HERO) -->
+    <!-- ==========================================================================
+         3. ГЛАВНЫЙ ЭКРАН (HERO SECTION)
+         ========================================================================== -->
     <section class="hero-section" id="heroIntro">
       <div class="container hero-content">
         <div class="hero-badge">Цифровой мемориально-образовательный комплекс</div>
@@ -168,7 +175,8 @@
           Интерактивная мемориальная экспозиция памяти 20 выпускников Ставропольского регионального многопрофильного колледжа, совершивших бессмертный ратный подвиг при защите Отечества.
         </p>
         
-        <div class="hero-stats" role="region" aria-label="Фонд экспозиции">
+        <!-- СТАТИСТИКА ФОНДА В РЕАЛЬНОМ ВРЕМЕНИ -->
+        <div class="hero-stats" role="region" aria-label="Мемориальные счетчики памяти">
           <div class="stat-card">
             <span class="stat-number">20</span>
             <span class="stat-label">Героев на Мемориале</span>
@@ -185,14 +193,16 @@
 
         <div class="hero-actions">
           <a href="#memorial" class="btn btn-primary">К Мемориалу Памяти</a>
-          <button class="btn btn-secondary" id="btnOpenGeneralTour" type="button">Аудиоэкскурсия музея</button>
-          <button class="btn btn-secondary" onclick="App.startPresentationMode()" type="button">Режим «Урок Мужества»</button>
-          <a href="certificate.html" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📜 Оформить Сертификат участника</a>
+          <button class="btn btn-secondary" id="btnOpenGeneralTour" type="button">🎧 Аудиоэкскурсия музея</button>
+          <button class="btn btn-secondary" onclick="App.startPresentationMode()" type="button">⚡ Режим «Урок Мужества»</button>
+          <a href="certificate.html" class="btn btn-secondary">📜 Оформить Сертификат участника</a>
         </div>
       </div>
     </section>
 
-    <!-- ЗАЛ I: ИНТЕРАКТИВНЫЙ МЕМОРИАЛ «ЗВЕЗДА ПАМЯТИ» -->
+    <!-- ==========================================================================
+         4. ЗАЛ I: ИНТЕРАКТИВНЫЙ МЕМОРИАЛ «ЗВЕЗДА ПАМЯТИ»
+         ========================================================================== -->
     <section id="memorial" class="section memorial-section">
       <div class="container">
         
@@ -203,10 +213,10 @@
         </div>
 
         <div class="section-header">
-          <div class="hall-tag">Зал I музея</div>
+          <span class="hall-tag">Зал I музея</span>
           <h2 class="section-title">Мемориал Славы «Звезда Памяти»</h2>
           <p class="section-desc">
-            Интерактивная 2.5D-витрина монумента во дворе колледжа. Выберите имя на гранитной плите для открытия персонального архивного досье и аудиогида.
+            Интерактивная 2.5D-витрина архитектурного монумента во дворе колледжа. Выберите имя на гранитной плите для открытия персонального архивного досье и аудиогида.
           </p>
 
           <div class="plaque-view-toggle" role="group" aria-label="Выбор мемориальной плиты">
@@ -220,11 +230,13 @@
           <div class="memorial-stand-canvas" id="memorialStand">
             <img src="assets/images/memorial-bg.jpg" alt="Памятник выпускникам СРМК" class="memorial-bg-img" onerror="this.src='assets/images/cover-master.jpg'">
 
+            <!-- Левая гранитная плита -->
             <div class="plaque-interactive-zone left-zone" id="leftPlaqueZone">
               <div class="plaque-title">Левая плита мемориала</div>
               <div class="names-list" id="leftPlaqueNames" role="list"></div>
             </div>
 
+            <!-- Правая гранитная плита -->
             <div class="plaque-interactive-zone right-zone" id="rightPlaqueZone">
               <div class="plaque-title">Правая плита мемориала</div>
               <div class="names-list" id="rightPlaqueNames" role="list"></div>
@@ -234,22 +246,26 @@
       </div>
     </section>
 
-    <!-- ЗАЛ II: СТУДЕНЧЕСКАЯ ЮНОСТЬ («ЗА ПАРТОЙ ГЕРОЯ») -->
+    <!-- ==========================================================================
+         5. ЗАЛ II: СТУДЕНЧЕСКАЯ ЮНОСТЬ («ЗА ПАРТОЙ ГЕРОЯ»)
+         ========================================================================== -->
     <section id="heroes-grid" class="section heroes-section">
       <div class="container">
         <div class="section-header">
-          <div class="hall-tag">Зал II музея</div>
+          <span class="hall-tag">Зал II музея</span>
           <h2 class="section-title">За партой Героя</h2>
           <p class="section-desc">
             Студенческие годы защитников Отечества: учебные мастерские, зачетные книжки, фотографии из аудиторий и воспоминания наставников.
           </p>
           
+          <!-- Поисковая панель -->
           <div class="search-wrapper">
             <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <input type="text" id="heroSearchInput" class="search-input" placeholder="Поиск по фамилии, специальности, части или награде..." autocomplete="off">
-            <button class="search-clear-btn" id="searchClearBtn" type="button" style="display:none;">&times;</button>
+            <button class="search-clear-btn" id="searchClearBtn" type="button" style="display:none;" aria-label="Очистить поиск">&times;</button>
           </div>
 
+          <!-- Смарт-чипы быстрого отбора -->
           <div class="smart-chips-bar" role="group" aria-label="Быстрый фильтр">
             <span class="chip-label">Быстрый отбор:</span>
             <button class="chip-btn" data-query="Орден Мужества" type="button">Орден Мужества</button>
@@ -259,25 +275,29 @@
             <button class="chip-btn" data-query="отличием" type="button">Красный диплом</button>
           </div>
 
+          <!-- Таксономия специальностей -->
           <div class="specialty-filters-bar" id="specialtyFiltersContainer"></div>
         </div>
 
+        <!-- Сетка карточек 20 героев -->
         <div class="heroes-grid" id="heroesCardsContainer"></div>
       </div>
     </section>
 
-    <!-- ЗАЛ III: ХРОНИКА ПОДВИГА И КАРТА -->
+    <!-- ==========================================================================
+         6. ЗАЛ III: ХРОНИКА ПОДВИГА И КАРТА БОЕВОЙ СЛАВЫ
+         ========================================================================== -->
     <section id="battle-path" class="section battle-section">
       <div class="container">
         <div class="section-header">
-          <div class="hall-tag">Зал III музея</div>
+          <span class="hall-tag">Зал III музея</span>
           <h2 class="section-title">Хроника ратного подвига и География боев</h2>
           <p class="section-desc">
             Интерактивная топография доблести: от аудиторий и мастерских колледжа в Ставрополе до рубежей защиты суверенитета Отечества.
           </p>
         </div>
 
-        <div class="theatre-nav-bar" role="group" aria-label="Фильтр рубежей">
+        <div class="theatre-nav-bar" role="group" aria-label="Фильтр секторов ТВД">
           <button class="theatre-btn active" data-theatre="all" type="button">Все рубежи (20 героев)</button>
           <button class="theatre-btn" data-theatre="dnieper" type="button">Днепровский плацдарм (5)</button>
           <button class="theatre-btn" data-theatre="zaporozhye" type="button">Запорожский щит (4)</button>
@@ -286,6 +306,7 @@
         </div>
 
         <div class="battle-timeline-grid">
+          <!-- Рубеж I: Днепр -->
           <article class="timeline-theatre-card" data-theatre-card="dnieper">
             <div class="theatre-card-header">
               <span class="theatre-badge">Рубеж I • 2022–2024</span>
@@ -305,6 +326,7 @@
             <button class="theatre-map-focus-btn" onclick="App.focusMap([46.6, 32.7], 8)" type="button">Показать сектор на карте →</button>
           </article>
 
+          <!-- Рубеж II: Запорожье -->
           <article class="timeline-theatre-card" data-theatre-card="zaporozhye">
             <div class="theatre-card-header">
               <span class="theatre-badge">Рубеж II • 2022–2024</span>
@@ -323,6 +345,7 @@
             <button class="theatre-map-focus-btn" onclick="App.focusMap([47.45, 35.8], 8)" type="button">Показать сектор на карте →</button>
           </article>
 
+          <!-- Рубеж III: Донбасс -->
           <article class="timeline-theatre-card" data-theatre-card="donbass">
             <div class="theatre-card-header">
               <span class="theatre-badge">Рубеж III • 2022–2024</span>
@@ -347,6 +370,7 @@
             <button class="theatre-map-focus-btn" onclick="App.focusMap([48.1, 37.7], 8)" type="button">Показать сектор на карте →</button>
           </article>
 
+          <!-- Рубеж IV: Курск -->
           <article class="timeline-theatre-card" data-theatre-card="kursk">
             <div class="theatre-card-header">
               <span class="theatre-badge">Рубеж IV • Август 2024</span>
@@ -363,7 +387,7 @@
           </article>
         </div>
 
-        <!-- Интерактивная карта Яндекс -->
+        <!-- Интерактивная карта Яндекс (API v2.1) -->
         <div class="map-section-wrapper">
           <div class="map-header-bar">
             <div class="map-title-group">
@@ -380,11 +404,13 @@
       </div>
     </section>
 
-    <!-- ЗАЛ IV: ЭСТАФЕТА МУЖЕСТВА -->
+    <!-- ==========================================================================
+         7. ЗАЛ IV: ЭСТАФЕТА МУЖЕСТВА И ЖИВАЯ ПАМЯТЬ
+         ========================================================================== -->
     <section id="memory-hall" class="section memory-section">
       <div class="container">
         <div class="section-header">
-          <div class="hall-tag">Зал IV музея</div>
+          <span class="hall-tag">Зал IV музея</span>
           <h2 class="section-title">Эстафета мужества: Память в сердцах</h2>
           <p class="section-desc">
             Как колледж хранит память о выпускниках-героях: именные парты, исследовательские проекты и музейные уроки мужества.
@@ -426,7 +452,9 @@
     </section>
   </main>
 
-  <!-- МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ -->
+  <!-- ==========================================================================
+       8. МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ
+       ========================================================================== -->
   <div class="modal" id="heroModal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-overlay" id="modalOverlay"></div>
     <div class="modal-dialog">
@@ -435,27 +463,9 @@
     </div>
   </div>
 
-  <!-- МОДАЛЬНОЕ ОКНО ПАСПОРТА МУЗЕЯ -->
-  <div class="modal" id="passportModal" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal-overlay" id="passportModalOverlay"></div>
-    <div class="modal-dialog" style="max-width: 760px;">
-      <button class="modal-close" id="passportModalCloseBtn" type="button" aria-label="Закрыть">&times;</button>
-      <div class="modal-body">
-        <h2 style="font-family: var(--font-serif); color: var(--accent-brass); margin-bottom: 16px;">Паспорт виртуального музея</h2>
-        <table style="width:100%; border-collapse: collapse; font-size: 0.88rem; color: #d8deea;">
-          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass); width: 35%;">Проект:</td><td style="padding: 10px 8px;">«Быть воином — жить вечно»</td></tr>
-          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Организация:</td><td style="padding: 10px 8px;">ГБПОУ «Ставропольский региональный многопрофильный колледж»</td></tr>
-          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Номинация:</td><td style="padding: 10px 8px;">«За партой героя» (Всероссийская акция «Карта доблести»)</td></tr>
-          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Руководитель:</td><td style="padding: 10px 8px;">Е. В. Бледных, директор ГБПОУ СРМК, канд. ист. наук</td></tr>
-          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Куратор:</td><td style="padding: 10px 8px;">А. В. Генте, преподаватель истории высшей кат.</td></tr>
-          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Разработчик:</td><td style="padding: 10px 8px;">А. И. Андреев, студент 2 курса «ИСиП»</td></tr>
-          <tr><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Фонд памяти:</td><td style="padding: 10px 8px;">20 выпускников колледжа, увековеченных на Мемориале Славы</td></tr>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- СТИКИ-АУДИОПЛЕЕР -->
+  <!-- ==========================================================================
+       9. СТИКИ-АУДИОПЛЕЕР ЭКСКУРСИИ
+       ========================================================================== -->
   <div class="audio-bar" id="audioPlayerBar" role="region" aria-label="Аудиоплеер">
     <div class="container audio-bar-inner">
       <div class="audio-info">
@@ -479,7 +489,9 @@
     </div>
   </div>
 
-  <!-- ПОДВАЛ -->
+  <!-- ==========================================================================
+       10. ПОДВАЛ (FOOTER)
+       ========================================================================== -->
   <footer class="footer">
     <div class="container footer-container">
       <div class="footer-col">
@@ -511,24 +523,38 @@
     </div>
   </footer>
 
-  <!-- ПОДКЛЮЧЕНИЕ СКРИПТОВ -->
+  <div id="memorialToast" class="memorial-toast"></div>
+
+  <!-- ==========================================================================
+       11. ПОДКЛЮЧЕНИЕ СКРИПТОВ (КАНОНИЧЕСКАЯ ИЕРАРХИЯ)
+       ========================================================================== -->
+  <!-- 1. Внешние SDK и API -->
   <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <!-- 2. База данных и первоисточники -->
   <script src="js/data.js"></script>
   <script src="js/sources.js"></script>
+
+  <!-- 3. Облачная синхронизация, защита и синтез речи -->
   <script src="js/cloud-sync.js"></script>
   <script src="js/tts-narrator.js"></script>
   <script src="js/anti-cheat-tribute.js"></script>
   <script src="js/heraldry-resolver.js"></script>
   <script src="js/tech-modules.js"></script>
+
+  <!-- 4. Главные контроллеры экспозиции и админка -->
   <script src="js/app.js"></script>
   <script src="js/admin.js"></script>
-  <!-- ЕДИНЫЙ НАВИГАЦИОННЫЙ ДИСПЕТЧЕР -->
+
+  <!-- 5. Единый навигационный диспетчер (управляет шапкой, дропдауном и паспортом) -->
   <script src="js/navigation.js"></script>
 
-  <!-- Интерактивные триггеры страницы -->
+  <!-- 6. Локальные триггеры страницы -->
   <script>
-    // Смарт-чипы поиска
+    'use strict';
+
+    // Смарт-чипы быстрого поиска
     document.querySelectorAll('.chip-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const query = btn.dataset.query;
@@ -541,7 +567,7 @@
       });
     });
 
-    // Очистка поиска
+    // Очистка строки поиска
     const searchInput = document.getElementById('heroSearchInput');
     const searchClearBtn = document.getElementById('searchClearBtn');
     if (searchInput && searchClearBtn) {
@@ -555,7 +581,29 @@
       });
     }
 
-    // Доступность (ГОСТ)
+    // Переключение плит мемориала (Все / Левая / Правая)
+    document.querySelectorAll('.plaque-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.plaque-toggle-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const view = btn.dataset.plaqueView;
+        const leftZone = document.getElementById('leftPlaqueZone');
+        const rightZone = document.getElementById('rightPlaqueZone');
+
+        if (view === 'left') {
+          if (leftZone) leftZone.style.display = 'flex';
+          if (rightZone) rightZone.style.display = 'none';
+        } else if (view === 'right') {
+          if (leftZone) leftZone.style.display = 'none';
+          if (rightZone) rightZone.style.display = 'flex';
+        } else {
+          if (leftZone) leftZone.style.display = 'flex';
+          if (rightZone) rightZone.style.display = 'flex';
+        }
+      });
+    });
+
+    // Режимы доступности по ГОСТ РФ
     const contrastBtn = document.getElementById('toggleContrastBtn');
     if (contrastBtn) {
       contrastBtn.addEventListener('click', () => {
