@@ -1,1 +1,52 @@
-(js/admin.js, js/app.js, js/cloud-sync.js, js/guestbook.js, js/heraldry-resolver.js, js/sources.js, js/tech-modules.js)
+```
+# Build artifacts
+dist/
+build/
+*.js.map
+
+# Dependencies
+node_modules/
+
+# Logs and temp files
+*.log
+*.tmp
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Distribution / packaging
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
+```

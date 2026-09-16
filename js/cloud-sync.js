@@ -6,6 +6,9 @@
 
 'use strict';
 
+// Импорт конфигурации из core.js для устранения дублирования
+import { CONFIG as CoreConfig } from './core.js';
+
 // ES6 экспорт для импорта в другие модули
 export const CloudConfig = {
   // Реальные ключи проекта Supabase.

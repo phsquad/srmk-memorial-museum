@@ -33,6 +33,7 @@ export default defineConfig({
         // Разделение чанков по типам
         manualChunks: {
           vendor: ['@supabase/supabase-js'],
+          core: ['./js/core.js'], // Общие утилиты в отдельный чанк
           data: ['./js/data.js'],
           app: ['./js/app.js'],
           admin: ['./js/admin.js'],
