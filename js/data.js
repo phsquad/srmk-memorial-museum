@@ -141,7 +141,7 @@ const MEMORY_BOOK_PROLOGUE = {
 `,
   pages: [{
     spreadNum: "Разворот I (Стр. 1–2)",
-    leftHtml: `<div class="page-header-meta"><span>ПРОЛОГ</span><span>26 СЕНТЯБРЯ 2025</span></div><div class="page-visual-frame"><img src="assets/images/cover-master.jpg" alt="Мемориал Славы СРМК"></div><div class="page-quote-box">«Память о человеке продолжается в его делах.»</div><div class="page-number-footer">Стр. 1</div>`,
+    leftHtml: `<div class="page-header-meta"><span>ПРОЛОГ</span><span>26 СЕНТЯБРЯ 2025</span></div><div class="page-visual-frame"><img src="assets/images/cover-master.webp" alt="Мемориал Славы СРМК" loading="lazy"></div><div class="page-quote-box">«Память о человеке продолжается в его делах.»</div><div class="page-number-footer">Стр. 1</div>`,
     rightHtml: `<div class="page-header-meta"><span>ВВОДНАЯ ГЛАВА</span><span>ЦЕРЕМОНИЯ ОТКРЫТИЯ</span></div><h3 class="page-chapter-title">Исторический акт открытия</h3><div class="page-story-text"><span class="drop-cap">2</span>6 сентября 2025 года во дворе СРМК состоялось торжественное открытие архитектурного монумента выпускникам колледжа, погибшим при исполнении воинского долга. Право открыть памятник было предоставлено студентам, чьи отцы выполняют задачи в зоне СВО.</div><div class="page-number-footer">Стр. 2</div>`
   }]
 };

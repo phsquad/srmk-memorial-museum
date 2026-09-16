@@ -699,7 +699,7 @@ const MemoryBookApp = {
 
         <div class="chapter-hero-header">
           <div class="chapter-photo-wrap">
-            <img src="${hero.photo}" alt="${hero.name}" class="chapter-photo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'140\\' height=\\'185\\'%3E%3Crect width=\\'140\\' height=\\'185\\' fill=\\'%2312151d\\'/ %3E%3Ctext x=\\'50%25\\' y=\\'50%25\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' fill=\\'%23c5a059\\' font-size=\\'12\\'%3EСРМК%3C/text%3E%3C/svg%3E'">
+            <img src="${hero.photo}" alt="${hero.name}" class="chapter-photo" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'140\\' height=\\'185\\'%3E%3Crect width=\\'140\\' height=\\'185\\' fill=\\'%2312151d\\'/ %3E%3Ctext x=\\'50%25\\' y=\\'50%25\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' fill=\\'%23c5a059\\' font-size=\\'12\\'%3EСРМК%3C/text%3E%3C/svg%3E'">
           </div>
 
           <div class="chapter-hero-titles">

@@ -1,4 +1,1 @@
-# Image files are source assets, not build artifacts
-# No build artifacts, dependencies, or temp files detected in changes
-# Only source/config files were modified (HTML, JS) along with image assets
-# Following rule 6: output empty since only source files and images present
+(js/app.js, js/data.js, js/desk-qr.js, js/grand-memory-book-part-1.js, js/grand-memory-book-part-2.js, js/grand-memory-book-part-3.js, js/memory-book.js, js/reader.js)

@@ -338,7 +338,7 @@ const App = {
               : null;
             const medalImg = awardVisual?.badge || this._getDefaultMedalIcon();
             const medalTitle = this.escapeHtml(awardTitle);
-            return `<span class="medal-icon" title="${medalTitle}"><img src="${medalImg}" alt="${medalTitle}" onerror="this.style.display='none'"></span>`;
+            return `<span class="medal-icon" title="${medalTitle}"><img src="${medalImg}" alt="${medalTitle}" loading="lazy" onerror="this.style.display='none'"></span>`;
           }).join('')}
           ${hero.awards.length > 4 ? `<span class="medal-more" title="Ещё ${hero.awards.length - 4} наград">+${hero.awards.length - 4}</span>` : ''}
         </div>`;
@@ -410,7 +410,7 @@ const App = {
       const awardElements = await Promise.all(hero.awards.map(async (awardTitle) => {
         if (typeof HeraldryResolver !== 'undefined') {
           const awardData = await HeraldryResolver.resolveAwardImages(awardTitle);
-          const badgeHtml = awardData.badgeUrl ? `<img src="${awardData.badgeUrl}" alt="${this.escapeHtml(awardData.name)}" class="award-badge-hero" title="${awardData.established ? `Учреждена: ${awardData.established}` : ''}">` : '';
+          const badgeHtml = awardData.badgeUrl ? `<img src="${awardData.badgeUrl}" alt="${this.escapeHtml(awardData.name)}" class="award-badge-hero" loading="lazy" title="${awardData.established ? `Учреждена: ${awardData.established}` : ''}">` : '';
           return {
             name: awardData.name,
             badge: badgeHtml,
@@ -418,7 +418,7 @@ const App = {
           };
         } else if (typeof ArchiveService !== 'undefined') {
           const visual = ArchiveService.getAwardVisual(awardTitle);
-          const badgeHtml = visual.badge ? `<img src="${visual.badge}" alt="${this.escapeHtml(visual.name)}" class="award-badge-hero">` : '';
+          const badgeHtml = visual.badge ? `<img src="${visual.badge}" alt="${this.escapeHtml(visual.name)}" class="award-badge-hero" loading="lazy">` : '';
           return {
             name: visual.name,
             badge: badgeHtml,
@@ -457,7 +457,7 @@ const App = {
       <div class="dossier-layout">
         <div class="dossier-sidebar">
           <div class="dossier-gallery-main">
-            <img src="${mainPhoto}" alt="${this.escapeHtml(hero.name)}" id="dossierMainImage" class="dossier-img" onerror="this.src='${FALLBACK_HERO_AVATAR}'">
+            <img src="${mainPhoto}" alt="${this.escapeHtml(hero.name)}" id="dossierMainImage" class="dossier-img" loading="lazy" onerror="this.src='${FALLBACK_HERO_AVATAR}'">
             <div class="dossier-gallery-caption" id="dossierImageCaption">
               <strong>${this.escapeHtml(galleryItems[0].caption || '')}</strong>
               ${galleryItems[0].desc ? `<br><small style="opacity:0.8;">${this.escapeHtml(galleryItems[0].desc)}</small>` : ''}
@@ -473,7 +473,7 @@ const App = {
                         onclick="App.switchGalleryPhoto('${item.url}', '${item.caption.replace(/'/g, "\\'")}', '${(item.desc || '').replace(/'/g, "\\'")}', this)" 
                         type="button" 
                         title="${this.escapeHtml(item.caption)}">
-                  <img src="${item.url}" alt="" onerror="this.src='${FALLBACK_HERO_AVATAR}'">
+                  <img src="${item.url}" alt="" loading="lazy" onerror="this.src='${FALLBACK_HERO_AVATAR}'">
                 </button>
               `).join('')}
             </div>
@@ -508,7 +508,7 @@ const App = {
           </div>
 
           <div class="dossier-qr-box">
-            <img src="${qrUrl}" alt="QR" class="dossier-qr-img">
+            <img src="${qrUrl}" alt="QR" class="dossier-qr-img" loading="lazy">
             <span class="dossier-qr-label">QR для «Парты Героя»</span>
           </div>
         </div>

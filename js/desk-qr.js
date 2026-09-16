@@ -164,10 +164,10 @@ const DeskQREngine = {
         <!-- Левая колонка: Фото + QR -->
         <div class="plaque-left-col">
           <div class="plaque-photo-frame">
-            <img src="${photoSrc}" alt="${hero.name}" onerror="this.src='assets/images/memorial-bg.jpg'">
+            <img src="${photoSrc}" alt="${hero.name}" loading="lazy" onerror="this.src='assets/images/memorial-bg.jpg'">
           </div>
           <div class="plaque-qr-box">
-            <img src="${qrApiUrl}" alt="QR" class="plaque-qr-img">
+            <img src="${qrApiUrl}" alt="QR" class="plaque-qr-img" loading="lazy">
             <div class="plaque-qr-text">
               Наведите камеру<br>для перехода<br>в цифровой музей
             </div>
