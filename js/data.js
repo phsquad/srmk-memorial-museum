@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * ЦЕНТРАЛЬНЫЙ РЕЕСТР ДАННЫХ: js/data.js (v12.0 Ultra Enterprise Edition)
+ * ЦЕНТРАЛЬНЫЙ РЕЕСТР ДАННЫХ: js/data.js (v13.0 Master)
  * Мемориально-образовательный комплекс ГБПОУ СРМК «Быть воином — жить вечно»
  * ============================================================================
  */
@@ -16,7 +16,7 @@ const MUSEUM_CONFIG = {
   coords: [45.0448, 41.9691],
   projectTitle: "Быть воином — жить вечно",
   nomination: "За партой героя",
-  coverImage: "assets/images/cover-master.jpg", // 🔥 Интеграция магистральной обложки
+  coverImage: "assets/images/cover-master.jpg",
   totalHeroesCount: 20
 };
 
@@ -33,7 +33,7 @@ const SPECIALTIES_TAXONOMY = {
 };
 
 /**
- * ПРОЛОГ КНИГИ ПАМЯТИ: СЦЕНАРИЙ ОТКРЫТИЯ МОНУМЕНТА (26 сентября 2025 г.)
+ * КАНОНИЧЕСКИЙ ПРОЛОГ КНИГИ ПАМЯТИ: СЦЕНАРИЙ ОТКРЫТИЯ МОНУМЕНТА (26 сентября 2025 г.)
  */
 const MEMORY_BOOK_PROLOGUE = {
   id: "prologue-memorial-opening",
@@ -46,7 +46,7 @@ const MEMORY_BOOK_PROLOGUE = {
   military: "20 павших героев СВО • Выпускники ГБПОУ СРМК",
   awards: "Ордена Мужества, Медали «За отвагу», Медали Суворова",
   location: "Двор ГБПОУ СРМК (г. Ставрополь, пр. Юности, 3)",
-  photo: "assets/images/cover-master.jpg", // 🔥 Обновлено на магистральную обложку
+  photo: "assets/images/cover-master.jpg",
   audioFile: "assets/audio/guides/general-tour.mp3",
   shortSnippet: "Официальный акт открытия архитектурного монумента выпускникам СРМК, погибшим в ходе специальной военной операции.",
   markdown: `
@@ -140,9 +140,26 @@ const MEMORY_BOOK_PROLOGUE = {
 *(Объявляется Минута молчания под метроном)*
 `,
   pages: [{
-    spreadNum: "Разворот I (Стр. 1–2)",
-    leftHtml: `<div class="page-header-meta"><span>ПРОЛОГ</span><span>26 СЕНТЯБРЯ 2025</span></div><div class="page-visual-frame"><img src="assets/images/cover-master.jpg" alt="Мемориал Славы СРМК"></div><div class="page-quote-box">«Память о человеке продолжается в его делах.»</div><div class="page-number-footer">Стр. 1</div>`,
-    rightHtml: `<div class="page-header-meta"><span>ВВОДНАЯ ГЛАВА</span><span>ЦЕРЕМОНИЯ ОТКРЫТИЯ</span></div><h3 class="page-chapter-title">Исторический акт открытия</h3><div class="page-story-text"><span class="drop-cap">2</span>6 сентября 2025 года во дворе СРМК состоялось торжественное открытие архитектурного монумента выпускникам колледжа, погибшим при исполнении воинского долга. Право открыть памятник было предоставлено студентам, чьи отцы выполняют задачи в зоне СВО.</div><div class="page-number-footer">Стр. 2</div>`
+    spreadNum: "Титульный разворот (Стр. 1–2)",
+    chapterTitle: "Открытие Мемориала Славы СРМК",
+    leftHtml: `
+      <div class="page-header-meta"><span>ПРОЛОГ</span><span>26 СЕНТЯБРЯ 2025</span></div>
+      <div class="page-visual-frame" style="height: 260px;">
+        <img src="assets/images/cover-master.jpg" alt="Мемориал Славы СРМК" style="object-fit:cover; width:100%; height:100%;">
+      </div>
+      <div class="page-quote-box">«Память о человеке продолжается в его делах.»</div>
+      <div class="page-number-footer">Лицевая страница</div>
+    `,
+    rightHtml: `
+      <div class="page-header-meta"><span>ВВОДНАЯ ГЛАВА</span><span>ЦЕРЕМОНИЯ ОТКРЫТИЯ</span></div>
+      <h3 class="page-chapter-title">Исторический акт открытия</h3>
+      <div class="page-story-text">
+        <span class="drop-cap">2</span>6 сентября 2025 года во дворе СРМК состоялось торжественное открытие архитектурного монумента выпускникам колледжа, погибшим при исполнении воинского долга. Право открыть памятник было предоставлено студентам, чьи отцы выполняют задачи в зоне СВО.
+        <p style="margin-top:12px;">Здесь запечатлены имена 20 героев — кавалеров Орденов Мужества и государственных боевых наград.</p>
+        <p style="margin-top:12px; font-weight:bold; color:#8a1c22;">Они учились здесь. Они шагнули в вечность.</p>
+      </div>
+      <div class="page-number-footer">Стр. 1</div>
+    `
   }]
 };
 
@@ -712,14 +729,13 @@ const heroesDatabase = [
     media: {
       photo: "assets/images/heroes/chupin.jpg",
       audioGuide: "assets/audio/guides/chupin.mp3",
-      documents: ["Студенческая зачетная кничка выпуска 2019 г."]
+      documents: ["Студенческая зачетная книжка выпуска 2019 г."]
     },
     memorialStatus: "Увековечен на правой плите Мемориала Славы СРМК",
     mapCoords: { lat: 48.2500, lng: 37.4000, locationName: "Покровское направление" }
   }
 ];
 
-// УПРАВЛЯЮЩИЙ ОБЪЕКТ
 const MuseumAPI = {
   getAllHeroes: () => heroesDatabase,
   getHeroById: (id) => heroesDatabase.find(h => h.id === id),
@@ -737,5 +753,5 @@ const MuseumAPI = {
 };
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { MUSEUM_CONFIG, SPECIALTIES_TAXONOMY, heroesDatabase, MuseumAPI };
+  module.exports = { MUSEUM_CONFIG, SPECIALTIES_TAXONOMY, MEMORY_BOOK_PROLOGUE, heroesDatabase, MuseumAPI };
 }

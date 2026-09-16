@@ -1,59 +1,11 @@
 /**
  * ============================================================================
- * ДВИЖОК 3D-ЧИТАЛКИ И БИБЛИОТЕКИ ФОЛИАНТОВ: js/reader.js (v13.0 Master)
+ * ДВИЖОК 3D-ЧИТАЛКИ И БИБЛИОТЕКИ ФОЛИАНТОВ: js/reader.js (v14.0 Master)
  * Мемориально-образовательный комплекс ГБПОУ СРМК «Быть воином — жить вечно»
- * 
- * Включает:
- * 1. Процедурный синтезатор шелеста страниц (Web Audio API)
- * 2. Адаптивное чтение без потери страниц на смартфонах и ПК
- * 3. Накатное глубокое связывание (Deep Linking по хэшу URL)
- * 4. Защищенный Fallback-генератор разворотов на лету из heroesDatabase
- * 5. Мультимедийные MP3-плееры, смену тем, свайп-жесты и печать разворота
  * ============================================================================
  */
 
 'use strict';
-
-const FOLIO_LIBRARY = [
-  // Базовая заглушка на случай отсутствия загруженных внешних томов
-  {
-    id: "prologue-memorial-opening",
-    volNum: "ГЛАВНЫЙ ТОМ",
-    chapterNum: "Вводная глава",
-    name: "Открытие Мемориала Славы СРМК",
-    years: "26 сентября 2025 года",
-    specialty: "ГБПОУ «Ставропольский региональный многопрофильный колледж»",
-    military: "Мемориал Славы СРМК",
-    awards: "Ордена Мужества",
-    plaque: "general",
-    photo: "assets/images/cover-master.jpg",
-    audioFile: "assets/audio/guides/general-tour.mp3",
-    pages: [
-      {
-        spreadNum: "Титульный разворот (Стр. 1–2)",
-        chapterTitle: "Быть воином — жить вечно",
-        leftHtml: `
-          <div class="page-header-meta"><span>ГБПОУ СРМК</span><span>ЭЛЕКТРОННАЯ КНИГА ПАМЯТИ</span></div>
-          <div class="page-visual-frame" style="height: 260px;">
-            <img src="assets/images/cover-master.jpg" alt="Обложка Книги Памяти" style="object-fit: cover; width:100%; height:100%;">
-          </div>
-          <div class="page-quote-box">«Память о человеке продолжается в его делах.»</div>
-          <div class="page-number-footer">Лицевая страница</div>
-        `,
-        rightHtml: `
-          <div class="page-header-meta"><span>ПРОЛОГ</span><span>ВСТУПЛЕНИЕ</span></div>
-          <h3 class="page-chapter-title">Быть воином — жить вечно</h3>
-          <div class="page-story-text">
-            <span class="drop-cap">Э</span>та книга — священная летопись подвига 20 выпускников Ставропольского регионального многопрофильного колледжа, отдавших свои жизни за свободу и независимость нашей Родины.
-            <p style="margin-top:12px;">Здесь переплетены мирный созидательный труд в учебных мастерских СРМК и высочайшая воинская доблесть на переднем крае. Каждая страница — свидетельство бессмертия духа нашего студенческого братства.</p>
-            <p style="margin-top:12px; font-weight:bold; color:#8a1c22;">Вечная слава воинам-героям, защитникам Отечества!</p>
-          </div>
-          <div class="page-number-footer">Стр. 1</div>
-        `
-      }
-    ]
-  }
-];
 
 const ReaderEngine = {
   currentBook: null,
@@ -64,29 +16,54 @@ const ReaderEngine = {
 
   init() {
     this.audioEl = document.getElementById('readerAudioElement');
+    this.updateFilterButtonsMeta();
     this.renderShelf();
     this.bindEvents();
 
     // Чтение хэша для прямого открытия книги
-    const linkedHero = window.location.hash.replace('#', '');
+    let linkedHero = window.location.hash.replace('#', '');
+    if (linkedHero === 'prologue-master-cover') {
+      linkedHero = 'prologue-memorial-opening';
+    }
     if (linkedHero) {
       this.openBook(linkedHero, false);
     }
-    console.log("[ReaderEngine v13.0 Master] 3D-Фолиант успешно инициализирован.");
+    console.log("[ReaderEngine v14.0 Master] Библиотека из 21 тома готова.");
   },
 
   /**
-   * 1. Безопасное получение полного архива (21 глава)
+   * 1. Безопасное получение полного канонического архива (ровно 21 том)
    */
   getArchive() {
-    if (typeof window.GRAND_MEMORY_BOOK_ARCHIVE !== 'undefined' && Array.isArray(window.GRAND_MEMORY_BOOK_ARCHIVE)) {
+    if (typeof window.GRAND_MEMORY_BOOK_ARCHIVE !== 'undefined' && Array.isArray(window.GRAND_MEMORY_BOOK_ARCHIVE) && window.GRAND_MEMORY_BOOK_ARCHIVE.length > 0) {
       return window.GRAND_MEMORY_BOOK_ARCHIVE;
     }
-    return FOLIO_LIBRARY;
+    if (typeof MEMORY_BOOK_PROLOGUE !== 'undefined') {
+      return [MEMORY_BOOK_PROLOGUE];
+    }
+    return [];
   },
 
   /**
-   * 2. Процедурный синтезатор шелеста страниц (Web Audio API)
+   * 2. Обновление цифр на кнопках фильтров
+   */
+  updateFilterButtonsMeta() {
+    const list = this.getArchive();
+    const leftCount = list.filter(b => b.plaque === 'left').length;
+    const rightCount = list.filter(b => b.plaque === 'right').length;
+    const totalCount = list.length;
+
+    const allBtn = document.querySelector('.shelf-filter-btn[data-filter="all"]');
+    const leftBtn = document.querySelector('.shelf-filter-btn[data-filter="left"]');
+    const rightBtn = document.querySelector('.shelf-filter-btn[data-filter="right"]');
+
+    if (allBtn) allBtn.textContent = `Все книги (${totalCount})`;
+    if (leftBtn) leftBtn.textContent = `Левая плита (${leftCount})`;
+    if (rightBtn) rightBtn.textContent = `Правая плита (${rightCount})`;
+  },
+
+  /**
+   * 3. Процедурный синтезатор шелеста страниц (Web Audio API)
    */
   playPageTurnSound() {
     try {
@@ -96,7 +73,7 @@ const ReaderEngine = {
       if (this.audioContext.state === 'suspended') this.audioContext.resume();
 
       const ctx = this.audioContext;
-      const bufferSize = ctx.sampleRate * 0.15; // 150 мс шелеста
+      const bufferSize = ctx.sampleRate * 0.15; // 150 мс
       const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
       const data = buffer.getChannelData(0);
 
@@ -123,12 +100,12 @@ const ReaderEngine = {
 
       noise.start();
     } catch (e) {
-      console.warn("[Web Audio] Звуковой движок временно недоступен:", e);
+      console.warn("[Web Audio] Звук перелистывания недоступен:", e);
     }
   },
 
   /**
-   * 3. Отрисовка книжной полки (Bookshelf Renderer)
+   * 4. Отрисовка книжной полки
    */
   renderShelf() {
     const grid = document.getElementById('bookshelfGrid');
@@ -147,9 +124,9 @@ const ReaderEngine = {
 
       let matchSearch = true;
       if (query) {
-        matchSearch = hero.name.toLowerCase().includes(query) ||
+        matchSearch = (hero.name && hero.name.toLowerCase().includes(query)) ||
           (hero.specialty && hero.specialty.toLowerCase().includes(query)) ||
-          (hero.education?.specialty && hero.education.specialty.toLowerCase().includes(query));
+          (hero.military && hero.military.toLowerCase().includes(query));
       }
       return matchFilter && matchSearch;
     });
@@ -158,18 +135,18 @@ const ReaderEngine = {
       const volNum = hero.volNum || `Том ${idx + 1}`;
       const photoSrc = hero.photo || hero.media?.photo || 'assets/images/cover-master.jpg';
       const specText = hero.specialty || hero.education?.specialty || 'Выпускник колледжа';
-      const isMaster = hero.id === 'prologue-memorial-opening' || hero.id === 'prologue-master-cover';
+      const isMaster = hero.plaque === 'general';
 
       return `
-        <article class="book-spine-card ${isMaster ? 'master-tome' : ''}" tabindex="0" role="button" aria-label="Открыть фолиант: ${hero.name}" 
+        <article class="book-spine-card ${isMaster ? 'master-tome' : ''}" tabindex="0" role="button" aria-label="Открыть фолиант: ${this.escapeHtml(hero.name)}" 
                  onclick="ReaderEngine.openBook('${hero.id}')" 
                  onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); ReaderEngine.openBook('${hero.id}'); }">
-          <div class="book-spine-vol">${volNum} • ${hero.plaque === 'left' ? 'Левая' : (hero.plaque === 'right' ? 'Правая' : 'ГБПОУ СРМК')}</div>
+          <div class="book-spine-vol">${volNum} • ${hero.plaque === 'left' ? 'Левая плита' : (hero.plaque === 'right' ? 'Правая плита' : 'ГБПОУ СРМК')}</div>
           <div class="book-spine-portrait">
-            <img src="${photoSrc}" alt="${hero.name}" onerror="this.src='assets/images/cover-master.jpg'">
+            <img src="${photoSrc}" alt="${this.escapeHtml(hero.name)}" onerror="this.src='assets/images/cover-master.jpg'">
           </div>
-          <h4 class="book-spine-title">${hero.name}</h4>
-          <p class="book-spine-spec">${specText}</p>
+          <h4 class="book-spine-title">${this.escapeHtml(hero.name)}</h4>
+          <p class="book-spine-spec">${this.escapeHtml(specText)}</p>
           <button class="book-spine-btn" type="button">Раскрыть фолиант</button>
         </article>
       `;
@@ -177,13 +154,18 @@ const ReaderEngine = {
   },
 
   /**
-   * 4. Раскрытие книги
+   * 5. Раскрытие книги
    */
   openBook(heroId, updateHash = true) {
     const archive = this.getArchive();
     let book = archive.find(b => b.id === heroId);
 
-    // Fallback-генератор из heroesDatabase на случай отсутствия тома в архиве
+    // Поддержка старого алиаса хэша
+    if (!book && heroId === 'prologue-master-cover') {
+      book = archive.find(b => b.id === 'prologue-memorial-opening');
+    }
+
+    // Fallback из heroesDatabase на случай отсутствия тома
     if (!book && typeof heroesDatabase !== 'undefined') {
       const h = heroesDatabase.find(x => x.id === heroId);
       if (h) {
@@ -203,16 +185,16 @@ const ReaderEngine = {
               chapterTitle: "Хроника ратного подвига",
               leftHtml: `
                 <div class="page-header-meta"><span>ГБПОУ СРМК</span><span>АРХИВНЫЙ МЕДАЛЬОН</span></div>
-                <div class="page-visual-frame"><img src="${photo}" alt="${h.name}" onerror="this.src='assets/images/cover-master.jpg'"></div>
-                <div class="page-quote-box">«${h.quote || 'Верность воинскому долгу и памяти студенческого братства.'}»</div>
-                <p style="font-size:0.85rem; color:#444; line-height:1.4;"><strong>Профессия:</strong> ${h.education?.specialty || 'Выпускник колледжа'}<br><strong>Звание:</strong> ${h.military?.rank || 'Воин ВС РФ'}<br><strong>Рубеж:</strong> ${h.mapCoords?.locationName || 'ТВД'}</p>
+                <div class="page-visual-frame"><img src="${photo}" alt="${this.escapeHtml(h.name)}" onerror="this.src='assets/images/cover-master.jpg'"></div>
+                <div class="page-quote-box">«${this.escapeHtml(h.quote || 'Верность воинскому долгу и памяти студенческого братства.')}»</div>
+                <p style="font-size:0.85rem; color:#444; line-height:1.4;"><strong>Профессия:</strong> ${this.escapeHtml(h.education?.specialty || 'Выпускник колледжа')}<br><strong>Звание:</strong> ${this.escapeHtml(h.military?.rank || 'Воин ВС РФ')}<br><strong>Рубеж:</strong> ${this.escapeHtml(h.mapCoords?.locationName || 'ТВД')}</p>
                 <div class="page-number-footer">Стр. 1</div>
               `,
               rightHtml: `
                 <div class="page-header-meta"><span>АРХИВ КНИГИ ПАМЯТИ</span><span>ГЛАВА I</span></div>
                 <h3 class="page-chapter-title">Хроника подвига</h3>
                 <div class="page-story-text">
-                  <span class="drop-cap">${h.name[0]}</span>${h.deed || 'Сведения о боевом пути и ратном подвиге героя-выпускника в настоящее время верифицируются через архивы Министерства обороны РФ.'}
+                  <span class="drop-cap">${h.name[0]}</span>${this.escapeHtml(h.deed || 'Сведения о боевом пути и ратном подвиге героя-выпускника верифицированы архивами колледжа.')}
                   <p style="margin-top:14px; font-weight:bold; color:#8a1c22;">Награжден Орденом Мужества посмертно. Увековечен на Мемориале Славы СРМК.</p>
                 </div>
                 <div class="page-number-footer">Стр. 2</div>
@@ -258,7 +240,7 @@ const ReaderEngine = {
   },
 
   /**
-   * 5. Отрисовка текущего разворота
+   * 6. Отрисовка разворота
    */
   renderSpread() {
     if (!this.currentBook || !this.currentBook.pages) return;
@@ -270,7 +252,6 @@ const ReaderEngine = {
     if (leftEl) leftEl.innerHTML = spread.leftHtml || '';
     if (rightEl) rightEl.innerHTML = spread.rightHtml || '';
 
-    // Сброс прокрутки внутри страницы
     leftEl?.scrollTo({ top: 0, behavior: 'instant' });
     rightEl?.scrollTo({ top: 0, behavior: 'instant' });
     document.getElementById('folioBookElement')?.scrollTo({ top: 0, behavior: 'instant' });
@@ -278,7 +259,6 @@ const ReaderEngine = {
     const total = this.currentBook.pages.length;
     document.getElementById('paginationDisplay').textContent = `${spread.spreadNum || `Разворот ${this.currentSpreadIdx + 1}`} из ${total}`;
 
-    // Генерация точек пагинации
     const dotsTrack = document.getElementById('pageDotsTrack');
     if (dotsTrack) {
       dotsTrack.innerHTML = this.currentBook.pages.map((_, i) =>
@@ -319,7 +299,7 @@ const ReaderEngine = {
   },
 
   /**
-   * 6. Мультимедиа-плеер аудиогида очерка
+   * 7. Аудиогид тома
    */
   toggleHeroAudio() {
     if (!this.currentBook || !this.audioEl) return;
@@ -355,9 +335,6 @@ const ReaderEngine = {
     }
   },
 
-  /**
-   * 7. Привязка событий интерфейса и свайпов
-   */
   bindEvents() {
     document.getElementById('shelfSearchInput')?.addEventListener('input', () => this.renderShelf());
 
@@ -397,24 +374,17 @@ const ReaderEngine = {
       }
     });
 
-    // Сенсорные свайпы для смартфонов
     let touchStartX = 0;
-    let touchStartY = 0;
     const stage = document.querySelector('.book-stage-wrapper');
     if (stage) {
       stage.addEventListener('touchstart', e => {
         touchStartX = e.changedTouches[0].screenX;
-        touchStartY = e.changedTouches[0].screenY;
       }, { passive: true });
 
       stage.addEventListener('touchend', e => {
         const deltaX = e.changedTouches[0].screenX - touchStartX;
-        const deltaY = e.changedTouches[0].screenY - touchStartY;
-
-        if (Math.abs(deltaX) > 60 && Math.abs(deltaY) < 50) {
-          if (deltaX < 0) this.nextPage();
-          if (deltaX > 0) this.prevPage();
-        }
+        if (deltaX < -60) this.nextPage();
+        if (deltaX > 60) this.prevPage();
       }, { passive: true });
     }
   },

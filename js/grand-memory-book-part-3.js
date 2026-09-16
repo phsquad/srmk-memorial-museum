@@ -1,6 +1,6 @@
 /*
- * GRAND MEMORY BOOK, PART 3
- * Финальные тома XV-XX для интерактивного фолианта СРМК.
+ * GRAND MEMORY BOOK, PART 3 (v3.0 Master)
+ * Финальные тома XV-XX + Каноническая сборка архива на 21 том
  */
 'use strict';
 
@@ -34,18 +34,28 @@ const GRAND_MEMORY_BOOK_PART_3 = [
   pages: book.pages.map((page,index) => ({
     spreadNum:`Разворот ${['I','II','III','IV'][index]} (Стр. ${index * 2 + 1}–${index * 2 + 2})`,
     chapterTitle:page[0],
-    leftHtml:`<div class="page-header-meta"><span>${book.volNum}</span><span>${page[2]}</span></div><div class="page-visual-frame"><img src="${book.photo}" alt="${book.name}"></div><div class="page-quote-box">«Память о человеке продолжается в его делах.»</div><div class="page-number-footer">Стр. ${index * 2 + 1}</div>`,
+    leftHtml:`<div class="page-header-meta"><span>${book.volNum}</span><span>${page[2]}</span></div><div class="page-visual-frame"><img src="${book.photo}" alt="${book.name}" onerror="this.src='assets/images/cover-master.jpg'"></div><div class="page-quote-box">«Память о человеке продолжается в его делах.»</div><div class="page-number-footer">Стр. ${index * 2 + 1}</div>`,
     rightHtml:`<div class="page-header-meta"><span>${book.chapterNum}</span><span>${page[2]}</span></div><h3 class="page-chapter-title">${page[0]}</h3><div class="page-story-text"><span class="drop-cap">${page[1][0]}</span>${page[1].slice(1)}</div><div class="page-number-footer">Стр. ${index * 2 + 2}</div>`
   }))
 }));
 
-const GRAND_MEMORY_BOOK_ARCHIVE = [
-  MEMORY_BOOK_PROLOGUE,
+// 🔥 КАНОНИЧЕСКИЙ АРХИВ: 1 ПРОЛОГ + 20 ТОМОВ ГЕРОЕВ (РОВНО 21 ТОМ)
+const rawArchive = [
+  (typeof MEMORY_BOOK_PROLOGUE !== 'undefined' ? MEMORY_BOOK_PROLOGUE : null),
   ...(typeof GRAND_MEMORY_BOOK_PART_1 !== 'undefined' ? GRAND_MEMORY_BOOK_PART_1 : []),
   ...(typeof GRAND_MEMORY_BOOK_PART_2 !== 'undefined' ? GRAND_MEMORY_BOOK_PART_2 : []),
   ...GRAND_MEMORY_BOOK_PART_3
-];
+].filter(Boolean);
 
-if (typeof window !== 'undefined') window.GRAND_MEMORY_BOOK_ARCHIVE = GRAND_MEMORY_BOOK_ARCHIVE;
+// Защитная дедупликация по уникальному ID
+const GRAND_MEMORY_BOOK_ARCHIVE = Array.from(
+  new Map(rawArchive.map(item => [item.id, item])).values()
+);
 
-if (typeof module !== 'undefined' && module.exports) module.exports = { GRAND_MEMORY_BOOK_PART_3 };
+if (typeof window !== 'undefined') {
+  window.GRAND_MEMORY_BOOK_ARCHIVE = GRAND_MEMORY_BOOK_ARCHIVE;
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { GRAND_MEMORY_BOOK_PART_3, GRAND_MEMORY_BOOK_ARCHIVE };
+}
