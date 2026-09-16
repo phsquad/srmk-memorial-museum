@@ -990,7 +990,6 @@ const App = {
       highlightIdx = (highlightIdx + 1) % featuredHeroes.length;
     }, 4000);
   },
-
   /* ==========================================================================
      WEB AUDIO СИНТЕЗАТОРЫ
      ========================================================================== */
@@ -1075,7 +1074,6 @@ const App = {
       console.warn('[Web Audio] Ошибка синтезатора Колокола:', e);
     }
   },
-
   initAmbientParticles() {
     if (document.getElementById('ambientSparksCanvas')) return;
 
