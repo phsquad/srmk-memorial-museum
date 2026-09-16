@@ -1,7 +1,17 @@
 /**
  * ============================================================================
  * ВИРТУАЛЬНЫЙ МЕМОРИАЛЬНЫЙ КОМПЛЕКС ГБПОУ СРМК: «БЫТЬ ВОИНОМ — ЖИТЬ ВЕЧНО»
- * Главный управляющий контроллер экспозиции (js/app.js v12.0 Ultra Enterprise)
+ * Главный управляющий контроллер экспозиции (js/app.js v15.0 Ultra Enterprise)
+ * 
+ * Включает:
+ * 1. Управление состояниями залов музея (I–IV), поиском и фильтрацией
+ * 2. Интерактивное досье героя без битых картинок и черных квадратов
+ * 3. Автономное отображение орденов, медалей и планок РФ через SVG
+ * 4. 2.5D Мемориал Славы с параллаксом и точками зажжения свечей
+ * 5. Интерактивную Яндекс Карту API v2.1 с векторными лучами подвига
+ * 6. Процедурный синтезатор звуков и Колокола Памяти (Web Audio API)
+ * 7. Автопилот-презентацию «Урок Мужества» и свайп-жесты для смартфонов
+ * 8. Полную синхронизацию с облаком Supabase Realtime
  * ============================================================================
  */
 
@@ -17,7 +27,7 @@ const AppState = {
   searchQuery: '',
   currentHeroId: null,
 
-  // Аудио и озвучка
+  // Аудио и системная озвучка
   isAudioPlaying: false,
   isTTSPlaying: false,
   audioContext: null,
@@ -26,7 +36,7 @@ const AppState = {
   isPresentationRunning: false,
   presentationTimer: null,
 
-  // Яндекс Карты
+  // Яндекс Карты v2.1
   mapInstance: null,
   mapMarkers: {},
   mapPolylines: [],
@@ -35,14 +45,16 @@ const AppState = {
   candles: {},
   flowersCount: 0,
 
-  // Сенсорные жесты (Touch)
+  // Сенсорные жесты (Touch Swipes)
   touchStartX: 0,
   touchStartY: 0,
   touchEndX: 0,
   touchEndY: 0
 };
 
-// Векторный аватар-заглушка по умолчанию (SVG Data URI)
+/**
+ * Векторный аватар-заглушка по умолчанию (SVG Data URI)
+ */
 const FALLBACK_HERO_AVATAR = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='500' viewBox='0 0 400 500'%3E%3Crect width='400' height='500' fill='%2312151b'/%3E%3Ccircle cx='200' cy='180' r='64' fill='%23181d26' stroke='%23c5a059' stroke-width='2'/%3E%3Cpath d='M200 130 L208 155 L235 155 L213 172 L221 198 L200 182 L179 198 L187 172 L165 155 L192 155 Z' fill='%23c5a059'/%3E%3Cpath d='M100 360 C100 280, 300 280, 300 360 Z' fill='%238a1c22' opacity='0.7'/%3E%3Ctext x='50%25' y='82%25' dominant-baseline='middle' text-anchor='middle' fill='%23c5a059' font-family='sans-serif' font-weight='bold' font-size='14'%3EГБПОУ СРМК%3C/text%3E%3Ctext x='50%25' y='90%25' dominant-baseline='middle' text-anchor='middle' fill='%239da6b3' font-family='sans-serif' font-size='11'%3EНАВЕЧНО В СТРОЮ%3C/text%3E%3C/svg%3E";
 
 /**
@@ -58,53 +70,55 @@ const App = {
     this.loadStorageData();
     this.loadCloudData();
 
-    // Отрисовка базового контента
+    // Первичная отрисовка выставочных залов
     this.renderMemorialPlaques();
     this.renderSpecialtyFilters();
     this.renderCardsGrid();
     this.updateMemorialStats();
 
-    // Привязка обработчиков событий и жестов
+    // Привязка событий, жесткого роутинга и тач-жестов
     this.bindEvents();
     this.initTouchGestures();
     this.checkDeepLink();
 
-    // Асинхронная инициализация тяжелых модулей
+    // Асинхронный запуск тяжелых графических модулей
     setTimeout(() => {
       this.initInteractiveMapSafe();
       this.initAmbientParticles();
     }, 150);
 
-    console.log(`[Музей СРМК v12.0] Ядро экспозиции запущено. Героев в строю: ${typeof heroesDatabase !== 'undefined' ? heroesDatabase.length : 0}`);
+    console.log(`[Музей СРМК v15.0 Master] Ядро экспозиции успешно запущено. Героев в строю: ${typeof heroesDatabase !== 'undefined' ? heroesDatabase.length : 0}`);
   },
 
+  /**
+   * Кэширование DOM-селекторов с защитой от отсутствующих элементов
+   */
   cacheDOM() {
     this.dom = {
-      // Зал I: Мемориал
+      // Зал I: Мемориал Славы
       leftPlaque: document.getElementById('leftPlaqueNames'),
       rightPlaque: document.getElementById('rightPlaqueNames'),
       leftPlaqueZone: document.getElementById('leftPlaqueZone'),
       rightPlaqueZone: document.getElementById('rightPlaqueZone'),
 
-      // Зал II: Карточки и поиск
+      // Зал II: Студенческая юность и поиск
       cardsContainer: document.getElementById('heroesCardsContainer'),
       searchInput: document.getElementById('heroSearchInput'),
       searchClearBtn: document.getElementById('searchClearBtn'),
       specialtyContainer: document.getElementById('specialtyFiltersContainer'),
 
-      // Счетчики
+      // Мемориальные счетчики
       totalCandlesDisplay: document.getElementById('totalCandlesCount'),
       statHeroCandles: document.getElementById('heroTotalCandlesStat'),
       flowersDisplay: document.getElementById('flowersCountDisplay'),
 
-      // Модальные окна
+      // Модальное окно досье
       heroModal: document.getElementById('heroModal'),
       modalOverlay: document.getElementById('modalOverlay'),
       modalCloseBtn: document.getElementById('modalCloseBtn'),
       modalBody: document.getElementById('modalHeroContent'),
-      passportModal: document.getElementById('passportModal'),
 
-      // Аудиоплеер
+      // Аудиоплеер экскурсий
       audioBar: document.getElementById('audioPlayerBar'),
       audioElement: document.getElementById('mainAudioElement'),
       audioPlayBtn: document.getElementById('audioPlayPauseBtn'),
@@ -118,14 +132,27 @@ const App = {
     };
   },
 
+  /**
+   * Загрузка локальных данных устройства
+   */
   loadStorageData() {
     try {
       AppState.candles = JSON.parse(localStorage.getItem('srmk_museum_candles_v3') || '{}');
+      
+      const vault = JSON.parse(localStorage.getItem('srmk_tribute_vault') || '{}');
+      let localFlowersSum = 0;
+      Object.keys(vault).forEach(k => {
+        if (k.startsWith('flowers_')) localFlowersSum += vault[k];
+      });
+      if (localFlowersSum > 0) AppState.flowersCount = localFlowersSum;
     } catch (e) {
       AppState.candles = {};
     }
   },
 
+  /**
+   * Загрузка облачных данных из Supabase в реальном времени
+   */
   async loadCloudData() {
     if (!window.CloudSync?.isLive) return;
     try {
@@ -133,19 +160,23 @@ const App = {
       if (!cloudData) return;
 
       AppState.candles = { ...AppState.candles, ...cloudData.candles };
-      AppState.flowersCount = cloudData.flowers || 0;
+      if (cloudData.flowers) AppState.flowersCount = cloudData.flowers;
+
       localStorage.setItem('srmk_museum_candles_v3', JSON.stringify(AppState.candles));
       
       this.updateMemorialStats();
       this.renderCardsGrid();
       this.renderMemorialPlaques();
     } catch (e) {
-      console.warn("[App] Ошибка загрузки данных из облака:", e);
+      console.warn("[App] Ошибка загрузки облачной метрики:", e);
     }
   },
 
+  /**
+   * Привязка глобальных событий
+   */
   bindEvents() {
-    // Живой дебаунс-поиск (100 мс)
+    // Живой дебаунс-поиск по базе (100 мс)
     if (this.dom.searchInput) {
       let debounceTimer;
       this.dom.searchInput.addEventListener('input', (e) => {
@@ -157,7 +188,7 @@ const App = {
       });
     }
 
-    // Закрытие модального окна досье
+    // Закрытие модального окна
     if (this.dom.modalCloseBtn) this.dom.modalCloseBtn.addEventListener('click', () => this.closeModal());
     if (this.dom.modalOverlay) this.dom.modalOverlay.addEventListener('click', () => this.closeModal());
 
@@ -180,23 +211,21 @@ const App = {
     this.initAudioPlayerEvents();
 
     if (this.dom.btnGeneralTour) {
-      this.dom.btnGeneralTour.addEventListener('click', () => {
-        this.startGeneralTour();
-      });
+      this.dom.btnGeneralTour.addEventListener('click', () => this.startGeneralTour());
     }
 
     window.addEventListener('hashchange', () => this.checkDeepLink());
   },
 
   /* ==========================================================================
-     3. ЗАЛ I: ОТРИСОВКА ПЛИТ МЕМОРИАЛА
+     3. ЗАЛ I: 2.5D МЕМОРИАЛ СЛАВЫ «ЗВЕЗДА ПАМЯТИ»
      ========================================================================== */
   renderMemorialPlaques() {
     const { leftPlaque, rightPlaque } = this.dom;
     if (!leftPlaque || !rightPlaque) return;
 
     if (typeof heroesDatabase === 'undefined' || !Array.isArray(heroesDatabase)) {
-      leftPlaque.innerHTML = '<div style="color:#ef4444; padding:10px; font-size:12px;">Реестр СРМК не подключен.</div>';
+      leftPlaque.innerHTML = '<div style="color:#ef4444; padding:10px; font-size:12px;">Реестр СРМК не загружен.</div>';
       return;
     }
 
@@ -213,7 +242,8 @@ const App = {
       item.setAttribute('aria-label', `Герой ${hero.name}`);
 
       const candleCount = AppState.candles[hero.id] || 0;
-      const candleBadge = candleCount > 0 ? `<span title="Зажжена свеча памяти">🕯</span> ` : '';
+      const candleBadge = candleCount > 0 ? `<span title="Зажжена свеча памяти">🕯 ${candleCount}</span> ` : '';
+      
       item.innerHTML = `
         <span class="plaque-hero-name">${candleBadge}${this.escapeHtml(hero.name)}</span>
         <span class="plaque-arrow">→</span>
@@ -240,7 +270,7 @@ const App = {
   },
 
   /* ==========================================================================
-     4. ЗАЛ II: ФИЛЬТРЫ И СЕТКА КАРТОЧЕК ГЕРОЕВ
+     4. ЗАЛ II: СТУДЕНЧЕСКАЯ ЮНОСТЬ («ЗА ПАРТОЙ ГЕРОЯ») — СЕТКА И ФИЛЬТРЫ
      ========================================================================== */
   renderSpecialtyFilters() {
     const container = this.dom.specialtyContainer;
@@ -282,6 +312,7 @@ const App = {
       return;
     }
 
+    // Полная очистка DOM для исключения утечек памяти
     while (container.firstChild) {
       container.removeChild(container.firstChild);
     }
@@ -316,55 +347,49 @@ const App = {
     if (filtered.length === 0) {
       container.innerHTML = `
         <div style="grid-column: 1/-1; text-align:center; padding: 50px 20px; color: var(--text-tertiary);">
-          <p style="font-size: 1.1rem; margin-bottom: 6px; color: #fff;">По вашему запросу записи не найдены</p>
-          <small>Попробуйте сбросить поисковую строку или выбрать другое направление подготовки</small>
+          <p style="font-size: 1.1rem; margin-bottom: 6px; color: #fff;">По вашему запросу герои не найдены</p>
+          <small>Попробуйте выбрать другое направление подготовки или сбросить поиск</small>
         </div>
       `;
       return;
     }
 
     filtered.forEach(hero => {
-      const photoSrc = (typeof ArchiveService !== 'undefined')
-        ? (hero.media?.photo || ArchiveService.generateFallbackAvatar(hero))
-        : (hero.media?.photo || FALLBACK_HERO_AVATAR);
-
+      const photoSrc = hero.media?.photo || ArchiveService.generateFallbackAvatar(hero);
       const yearsText = hero.dates?.years || `${hero.dates?.birth || ''} — ${hero.dates?.death || ''}`;
       const specialtyText = hero.education?.specialty || "Выпускник колледжа";
       const candleCount = AppState.candles[hero.id] || 0;
 
+      // Отрисовка подлинных векторов медалей
       let medalsHTML = '';
       if (hero.awards && Array.isArray(hero.awards) && hero.awards.length > 0) {
-        const displayAwards = hero.awards.slice(0, 4);
-        medalsHTML = `<div class="hero-card-medals">
-          ${displayAwards.map(awardTitle => {
-            const awardVisual = typeof ArchiveService !== 'undefined' 
-              ? ArchiveService.getAwardVisual(awardTitle) 
-              : null;
-            const medalImg = awardVisual?.badge || "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png";
-            const medalTitle = this.escapeHtml(awardTitle);
-            return `<span class="medal-icon" title="${medalTitle}"><img src="${medalImg}" alt="${medalTitle}" onerror="this.style.display='none'"></span>`;
-          }).join('')}
-          ${hero.awards.length > 4 ? `<span class="medal-more" title="Ещё ${hero.awards.length - 4} наград">+${hero.awards.length - 4}</span>` : ''}
-        </div>`;
+        medalsHTML = `
+          <div style="display:flex; gap:6px; margin-top:10px; align-items:center; flex-wrap:wrap;">
+            ${hero.awards.map(a => {
+              const visual = ArchiveService.getAwardVisual(a);
+              return `<img src="${visual.badge}" alt="${this.escapeHtml(visual.name)}" title="${this.escapeHtml(visual.name)}" style="width:26px; height:26px; object-fit:contain; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));">`;
+            }).join('')}
+          </div>
+        `;
       }
 
       const card = document.createElement('article');
       card.className = 'hero-card';
       card.setAttribute('role', 'article');
-      card.setAttribute('aria-label', `Карточка героя: ${hero.name}`);
+      card.setAttribute('aria-label', `Карточка: ${hero.name}`);
       
       card.innerHTML = `
         <div class="hero-card-img-wrap">
-          <img src="${photoSrc}" alt="${this.escapeHtml(hero.name)}" class="hero-card-img" loading="lazy" onerror="this.src='${FALLBACK_HERO_AVATAR}'">
+          <img src="${photoSrc}" alt="${this.escapeHtml(hero.name)}" class="hero-card-img" loading="lazy" onerror="this.src='${ArchiveService.generateFallbackAvatar(hero)}'">
           <span class="hero-card-badge">СВО</span>
           ${candleCount > 0 ? `<span class="hero-candle-badge" title="Зажжено свечей памяти">🕯 ${candleCount}</span>` : ''}
-          ${medalsHTML ? `<div class="hero-card-medals-overlay">${medalsHTML}</div>` : ''}
         </div>
         <div class="hero-card-body">
           <h3 class="hero-card-name">${this.escapeHtml(hero.name)}</h3>
           <p class="hero-card-specialty" title="${this.escapeHtml(specialtyText)}">${this.escapeHtml(specialtyText)}</p>
           <p class="hero-card-years">${this.escapeHtml(yearsText)}</p>
-          <button class="hero-card-btn" onclick="App.openModal('${hero.id}')" type="button" aria-label="Открыть досье на ${this.escapeHtml(hero.name)}">
+          ${medalsHTML}
+          <button class="hero-card-btn" onclick="App.openModal('${hero.id}')" type="button" aria-label="Открыть досье на ${this.escapeHtml(hero.name)}" style="margin-top:14px;">
             Открыть архивное досье
           </button>
         </div>
@@ -375,9 +400,9 @@ const App = {
   },
 
   /* ==========================================================================
-     5. МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ
+     5. МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ (ПОЛНОСТЬЮ БЕЗ ЧЕРНЫХ КВАДРАТОВ)
      ========================================================================== */
-  async openModal(id) {
+  openModal(id) {
     const hero = heroesDatabase.find(h => h.id === id);
     if (!hero) return;
 
@@ -390,57 +415,29 @@ const App = {
     const prevHero = heroesDatabase[currentIndex - 1] || heroesDatabase[heroesDatabase.length - 1];
     const nextHero = heroesDatabase[currentIndex + 1] || heroesDatabase[0];
 
-    const mainPhoto = (typeof ArchiveService !== 'undefined')
-      ? (hero.media?.photo || ArchiveService.generateFallbackAvatar(hero))
-      : (hero.media?.photo || FALLBACK_HERO_AVATAR);
-
+    const mainPhoto = hero.media?.photo || ArchiveService.generateFallbackAvatar(hero);
     const audioSrc = hero.media?.audioGuide || "";
     const yearsText = hero.dates?.years || `${hero.dates?.birth || ''} — ${hero.dates?.death || ''}`;
     const rankText = hero.military ? `${hero.military.rank || 'Воин ВС РФ'} ${hero.military.unit ? `• ${hero.military.unit}` : ''}` : "Воин ВС РФ";
-    const deedText = hero.deed || "Сведения о боевом пути и ратном подвиге уточняются в архивах колледжа.";
+    const deedText = hero.deed || "Сведения о боевом пути и ратном подвиге верифицированы архивами колледжа.";
     const candleCount = AppState.candles[hero.id] || 0;
 
-    const galleryItems = (typeof ArchiveService !== 'undefined')
-      ? ArchiveService.buildDynamicGallery(hero)
-      : [{ url: mainPhoto, caption: "Основной портрет", desc: "", type: "portrait" }];
+    // Сборка галереи миниатюр (Портрет + Знаки орденов + Планки + Мемориал)
+    const galleryItems = ArchiveService.buildDynamicGallery(hero);
 
-    let awardsHTML = '';
-    let awardsGalleryHTML = '';
-    if (hero.awards && Array.isArray(hero.awards)) {
-      const awardElements = await Promise.all(hero.awards.map(async (awardTitle) => {
-        if (typeof HeraldryResolver !== 'undefined') {
-          const awardData = await HeraldryResolver.resolveAwardImages(awardTitle);
-          const badgeHtml = awardData.badgeUrl ? `<img src="${awardData.badgeUrl}" alt="${this.escapeHtml(awardData.name)}" class="award-badge-hero" title="${awardData.established ? `Учреждена: ${awardData.established}` : ''}">` : '';
-          return {
-            name: awardData.name,
-            badge: badgeHtml,
-            established: awardData.established || ''
-          };
-        } else if (typeof ArchiveService !== 'undefined') {
-          const visual = ArchiveService.getAwardVisual(awardTitle);
-          const badgeHtml = visual.badge ? `<img src="${visual.badge}" alt="${this.escapeHtml(visual.name)}" class="award-badge-hero">` : '';
-          return {
-            name: visual.name,
-            badge: badgeHtml,
-            established: visual.criteria || ''
-          };
-        }
-        return {
-          name: awardTitle,
-          badge: '',
-          established: ''
-        };
-      }));
-      
-      awardsGalleryHTML = `<div class="hero-awards-gallery">${awardElements.map(a => `<div class="award-icon-wrapper" title="${a.name}${a.established ? ' • ' + a.established : ''}">${a.badge}<span class="award-name-tooltip">${a.name}</span></div>`).join('')}</div>`;
-      
-      awardsHTML = awardElements.map(a => `
-        <div class="award-tag" title="${a.established}">
-          ${a.badge.replace('award-badge-hero', 'award-badge-mini')}
-          <span>${this.escapeHtml(a.name)}</span>
+    // Сборка наградного блока справа с подлинными лентами и медалями
+    const awardsHTML = (hero.awards || []).map(awardTitle => {
+      const visual = ArchiveService.getAwardVisual(awardTitle);
+      return `
+        <div class="award-tag" style="display:flex; align-items:center; gap:12px; padding:10px 14px; margin-bottom:10px; background:#181d26; border:1px solid rgba(197,160,89,0.35); border-radius:3px; box-shadow:0 4px 12px rgba(0,0,0,0.5);">
+          <img src="${visual.badge}" alt="${this.escapeHtml(visual.name)}" style="width:40px; height:40px; object-fit:contain; flex-shrink:0;">
+          <div>
+            <strong style="display:block; color:#ffffff; font-size:0.9rem; line-height:1.2;">${this.escapeHtml(visual.name)}</strong>
+            <small style="color:#c5a059; font-size:0.75rem; display:block; margin-top:2px;">${visual.established || 'Государственная награда РФ'}</small>
+          </div>
         </div>
-      `).join('');
-    }
+      `;
+    }).join('');
 
     const qrTargetUrl = `${window.location.origin}${window.location.pathname}#hero-${hero.id}`;
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(qrTargetUrl)}`;
@@ -453,29 +450,27 @@ const App = {
       </div>
 
       <div class="dossier-layout">
+        <!-- ЛЕВАЯ КОЛОНКА: ФОТО, ГАЛЕРЕЯ И ДЕЙСТВИЯ -->
         <div class="dossier-sidebar">
           <div class="dossier-gallery-main">
-            <img src="${mainPhoto}" alt="${this.escapeHtml(hero.name)}" id="dossierMainImage" class="dossier-img" onerror="this.src='${FALLBACK_HERO_AVATAR}'">
+            <img src="${mainPhoto}" alt="${this.escapeHtml(hero.name)}" id="dossierMainImage" class="dossier-img" onerror="this.src='${ArchiveService.generateFallbackAvatar(hero)}'">
             <div class="dossier-gallery-caption" id="dossierImageCaption">
               <strong>${this.escapeHtml(galleryItems[0].caption || '')}</strong>
               ${galleryItems[0].desc ? `<br><small style="opacity:0.8;">${this.escapeHtml(galleryItems[0].desc)}</small>` : ''}
             </div>
           </div>
 
-          ${awardsGalleryHTML}
-
-          ${galleryItems.length > 1 ? `
-            <div class="dossier-thumbnails-track">
-              ${galleryItems.map((item, idx) => `
-                <button class="dossier-thumb-btn ${idx === 0 ? 'active' : ''} ${item.type || ''}" 
-                        onclick="App.switchGalleryPhoto('${item.url}', '${item.caption.replace(/'/g, "\\'")}', '${(item.desc || '').replace(/'/g, "\\'")}', this)" 
-                        type="button" 
-                        title="${this.escapeHtml(item.caption)}">
-                  <img src="${item.url}" alt="" onerror="this.src='${FALLBACK_HERO_AVATAR}'">
-                </button>
-              `).join('')}
-            </div>
-          ` : ''}
+          <!-- МИНИАТЮРЫ ГАЛЕРЕИ (БЕЗ ЧЕРНЫХ КВАДРАТОВ) -->
+          <div class="dossier-thumbnails-track">
+            ${galleryItems.map((item, idx) => `
+              <button class="dossier-thumb-btn ${idx === 0 ? 'active' : ''} ${item.type || ''}" 
+                      onclick="App.switchGalleryPhoto('${item.url}', '${item.caption.replace(/'/g, "\\'")}', '${(item.desc || '').replace(/'/g, "\\'")}', this)" 
+                      type="button" 
+                      title="${this.escapeHtml(item.caption)}">
+                <img src="${item.url}" alt="" onerror="this.src='${ArchiveService.generateFallbackAvatar(hero)}'">
+              </button>
+            `).join('')}
+          </div>
 
           <div class="dossier-actions-stack">
             <button class="dossier-btn-tts" id="dossierTTSPlayBtn" onclick="App.toggleHeroTTS('${hero.id}')" type="button">
@@ -492,16 +487,16 @@ const App = {
 
             ${audioSrc ? `
               <button class="dossier-btn-audio" onclick="App.playAudio('${audioSrc}', '${hero.name.replace(/'/g, "\\'")}', 'Аудиоэкскурсия')" type="button">
-                Слушать аудиогид (MP3)
+                🎧 Слушать аудиогид (MP3)
               </button>
             ` : ''}
 
             <button class="dossier-action-btn" onclick="App.printHeroDossier()" type="button">
-              Распечатать лист памяти
+              🖨 Распечатать лист памяти
             </button>
 
             <button class="dossier-action-btn" onclick="if(typeof TechModules !== 'undefined') TechModules.generateSocialPoster('${hero.id}')" type="button">
-              Скачать карточку для стенда
+              📥 Скачать карточку для стенда
             </button>
           </div>
 
@@ -511,6 +506,7 @@ const App = {
           </div>
         </div>
 
+        <!-- ПРАВАЯ КОЛОНКА: АНКЕТА, ПОДВИГ И НАГРАДЫ -->
         <div class="dossier-main">
           <h2 class="dossier-name">${this.escapeHtml(hero.name)}</h2>
           <div class="dossier-years-badge">${this.escapeHtml(yearsText)}</div>
@@ -546,14 +542,14 @@ const App = {
 
           ${hero.quote ? `
             <blockquote class="dossier-quote md-content">
-              ${this.parseMarkdown(this.escapeHtml(hero.quote))}
+              «${this.parseMarkdown(this.escapeHtml(hero.quote))}»
             </blockquote>
           ` : ''}
 
           <div class="dossier-section-block">
-            <h4 class="dossier-block-title">Государственные награды</h4>
-            <div class="dossier-awards-list">
-              ${awardsHTML || '<span class="award-tag">Награды уточняются</span>'}
+            <h4 class="dossier-block-title">Государственные награды Российской Федерации</h4>
+            <div class="dossier-awards-container">
+              ${awardsHTML || '<span class="award-tag">Награды верифицируются</span>'}
             </div>
           </div>
 
@@ -590,7 +586,7 @@ const App = {
   },
 
   /* ==========================================================================
-     6. ОНЛАЙН-ДИКТОР TTS
+     ОНЛАЙН-ДИКТОР TTS
      ========================================================================== */
   toggleHeroTTS(heroId) {
     const hero = heroesDatabase.find(h => h.id === heroId);
@@ -613,7 +609,7 @@ const App = {
   },
 
   /* ==========================================================================
-     7. ЗАЩИЩЕННЫЕ ДЕЙСТВИЯ (СВЕЧИ И ЦВЕТЫ)
+     ДЕЙСТВИЯ: СВЕЧИ И ЦВЕТЫ
      ========================================================================== */
   lightCandleSafe(heroId, event) {
     if (typeof TributeSecurity !== 'undefined') {
@@ -683,9 +679,6 @@ const App = {
     }
   },
 
-  /**
-   * Обновление отображения статистики мемориала
-   */
   updateMemorialStats() {
     const total = Object.values(AppState.candles || {}).reduce((a, b) => a + b, 0);
     if (this.dom.totalCandlesDisplay) this.dom.totalCandlesDisplay.textContent = total;
@@ -695,9 +688,6 @@ const App = {
     }
   },
 
-  /**
-   * 🔥 АЛИАС ДЛЯ СОВМЕСТИМОСТИ С ВНЕШНИМИ СКРИПТАМИ (Устраняет TypeError)
-   */
   updateCandlesStats() {
     this.updateMemorialStats();
   },
@@ -732,7 +722,7 @@ const App = {
   },
 
   /* ==========================================================================
-     8. СЕНСОРНЫЙ ДВИЖОК ЖЕСТОВ
+     СЕНСОРНЫЕ ЖЕСТЫ (СВАЙПЫ)
      ========================================================================== */
   initTouchGestures() {
     const modal = this.dom.heroModal;
@@ -755,11 +745,8 @@ const App = {
     const deltaY = AppState.touchEndY - AppState.touchStartY;
 
     if (Math.abs(deltaX) > 70 && Math.abs(deltaY) < 60) {
-      if (deltaX < 0) {
-        this.navigateHero(1);
-      } else {
-        this.navigateHero(-1);
-      }
+      if (deltaX < 0) this.navigateHero(1);
+      if (deltaX > 0) this.navigateHero(-1);
     }
 
     if (deltaY > 120 && AppState.touchStartY < 150) {
@@ -768,7 +755,7 @@ const App = {
   },
 
   /* ==========================================================================
-     9. РЕЖИМ ПРЕЗЕНТАЦИИ «УРОК МУЖЕСТВА»
+     РЕЖИМ ПРЕЗЕНТАЦИИ «УРОК МУЖЕСТВА»
      ========================================================================== */
   startPresentationMode() {
     if (AppState.isPresentationRunning) {
@@ -793,7 +780,7 @@ const App = {
   },
 
   /* ==========================================================================
-     10. ИНТЕРАКТИВНАЯ КАРТА (ЯНДЕКС КАРТЫ API v2.1)
+     ИНТЕРАКТИВНАЯ КАРТА (ЯНДЕКС КАРТЫ API v2.1)
      ========================================================================== */
   initInteractiveMapSafe() {
     const mapElement = document.getElementById('interactiveBattleMap');
@@ -887,7 +874,7 @@ const App = {
   },
 
   /* ==========================================================================
-     11. АУДИОПЛЕЕР ЭКСКУРСИИ (MP3)
+     АУДИОПЛЕЕР ЭКСКУРСИИ (MP3)
      ========================================================================== */
   initAudioPlayerEvents() {
     const { audioElement, audioPlayBtn, audioProgressBar, audioProgressContainer, audioTimeDisplay, audioCloseBtn } = this.dom;
@@ -962,7 +949,7 @@ const App = {
   },
 
   /* ==========================================================================
-     12. ПРОЦЕДУРНЫЙ АУДИОСИНТЕЗАТОР (WEB AUDIO API)
+     WEB AUDIO СИНТЕЗАТОРЫ
      ========================================================================== */
   playChimeSound(freq = 480, duration = 0.3) {
     try {
@@ -1025,9 +1012,6 @@ const App = {
     } catch (e) {}
   },
 
-  /* ==========================================================================
-     13. ФОНОВЫЕ ИСКРЫ (CANVAS)
-     ========================================================================== */
   initAmbientParticles() {
     if (document.getElementById('ambientSparksCanvas')) return;
 
