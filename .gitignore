@@ -1,1 +1,28 @@
-(js/app.js, js/data.js, js/desk-qr.js, js/grand-memory-book-part-1.js, js/grand-memory-book-part-2.js, js/grand-memory-book-part-3.js, js/memory-book.js, js/reader.js)
+```
+# Images - thumbs directory
+assets/images/heroes/thumbs/
+
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+```

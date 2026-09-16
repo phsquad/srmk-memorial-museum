@@ -198,6 +198,8 @@ const ReaderEngine = {
     grid.innerHTML = filtered.map((hero, idx) => {
       const volNum = hero.volNum || `Том ${idx + 1}`;
       const photoSrc = hero.media?.photo || hero.photo || 'assets/images/cover-master.jpg';
+      // 🔥 Оптимизация: используем thumbnail для обложек фолиантов
+      const thumbSrc = photoSrc.replace('assets/images/heroes/', 'assets/images/heroes/thumbs/');
       const specText = hero.education?.specialty || hero.specialty || 'Выпускник колледжа';
       const isMaster = hero.id === 'prologue-master-cover';
 
@@ -207,7 +209,7 @@ const ReaderEngine = {
                  onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); ReaderEngine.openBook('${hero.id}'); }">
           <div class="book-spine-vol">${volNum} • ${hero.plaque === 'left' ? 'Левая' : (hero.plaque === 'right' ? 'Правая' : 'ГБПОУ СРМК')}</div>
           <div class="book-spine-portrait">
-            <img src="${photoSrc}" alt="${hero.name}" loading="lazy" onerror="this.src='assets/images/cover-master.jpg'">
+            <img src="${thumbSrc}" alt="${hero.name}" loading="lazy" onerror="this.src='${photoSrc}'">
           </div>
           <h4 class="book-spine-title">${hero.name}</h4>
           <p class="book-spine-spec">${specText}</p>

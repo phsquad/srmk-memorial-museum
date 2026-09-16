@@ -320,8 +320,11 @@ const App = {
 
     filtered.forEach(hero => {
       const photoSrc = (typeof ArchiveService !== 'undefined')
-        ? (hero.media?.photo || ArchiveService.generateFallbackAvatar(hero))
-        : (hero.media?.photo || FALLBACK_HERO_AVATAR);
+        ? (hero.media?.photo || hero.photo || ArchiveService.generateFallbackAvatar(hero))
+        : (hero.media?.photo || hero.photo || FALLBACK_HERO_AVATAR);
+      
+      // 🔥 Оптимизация: используем thumbnail для карточек героев
+      const thumbSrc = photoSrc.replace('assets/images/heroes/', 'assets/images/heroes/thumbs/');
 
       const yearsText = hero.dates?.years || `${hero.dates?.birth || ''} — ${hero.dates?.death || ''}`;
       const specialtyText = hero.education?.specialty || "Выпускник колледжа";
@@ -353,7 +356,7 @@ const App = {
       // 🔥 Наполнение строго изолированной HTML-структурой через DocumentFragment
       card.innerHTML = `
         <div class="hero-card-img-wrap">
-          <img src="${photoSrc}" alt="${this.escapeHtml(hero.name)}" class="hero-card-img" loading="lazy" onerror="this.src='${FALLBACK_HERO_AVATAR}'">
+          <img src="${thumbSrc}" alt="${this.escapeHtml(hero.name)}" class="hero-card-img" loading="lazy" onerror="this.src='${photoSrc}'">
           <span class="hero-card-badge">СВО</span>
           ${candleCount > 0 ? `<span class="hero-candle-badge" title="Зажжено свечей памяти">🕯 ${candleCount}</span>` : ''}
           ${medalsHTML ? `<div class="hero-card-medals-overlay">${medalsHTML}</div>` : ''}
