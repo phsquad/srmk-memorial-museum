@@ -180,8 +180,10 @@ const ArchiveService = {
 
     const candidateUrls = [
       hero.media?.photo,
+      `assets/images/heroes/${hero.id}.webp`,
       `assets/images/heroes/${hero.id}.jpg`,
       `assets/images/heroes/${hero.id}.png`,
+      `https://raw.githubusercontent.com/phsquad/srmkmuseum/main/assets/images/heroes/${hero.id}.webp`,
       `https://raw.githubusercontent.com/phsquad/srmkmuseum/main/assets/images/heroes/${hero.id}.jpg`
     ].filter(Boolean);
 

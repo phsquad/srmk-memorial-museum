@@ -13,7 +13,7 @@ const GRAND_MEMORY_BOOK_PART_1 = [
     specialty: 'Техническая эксплуатация оборудования (выпуск 2016 г.)',
     military: 'Рядовой, стрелок мотострелковых войск ВС РФ',
     awards: 'Орден Мужества (посмертно)', location: 'Донецкий укрепленный рубеж (ДНР)',
-    photo: 'assets/images/heroes/petukhov.jpg', audioFile: 'assets/audio/guides/petukhov.mp3',
+    photo: 'assets/images/heroes/petukhov.webp', audioFile: 'assets/audio/guides/petukhov.mp3',
     shortSnippet: 'Прикрыл собой эвакуацию группы раненых сослуживцев во время контратаки бронетехники.',
     pages: [
       ['Стальной характер', 'В 2012 году Владислав Петухов поступил в СРМК на техническую специальность. В мастерских колледжа он отличался точностью, выдержкой и готовностью помочь товарищам. В 2016 году защитил диплом техника-механика на отлично.', 'ЛИЧНОЕ ДЕЛО № 2012-МЕХ'],
@@ -27,7 +27,7 @@ const GRAND_MEMORY_BOOK_PART_1 = [
     name: 'Ярышев Максим Викторович', years: '21.02.1985 — 20.01.2024',
     specialty: 'Сварочное производство (выпуск 2004 г.)', military: 'Сержант, командир штурмового отделения',
     awards: 'Орден Мужества (посмертно), Медаль «За отвагу»', location: 'Авдеевский укрепленный район',
-    photo: 'assets/images/heroes/yaryshev.jpg', audioFile: 'assets/audio/guides/yaryshev.mp3',
+    photo: 'assets/images/heroes/yaryshev.webp', audioFile: 'assets/audio/guides/yaryshev.mp3',
     shortSnippet: 'Командир штурмового отделения, прорыв бетонированных укреплений Авдеевского района.',
     pages: [
       ['Школа рабочего мастерства', 'Максим Ярышев поступил в колледж в 2000 году на сварочное производство. Он изучал физику сварочной дуги, газовую резку и металловедение, став профессионалом с золотыми руками.', 'ОГОНЬ И МЕТАЛЛ'],
@@ -40,7 +40,7 @@ const GRAND_MEMORY_BOOK_PART_1 = [
     id: 'sopolev-n-s', volNum: 'Том III', chapterNum: 'Глава III', plaque: 'left',
     name: 'Сополев Николай Сергеевич', years: '20.12.2000 — 2023', specialty: 'Пожарная безопасность (выпуск 2020 г.)',
     military: 'Гвардии рядовой 247-го гв. ДШП ВДВ', awards: 'Орден Мужества (посмертно)', location: 'Запорожское направление (Орехов)',
-    photo: 'assets/images/heroes/sopolev.jpg', audioFile: 'assets/audio/guides/sopolev.mp3',
+    photo: 'assets/images/heroes/sopolev.webp', audioFile: 'assets/audio/guides/sopolev.mp3',
     shortSnippet: 'Спасал раненых товарищей под непрерывным обстрелом на Ореховском направлении.',
     pages: [
       ['Призвание спасателя', 'Николай Сополев окончил отделение пожарной безопасности и стал квалифицированным техником-спасателем. На учебных тревогах он всегда первым приходил на помощь.', 'ОТДЕЛЕНИЕ МЧС'],
@@ -53,7 +53,7 @@ const GRAND_MEMORY_BOOK_PART_1 = [
     id: 'belov-s-a', volNum: 'Том IV', chapterNum: 'Глава IV', plaque: 'left',
     name: 'Белов Сергей Александрович', years: '05.01.1995 — 2023', specialty: 'Электрооборудование и энергетика (выпуск 2015 г.)',
     military: 'Младший сержант, командир боевой машины', awards: 'Орден Мужества (посмертно)', location: 'Бахмутский рубеж',
-    photo: 'assets/images/heroes/belov.jpg', audioFile: 'assets/audio/guides/belov.mp3',
+    photo: 'assets/images/heroes/belov.webp', audioFile: 'assets/audio/guides/belov.mp3',
     shortSnippet: 'Командир боевой машины обеспечил перегруппировку батальона под танковым ударом.',
     pages: [
       ['Энергия и дисциплина', 'Сергей окончил электротехническое отделение СРМК. Его отличали математическая точность, техническая грамотность и железная самодисциплина.', 'ЭЛЕКТРООТДЕЛЕНИЕ'],
@@ -66,7 +66,7 @@ const GRAND_MEMORY_BOOK_PART_1 = [
     id: 'shartov-p-n', volNum: 'Том V', chapterNum: 'Глава V', plaque: 'left',
     name: 'Шартов Павел Николаевич', years: '1998 — 2023', specialty: 'ТО и ремонт автотранспорта (выпуск 2018 г.)',
     military: 'Рядовой, водитель подвоза боеприпасов МТО', awards: 'Орден Мужества (посмертно)', location: 'Марьинское направление',
-    photo: 'assets/images/heroes/shartov.jpg', audioFile: 'assets/audio/guides/shartov.mp3',
+    photo: 'assets/images/heroes/shartov.webp', audioFile: 'assets/audio/guides/shartov.mp3',
     shortSnippet: 'Водитель МТО совершал рейсы на передний край под ударами артиллерии и дронов.',
     pages: [
       ['Автомобильная лаборатория', 'Павел окончил автотранспортное отделение в 2018 году и виртуозно владел диагностикой тяжелых армейских грузовиков.', 'АВТООТДЕЛЕНИЕ'],
@@ -79,7 +79,7 @@ const GRAND_MEMORY_BOOK_PART_1 = [
     id: 'nazyrov-sh-r', volNum: 'Том VI', chapterNum: 'Глава VI', plaque: 'left',
     name: 'Назыров Шамиль Рустамович', years: '26.09.2002 — 04.05.2023', specialty: 'Электромонтер (Красный диплом 2021 г.)',
     military: 'Гвардии рядовой, водитель «Машины жизни»', awards: 'Орден Мужества, Медаль «За храбрость» II степени', location: 'Херсонская область, с. Гладковка',
-    photo: 'assets/images/heroes/nazyrov.jpg', audioFile: 'assets/audio/guides/nazyrov.mp3',
+    photo: 'assets/images/heroes/nazyrov.webp', audioFile: 'assets/audio/guides/nazyrov.mp3',
     shortSnippet: 'Легендарный водитель «Машины жизни», доставлявший воду на передовую под обстрелами.',
     pages: [
       ['Золотой выпускник', 'Шамиль окончил колледж с отличием по профессии электромонтера, параллельно освоил сварочное дело и поступил в университет.', 'КРАСНЫЙ ДИПЛОМ'],
@@ -92,7 +92,7 @@ const GRAND_MEMORY_BOOK_PART_1 = [
     id: 'lukyanenko-i-v', volNum: 'Том VII', chapterNum: 'Глава VII', plaque: 'left',
     name: 'Лукьяненко Игорь Владимирович', years: '1997 — 2023', specialty: 'Машиностроение и металлообработка (выпуск 2017 г.)',
     military: 'Рядовой, механик-водитель танка Т-72Б3', awards: 'Орден Мужества (посмертно)', location: 'Донецкое направление',
-    photo: 'assets/images/heroes/lukyanenko.jpg', audioFile: 'assets/audio/guides/lukyanenko.mp3',
+    photo: 'assets/images/heroes/lukyanenko.webp', audioFile: 'assets/audio/guides/lukyanenko.mp3',
     shortSnippet: 'Механик-водитель сохранил экипаж и маневренность танка под прямым артиллерийским огнем.',
     pages: [
       ['Стальной клин', 'Игорь окончил машиностроительное отделение и глубоко понимал механику силовых агрегатов и физику металлов.', 'МАШИНОСТРОЕНИЕ'],
