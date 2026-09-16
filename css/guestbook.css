@@ -1,7 +1,8 @@
 @charset "UTF-8";
 
 /* ==========================================================================
-   СТИЛИ ЦИФРОВОЙ СТЕНЫ ПАМЯТИ: css/guestbook.css
+   СТИЛИ ЦИФРОВОЙ СТЕНЫ ПАМЯТИ: css/guestbook.css (v4.0 Master)
+   Мемориально-образовательный комплекс ГБПОУ СРМК «Быть воином — жить вечно»
    ========================================================================== */
 :root {
   --bg-main: #0a0c0f;
@@ -51,101 +52,31 @@ body {
   padding: 0 24px;
 }
 
-/* Шапка */
-.gb-header {
-  background: rgba(10, 12, 16, 0.96);
-  backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--border-hairline);
-  padding: 12px 0;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.logo-badge {
-  background: var(--accent-granite);
-  color: #fff;
-  font-family: var(--font-serif);
-  font-weight: 900;
-  font-size: 0.85rem;
-  padding: 6px 12px;
-  border-radius: 2px;
-  text-decoration: none;
-}
-
-.header-titles .sub-title {
-  display: block;
-  font-size: 0.65rem;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  font-weight: 700;
-}
-
-.header-titles .main-title {
-  font-family: var(--font-serif);
-  font-size: 1rem;
-  color: var(--accent-brass);
-}
-
-.header-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.nav-btn {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-hairline);
-  color: var(--text-secondary);
-  padding: 7px 14px;
-  border-radius: 2px;
-  text-decoration: none;
-  font-size: 0.78rem;
-  font-weight: 600;
-  transition: var(--transition);
-}
-
-.nav-btn:hover {
-  color: #fff;
-  border-color: var(--accent-brass);
-}
-
-.nav-btn.btn-primary {
-  background: var(--accent-granite);
-  color: #fff;
-  border-color: var(--accent-granite);
-}
-
-/* Баннер Hero */
+/* ==========================================================================
+   1. БАННЕР HERO СТЕНЫ ПАМЯТИ
+   ========================================================================== */
 .gb-hero {
   padding: 65px 0 50px;
   text-align: center;
   background: radial-gradient(circle at 50% 25%, rgba(26, 32, 44, 0.75) 0%, var(--bg-main) 75%);
   border-bottom: 1px solid var(--border-hairline);
+  position: relative;
 }
 
-.hero-crest { font-size: 2.2rem; margin-bottom: 8px; }
+.hero-crest { 
+  font-size: 2.4rem; 
+  margin-bottom: 8px; 
+}
+
 .hero-badge {
   display: inline-block;
   color: var(--accent-brass);
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 2px;
   border-bottom: 1px solid var(--border-accent);
-  padding-bottom: 3px;
+  padding-bottom: 4px;
   margin-bottom: 14px;
 }
 
@@ -156,10 +87,11 @@ body {
   letter-spacing: 0.8px;
   color: #ffffff;
   margin-bottom: 14px;
+  line-height: 1.2;
 }
 
 .hero-quote {
-  max-width: 720px;
+  max-width: 740px;
   margin: 0 auto 28px;
   font-family: var(--font-book);
   font-size: 1.05rem;
@@ -179,16 +111,18 @@ body {
 .stat-box {
   background: var(--bg-surface);
   border: 1px solid var(--border-hairline);
-  padding: 10px 24px;
+  padding: 12px 28px;
   border-radius: 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-width: 140px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .stat-num {
   font-family: var(--font-serif);
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   font-weight: 900;
   color: var(--accent-brass);
   line-height: 1;
@@ -200,6 +134,7 @@ body {
   color: var(--text-tertiary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  font-weight: 600;
 }
 
 .btn-open-form {
@@ -215,20 +150,24 @@ body {
   transition: var(--transition);
   box-shadow: 0 4px 20px rgba(138, 28, 34, 0.4);
 }
+
 .btn-open-form:hover {
   background: var(--accent-granite-hover);
   transform: translateY(-2px);
   box-shadow: 0 6px 25px rgba(138, 28, 34, 0.6);
 }
 
-/* Панель фильтров */
+/* ==========================================================================
+   2. ПАНЕЛЬ ФИЛЬТРАЦИИ И ПОИСКА
+   ========================================================================== */
 .gb-filter-bar {
   background: #080a0d;
   border-bottom: 1px solid var(--border-hairline);
   padding: 14px 0;
   position: sticky;
-  top: 61px;
+  top: 66px; /* Расположена прямо под site-header */
   z-index: 900;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
 }
 
 .filter-container {
@@ -243,39 +182,57 @@ body {
   flex: 1;
   min-width: 260px;
 }
+
 .search-icon {
-  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  position: absolute; 
+  left: 12px; 
+  top: 50%; 
+  transform: translateY(-50%);
   color: var(--text-tertiary);
+  pointer-events: none;
 }
+
 .search-input {
   width: 100%;
   background: var(--bg-surface);
   border: 1px solid var(--border-hairline);
   color: #fff;
-  padding: 9px 12px 9px 34px;
+  padding: 10px 14px 10px 36px;
   border-radius: 2px;
-  font-size: 0.84rem;
+  font-size: 0.86rem;
   outline: none;
+  transition: var(--transition);
 }
-.search-input:focus { border-color: var(--accent-brass); }
+
+.search-input:focus { 
+  border-color: var(--accent-brass); 
+  box-shadow: 0 0 12px var(--accent-brass-dim);
+}
 
 .filter-dropdown-wrap {
-  min-width: 220px;
+  min-width: 230px;
 }
+
 .filter-select {
   width: 100%;
   background: var(--bg-surface);
   border: 1px solid var(--border-hairline);
   color: #fff;
-  padding: 9px 12px;
+  padding: 10px 14px;
   border-radius: 2px;
   font-size: 0.82rem;
   outline: none;
   cursor: pointer;
+  transition: var(--transition);
 }
-.filter-select:focus { border-color: var(--accent-brass); }
 
-/* Сетка карточек стены */
+.filter-select:focus { 
+  border-color: var(--accent-brass); 
+}
+
+/* ==========================================================================
+   3. СЕТКА КАРТОЧЕК СТЕНЫ (WALL FEED)
+   ========================================================================== */
 .gb-main-feed {
   flex-grow: 1;
   padding: 40px 24px 80px;
@@ -283,7 +240,7 @@ body {
 
 .wall-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
   gap: 24px;
   align-items: start;
 }
@@ -297,7 +254,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 240px;
+  min-height: 250px;
   border: 1px solid var(--border-hairline);
   transition: transform 0.25s var(--transition), box-shadow 0.25s var(--transition);
 }
@@ -305,6 +262,10 @@ body {
 .tribute-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 20px 40px rgba(0,0,0,0.9), 0 0 16px var(--accent-brass-dim);
+}
+
+.tribute-card.pinned {
+  border-left: 4px solid var(--accent-granite);
 }
 
 /* 4 ХУДОЖЕСТВЕННЫХ СТИЛЯ ОТКРЫТКИ */
@@ -380,6 +341,8 @@ body {
   color: #dbe2ed;
   margin-bottom: 18px;
   font-style: italic;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .card-footer-row {
@@ -394,18 +357,19 @@ body {
   background: transparent;
   border: 1px solid var(--border-hairline);
   color: var(--accent-brass);
-  padding: 5px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
-  font-size: 0.76rem;
-  font-weight: 600;
+  font-size: 0.78rem;
+  font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   transition: var(--transition);
 }
 
-.btn-flame-tribute:hover, .btn-flame-tribute.active {
+.btn-flame-tribute:hover, 
+.btn-flame-tribute.active {
   background: var(--accent-brass-dim);
   border-color: var(--accent-brass);
   transform: scale(1.05);
@@ -417,7 +381,7 @@ body {
 }
 
 /* ==========================================================================
-   МОДАЛЬНОЕ ОКНО ФОРМЫ
+   4. МОДАЛЬНОЕ ОКНО ФОРМЫ
    ========================================================================== */
 .gb-modal {
   position: fixed;
@@ -428,7 +392,10 @@ body {
   justify-content: center;
   padding: 20px;
 }
-.gb-modal.active { display: flex; }
+
+.gb-modal.active { 
+  display: flex; 
+}
 
 .gb-overlay {
   position: absolute;
@@ -459,15 +426,57 @@ body {
   border-bottom: 1px solid var(--border-hairline);
   padding-bottom: 12px;
 }
-.modal-sub { font-size: 0.68rem; color: var(--accent-brass); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
-.modal-title { font-family: var(--font-serif); font-size: 1.35rem; color: #fff; }
-.modal-close-btn { background: none; border: none; font-size: 1.8rem; color: var(--text-tertiary); cursor: pointer; }
-.modal-close-btn:hover { color: #fff; }
 
-.tribute-form { display: flex; flex-direction: column; gap: 14px; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.form-field { display: flex; flex-direction: column; gap: 5px; }
-.field-label { font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; }
+.modal-sub { 
+  font-size: 0.68rem; 
+  color: var(--accent-brass); 
+  text-transform: uppercase; 
+  font-weight: 700; 
+  letter-spacing: 1px; 
+}
+
+.modal-title { 
+  font-family: var(--font-serif); 
+  font-size: 1.35rem; 
+  color: #fff; 
+}
+
+.modal-close-btn { 
+  background: none; 
+  border: none; 
+  font-size: 1.8rem; 
+  color: var(--text-tertiary); 
+  cursor: pointer; 
+}
+
+.modal-close-btn:hover { 
+  color: #fff; 
+}
+
+.tribute-form { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 14px; 
+}
+
+.form-row { 
+  display: grid; 
+  grid-template-columns: 1fr 1fr; 
+  gap: 12px; 
+}
+
+.form-field { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 5px; 
+}
+
+.field-label { 
+  font-size: 0.75rem; 
+  font-weight: 700; 
+  color: var(--text-secondary); 
+  text-transform: uppercase; 
+}
 
 .field-input, .field-select, .field-textarea {
   width: 100%;
@@ -480,20 +489,31 @@ body {
   font-size: 0.86rem;
   outline: none;
 }
+
 .field-input:focus, .field-select:focus, .field-textarea:focus {
   border-color: var(--accent-brass);
 }
 
-.char-counter { font-size: 0.7rem; color: var(--text-tertiary); text-align: right; }
+.char-counter { 
+  font-size: 0.7rem; 
+  color: var(--text-tertiary); 
+  text-align: right; 
+}
 
-/* Выбор стиля карточки */
 .card-styles-picker {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
 }
-.style-choice { cursor: pointer; }
-.style-choice input { display: none; }
+
+.style-choice { 
+  cursor: pointer; 
+}
+
+.style-choice input { 
+  display: none; 
+}
+
 .style-box {
   display: block;
   padding: 8px 4px;
@@ -505,6 +525,7 @@ body {
   color: var(--text-secondary);
   transition: var(--transition);
 }
+
 .style-choice input:checked + .style-box {
   border-color: var(--accent-brass);
   color: var(--accent-brass);
@@ -525,9 +546,15 @@ body {
   transition: var(--transition);
   margin-top: 8px;
 }
-.btn-submit-tribute:hover { background: var(--accent-granite-hover); transform: translateY(-1px); }
 
-/* Подвал */
+.btn-submit-tribute:hover { 
+  background: var(--accent-granite-hover); 
+  transform: translateY(-1px); 
+}
+
+/* ==========================================================================
+   5. ПОДВАЛ И СЕРВИСНЫЕ ЭЛЕМЕНТЫ
+   ========================================================================== */
 .gb-footer {
   background: #060709;
   border-top: 1px solid var(--border-hairline);
@@ -536,17 +563,50 @@ body {
   color: var(--text-tertiary);
   margin-top: auto;
 }
-.footer-inner { display: grid; grid-template-columns: 1.2fr 100px 1.2fr; align-items: center; gap: 20px; }
-.footer-center { text-align: center; }
-.crest-mini { font-size: 1.4rem; color: var(--accent-brass); }
-.footer-moto { font-family: var(--font-serif); color: var(--accent-brass); font-size: 0.85rem; }
-.footer-right { text-align: right; }
-.btn-admin-mod { background: none; border: none; color: #555; font-size: 0.72rem; cursor: pointer; }
-.btn-admin-mod:hover { color: var(--accent-brass); }
+
+.footer-inner { 
+  display: grid; 
+  grid-template-columns: 1.2fr 100px 1.2fr; 
+  align-items: center; 
+  gap: 20px; 
+}
+
+.footer-center { 
+  text-align: center; 
+}
+
+.crest-mini { 
+  font-size: 1.4rem; 
+  color: var(--accent-brass); 
+}
+
+.footer-moto { 
+  font-family: var(--font-serif); 
+  color: var(--accent-brass); 
+  font-size: 0.85rem; 
+}
+
+.footer-right { 
+  text-align: right; 
+}
+
+.btn-admin-mod { 
+  background: none; 
+  border: none; 
+  color: #666; 
+  font-size: 0.72rem; 
+  cursor: pointer; 
+  transition: color var(--transition);
+}
+
+.btn-admin-mod:hover { 
+  color: var(--accent-brass); 
+}
 
 .gb-toast {
   position: fixed;
-  bottom: 24px; right: 24px;
+  bottom: 24px; 
+  right: 24px;
   background: rgba(14, 16, 22, 0.96);
   border: 1px solid var(--accent-brass);
   color: #fff;
@@ -558,4 +618,8 @@ body {
   transform: translateY(40px);
   transition: all 0.25s ease;
 }
-.gb-toast.active { opacity: 1; transform: translateY(0); }
+
+.gb-toast.active { 
+  opacity: 1; 
+  transform: translateY(0); 
+}

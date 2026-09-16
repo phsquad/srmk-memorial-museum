@@ -1,30 +1,32 @@
 /**
  * ============================================================================
- * КРИПТОГРАФИЧЕСКИЙ АНТИБОТ-ЩИТ: js/anti-cheat-tribute.js
- * Proof-of-Work (PoW) + Биометрия курсора + Аппаратный фингерпринт
+ * КРИПТОГРАФИЧЕСКИЙ АНТИБОТ-ЩИТ: js/anti-cheat-tribute.js (v3.0 Master)
+ * Proof-of-Work (PoW) + Биометрия курсора + Аппаратный фингерпринт устройства
+ * 
+ * Обеспечивает единую защищенную фиксацию возложения цветов и зажжения свечей
  * ============================================================================
  */
 
 'use strict';
 
 const TributeSecurity = {
-  POW_DIFFICULTY: "0000", // Требуется хэш, начинающийся с 4 нулей
+  POW_DIFFICULTY: "0000", // Хэш должен начинаться с 4 нулей
   SALT: "SRMK_MEMORIAL_DEFENSE_HEROES_2026",
-  COOLDOWN_MS: 24 * 60 * 60 * 1000, // 24 часа
+  COOLDOWN_MS: 24 * 60 * 60 * 1000, // Суточный кулдаун (24 часа)
 
-  // Сбор энтропии движений курсора
   _mouseEntropy: [],
   _lastClickTime: 0,
 
   init() {
     this._trackMouseEntropy();
+    console.log("[TributeSecurity v3.0] Криптографический антибот-щит готов.");
   },
 
   _trackMouseEntropy() {
     let lastMove = 0;
     window.addEventListener('mousemove', (e) => {
       const now = performance.now();
-      if (now - lastMove > 50) { // Сэмплирование раз в 50мс
+      if (now - lastMove > 50) {
         this._mouseEntropy.push(Math.round(e.clientX + e.clientY));
         if (this._mouseEntropy.length > 20) this._mouseEntropy.shift();
         lastMove = now;
@@ -33,30 +35,37 @@ const TributeSecurity = {
   },
 
   /**
-   * 1. Генерация уникального аппаратного слепка устройства
+   * 1. Генерация уникального аппаратного отпечатка устройства (Canvas Fingerprint)
    */
   async getDeviceFingerprint() {
-    const canvas = document.createElement('canvas');
-    canvas.width = 100;
-    canvas.height = 30;
-    const ctx = canvas.getContext('2d');
-    ctx.textBaseline = "top";
-    ctx.font = "14px 'Cinzel', serif";
-    ctx.fillStyle = "#8a1c22";
-    ctx.fillText("SRMK-MEMORIAL-2026", 2, 2);
-    ctx.fillStyle = "#c5a059";
-    ctx.fillRect(10, 10, 80, 10);
-    
-    const canvasHash = canvas.toDataURL();
-    const rawSeed = `${navigator.userAgent}_${screen.width}x${screen.height}_${canvasHash}`;
-    
-    const msgBuffer = new TextEncoder().encode(rawSeed);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-    return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 16);
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 100;
+      canvas.height = 30;
+      const ctx = canvas.getContext('2d');
+      ctx.textBaseline = "top";
+      ctx.font = "14px 'Cinzel', serif";
+      ctx.fillStyle = "#8a1c22";
+      ctx.fillText("SRMK-MEMORIAL-2026", 2, 2);
+      ctx.fillStyle = "#c5a059";
+      ctx.fillRect(10, 10, 80, 10);
+      
+      const canvasHash = canvas.toDataURL();
+      const rawSeed = `${navigator.userAgent}_${screen.width}x${screen.height}_${canvasHash}`;
+      
+      const msgBuffer = new TextEncoder().encode(rawSeed);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      return Array.from(new Uint8Array(hashBuffer))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('')
+        .substring(0, 16);
+    } catch (e) {
+      return "srmk_fallback_device_" + Math.random().toString(36).substring(2, 8);
+    }
   },
 
   /**
-   * 2. Proof-of-Work (Решение криптографической головоломки на клиенте)
+   * 2. Решение криптографической задачи Proof-of-Work на клиенте
    */
   async solveProofOfWork(challengeSeed) {
     let nonce = 0;
@@ -78,40 +87,41 @@ const TributeSecurity = {
   },
 
   /**
-   * 3. Главная проверка права на действие
+   * 3. Главная проверка права на действие (Свеча или Цветы)
    */
   async verifyAndExecuteTribute(type, heroId, event, onSuccess) {
-    // А) Проверка на эмуляцию клика скриптом
-    if (!event || !event.isTrusted) {
-      this._showToast("Ошибка: Программное воздействие заблокировано системой безопасности.", "error");
+    // А) Защита от программной эмуляции клика (bot.click())
+    if (event && !event.isTrusted) {
+      this._showToast("Программное воздействие заблокировано системой безопасности.", "error");
       return;
     }
 
-    // Б) Анализ энтропии движений человека
+    // Б) Анализ естественной энтропии движений курсора
     if (this._mouseEntropy.length < 3 && !('ontouchstart' in window)) {
-      this._showToast("Внимание: Слишком быстрое действие. Пожалуйста, взаимодействуйте естественно.", "warn");
+      this._showToast("Слишком быстрое действие. Пожалуйста, взаимодействуйте естественно.", "warn");
       return;
     }
 
-    // В) Анти-спам интервал (не чаще 1 раза в 2 секунды)
+    // В) Анти-спам задержка (не чаще 1 раза в 1.5 секунды)
     const now = Date.now();
-    if (now - this._lastClickTime < 2000) return;
+    if (now - this._lastClickTime < 1500) return;
     this._lastClickTime = now;
 
-    // Г) Проверка 24-часового лимита для конкретного действия
+    // Г) Проверка суточного кулдауна для конкретного действия и героя
     const deviceId = await this.getDeviceFingerprint();
     const storageKey = `srmk_tribute_${type}_${heroId || 'global'}_${deviceId}`;
     const lastDone = parseInt(localStorage.getItem(storageKey) || '0', 10);
 
     if (now - lastDone < this.COOLDOWN_MS) {
       const hoursLeft = Math.ceil((this.COOLDOWN_MS - (now - lastDone)) / (1000 * 60 * 60));
-      this._showToast(`Вы уже почтили память сегодня. Повторное действие будет доступно через ${hoursLeft} ч.`, "info");
+      const actionName = type === 'flowers' ? 'возложили цветы' : 'зажгли Свечу Памяти';
+      this._showToast(`Вы уже ${actionName} сегодня. Повторное действие доступно через ${hoursLeft} ч.`, "info");
       return;
     }
 
-    // Д) Запуск решения Proof-of-Work задачи
-    this._showToast("Криптографическая верификация...", "info");
-    const challenge = `${deviceId}_${heroId}_${Date.now()}`;
+    // Д) Запуск решения криптографической задачи PoW
+    this._showToast("Верификация действия...", "info");
+    const challenge = `${deviceId}_${heroId || 'global'}_${Date.now()}`;
     const solution = await this.solveProofOfWork(challenge);
 
     if (!solution) {
@@ -119,13 +129,14 @@ const TributeSecurity = {
       return;
     }
 
-    // Е) Успешная фиксация в защищенном хранилище
+    // Е) Фиксация времени действия в локальном кэше устройства
     localStorage.setItem(storageKey, now.toString());
     
-    // Подпись счетчика
+    // Ж) Обновление единого реестра счетчиков устройства
     let vault = JSON.parse(localStorage.getItem('srmk_tribute_vault') || '{}');
-    const actionKey = `${type}_${heroId}`;
-    vault[actionKey] = (vault[actionKey] || 0) + 1;
+    const actionKey = `${type}_${heroId || 'global'}`;
+    const incrementStep = (type === 'flowers') ? 2 : 1;
+    vault[actionKey] = (vault[actionKey] || 0) + incrementStep;
     localStorage.setItem('srmk_tribute_vault', JSON.stringify(vault));
 
     if (typeof onSuccess === 'function') {
@@ -143,7 +154,7 @@ const TributeSecurity = {
     }
     toast.textContent = msg;
     toast.className = `memorial-toast active toast-${type}`;
-    setTimeout(() => toast.classList.remove('active'), 3500);
+    setTimeout(() => toast.classList.remove('active'), 3200);
   }
 };
 

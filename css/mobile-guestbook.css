@@ -1,35 +1,12 @@
 @charset "UTF-8";
 
 /* ==========================================================================
-   МОБИЛЬНЫЕ СТИЛИ СТЕНЫ ПАМЯТИ: css/mobile-guestbook.css
+   МОБИЛЬНЫЕ СТИЛИ СТЕНЫ ПАМЯТИ: css/mobile-guestbook.css (v4.0 Master)
    ========================================================================== */
 @media (max-width: 900px) {
 
-  .gb-header {
-    padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
-  }
-
-  .header-content {
-    flex-direction: column;
-    gap: 8px;
-    align-items: flex-start;
-  }
-
-  .header-actions {
-    width: 100%;
-    overflow-x: auto;
-    padding-bottom: 2px;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .nav-btn {
-    flex-shrink: 0;
-    padding: 6px 12px;
-    font-size: 0.74rem;
-  }
-
   .gb-hero {
-    padding: 40px 0 30px;
+    padding: 40px 0 28px;
   }
 
   .hero-title {
@@ -49,6 +26,7 @@
 
   .stat-box {
     padding: 8px 14px;
+    min-width: 100px;
   }
 
   .stat-num {
@@ -65,7 +43,7 @@
     font-size: 0.9rem;
   }
 
-  /* Панель фильтров */
+  /* Панель фильтров на смартфонах */
   .gb-filter-bar {
     position: static;
     padding: 12px 0;
@@ -82,9 +60,9 @@
     min-width: 100%;
   }
 
-  /* Переход сетки стены в одну колонку */
+  /* Переход сетки стены в 1 колонку */
   .gb-main-feed {
-    padding: 24px 16px calc(50px + env(safe-area-inset-bottom, 0px));
+    padding: 20px 16px calc(50px + env(safe-area-inset-bottom, 0px));
   }
 
   .wall-grid {
