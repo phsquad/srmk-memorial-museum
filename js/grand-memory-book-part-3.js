@@ -46,6 +46,11 @@ const GRAND_MEMORY_BOOK_ARCHIVE = [
   ...GRAND_MEMORY_BOOK_PART_3
 ];
 
+// Обратная совместимость для глобального доступа
 if (typeof window !== 'undefined') window.GRAND_MEMORY_BOOK_ARCHIVE = GRAND_MEMORY_BOOK_ARCHIVE;
+if (typeof window !== 'undefined') window.GRAND_MEMORY_BOOK_PART_3 = GRAND_MEMORY_BOOK_PART_3;
+
+// ES6 модульный экспорт для сборщика Vite/Webpack
+export { GRAND_MEMORY_BOOK_PART_3, GRAND_MEMORY_BOOK_ARCHIVE };
 
 if (typeof module !== 'undefined' && module.exports) module.exports = { GRAND_MEMORY_BOOK_PART_3 };
