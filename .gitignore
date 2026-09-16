@@ -1,17 +1,1 @@
-```
-# Environment
-.env.local
-.env.*
-
-# Logs and temp files
-*.log
-*.tmp
-*.swp
-
-# Editors
-.vscode/
-.idea/
-
-# Original rules preserved
-*.log
-```
+Nothing needs to be added to .gitignore since the changes only include source files (`.md`, `.html`) and no build artifacts, dependencies, or temporary files.
