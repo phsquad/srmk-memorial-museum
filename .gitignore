@@ -1,11 +1,10 @@
 ```
-# Dependencies
-node_modules/
+# Backup files
+*.bak
 
-# Build artifacts
-dist/
-build/
-*.js.map
+# Logs and temp files
+*.log
+*.tmp
 
 # Environment
 .env
@@ -16,15 +15,19 @@ build/
 .vscode/
 .idea/
 
-# Logs
-*.log
-
-# Python (if applicable)
+# Dependencies
+node_modules/
+.venv/
+venv/
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-.Python
-venv/
-.venv/
+
+# Build artifacts
+dist/
+build/
+target/
+
+# OS generated files
+.DS_Store
+Thumbs.db
 ```
