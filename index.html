@@ -426,12 +426,32 @@
     </section>
   </main>
 
-  <!-- МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ (Генерируется в app.js) -->
+  <!-- МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ -->
   <div class="modal" id="heroModal" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal-overlay" id="modalOverlay"></div>
     <div class="modal-dialog">
       <button class="modal-close" id="modalCloseBtn" type="button" aria-label="Закрыть">&times;</button>
       <div class="modal-body" id="modalHeroContent"></div>
+    </div>
+  </div>
+
+  <!-- МОДАЛЬНОЕ ОКНО ПАСПОРТА МУЗЕЯ -->
+  <div class="modal" id="passportModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-overlay" id="passportModalOverlay"></div>
+    <div class="modal-dialog" style="max-width: 760px;">
+      <button class="modal-close" id="passportModalCloseBtn" type="button" aria-label="Закрыть">&times;</button>
+      <div class="modal-body">
+        <h2 style="font-family: var(--font-serif); color: var(--accent-brass); margin-bottom: 16px;">Паспорт виртуального музея</h2>
+        <table style="width:100%; border-collapse: collapse; font-size: 0.88rem; color: #d8deea;">
+          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass); width: 35%;">Проект:</td><td style="padding: 10px 8px;">«Быть воином — жить вечно»</td></tr>
+          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Организация:</td><td style="padding: 10px 8px;">ГБПОУ «Ставропольский региональный многопрофильный колледж»</td></tr>
+          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Номинация:</td><td style="padding: 10px 8px;">«За партой героя» (Всероссийская акция «Карта доблести»)</td></tr>
+          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Руководитель:</td><td style="padding: 10px 8px;">Е. В. Бледных, директор ГБПОУ СРМК, канд. ист. наук</td></tr>
+          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Куратор:</td><td style="padding: 10px 8px;">А. В. Генте, преподаватель истории высшей кат.</td></tr>
+          <tr style="border-bottom: 1px solid var(--border-hairline);"><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Разработчик:</td><td style="padding: 10px 8px;">А. И. Андреев, студент 2 курса «ИСиП»</td></tr>
+          <tr><td style="padding: 10px 8px; font-weight: bold; color: var(--accent-brass);">Фонд памяти:</td><td style="padding: 10px 8px;">20 выпускников колледжа, увековеченных на Мемориале Славы</td></tr>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -491,7 +511,7 @@
     </div>
   </footer>
 
-  <!-- СКРИПТЫ -->
+  <!-- ПОДКЛЮЧЕНИЕ СКРИПТОВ -->
   <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/data.js"></script>
@@ -503,6 +523,7 @@
   <script src="js/tech-modules.js"></script>
   <script src="js/app.js"></script>
   <script src="js/admin.js"></script>
+  <!-- ЕДИНЫЙ НАВИГАЦИОННЫЙ ДИСПЕТЧЕР -->
   <script src="js/navigation.js"></script>
 
   <!-- Интерактивные триггеры страницы -->
@@ -533,28 +554,6 @@
         searchInput.dispatchEvent(new Event('input'));
       });
     }
-
-    // Переключение плит мемориала
-    document.querySelectorAll('.plaque-toggle-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.plaque-toggle-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const view = btn.dataset.plaqueView;
-        const leftZone = document.getElementById('leftPlaqueZone');
-        const rightZone = document.getElementById('rightPlaqueZone');
-
-        if (view === 'left') {
-          if (leftZone) leftZone.style.display = 'flex';
-          if (rightZone) rightZone.style.display = 'none';
-        } else if (view === 'right') {
-          if (leftZone) leftZone.style.display = 'none';
-          if (rightZone) rightZone.style.display = 'flex';
-        } else {
-          if (leftZone) leftZone.style.display = 'flex';
-          if (rightZone) rightZone.style.display = 'flex';
-        }
-      });
-    });
 
     // Доступность (ГОСТ)
     const contrastBtn = document.getElementById('toggleContrastBtn');
