@@ -8,6 +8,10 @@
 
 'use strict';
 
+// Импорт общих утилит из core.js для устранения дублирования
+import { formatDate, Storage, CONFIG } from './core.js';
+import { CloudSync, CloudConfig } from './cloud-sync.js';
+
 const GuestbookEngine = {
   tributes: [],
   userFlames: {},

@@ -325,17 +325,11 @@
 
   <div id="gbToast" class="gb-toast"></div>
 
-  <!-- 1. База данных героев -->
-  <script src="js/data.js"></script>
 
-  <!-- 2. SUPABASE REALTIME CLOUD SDK (Облако) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/cloud-sync.js"></script>
-
-  <!-- 3. Главный контроллер Стены Памяти -->
-  <script src="js/guestbook.js"></script>
-
-  <!-- НАВИГАЦИОННЫЙ МОДУЛЬ -->
-  <script src="js/navigation.js"></script>
+  <!-- ES6 Modules для Стены Памяти -->
+  <script type="module" src="js/core.js"></script>
+  <script type="module" src="js/cloud-sync.js"></script>
+  <script type="module" src="js/guestbook.js"></script>
+  <script type="module" src="js/navigation.js"></script>
 </body>
 </html>

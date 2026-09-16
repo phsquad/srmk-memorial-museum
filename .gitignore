@@ -1,8 +1,7 @@
-```
+(js/main.js has been added, but this appears to be a compiled/built JavaScript file rather than source code, so it should be ignored)
+
 # Build artifacts
-dist/
-build/
-*.js.map
+js/main.js
 
 # Dependencies
 node_modules/
@@ -11,42 +10,11 @@ node_modules/
 *.log
 *.tmp
 
-# Environment
-.env
-.env.local
-*.env.*
-
 # Editors
 .vscode/
 .idea/
 
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
-
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Distribution / packaging
-.Python
-env/
-venv/
-.venv/
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.log
-
-# System files
-.DS_Store
-Thumbs.db
-```
+# Environment
+.env
+.env.local
+*.env.*

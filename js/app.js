@@ -8,6 +8,7 @@
 'use strict';
 
 // ES6 импорты зависимых модулей
+import { CONFIG, formatDate, Storage } from './core.js';
 import { CloudSync } from './cloud-sync.js';
 import { ArchiveService } from './sources.js';
 import { HeraldryResolver } from './heraldry-resolver.js';

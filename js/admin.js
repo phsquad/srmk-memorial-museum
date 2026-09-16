@@ -11,6 +11,10 @@
 
 'use strict';
 
+// Импорт общих утилит из core.js для устранения дублирования
+import { formatDate, Storage, CONFIG } from './core.js';
+import { CloudSync } from './cloud-sync.js';
+
 const AdminCMS = {
   adminPassword: "2026",
   currentHeroId: null,

@@ -521,20 +521,16 @@
   <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
-  <!-- 2. База данных и источники -->
-  <script src="js/data.js"></script>
-  <script src="js/sources.js"></script>
-
-  <!-- 3. Облачный мост, защита и геральдика -->
-  <script src="js/cloud-sync.js"></script>
-  <script src="js/tts-narrator.js"></script>
-  <script src="js/anti-cheat-tribute.js"></script>
-  <script src="js/heraldry-resolver.js"></script>
-  <script src="js/tech-modules.js"></script>
-
-  <!-- 4. Основной контроллер выставки и панель CMS -->
-  <script src="js/app.js"></script>
-  <script src="js/admin.js"></script>
+  <!-- 2. Основной entry-point приложения (ES6 Module) -->
+  <script type="module" src="js/main.js"></script>
+  
+  <!-- 3. Остальные скрипты как модули (для обратной совместимости при необходимости) -->
+  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/admin.js"></script>
+  <script type="module" src="js/guestbook.js"></script>
+  <script type="module" src="js/quiz.js"></script>
+  <script type="module" src="js/reader.js"></script>
+  <script type="module" src="js/certificate-verifier.js"></script>
 
   <!-- Интерактивные триггеры страницы -->
   <script>

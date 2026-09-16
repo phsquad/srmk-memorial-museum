@@ -13,6 +13,9 @@
 
 'use strict';
 
+// Импорт общих утилит из core.js для устранения дублирования
+import { formatDate, Storage, CONFIG } from './core.js';
+
 const FOLIO_LIBRARY = [
   // Базовая заглушка на случай отсутствия загруженных внешних томов
   {
