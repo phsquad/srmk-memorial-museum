@@ -1,1 +1,30 @@
-(js/admin.js, js/anti-copy-master.js, js/app.js, js/cloud-sync.js, js/desk-qr.js, js/guestbook.js, js/heraldry-resolver.js, js/memory-book.js, js/quiz.js, js/reader.js, js/tech-modules.js, js/tts-narrator.js)
+```
+# Dependencies
+node_modules/
+
+# Build artifacts
+dist/
+build/
+*.js.map
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Python (if applicable)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+```
