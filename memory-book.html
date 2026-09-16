@@ -110,7 +110,7 @@
        МОДАЛЬНЫЙ МАРКДАУН-РИДЕР (ПОЛНОЭКРАННОЕ ЧТЕНИЕ)
        ========================================================================== -->
   <div class="reader-modal" id="readerModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="readerHeroTag">
-    <div class="reader-overlay" onclick="MemoryBookApp.closeReader()"></div>
+    <div class="reader-overlay" data-action="mbCloseReader"></div>
     <div class="reader-dialog">
       
       <!-- Панель управления ридером -->
@@ -118,8 +118,8 @@
         <div class="reader-hero-tag" id="readerHeroTag">Глава летописи</div>
         <div class="reader-actions">
           <button class="reader-btn" id="readerAudioBtn" type="button">🎧 Слушать аудиогид</button>
-          <button class="reader-btn" onclick="window.print()" type="button">🖨 Печать Справки</button>
-          <button class="reader-close" onclick="MemoryBookApp.closeReader()" type="button" aria-label="Закрыть">&times;</button>
+          <button class="reader-btn" id="btnPrintReader" type="button">🖨 Печать Справки</button>
+          <button class="reader-close" data-action="mbCloseReader" type="button" aria-label="Закрыть">&times;</button>
         </div>
       </div>
 
@@ -148,7 +148,7 @@
         <div class="audio-progress-fill" id="bookAudioProgressFill"></div>
       </div>
       <span class="audio-timer" id="bookAudioTimer">0:00 / 0:00</span>
-      <button class="audio-close-btn" onclick="MemoryBookApp.stopAudio()" type="button">&times;</button>
+      <button class="audio-close-btn" data-action="mbStopAudio" type="button">&times;</button>
     </div>
     <audio id="bookAudioPlayer" preload="metadata"></audio>
   </div>

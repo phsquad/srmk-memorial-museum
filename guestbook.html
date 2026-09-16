@@ -224,7 +224,7 @@
        МОДАЛЬНОЕ ОКНО: ФОРМА ДОБАВЛЕНИЯ ПОСЛАНИЯ
        ========================================================================== -->
   <div class="gb-modal" id="gbModal" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="gb-overlay" onclick="GuestbookEngine.closeModal()"></div>
+    <div class="gb-overlay" data-action="gbCloseModal"></div>
     <div class="gb-dialog">
       
       <div class="modal-header">
@@ -232,7 +232,7 @@
           <span class="modal-sub">Запись в вечную летопись</span>
           <h3 class="modal-title">Послание на Стену Памяти</h3>
         </div>
-        <button class="modal-close-btn" onclick="GuestbookEngine.closeModal()" type="button">&times;</button>
+        <button class="modal-close-btn" data-action="gbCloseModal" type="button">&times;</button>
       </div>
 
       <form id="tributeForm" class="tribute-form" onsubmit="GuestbookEngine.handleSubmit(event)">
@@ -318,7 +318,7 @@
       </div>
       <div class="footer-right">
         <p>© 2026 Цифровой фонд Мемориала Славы СРМК.</p>
-        <button class="btn-admin-mod" onclick="GuestbookEngine.openModeratorPrompt()">[ Модерация архива ]</button>
+        <button class="btn-admin-mod" id="btnModeratorPrompt" type="button">[ Модерация архива ]</button>
       </div>
     </div>
   </footer>

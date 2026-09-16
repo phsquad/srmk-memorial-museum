@@ -427,7 +427,24 @@ const GuestbookEngine = {
   },
 
   bindDOMEvents() {
+    // Делегирование событий для кнопок с data-action атрибутами
+    document.addEventListener('click', (e) => {
+      const target = e.target.closest('[data-action]');
+      if (!target) return;
+
+      const action = target.dataset.action;
+      
+      if (action === 'gbCloseModal') {
+        this.closeModal();
+      }
+    });
+
     document.getElementById('btnOpenModalForm')?.addEventListener('click', () => this.openModal());
+    
+    // Обработчик для кнопки модерации
+    document.getElementById('btnModeratorPrompt')?.addEventListener('click', () => {
+      this.openModeratorPrompt();
+    });
     
     const searchInput = document.getElementById('gbSearchInput');
     if (searchInput) {

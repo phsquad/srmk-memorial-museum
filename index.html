@@ -189,7 +189,7 @@
         <div class="hero-actions">
           <a href="#memorial" class="btn btn-primary">К Мемориалу Памяти</a>
           <button class="btn btn-secondary" id="btnOpenGeneralTour" type="button">Аудиоэкскурсия музея</button>
-          <button class="btn btn-secondary" onclick="App.startPresentationMode()" type="button">Режим «Урок Мужества»</button>
+          <button class="btn btn-secondary" id="btnStartPresentationMode" type="button">Режим «Урок Мужества»</button>
           <a href="certificate.html" class="btn btn-secondary" target="_blank" rel="noopener noreferrer">📜 Оформить Сертификат участника</a>
         </div>
       </div>
@@ -299,13 +299,13 @@
               Ожесточенные встречные бои десанта в феврале 2022 года. Подвиг разведчика-санитара 247-го ДШП <strong>Николая Вечёрки</strong> и стрелка <strong>Максима Елагина</strong>; рейсы «Машины жизни» <strong>Шамиля Назырова</strong>; стойкость <strong>Никиты Горлова</strong> и <strong>Ивана Сербиенко</strong>.
             </p>
             <div class="theatre-heroes-pills">
-              <span class="hero-pill" onclick="App.openModal('vecherka-n-a')">Н. Вечёрка</span>
-              <span class="hero-pill" onclick="App.openModal('elagin-m-n')">М. Елагин</span>
-              <span class="hero-pill" onclick="App.openModal('gorlov-n-a')">Н. Горлов</span>
-              <span class="hero-pill" onclick="App.openModal('nazyrov-sh-r')">Ш. Назыров</span>
-              <span class="hero-pill" onclick="App.openModal('serbienko-i-p')">И. Сербиенко</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="vecherka-n-a">Н. Вечёрка</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="elagin-m-n">М. Елагин</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="gorlov-n-a">Н. Горлов</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="nazyrov-sh-r">Ш. Назыров</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="serbienko-i-p">И. Сербиенко</span>
             </div>
-            <button class="theatre-map-focus-btn" onclick="App.focusMap([46.6, 32.7], 8)" type="button">Показать сектор на карте →</button>
+            <button class="theatre-map-focus-btn" data-action="focusMap" data-coords="[46.6, 32.7]" data-zoom="8" type="button">Показать сектор на карте →</button>
           </article>
 
           <article class="timeline-theatre-card" data-theatre-card="zaporozhye">
@@ -318,12 +318,12 @@
               Отражение бронетанковых атак электромехаником <strong>Дмитрием Самохиным</strong> (Орден Мужества № 83029); спасение раненых техником <strong>Николаем Сополевым</strong>; инженерная разведка сапера <strong>Константина Луценко</strong>; стойкость десантника <strong>Ивана Пономарчука</strong>.
             </p>
             <div class="theatre-heroes-pills">
-              <span class="hero-pill" onclick="App.openModal('samokhin-d-a')">Д. Самохин</span>
-              <span class="hero-pill" onclick="App.openModal('sopolev-n-s')">Н. Сополев</span>
-              <span class="hero-pill" onclick="App.openModal('lutsenko-k-a')">К. Луценко</span>
-              <span class="hero-pill" onclick="App.openModal('ponomarchuk-i-s')">И. Пономарчук</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="samokhin-d-a">Д. Самохин</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="sopolev-n-s">Н. Сополев</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="lutsenko-k-a">К. Луценко</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="ponomarchuk-i-s">И. Пономарчук</span>
             </div>
-            <button class="theatre-map-focus-btn" onclick="App.focusMap([47.45, 35.8], 8)" type="button">Показать сектор на карте →</button>
+            <button class="theatre-map-focus-btn" data-action="focusMap" data-coords="[47.45, 35.8]" data-zoom="8" type="button">Показать сектор на карте →</button>
           </article>
 
           <article class="timeline-theatre-card" data-theatre-card="donbass">
@@ -336,18 +336,18 @@
               Командирский подвиг <strong>Станислава Мартынова</strong> под Угледаром; штурмовые действия <strong>Максима Ярышева</strong>; оборона опорных пунктов <strong>Ильи Чупина</strong>; героизм <strong>Александра Григорьева</strong>, <strong>Владислава Петухова</strong>, <strong>Сергея Белова</strong>, <strong>Павла Шартова</strong>, <strong>Игоря Лукьяненко</strong>, <strong>Никиты Брынзы</strong> и <strong>Виктора Бутова</strong>.
             </p>
             <div class="theatre-heroes-pills">
-              <span class="hero-pill" onclick="App.openModal('martynov-s-k')">С. Мартынов</span>
-              <span class="hero-pill" onclick="App.openModal('yaryshev-m-v')">М. Ярышев</span>
-              <span class="hero-pill" onclick="App.openModal('chupin-i-v')">И. Чупин</span>
-              <span class="hero-pill" onclick="App.openModal('grigoriev-a-n')">А. Григорьев</span>
-              <span class="hero-pill" onclick="App.openModal('brynza-n-d')">Н. Брынза</span>
-              <span class="hero-pill" onclick="App.openModal('petukhov-v-v')">В. Петухов</span>
-              <span class="hero-pill" onclick="App.openModal('belov-s-a')">С. Белов</span>
-              <span class="hero-pill" onclick="App.openModal('shartov-p-n')">П. Шартов</span>
-              <span class="hero-pill" onclick="App.openModal('lukyanenko-i-v')">И. Лукьяненко</span>
-              <span class="hero-pill" onclick="App.openModal('butov-v-e')">В. Бутов</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="martynov-s-k">С. Мартынов</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="yaryshev-m-v">М. Ярышев</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="chupin-i-v">И. Чупин</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="grigoriev-a-n">А. Григорьев</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="brynza-n-d">Н. Брынза</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="petukhov-v-v">В. Петухов</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="belov-s-a">С. Белов</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="shartov-p-n">П. Шартов</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="lukyanenko-i-v">И. Лукьяненко</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="butov-v-e">В. Бутов</span>
             </div>
-            <button class="theatre-map-focus-btn" onclick="App.focusMap([48.1, 37.7], 8)" type="button">Показать сектор на карте →</button>
+            <button class="theatre-map-focus-btn" data-action="focusMap" data-coords="[48.1, 37.7]" data-zoom="8" type="button">Показать сектор на карте →</button>
           </article>
 
           <article class="timeline-theatre-card" data-theatre-card="kursk">
@@ -360,9 +360,9 @@
               Отражение вторжения в приграничную зону. Выпускник IT-отделения колледжа 2024 года <strong>Никита Назаренко</strong> под огнем противника обеспечивал надежную связь штабов и боевых групп. Героически погиб 13 августа 2024 года.
             </p>
             <div class="theatre-heroes-pills">
-              <span class="hero-pill" onclick="App.openModal('nazarenko-n-s')">Н. Назаренко</span>
+              <span class="hero-pill" data-action="openModal" data-hero-id="nazarenko-n-s">Н. Назаренко</span>
             </div>
-            <button class="theatre-map-focus-btn" onclick="App.focusMap([51.3, 35.2], 9)" type="button">Показать сектор на карте →</button>
+            <button class="theatre-map-focus-btn" data-action="focusMap" data-coords="[51.3, 35.2]" data-zoom="9" type="button">Показать сектор на карте →</button>
           </article>
         </div>
 
@@ -373,8 +373,8 @@
               <span>Интерактивная карта боевой славы СРМК</span>
             </div>
             <div class="map-quick-actions">
-              <button class="map-quick-btn" onclick="App.focusMap([45.0448, 41.9691], 13)" type="button">Колледж (Ставрополь)</button>
-              <button class="map-quick-btn" onclick="App.focusMap([47.5, 36.5], 6)" type="button">Общий план ТВД</button>
+              <button class="map-quick-btn" data-action="focusMap" data-coords="[45.0448, 41.9691]" data-zoom="13" type="button">Колледж (Ставрополь)</button>
+              <button class="map-quick-btn" data-action="focusMap" data-coords="[47.5, 36.5]" data-zoom="6" type="button">Общий план ТВД</button>
             </div>
           </div>
           <div id="interactiveBattleMap" class="battle-map-wrapper" role="region" aria-label="Карта боевого пути"></div>
@@ -507,7 +507,7 @@
         <h3>Конкурсный статус</h3>
         <p>Проект разработан для Всероссийской акции «Имя в истории образовательной организации» (номинация «За партой героя»).</p>
         <p class="copyright">© 2026 ГБПОУ СРМК. «Быть воином — жить вечно».</p>
-        <button onclick="if(typeof AdminCMS !== 'undefined') AdminCMS.open()" style="background:none; border:none; color:var(--text-tertiary); font-size:11px; cursor:pointer; margin-top:8px;" type="button">
+        <button id="btnAdminPanel" style="background:none; border:none; color:var(--text-tertiary); font-size:11px; cursor:pointer; margin-top:8px;" type="button">
           [ Панель управления ]
         </button>
       </div>
