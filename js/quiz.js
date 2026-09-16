@@ -1,15 +1,18 @@
 /**
  * ============================================================================
- * ДВИЖОК ИСТОРИЧЕСКОГО КВЕСТА: js/quiz.js (v1.0 Master)
- * 10 вопросов, процедурный звук, логика проверки и редирект на certificate.html
+ * ДВИЖОК ИСТОРИЧЕСКОГО КВЕСТА: js/quiz.js (v2.0 Ultra Enterprise)
+ * Мемориальный комплекс ГБПОУ СРМК «Быть воином — жить вечно»
+ * 
+ * Включает:
+ * 1. 10 канонических вопросов о подвигах 20 героев колледжа
+ * 2. Web Audio процедурный синтез триумфальных и сигнальных звуков
+ * 3. Realtime-сохранение в Зал Славы (Supabase) + LocalStorage Fallback
+ * 4. Наградную систему бейджей и автоматический шлюз в certificate.html
  * ============================================================================
  */
 
 'use strict';
 
-/**
- * МОДУЛЬ БЕЗОПАСНОГО ХРАНИЛИЩА
- */
 const SafeStorage = {
   get: (key) => {
     try {
@@ -41,7 +44,7 @@ const QUIZ_QUESTIONS = [
       "Информационные системы и программирование"
     ],
     correct: 0,
-    explanation: "Шамиль Назыров окончил колледж с отличием (красный диплом) по профессии электромонтера, параллельно освоив сварочное дело. В Херсонской области его водовоз бойцы уважительно называли «Машиной жизни»."
+    explanation: "Шамиль Назыров окончил колледж с отличием (красный диплом) по профессии электромонтера, параллельно освоив сварочное дело. В Херсонской области его автоцистерну бойцы с надеждой назвали «Машиной жизни»."
   },
   {
     theme: "География ТВД / Связь",
@@ -166,7 +169,27 @@ const QuizEngine = {
   },
 
   init() {
-    console.log("[QuizEngine] Исторический квест инициализирован.");
+    this.bindEvents();
+    this.loadBadges();
+    this.loadLeaderboard();
+    console.log("[QuizEngine v2.0] Модуль исторического квеста готов.");
+  },
+
+  bindEvents() {
+    document.getElementById('startQuestBtn')?.addEventListener('click', () => this.startQuest());
+    document.getElementById('nextQuestionBtn')?.addEventListener('click', () => this.nextQuestion());
+    document.getElementById('restartQuestBtn')?.addEventListener('click', () => this.restartQuest());
+    document.getElementById('btnClaimCert')?.addEventListener('click', () => this.claimCertificate());
+
+    // Автозаполнение имени, если оно сохранено ранее
+    const savedName = SafeStorage.get('srmk_quiz_user_name');
+    const savedGroup = SafeStorage.get('srmk_quiz_user_group');
+    if (savedName && document.getElementById('participantName')) {
+      document.getElementById('participantName').value = savedName;
+    }
+    if (savedGroup && document.getElementById('participantGroup')) {
+      document.getElementById('participantGroup').value = savedGroup;
+    }
   },
 
   /**
@@ -183,7 +206,7 @@ const QuizEngine = {
       const now = ctx.currentTime;
 
       if (type === 'correct') {
-        // Мажорный триумфальный аккорд (E5 -> G#5 -> B5)
+        // Триумфальный мажорный перезвон (E5 -> G#5 -> B5)
         [659.25, 830.61, 987.77].forEach((freq, i) => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
@@ -197,20 +220,20 @@ const QuizEngine = {
           osc.stop(now + i * 0.08 + 0.35);
         });
       } else if (type === 'wrong') {
-        // Глухой низкий сигнал ошибки
+        // Низкий тон ошибки
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(180, now);
         osc.frequency.linearRampToValueAtTime(110, now + 0.25);
-        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.setValueAtTime(0.12, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
         osc.connect(gain);
         gain.connect(ctx.destination);
         osc.start(now);
         osc.stop(now + 0.25);
       } else if (type === 'fanfare') {
-        // Победные фанфары при завершении
+        // Победные фанфары (C5 -> E5 -> G5 -> C6)
         [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
@@ -224,25 +247,30 @@ const QuizEngine = {
           osc.stop(now + i * 0.12 + 0.6);
         });
       }
-    } catch (e) {}
+    } catch (e) {
+      console.warn('[Web Audio] Синтезатор звука недоступен:', e);
+    }
   },
 
   /**
    * 2. Старт квеста
    */
   startQuest() {
-    const nameInput = document.getElementById('participantName').value.trim();
-    const groupInput = document.getElementById('participantGroup').value.trim();
-    const specSelect = document.getElementById('participantSpecialty').value;
+    const nameInput = document.getElementById('participantName')?.value.trim();
+    const groupInput = document.getElementById('participantGroup')?.value.trim();
+    const specSelect = document.getElementById('participantSpecialty')?.value || "09.02.11 Разработка ПО";
 
     if (!nameInput || !groupInput) {
-      this.showToast('Пожалуйста, укажите ваши ФИО и группу для оформления сертификата!');
+      this.showToast('Пожалуйста, укажите ваши ФИО и группу для оформления наградного сертификата!');
       return;
     }
 
     this.participant.name = nameInput;
     this.participant.group = groupInput;
     this.participant.specialty = specSelect;
+
+    SafeStorage.set('srmk_quiz_user_name', nameInput);
+    SafeStorage.set('srmk_quiz_user_group', groupInput);
 
     this.currentQuestionIdx = 0;
     this.score = 0;
@@ -261,9 +289,9 @@ const QuizEngine = {
     this.isAnswerLocked = false;
     const q = QUIZ_QUESTIONS[this.currentQuestionIdx];
 
-    // Обновление прогресс-бара
     const progressPercent = ((this.currentQuestionIdx) / QUIZ_QUESTIONS.length) * 100;
-    document.getElementById('quizProgressBar').style.width = `${progressPercent}%`;
+    const bar = document.getElementById('quizProgressBar');
+    if (bar) bar.style.width = `${progressPercent}%`;
 
     document.getElementById('qNumberDisplay').textContent = `Вопрос ${this.currentQuestionIdx + 1} из ${QUIZ_QUESTIONS.length}`;
     document.getElementById('qThemeBadge').textContent = q.theme;
@@ -281,8 +309,8 @@ const QuizEngine = {
       btn.className = 'option-btn';
       btn.type = 'button';
       btn.innerHTML = `
-        <span class="option-letter">${letters[idx]}</span>
-        <span>${optText}</span>
+        <span class="option-letter" style="display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; background:rgba(197,160,89,0.2); color:var(--primary-gold); font-weight:bold; margin-right:10px;">${letters[idx]}</span>
+        <span>${this.escapeHtml(optText)}</span>
       `;
       btn.onclick = () => this.handleAnswer(idx, btn);
       optionsContainer.appendChild(btn);
@@ -290,7 +318,7 @@ const QuizEngine = {
   },
 
   /**
-   * 4. Проверка ответа
+   * 4. Обработка ответа
    */
   handleAnswer(selectedIdx, btnElement) {
     if (this.isAnswerLocked) return;
@@ -298,36 +326,45 @@ const QuizEngine = {
 
     const q = QUIZ_QUESTIONS[this.currentQuestionIdx];
     const allButtons = document.querySelectorAll('.option-btn');
-    allButtons.forEach(b => b.classList.add('locked'));
+    allButtons.forEach(b => {
+      b.disabled = true;
+      b.style.cursor = 'default';
+    });
 
     const isCorrect = (selectedIdx === q.correct);
 
     if (isCorrect) {
       this.score++;
       btnElement.classList.add('correct');
+      btnElement.style.borderColor = 'var(--success-green)';
+      btnElement.style.background = 'rgba(76, 175, 80, 0.2)';
       this.playSound('correct');
     } else {
       btnElement.classList.add('wrong');
+      btnElement.style.borderColor = 'var(--danger-red)';
+      btnElement.style.background = 'rgba(244, 67, 54, 0.2)';
+      
       allButtons[q.correct].classList.add('correct');
+      allButtons[q.correct].style.borderColor = 'var(--success-green)';
+      allButtons[q.correct].style.background = 'rgba(76, 175, 80, 0.2)';
       this.playSound('wrong');
     }
 
     document.getElementById('qScoreDisplay').textContent = `Баллы: ${this.score}`;
 
-    // Историческая справка
     const expBox = document.getElementById('explanationBox');
     const expStatus = document.getElementById('expStatusText');
     const expDesc = document.getElementById('expDescriptionText');
 
-    expStatus.textContent = isCorrect ? "✓ ВЕРНО!" : "✗ ОШИБКА";
-    expStatus.className = `exp-status ${isCorrect ? 'correct-text' : 'wrong-text'}`;
+    expStatus.textContent = isCorrect ? "✓ ВЕРНО!" : "✗ НЕВЕРНО";
+    expStatus.style.color = isCorrect ? 'var(--success-green)' : 'var(--danger-red)';
     expDesc.textContent = q.explanation;
 
     expBox.style.display = 'block';
   },
 
   /**
-   * 5. Следующий вопрос или финал
+   * 5. Переход к следующему вопросу
    */
   nextQuestion() {
     this.currentQuestionIdx++;
@@ -339,18 +376,37 @@ const QuizEngine = {
   },
 
   /**
-   * 6. Финальный экран результатов
+   * 6. Экран итогов
    */
-  showResults() {
+  async showResults() {
     document.getElementById('quizProgressBar').style.width = '100%';
     document.getElementById('questionScreen').style.display = 'none';
     document.getElementById('resultScreen').style.display = 'block';
 
     const percent = Math.round((this.score / QUIZ_QUESTIONS.length) * 100);
     document.getElementById('finalScoreDigits').textContent = `${this.score}/${QUIZ_QUESTIONS.length}`;
-    document.getElementById('finalPercentDigits').textContent = `${percent}%`;
+    document.getElementById('finalPercentDigits').textContent = `${percent}% правильных ответов`;
 
     const isWinner = (this.score >= 8); // Норматив >= 80%
+
+    // Сохранение в локальную историю
+    const localResults = JSON.parse(SafeStorage.get('quiz_history_records') || '[]');
+    localResults.unshift({
+      name: this.participant.name,
+      group: this.participant.group,
+      score: this.score,
+      date: new Date().toISOString()
+    });
+    SafeStorage.set('quiz_history_records', JSON.stringify(localResults.slice(0, 20)));
+
+    // Разблокировка бейджей
+    this.unlockBadges(this.score);
+
+    // Отправка в облако Supabase
+    if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
+      await CloudSync.saveQuizResult(this.participant.name, this.score, this.participant.group, QUIZ_QUESTIONS.length);
+      this.loadLeaderboard();
+    }
 
     if (isWinner) {
       this.playSound('fanfare');
@@ -369,48 +425,9 @@ const QuizEngine = {
   },
 
   /**
-   * 7. Перенаправление на certificate.html с автозаполнением и записью в БД
+   * 7. Перенаправление на certificate.html с автозаполнением
    */
-  async claimCertificate() {
-    const btn = document.getElementById('btnClaimCert');
-    if (btn) {
-      btn.innerHTML = '⏳ Сохранение результата в облаке...';
-      btn.style.pointerEvents = 'none';
-    }
-
-    // Сохраняем результат в локальное хранилище
-    const localResults = JSON.parse(SafeStorage.get('quizResults') || '[]');
-    localResults.push({
-      name: this.participant.name,
-      group: this.participant.group,
-      score: this.score,
-      date: new Date().toISOString()
-    });
-    SafeStorage.set('quizResults', JSON.stringify(localResults));
-
-    // Сохраняем бейджи если победа
-    if (this.score >= 8) {
-      const earnedBadges = JSON.parse(SafeStorage.get('quizBadges') || '[]');
-      if (!earnedBadges.find(b => b.id === 'winner')) {
-        earnedBadges.push({
-          id: 'winner',
-          icon: '🏆',
-          title: 'Победитель квиза',
-          desc: `Набрано ${this.score}/10 баллов`
-        });
-        SafeStorage.set('quizBadges', JSON.stringify(earnedBadges));
-      }
-    }
-
-    // Сохраняем результат в глобальную таблицу лидеров Supabase через CloudSync
-    if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
-      try {
-        await CloudSync.saveQuizResult(this.participant.name, this.score, this.participant.group);
-      } catch (e) {
-        console.warn('Не удалось сохранить в Supabase:', e);
-      }
-    }
-
+  claimCertificate() {
     const params = new URLSearchParams({
       role: 'student',
       name: this.participant.name,
@@ -426,128 +443,109 @@ const QuizEngine = {
   restartQuest() {
     document.getElementById('resultScreen').style.display = 'none';
     document.getElementById('startScreen').style.display = 'block';
+    this.loadBadges();
+  },
+
+  unlockBadges(score) {
+    const current = JSON.parse(SafeStorage.get('srmk_user_badges') || '[]');
+    const newBadges = [];
+
+    if (score >= 5 && !current.includes('badge_init')) newBadges.push('badge_init');
+    if (score >= 8 && !current.includes('badge_winner')) newBadges.push('badge_winner');
+    if (score === 10 && !current.includes('badge_perfect')) newBadges.push('badge_perfect');
+
+    if (newBadges.length > 0) {
+      const updated = [...current, ...newBadges];
+      SafeStorage.set('srmk_user_badges', JSON.stringify(updated));
+    }
+  },
+
+  loadBadges() {
+    const container = document.getElementById('startBadges');
+    if (!container) return;
+
+    const badges = JSON.parse(SafeStorage.get('srmk_user_badges') || '[]');
+    const list = [
+      { id: 'badge_init', icon: '🎯', title: 'Знаток истории', desc: 'Набрано от 5 баллов' },
+      { id: 'badge_winner', icon: '🏆', title: 'Победитель квиза', desc: 'Успешная сдача (8+ баллов)' },
+      { id: 'badge_perfect', icon: '👑', title: 'Абсолютный триумф', desc: 'Идеальные 10/10 баллов' },
+      { id: 'badge_watch', icon: '🕯', title: 'Хранитель Памяти', desc: 'Пройдены залы музея' }
+    ];
+
+    container.innerHTML = list.map(b => {
+      const isUnlocked = badges.includes(b.id) || (b.id === 'badge_watch');
+      return `
+        <div class="badge-card ${isUnlocked ? 'unlocked' : ''}">
+          <span class="badge-icon">${b.icon}</span>
+          <span class="badge-title">${b.title}</span>
+          <span class="badge-desc">${b.desc}</span>
+        </div>
+      `;
+    }).join('');
+  },
+
+  async loadLeaderboard() {
+    const tbody = document.getElementById('leaderboardBody');
+    const statusEl = document.getElementById('cloudStatus');
+    if (!tbody) return;
+
+    // 1. Попытка загрузить из Supabase
+    if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
+      const cloudResults = await CloudSync.getQuizResults(10);
+      if (cloudResults && cloudResults.length > 0) {
+        tbody.innerHTML = cloudResults.map((r, i) => `
+          <tr>
+            <td class="rank-cell rank-${i + 1}">${i + 1 <= 3 ? ['🥇', '🥈', '🥉'][i] : i + 1}</td>
+            <td style="font-weight: 600; color: #fff;">${this.escapeHtml(r.student_name)}</td>
+            <td>${this.escapeHtml(r.group_name || 'СРМК')}</td>
+            <td style="color: var(--primary-gold); font-weight: bold; text-align: center;">${r.score}/10</td>
+            <td style="color: var(--text-muted); text-align: right;">${new Date(r.completed_at).toLocaleDateString('ru-RU')}</td>
+          </tr>
+        `).join('');
+        if (statusEl) statusEl.textContent = '✓ Онлайн-синхронизация с глобальным Залом Славы (Supabase)';
+        return;
+      }
+    }
+
+    // 2. Локальный Fallback
+    const local = JSON.parse(SafeStorage.get('quiz_history_records') || '[]');
+    if (local.length > 0) {
+      tbody.innerHTML = local.slice(0, 10).map((r, i) => `
+        <tr>
+          <td class="rank-cell rank-${i + 1}">${i + 1 <= 3 ? ['🥇', '🥈', '🥉'][i] : i + 1}</td>
+          <td style="font-weight: 600; color: #fff;">${this.escapeHtml(r.name)}</td>
+          <td>${this.escapeHtml(r.group || 'СРМК')}</td>
+          <td style="color: var(--primary-gold); font-weight: bold; text-align: center;">${r.score}/10</td>
+          <td style="color: var(--text-muted); text-align: right;">${new Date(r.date).toLocaleDateString('ru-RU')}</td>
+        </tr>
+      `).join('');
+      if (statusEl) statusEl.textContent = 'Локальный Зал Славы устройства';
+    } else {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 20px;">
+            В Зале Славы пока нет записей. Пройдите квест первым!
+          </td>
+        </tr>
+      `;
+      if (statusEl) statusEl.textContent = 'Готов к фиксации рекордов';
+    }
   },
 
   showToast(msg) {
     const toast = document.getElementById('quizToast');
     if (!toast) return;
     toast.textContent = msg;
-    toast.classList.add('active');
-    setTimeout(() => toast.classList.remove('active'), 2800);
+    toast.className = 'memorial-toast active toast-info';
+    setTimeout(() => toast.classList.remove('active'), 3000);
   },
 
-  /**
-   * 8. Загрузка бейджей игрока из localStorage
-   */
-  loadBadges() {
-    const badgesContainer = document.getElementById('startBadges');
-    if (!badgesContainer) return;
-
-    const earnedBadges = JSON.parse(SafeStorage.get('quizBadges') || '[]');
-    
-    if (earnedBadges.length === 0) {
-      badgesContainer.innerHTML = '<p style="color: var(--text-muted); font-size: 0.9rem;">Пока нет достижений. Пройдите квиз!</p>';
-      return;
-    }
-
-    badgesContainer.innerHTML = earnedBadges.map(badge => `
-      <div class="badge-card unlocked">
-        <span class="badge-icon">${badge.icon}</span>
-        <span class="badge-title">${badge.title}</span>
-        <span class="badge-desc">${badge.desc}</span>
-      </div>
-    `).join('');
-  },
-
-  /**
-   * 9. Загрузка таблицы лидеров из Supabase
-   */
-  async loadLeaderboard() {
-    const tbody = document.getElementById('leaderboardBody');
-    const statusEl = document.getElementById('cloudStatus');
-    if (!tbody) return;
-
-    // Пробуем загрузить из Supabase через CloudSync
-    if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
-      try {
-        const results = await CloudSync.getQuizResults(10);
-        if (results && results.length > 0) {
-          tbody.innerHTML = results.map((r, i) => `
-            <tr>
-              <td class="rank-cell rank-${i + 1}">${i + 1}</td>
-              <td>${this.escapeHtml(r.name)}</td>
-              <td>${this.escapeHtml(r.group || '-')}</td>
-              <td style="color: var(--primary-gold); font-weight: bold;">${r.score}/10</td>
-              <td style="color: var(--text-muted);">${new Date(r.created_at).toLocaleDateString('ru-RU')}</td>
-            </tr>
-          `).join('');
-          statusEl.textContent = '✓ Данные загружены из облака (Supabase)';
-          return;
-        }
-      } catch (e) {
-        console.warn('Не удалось загрузить данные из Supabase:', e);
-      }
-    }
-
-    // Fallback: локальные данные
-    const localResults = JSON.parse(SafeStorage.get('quizResults') || '[]');
-    localResults.sort((a, b) => b.score - a.score || new Date(a.date) - new Date(b.date));
-    const top10 = localResults.slice(0, 10);
-
-    if (top10.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Пока нет результатов. Будьте первыми!</td></tr>';
-      statusEl.textContent = 'Локальный режим (нет подключения к облаку)';
-      return;
-    }
-
-    tbody.innerHTML = top10.map((r, i) => `
-      <tr>
-        <td class="rank-cell rank-${i + 1}">${i + 1}</td>
-        <td>${this.escapeHtml(r.name)}</td>
-        <td>${this.escapeHtml(r.group || '-')}</td>
-        <td style="color: var(--primary-gold); font-weight: bold;">${r.score}/10</td>
-        <td style="color: var(--text-muted);">${new Date(r.date).toLocaleDateString('ru-RU')}</td>
-      </tr>
-    `).join('');
-    statusEl.textContent = 'Локальные результаты (подключите Supabase для синхронизации)';
-  },
-
-  /**
-   * 10. Экранирование HTML для безопасности
-   */
-  escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>'"]/g, tag => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    }[tag]));
   }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
-  console.log("[QuizEngine] Исторический квест инициализирован.");
-  
-  // Привязка кнопок
-  const startBtn = document.getElementById('startQuestBtn');
-  if (startBtn) {
-    startBtn.addEventListener('click', () => QuizEngine.startQuest());
-  }
-  
-  const nextBtn = document.getElementById('nextQuestionBtn');
-  if (nextBtn) {
-    nextBtn.addEventListener('click', () => QuizEngine.nextQuestion());
-  }
-  
-  const restartBtn = document.getElementById('restartQuestBtn');
-  if (restartBtn) {
-    restartBtn.addEventListener('click', () => QuizEngine.restartQuest());
-  }
-  
-  const claimCertBtn = document.getElementById('btnClaimCert');
-  if (claimCertBtn) {
-    claimCertBtn.addEventListener('click', () => QuizEngine.claimCertificate());
-  }
-  
-  // Загрузка бейджей и таблицы лидеров
-  QuizEngine.loadBadges();
-  QuizEngine.loadLeaderboard();
-});
+document.addEventListener('DOMContentLoaded', () => QuizEngine.init());
