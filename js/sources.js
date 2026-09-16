@@ -1,6 +1,6 @@
 /**
  * ============================================================================
- * ГЕРАЛЬДИЧЕСКИЙ АТЛАС НАГРАД И ГАЛЕРЕЯ: js/sources.js (v10.0 Ultra Master)
+ * ГЕРАЛЬДИЧЕСКИЙ АТЛАС НАГРАД И ГАЛЕРЕЯ: js/sources.js (v11.0 Ultra Master)
  * Мемориально-образовательный комплекс ГБПОУ СРМК «Быть воином — жить вечно»
  * 
  * Включает:
@@ -13,40 +13,192 @@
 'use strict';
 
 /**
- * 1. АВТОНОМНЫЕ ВЕКТОРНЫЕ ИЗОБРАЖЕНИЯ НАГРАД РФ (SVG DATA URI)
- * Гарантирует 100% отображение без внешних запросов и CORS-блокировок
+ * Хелпер создания 100% валидных SVG Data URI без проблем с кодировкой
+ */
+function createSvgDataUri(svgString) {
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString.trim())}`;
+}
+
+/**
+ * 1. ВЕКТОРНЫЕ ИСХОДНИКИ ГОСУДАРСТВЕННЫХ НАГРАД И ПЛАНАТ ОРДЕНОВ РФ
  */
 const HERALDIC_SVGS = {
-  // ОРДЕН МУЖЕСТВА (Серебряный крест с орлом и рельефом)
-  ORDER_OF_COURAGE_BADGE: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300' width='300' height='300'%3E%3Cdefs%3E%3CradialGradient id='silverMetal' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='45%25' stop-color='%23d8dde6'/%3E%3Cstop offset='85%25' stop-color='%238a93a0'/%3E%3Cstop offset='100%25' stop-color='%23505763'/%3E%3C/radialGradient%3E%3ClinearGradient id='goldShine' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23fff3b0'/%3E%3Cstop offset='50%25' stop-color='%23c5a059'/%3E%3Cstop offset='100%25' stop-color='%23856427'/%3E%3C/linearGradient%3E%3Cfilter id='dropShadow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeDropShadow dx='0' dy='8' stdDeviation='8' flood-color='%23000' flood-opacity='0.6'/%3E%3C/filter%3E%3C/defs%3E%3Cg filter='url(%23dropShadow)'%3E%3Cpath d='M150 20 L178 95 C195 98 202 105 205 122 L280 150 L205 178 C202 195 195 202 178 205 L150 280 L122 205 C105 202 98 195 95 178 L20 150 L95 122 C98 105 105 98 122 95 Z' fill='url(%23silverMetal)' stroke='%23424752' stroke-width='3'/%3E%3Cpath d='M150 45 L168 105 L228 122 L172 150 L228 178 L168 195 L150 255 L132 195 L72 178 L128 150 L72 122 L132 105 Z' fill='%239aa3b0' opacity='0.5'/%3E%3Ccircle cx='150' cy='150' r='58' fill='url(%23silverMetal)' stroke='%23363a43' stroke-width='2.5'/%3E%3Ccircle cx='150' cy='150' r='48' fill='%2312151d' stroke='url(%23goldShine)' stroke-width='2'/%3E%3Cpath d='M150 118 L154 132 L168 132 L157 141 L161 155 L150 146 L139 155 L143 141 L132 132 L146 132 Z' fill='url(%23goldShine)'/%3E%3Ctext x='150' y='178' text-anchor='middle' fill='%23ffffff' font-family='sans-serif' font-weight='900' font-size='11' letter-spacing='2'%3EМУЖЕСТВО%3C/text%3E%3C/g%3E%3C/svg%3E",
+  // ОРДЕН МУЖЕСТВА (Серебряный рельефный крест с орлом)
+  ORDER_OF_COURAGE_BADGE: createSvgDataUri(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+      <defs>
+        <radialGradient id="silverMetal" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="40%" stop-color="#e2e8f0"/>
+          <stop offset="75%" stop-color="#94a3b8"/>
+          <stop offset="100%" stop-color="#475569"/>
+        </radialGradient>
+        <linearGradient id="goldShine" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#fff3b0"/>
+          <stop offset="50%" stop-color="#c5a059"/>
+          <stop offset="100%" stop-color="#78561d"/>
+        </linearGradient>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000000" flood-opacity="0.6"/>
+        </filter>
+      </defs>
+      <g filter="url(#shadow)">
+        <path d="M150 15 L182 92 C202 96 208 104 212 122 L285 150 L212 178 C208 196 202 204 182 208 L150 285 L118 208 C98 204 92 196 88 178 L15 150 L88 122 C92 104 98 96 118 92 Z" fill="url(#silverMetal)" stroke="#334155" stroke-width="3"/>
+        <path d="M150 40 L168 102 L228 120 L172 150 L228 180 L168 198 L150 260 L132 198 L72 180 L128 150 L72 120 L132 102 Z" fill="#64748b" opacity="0.4"/>
+        <circle cx="150" cy="150" r="58" fill="url(#silverMetal)" stroke="#1e293b" stroke-width="3"/>
+        <circle cx="150" cy="150" r="48" fill="#12151d" stroke="url(#goldShine)" stroke-width="2"/>
+        <path d="M150 118 L154 132 L168 132 L157 141 L161 155 L150 146 L139 155 L143 141 L132 132 L146 132 Z" fill="url(#goldShine)"/>
+        <text x="150" y="178" text-anchor="middle" fill="#ffffff" font-family="'Cinzel', serif" font-weight="900" font-size="11" letter-spacing="2">МУЖЕСТВО</text>
+      </g>
+    </svg>
+  `),
   
-  // ПЛАНКА ОРДЕНА МУЖЕСТВА (Красная с белыми краями)
-  ORDER_OF_COURAGE_RIBBON: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 70' width='240' height='70'%3E%3Crect width='240' height='70' rx='4' fill='%238a1c22' stroke='%23222' stroke-width='2'/%3E%3Crect x='0' y='0' width='16' height='70' fill='%23ffffff' rx='2'/%3E%3Crect x='224' y='0' width='16' height='70' fill='%23ffffff' rx='2'/%3E%3Crect width='240' height='70' rx='4' fill='none' stroke='%23c5a059' stroke-width='1.5' stroke-opacity='0.4'/%3E%3C/svg%3E",
+  // ПЛАНКА ОРДЕНА МУЖЕСТВА (Красная лента с белыми полосами по краям)
+  ORDER_OF_COURAGE_RIBBON: createSvgDataUri(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 70" width="240" height="70">
+      <rect width="240" height="70" rx="4" fill="#8a1c22" stroke="#111111" stroke-width="2"/>
+      <rect x="0" y="0" width="16" height="70" fill="#ffffff"/>
+      <rect x="224" y="0" width="16" height="70" fill="#ffffff"/>
+      <rect width="240" height="70" rx="4" fill="none" stroke="#c5a059" stroke-width="1.5" stroke-opacity="0.5"/>
+    </svg>
+  `),
 
-  // МЕДАЛЬ «ЗА ОТВАГУ» (Серебряная медаль с танком и самолетами)
-  MEDAL_FOR_COURAGE_BADGE: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300' width='300' height='300'%3E%3Cdefs%3E%3CradialGradient id='silverCoin' cx='40%25' cy='40%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='70%25' stop-color='%23b8c0cc'/%3E%3Cstop offset='100%25' stop-color='%237a828f'/%3E%3C/radialGradient%3E%3Cfilter id='dropShadow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeDropShadow dx='0' dy='8' stdDeviation='8' flood-color='%23000' flood-opacity='0.6'/%3E%3C/filter%3E%3C/defs%3E%3Cg filter='url(%23dropShadow)'%3E%3Ccircle cx='150' cy='150' r='120' fill='url(%23silverCoin)' stroke='%234f5560' stroke-width='4'/%3E%3Ccircle cx='150' cy='150' r='112' fill='none' stroke='%23ffffff' stroke-width='1.5' stroke-opacity='0.6'/%3E%3Cpath d='M80 75 L100 85 L90 88 Z M140 60 L165 72 L152 75 Z M200 78 L220 88 L210 91 Z' fill='%23505763'/%3E%3Ctext x='150' y='142' text-anchor='middle' fill='%23991b1b' font-family='sans-serif' font-weight='900' font-size='22' letter-spacing='3'%3EЗА ОТВАГУ%3C/text%3E%3Crect x='100' y='165' width='100' height='26' rx='6' fill='%23505763'/%3E%3Ccircle cx='115' cy='182' r='7' fill='%23222'/%3E%3Ccircle cx='138' cy='182' r='7' fill='%23222'/%3E%3Ccircle cx='162' cy='182' r='7' fill='%23222'/%3E%3Ccircle cx='185' cy='182' r='7' fill='%23222'/%3E%3Cpath d='M105 165 L125 152 L175 152 L195 165 Z' fill='%23383d47'/%3E%3Cline x1='80' y1='158' x2='125' y2='158' stroke='%23222' stroke-width='4' stroke-linecap='round'/%3E%3Ctext x='150' y='225' text-anchor='middle' fill='%23991b1b' font-family='sans-serif' font-weight='800' font-size='14' letter-spacing='5'%3EСССР%3C/text%3E%3C/g%3E%3C/svg%3E",
+  // МЕДАЛЬ «ЗА ОТВАГУ» (Серебряный круг с танком Т-35 и самолетами)
+  MEDAL_FOR_COURAGE_BADGE: createSvgDataUri(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+      <defs>
+        <radialGradient id="silverCoin" cx="40%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="70%" stop-color="#cbd5e1"/>
+          <stop offset="100%" stop-color="#64748b"/>
+        </radialGradient>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000000" flood-opacity="0.6"/>
+        </filter>
+      </defs>
+      <g filter="url(#shadow)">
+        <circle cx="150" cy="150" r="120" fill="url(#silverCoin)" stroke="#334155" stroke-width="4"/>
+        <circle cx="150" cy="150" r="112" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.6"/>
+        <path d="M80 75 L100 85 L90 88 Z M140 60 L165 72 L152 75 Z M200 78 L220 88 L210 91 Z" fill="#475569"/>
+        <text x="150" y="142" text-anchor="middle" fill="#991b1b" font-family="'Montserrat', sans-serif" font-weight="900" font-size="22" letter-spacing="3">ЗА ОТВАГУ</text>
+        <rect x="100" y="165" width="100" height="26" rx="6" fill="#475569"/>
+        <circle cx="115" cy="182" r="7" fill="#1e293b"/>
+        <circle cx="138" cy="182" r="7" fill="#1e293b"/>
+        <circle cx="162" cy="182" r="7" fill="#1e293b"/>
+        <circle cx="185" cy="182" r="7" fill="#1e293b"/>
+        <path d="M105 165 L125 152 L175 152 L195 165 Z" fill="#334155"/>
+        <line x1="80" y1="158" x2="125" y2="158" stroke="#1e293b" stroke-width="4" stroke-linecap="round"/>
+        <text x="150" y="225" text-anchor="middle" fill="#991b1b" font-family="'Montserrat', sans-serif" font-weight="800" font-size="14" letter-spacing="5">СССР</text>
+      </g>
+    </svg>
+  `),
 
   // ПЛАНКА МЕДАЛИ «ЗА ОТВАГУ» (Серая с синими полосками по краям)
-  MEDAL_FOR_COURAGE_RIBBON: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 70' width='240' height='70'%3E%3Crect width='240' height='70' rx='4' fill='%239da6b3' stroke='%23222' stroke-width='2'/%3E%3Crect x='10' y='0' width='14' height='70' fill='%231d4ed8'/%3E%3Crect x='216' y='0' width='14' height='70' fill='%231d4ed8'/%3E%3Crect width='240' height='70' rx='4' fill='none' stroke='%23c5a059' stroke-width='1.5' stroke-opacity='0.4'/%3E%3C/svg%3E",
+  MEDAL_FOR_COURAGE_RIBBON: createSvgDataUri(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 70" width="240" height="70">
+      <rect width="240" height="70" rx="4" fill="#94a3b8" stroke="#111111" stroke-width="2"/>
+      <rect x="10" y="0" width="14" height="70" fill="#1d4ed8"/>
+      <rect x="216" y="0" width="14" height="70" fill="#1d4ed8"/>
+      <rect width="240" height="70" rx="4" fill="none" stroke="#c5a059" stroke-width="1.5" stroke-opacity="0.4"/>
+    </svg>
+  `),
 
-  // МЕДАЛЬ СУВОРОВА
-  MEDAL_OF_SUVOROV_BADGE: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300' width='300' height='300'%3E%3Cdefs%3E%3CradialGradient id='goldCoin' cx='40%25' cy='40%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%23fff3b0'/%3E%3Cstop offset='70%25' stop-color='%23c5a059'/%3E%3Cstop offset='100%25' stop-color='%2378561d'/%3E%3C/radialGradient%3E%3Cfilter id='dropShadow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeDropShadow dx='0' dy='8' stdDeviation='8' flood-color='%23000' flood-opacity='0.6'/%3E%3C/filter%3E%3C/defs%3E%3Cg filter='url(%23dropShadow)'%3E%3Ccircle cx='150' cy='150' r='120' fill='url(%23goldCoin)' stroke='%23543d14' stroke-width='4'/%3E%3Ccircle cx='150' cy='150' r='112' fill='none' stroke='%23fff' stroke-width='1.5' stroke-opacity='0.5'/%3E%3Ccircle cx='150' cy='130' r='40' fill='%238f6b28' stroke='%23fff' stroke-width='2' opacity='0.8'/%3E%3Cpath d='M130 135 C130 110 170 110 170 135 C170 150 130 150 130 135 Z' fill='%23ffffff'/%3E%3Cpath d='M85 210 L215 210' stroke='%2338270a' stroke-width='5' stroke-linecap='round'/%3E%3Cpath d='M95 220 L205 200' stroke='%2338270a' stroke-width='3' stroke-linecap='round'/%3E%3Ctext x='150' y='190' text-anchor='middle' fill='%232e2007' font-family='serif' font-weight='900' font-size='17' letter-spacing='2'%3EА. СУВОРОВ%3C/text%3E%3C/g%3E%3C/svg%3E",
+  // МЕДАЛЬ СУВОРОВА (Золотисто-бронзовый барельеф)
+  MEDAL_OF_SUVOROV_BADGE: createSvgDataUri(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+      <defs>
+        <radialGradient id="goldCoin" cx="40%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#fff3b0"/>
+          <stop offset="70%" stop-color="#c5a059"/>
+          <stop offset="100%" stop-color="#78561d"/>
+        </radialGradient>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000000" flood-opacity="0.6"/>
+        </filter>
+      </defs>
+      <g filter="url(#shadow)">
+        <circle cx="150" cy="150" r="120" fill="url(#goldCoin)" stroke="#543d14" stroke-width="4"/>
+        <circle cx="150" cy="150" r="112" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.5"/>
+        <circle cx="150" cy="125" r="38" fill="#8f6b28" stroke="#ffffff" stroke-width="2" opacity="0.8"/>
+        <path d="M132 130 C132 108 168 108 168 130 C168 145 132 145 132 130 Z" fill="#ffffff"/>
+        <path d="M85 205 L215 205" stroke="#38270a" stroke-width="5" stroke-linecap="round"/>
+        <path d="M95 215 L205 195" stroke="#38270a" stroke-width="3" stroke-linecap="round"/>
+        <text x="150" y="185" text-anchor="middle" fill="#2e2007" font-family="'Cinzel', serif" font-weight="900" font-size="16" letter-spacing="2">А. СУВОРОВ</text>
+      </g>
+    </svg>
+  `),
 
-  // ПЛАНКА МЕДАЛИ СУВОРОВА (Красная с зелеными полосами)
-  MEDAL_OF_SUVOROV_RIBBON: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 70' width='240' height='70'%3E%3Crect width='240' height='70' rx='4' fill='%23b91c1c' stroke='%23222' stroke-width='2'/%3E%3Crect x='10' y='0' width='14' height='70' fill='%2315803d'/%3E%3Crect x='216' y='0' width='14' height='70' fill='%2315803d'/%3E%3Crect width='240' height='70' rx='4' fill='none' stroke='%23c5a059' stroke-width='1.5' stroke-opacity='0.4'/%3E%3C/svg%3E",
+  // ПЛАНКА МЕДАЛИ СУВОРОВА
+  MEDAL_OF_SUVOROV_RIBBON: createSvgDataUri(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 70" width="240" height="70">
+      <rect width="240" height="70" rx="4" fill="#b91c1c" stroke="#111111" stroke-width="2"/>
+      <rect x="10" y="0" width="14" height="70" fill="#15803d"/>
+      <rect x="216" y="0" width="14" height="70" fill="#15803d"/>
+      <rect width="240" height="70" rx="4" fill="none" stroke="#c5a059" stroke-width="1.5" stroke-opacity="0.4"/>
+    </svg>
+  `),
 
   // МЕДАЛЬ «ЗА ХРАБРОСТЬ» II СТЕПЕНИ
-  MEDAL_FOR_BRAVERY_BADGE: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300' width='300' height='300'%3E%3Cdefs%3E%3CradialGradient id='silverBravery' cx='45%25' cy='45%25' r='55%25'%3E%3Cstop offset='0%25' stop-color='%23ffffff'/%3E%3Cstop offset='70%25' stop-color='%23c2c8d2'/%3E%3Cstop offset='100%25' stop-color='%23717885'/%3E%3C/radialGradient%3E%3Cfilter id='dropShadow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeDropShadow dx='0' dy='8' stdDeviation='8' flood-color='%23000' flood-opacity='0.6'/%3E%3C/filter%3E%3C/defs%3E%3Cg filter='url(%23dropShadow)'%3E%3Ccircle cx='150' cy='150' r='120' fill='url(%23silverBravery)' stroke='%23454b57' stroke-width='4'/%3E%3Cpath d='M150 45 L160 110 L150 115 L140 110 Z M150 255 L160 190 L150 185 L140 190 Z M45 150 L110 160 L115 150 L110 140 Z M255 150 L190 160 L185 150 L190 140 Z' fill='%238a1c22'/%3E%3Ccircle cx='150' cy='150' r='55' fill='%2312151c' stroke='%23c5a059' stroke-width='3'/%3E%3Ctext x='150' y='146' text-anchor='middle' fill='%23ffffff' font-family='sans-serif' font-weight='900' font-size='15' letter-spacing='2'%3EЗА ХРАБРОСТЬ%3C/text%3E%3Ctext x='150' y='170' text-anchor='middle' fill='%23c5a059' font-family='serif' font-weight='900' font-size='18'%3EII СТЕПЕНЬ%3C/text%3E%3C/g%3E%3C/svg%3E",
+  MEDAL_FOR_BRAVERY_BADGE: createSvgDataUri(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+      <defs>
+        <radialGradient id="silverBravery" cx="45%" cy="45%" r="55%">
+          <stop offset="0%" stop-color="#ffffff"/>
+          <stop offset="70%" stop-color="#cbd5e1"/>
+          <stop offset="100%" stop-color="#64748b"/>
+        </radialGradient>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000000" flood-opacity="0.6"/>
+        </filter>
+      </defs>
+      <g filter="url(#shadow)">
+        <circle cx="150" cy="150" r="120" fill="url(#silverBravery)" stroke="#334155" stroke-width="4"/>
+        <path d="M150 45 L160 110 L150 115 L140 110 Z M150 255 L160 190 L150 185 L140 190 Z M45 150 L110 160 L115 150 L110 140 Z M255 150 L190 160 L185 150 L190 140 Z" fill="#8a1c22"/>
+        <circle cx="150" cy="150" r="55" fill="#12151c" stroke="#c5a059" stroke-width="3"/>
+        <text x="150" y="146" text-anchor="middle" fill="#ffffff" font-family="'Montserrat', sans-serif" font-weight="900" font-size="14" letter-spacing="1">ЗА ХРАБРОСТЬ</text>
+        <text x="150" y="170" text-anchor="middle" fill="#c5a059" font-family="'Cinzel', serif" font-weight="900" font-size="16">II СТЕПЕНЬ</text>
+      </g>
+    </svg>
+  `),
 
   // ПЛАНКА МЕДАЛИ «ЗА ХРАБРОСТЬ»
-  MEDAL_FOR_BRAVERY_RIBBON: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 70' width='240' height='70'%3E%3Crect width='240' height='70' rx='4' fill='%23111827' stroke='%23222' stroke-width='2'/%3E%3Crect x='0' y='0' width='120' height='70' fill='%23ea580c'/%3E%3Crect x='40' y='0' width='40' height='70' fill='%23111827'/%3E%3Crect x='140' y='0' width='20' height='70' fill='%23ffffff'/%3E%3Crect x='180' y='0' width='20' height='70' fill='%23ffffff'/%3E%3Crect width='240' height='70' rx='4' fill='none' stroke='%23c5a059' stroke-width='1.5' stroke-opacity='0.4'/%3E%3C/svg%3E",
+  MEDAL_FOR_BRAVERY_RIBBON: createSvgDataUri(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 70" width="240" height="70">
+      <rect width="240" height="70" rx="4" fill="#111827" stroke="#111111" stroke-width="2"/>
+      <rect x="0" y="0" width="120" height="70" fill="#ea580c"/>
+      <rect x="40" y="0" width="40" height="70" fill="#111827"/>
+      <rect x="140" y="0" width="20" height="70" fill="#ffffff"/>
+      <rect x="180" y="0" width="20" height="70" fill="#ffffff"/>
+      <rect width="240" height="70" rx="4" fill="none" stroke="#c5a059" stroke-width="1.5" stroke-opacity="0.4"/>
+    </svg>
+  `),
 
-  // ЗНАК «ВЕТЕРАН БОЕВЫХ ДЕЙСТВИЙ»
-  VETERAN_BADGE: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 300' width='300' height='300'%3E%3Cdefs%3E%3ClinearGradient id='brassShield' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23ffeaa7'/%3E%3Cstop offset='60%25' stop-color='%23c5a059'/%3E%3Cstop offset='100%25' stop-color='%237d5c1b'/%3E%3C/linearGradient%3E%3Cfilter id='dropShadow' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeDropShadow dx='0' dy='8' stdDeviation='8' flood-color='%23000' flood-opacity='0.6'/%3E%3C/filter%3E%3C/defs%3E%3Cg filter='url(%23dropShadow)'%3E%3Cpath d='M150 25 C230 25 250 65 250 140 C250 215 150 275 150 275 C150 275 50 215 50 140 C50 65 70 25 150 25 Z' fill='url(%23brassShield)' stroke='%23382705' stroke-width='4'/%3E%3Cpath d='M150 40 C215 40 232 75 232 140 C232 202 150 255 150 255 C150 255 68 202 68 140 C68 75 85 40 150 40 Z' fill='%238a1c22' stroke='%23fff' stroke-width='1.5'/%3E%3Cpath d='M150 85 L158 110 L185 110 L163 126 L171 150 L150 135 L129 150 L137 126 L115 110 L142 110 Z' fill='url(%23brassShield)' stroke='%23fff' stroke-width='1'/%3E%3Ctext x='150' y='185' text-anchor='middle' fill='%23ffffff' font-family='sans-serif' font-weight='900' font-size='15' letter-spacing='2'%3EВЕТЕРАН%3C/text%3E%3Ctext x='150' y='208' text-anchor='middle' fill='%23ffeaa7' font-family='sans-serif' font-weight='800' font-size='12' letter-spacing='1.5'%3EБОЕВЫХ ДЕЙСТВИЙ%3C/text%3E%3C/g%3E%3C/svg%3E"
+  // ВЕТЕРАН БОЕВЫХ ДЕЙСТВИЙ
+  VETERAN_BADGE: createSvgDataUri(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+      <defs>
+        <linearGradient id="brassShield" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ffeaa7"/>
+          <stop offset="60%" stop-color="#c5a059"/>
+          <stop offset="100%" stop-color="#7d5c1b"/>
+        </linearGradient>
+        <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000000" flood-opacity="0.6"/>
+        </filter>
+      </defs>
+      <g filter="url(#shadow)">
+        <path d="M150 25 C230 25 250 65 250 140 C250 215 150 275 150 275 C150 275 50 215 50 140 C50 65 70 25 150 25 Z" fill="url(#brassShield)" stroke="#382705" stroke-width="4"/>
+        <path d="M150 40 C215 40 232 75 232 140 C232 202 150 255 150 255 C150 255 68 202 68 140 C68 75 85 40 150 40 Z" fill="#8a1c22" stroke="#ffffff" stroke-width="1.5"/>
+        <path d="M150 85 L158 110 L185 110 L163 126 L171 150 L150 135 L129 150 L137 126 L115 110 L142 110 Z" fill="url(#brassShield)" stroke="#ffffff" stroke-width="1"/>
+        <text x="150" y="185" text-anchor="middle" fill="#ffffff" font-family="'Montserrat', sans-serif" font-weight="900" font-size="15" letter-spacing="2">ВЕТЕРАН</text>
+        <text x="150" y="208" text-anchor="middle" fill="#ffeaa7" font-family="'Montserrat', sans-serif" font-weight="800" font-size="11" letter-spacing="1.5">БОЕВЫХ ДЕЙСТВИЙ</text>
+      </g>
+    </svg>
+  `)
 };
 
 /**
- * БАЗА ДАННЫХ ГОСУДАРСТВЕННЫХ НАГРАД
+ * 2. СВЯЗУЮЩАЯ БАЗА НАГРАД
  */
 const AWARDS_DATABASE = {
   "орден мужества": {
@@ -54,35 +206,35 @@ const AWARDS_DATABASE = {
     badge: HERALDIC_SVGS.ORDER_OF_COURAGE_BADGE,
     ribbon: HERALDIC_SVGS.ORDER_OF_COURAGE_RIBBON,
     established: "Учрежден в 1994 г.",
-    criteria: "Высшая государственная награда за самоотверженность, мужество и отвагу при исполнении воинского долга."
+    criteria: "Высшая награда за самоотверженность, мужество и отвагу при исполнении воинского долга."
   },
   "медаль «за отвагу»": {
     name: "Медаль «За отвагу»",
     badge: HERALDIC_SVGS.MEDAL_FOR_COURAGE_BADGE,
     ribbon: HERALDIC_SVGS.MEDAL_FOR_COURAGE_RIBBON,
     established: "Учреждена в 1994 г.",
-    criteria: "Государственная награда за личное мужество и отвагу, проявленные в боях при защите Отечества."
+    criteria: "Награда за личное мужество и отвагу, проявленные в боях при защите Отечества."
   },
   "медаль суворова": {
     name: "Медаль Суворова",
     badge: HERALDIC_SVGS.MEDAL_OF_SUVOROV_BADGE,
     ribbon: HERALDIC_SVGS.MEDAL_OF_SUVOROV_RIBBON,
     established: "Учреждена в 1994 г.",
-    criteria: "Награда военнослужащих сухопутных войск за личное мужество и отвагу при защите рубежей Отечества."
+    criteria: "Награда за личное мужество и отвагу при защите сухопутных рубежей Отечества."
   },
   "медаль «за храбрость»": {
     name: "Медаль «За храбрость» II степени",
     badge: HERALDIC_SVGS.MEDAL_FOR_BRAVERY_BADGE,
     ribbon: HERALDIC_SVGS.MEDAL_FOR_BRAVERY_RIBBON,
     established: "Учреждена в 2023 г.",
-    criteria: "Награда за храбрость и мужество в ходе выполнения боевых и специальных задач по защите Родины."
+    criteria: "Награда за храбрость и мужество в ходе выполнения специальных и боевых задач."
   },
   "ветеран боевых действий": {
     name: "Ветеран боевых действий",
     badge: HERALDIC_SVGS.VETERAN_BADGE,
     ribbon: HERALDIC_SVGS.VETERAN_BADGE,
     established: "Государственный статус РФ",
-    criteria: "Знак отличия и государственный статус за участие в боевых действиях по защите интересов Отечества."
+    criteria: "Знак отличия и статус за участие в боевых действиях по защите интересов страны."
   }
 };
 
@@ -90,21 +242,21 @@ const ArchiveService = {
   _imageCache: new Map(),
 
   /**
-   * 2. АВТОМАТИЧЕСКАЯ СБОРКА МУЛЬТИМЕДИЙНОЙ ГАЛЕРЕИ БЕЗ БИТЫХ КВАДРАТОВ
+   * 3. СБОРЩИК ГАЛЕРЕИ В ДОСЬЕ ГЕРОЯ (БЕЗ ЧЕРНЫХ КВАДРАТОВ)
    */
   buildDynamicGallery(hero) {
     const gallery = [];
 
-    // 1. Портрет героя (фото или векторный аватар)
+    // 1. Портрет героя
     const photoUrl = hero.media?.photo || hero.photo || this.generateFallbackAvatar(hero);
     gallery.push({
       url: photoUrl,
       caption: `Портрет: ${hero.name}`,
-      desc: hero.education?.specialty || hero.specialty || "Выпускник колледжа",
+      desc: hero.education?.specialty || hero.specialty || "Выпускник СРМК",
       type: "portrait"
     });
 
-    // 2. Государственные награды и орденские планки
+    // 2. Векторные знаки и планки орденов
     if (hero.awards && Array.isArray(hero.awards)) {
       hero.awards.forEach(awardTitle => {
         const visual = this.getAwardVisual(awardTitle);
@@ -129,11 +281,11 @@ const ArchiveService = {
       });
     }
 
-    // 3. Мемориал колледжа
+    // 3. Памятник монумента СРМК
     gallery.push({
       url: "assets/images/cover-master.jpg",
       caption: "Мемориал Славы «Звезда Памяти»",
-      desc: `Памятная ${hero.plaque === 'left' ? 'левая' : 'правая'} плита монумента ГБПОУ СРМК`,
+      desc: `Памятная ${hero.plaque === 'left' ? 'левая' : 'правая'} плита во дворе ГБПОУ СРМК`,
       type: "memorial"
     });
 
@@ -141,7 +293,7 @@ const ArchiveService = {
   },
 
   /**
-   * 3. ПОЛУЧЕНИЕ НАГРАДЫ ПО ТЕКСТУ
+   * 4. ПОИСК НАГРАДЫ ПО ТЕКСТОВОМУ ИМЕНИ
    */
   getAwardVisual(awardTitle) {
     if (!awardTitle) return { name: "Награда РФ", badge: HERALDIC_SVGS.ORDER_OF_COURAGE_BADGE, ribbon: HERALDIC_SVGS.ORDER_OF_COURAGE_RIBBON, criteria: "" };
@@ -163,7 +315,7 @@ const ArchiveService = {
   },
 
   /**
-   * 4. ГЕНЕРАТОР ВЕКТОРНЫХ МЕМОРИАЛЬНЫХ АВАТАРОВ (SVG)
+   * 5. ГЕНЕРАТОР ГЕРБОВЫХ ВЕКТОРНЫХ АВАТАРОВ (SVG)
    */
   generateFallbackAvatar(hero) {
     const parts = (hero.name || "Герой СРМК").split(' ');
@@ -187,7 +339,6 @@ const ArchiveService = {
         <rect width="400" height="500" fill="url(#bgGrad)"/>
         <rect x="14" y="14" width="372" height="472" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" stroke-opacity="0.3" rx="4"/>
 
-        <!-- Центральный орденский медальон -->
         <g transform="translate(200, 175)">
           <circle r="80" fill="#0f1218" stroke="url(#goldGrad)" stroke-width="2"/>
           <path d="M-46 -46 L46 46 M-46 46 L46 -46" stroke="#8a1c22" stroke-width="12" stroke-linecap="round"/>
@@ -195,7 +346,6 @@ const ArchiveService = {
           <text y="9" text-anchor="middle" fill="#ffffff" font-family="'Cinzel', Georgia, serif" font-weight="900" font-size="26" letter-spacing="2">${initials}</text>
         </g>
 
-        <!-- Георгиевская лента -->
         <g transform="translate(45, 295)">
           <rect width="310" height="8" fill="#f97316"/>
           <rect x="62" width="31" height="8" fill="#111111"/>
@@ -203,7 +353,6 @@ const ArchiveService = {
           <rect x="248" width="31" height="8" fill="#111111"/>
         </g>
 
-        <!-- Типографика -->
         <text x="200" y="340" text-anchor="middle" fill="#c5a059" font-family="'Montserrat', sans-serif" font-weight="700" font-size="14" letter-spacing="1">ГБПОУ СРМК</text>
         <text x="200" y="365" text-anchor="middle" fill="#9da6b3" font-family="'Montserrat', sans-serif" font-size="11">${specialtyName.length > 34 ? specialtyName.substring(0, 31) + '...' : specialtyName}</text>
         <text x="200" y="388" text-anchor="middle" fill="#606875" font-family="'Montserrat', sans-serif" font-size="11.5">${yearsText}</text>
@@ -212,9 +361,10 @@ const ArchiveService = {
       </svg>
     `;
 
-    return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+    return createSvgDataUri(svg);
   }
 };
 
 window.ArchiveService = ArchiveService;
 window.HERALDIC_SVGS = HERALDIC_SVGS;
+window.AWARDS_DATABASE = AWARDS_DATABASE;
