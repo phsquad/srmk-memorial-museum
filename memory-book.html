@@ -177,19 +177,7 @@
   <!-- ==========================================================================
        ПОДКЛЮЧЕНИЕ СКРИПТОВ (СТРОГИЙ ПОРЯДОК ЗАГРУЗКИ)
        ========================================================================== -->
-  <!-- 1. Облачная база данных Supabase SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
-  <!-- 2. База данных мемориала и расширенные тома летописи -->
-  <script src="js/data.js"></script>
-  <script src="js/grand-memory-book-part-1.js"></script>
-  <script src="js/grand-memory-book-part-2.js"></script>
-  <script src="js/grand-memory-book-part-3.js"></script>
-  
-  <!-- 3. Облачный мост и защитный шлюз -->
-  <script src="js/cloud-sync.js"></script>
-  
-  <!-- 4. Управляющий движок страницы Книги Памяти -->
-  <script src="js/memory-book.js"></script>
+  <!-- ES6 Module: Главный движок Книги Памяти с импортами зависимостей -->
+  <script type="module" src="js/memory-book.js"></script>
 </body>
 </html>

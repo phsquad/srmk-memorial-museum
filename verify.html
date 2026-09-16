@@ -538,13 +538,12 @@
   </footer>
 
   <!-- ПОДКЛЮЧЕНИЕ ОБЛАКА И ВСПОМОГАТЕЛЬНЫХ СТИЛЕЙ -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/data.js"></script>
-  <script src="js/cloud-sync.js"></script>
-  <script src="js/certificate-verifier.js"></script>
+  <script type="module" src="js/certificate-verifier.js"></script>
+  <script type="module" src="js/navigation.js"></script>
 
-  <script>
-    'use strict';
+  <script type="module">
+    import { CloudSync } from './js/cloud-sync.js';
+    import { CertificateVerifier } from './js/certificate-verifier.js';
 
     const VerifyApp = {
       async init() {
@@ -650,7 +649,5 @@
 
     document.addEventListener('DOMContentLoaded', () => VerifyApp.init());
   </script>
-  <!-- НАВИГАЦИОННЫЙ СКРИПТ -->
-  <script src="js/navigation.js"></script>
 </body>
 </html>

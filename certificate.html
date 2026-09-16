@@ -615,11 +615,11 @@
   </main>
 
   <!-- SUPABASE REALTIME CLOUD SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/cloud-sync.js"></script>
-  <script src="js/certificate-verifier.js"></script>
-  <script>
-    'use strict';
+  <script type="module" src="js/certificate-verifier.js"></script>
+  <script type="module" src="js/navigation.js"></script>
+  <script type="module">
+    import { CloudSync } from './js/cloud-sync.js';
+    import { CertificateVerifier } from './js/certificate-verifier.js';
 
     const CertEngine = {
       role: 'student',         // 'student' | 'teacher'
@@ -843,7 +843,7 @@
           const name = document.getElementById('inputTeacherName').value || 'ФИО Преподавателя';
           const role = document.getElementById('inputTeacherRole').value || 'Должность';
           const dept = document.getElementById('inputTeacherDept').value || 'Кафедра';
-          const metaHTML = `${role} • <span>${dept}</span>`;
+          const metaHTML = `${role} • <span>${dept}`;
           container.appendChild(this.createSheetDOM(name, metaHTML, reasonHTML, dateStr, 'НАГРАДНОЙ СЕРТИФИКАТ НАСТАВНИКА', 1));
           return;
         }
@@ -941,7 +941,5 @@
 
     document.addEventListener('DOMContentLoaded', () => CertEngine.init());
   </script>
-  <!-- НАВИГАЦИОННЫЙ СКРИПТ -->
-  <script src="js/navigation.js"></script>
 </body>
 </html>
