@@ -1,1 +1,1 @@
-Nothing needs to be added to .gitignore since only JavaScript source files were modified and no build artifacts, dependencies, or temporary files were included in the changes.
+(js/admin.js, js/app.js, js/cloud-sync.js, js/guestbook.js, js/heraldry-resolver.js, js/sources.js, js/tech-modules.js)

@@ -761,4 +761,8 @@ if (typeof window !== 'undefined') {
   window.AdminCMS = AdminCMS;
 }
 
-document.addEventListener('DOMContentLoaded', () => AdminCMS.init());
+// Инициализация при загрузке DOM (только при прямом подключении)
+if (typeof document !== 'undefined' && !window.__adminInitialized) {
+  window.__adminInitialized = true;
+  document.addEventListener('DOMContentLoaded', () => AdminCMS.init());
+}

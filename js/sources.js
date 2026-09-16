@@ -306,4 +306,11 @@ const ArchiveService = {
   }
 };
 
-window.ArchiveService = ArchiveService;
+// ES6 экспорт для импорта в другие модули
+export { ArchiveService, AWARDS_DATABASE };
+
+// Для обратной совместимости с глобальной областью видимости
+if (typeof window !== 'undefined') {
+  window.ArchiveService = ArchiveService;
+  window.AWARDS_DATABASE = AWARDS_DATABASE;
+}

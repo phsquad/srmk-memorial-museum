@@ -564,4 +564,8 @@ if (typeof window !== 'undefined') {
   window.GuestbookEngine = GuestbookEngine;
 }
 
-document.addEventListener('DOMContentLoaded', () => GuestbookEngine.init());
+// Инициализация при загрузке DOM (только при прямом подключении)
+if (typeof document !== 'undefined' && !window.__guestbookInitialized) {
+  window.__guestbookInitialized = true;
+  document.addEventListener('DOMContentLoaded', () => GuestbookEngine.init());
+}

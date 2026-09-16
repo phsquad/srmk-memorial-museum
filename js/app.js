@@ -7,6 +7,12 @@
 
 'use strict';
 
+// ES6 импорты зависимых модулей
+import { CloudSync } from './cloud-sync.js';
+import { ArchiveService } from './sources.js';
+import { HeraldryResolver } from './heraldry-resolver.js';
+import { TechModules } from './tech-modules.js';
+
 /**
  * 1. ГЛОБАЛЬНОЕ СОСТОЯНИЕ ПРИЛОЖЕНИЯ (APP STATE)
  */

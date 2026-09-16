@@ -457,5 +457,16 @@ const TechModules = {
   }
 };
 
-window.TechModules = TechModules;
-document.addEventListener('DOMContentLoaded', () => TechModules.init());
+// ES6 экспорт для импорта в другие модули
+export { TechModules };
+
+// Для обратной совместимости с глобальной областью видимости
+if (typeof window !== 'undefined') {
+  window.TechModules = TechModules;
+}
+
+// Инициализация при загрузке DOM (только при прямом подключении)
+if (typeof document !== 'undefined' && !window.__techModulesInitialized) {
+  window.__techModulesInitialized = true;
+  document.addEventListener('DOMContentLoaded', () => TechModules.init());
+}
