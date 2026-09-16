@@ -1,10 +1,23 @@
 /**
- * НАВИГАЦИОННЫЙ МОДУЛЬ ДЛЯ ЕДИНОЙ ШАПКИ
- * Подключается на все страницы сайта
+ * НАВИГАЦИОННЫЙ КОМПОНЕНТ
+ * Единый модуль для рендеринга и управления навигацией на всех страницах.
+ * Устраняет дублирование кода между страницами.
  */
 
 (function() {
   'use strict';
+
+  // Конфигурация меню навигации
+  const NAV_ITEMS = [
+    { id: 'home', label: 'Главная', href: 'index.html', icon: '🏠' },
+    { id: 'about', label: 'О музее', href: 'about.html', icon: 'ℹ️' },
+    { id: 'heroes', label: 'Герои', href: 'heroes.html', icon: '🎖️' },
+    { id: 'memory-book', label: 'Книга памяти', href: 'memory-book.html', icon: '📖' },
+    { id: 'guest-book', label: 'Гостевая книга', href: 'guest-book.html', icon: '✍️' },
+    { id: 'quiz', label: 'Викторина', href: 'quiz.html', icon: '❓' },
+    { id: 'sources', label: 'Источники', href: 'sources.html', icon: '📚' },
+    { id: 'contacts', label: 'Контакты', href: 'contacts.html', icon: '📞' }
+  ];
 
   // === ИНИЦИАЛИЗАЦИЯ ПОСЛЕ ЗАГРУЗКИ DOM ===
   document.addEventListener('DOMContentLoaded', function() {
@@ -15,6 +28,9 @@
    * Основная функция инициализации навигации
    */
   function initNavigation() {
+    // Подсветка активной страницы
+    highlightActivePage();
+    
     // Инициализация выпадающего меню модулей
     initModulesDropdown();
     
@@ -24,8 +40,7 @@
     // Инициализация кнопки паспорта проекта
     initPassportButton();
     
-    // Подсветка активной страницы в навигации
-    highlightActivePage();
+    Logger.info('Navigation component initialized');
   }
 
   /**
@@ -249,6 +264,119 @@
   }
 
   /**
+   * Рендеринг шапки сайта
+   * @param {string} containerId - ID контейнера для вставки шапки
+   */
+  function renderHeader(containerId = 'siteHeader') {
+    const container = document.getElementById(containerId);
+    if (!container) {
+      Logger.warn(`Контейнер шапки #${containerId} не найден`);
+      return;
+    }
+
+    const currentPageId = getCurrentPageId();
+    
+    // Генерация ссылок основного меню
+    const desktopNavLinks = NAV_ITEMS.slice(0, 4).map(item => {
+      const isActive = item.id === currentPageId ? 'active' : '';
+      return `<a href="${item.href}" class="nav-link ${isActive}" data-page="${item.id}">${item.label}</a>`;
+    }).join('');
+
+    // Генерация ссылок выпадающего меню модулей
+    const moduleItems = [
+      { href: 'memory-book.html', icon: '📖', title: 'Книга Памяти', subtitle: 'Летопись 20 героев' },
+      { href: 'reader.html', icon: '📚', title: '3D Фолиант', subtitle: 'Читалка с перелистыванием' },
+      { href: 'quiz.html', icon: '⚔️', title: 'Квест-викторина', subtitle: '10 интерактивных вопросов' },
+      { href: 'methodology.html', icon: '📑', title: 'Методкабинет', subtitle: 'Банк уроков для педагогов' },
+      { href: 'verify.html', icon: '🛡', title: 'Реестр верификации', subtitle: 'Проверка сертификатов' },
+      { href: 'desk-qr.html', icon: '🪑', title: 'Парта Героя', subtitle: 'Конструктор табличек А4' },
+      { href: 'guestbook.html', icon: '🕯', title: 'Стена Памяти', subtitle: 'Послания и лампады' }
+    ];
+
+    const dropdownItems = moduleItems.map(item => `
+      <a href="${item.href}" class="dropdown-item">
+        <span class="item-icon">${item.icon}</span>
+        <div><strong>${item.title}</strong><small>${item.subtitle}</small></div>
+      </a>
+    `).join('');
+
+    // Генерация ссылок мобильного меню
+    const mobileMainLinks = NAV_ITEMS.map(item => 
+      `<a href="${item.href}" class="drawer-link" data-page="${item.id}">${item.icon} ${item.label}</a>`
+    ).join('');
+
+    const mobileModuleLinks = moduleItems.map(item => 
+      `<a href="${item.href}" class="drawer-link">${item.icon} ${item.title}</a>`
+    ).join('');
+
+    container.innerHTML = `
+      <div class="container header-container">
+        
+        <!-- ЛОГОТИП И НАЗВАНИЕ -->
+        <a href="#heroIntro" class="logo-group" aria-label="На главную страницу музея">
+          <div class="logo-badge">СРМК</div>
+          <div class="logo-text">
+            <span class="org-name">ГБПОУ СРМК • Ставрополь</span>
+            <span class="site-title">«Быть воином — жить вечно»</span>
+          </div>
+        </a>
+
+        <!-- ОСНОВНАЯ НАВИГАЦИЯ -->
+        <nav class="nav" id="desktopNav" aria-label="Навигация по залам">
+          ${desktopNavLinks}
+        </nav>
+
+        <!-- ПАНЕЛЬ ДЕЙСТВИЙ И ЦИФРОВЫХ МОДУЛЕЙ -->
+        <div class="header-actions">
+          <!-- ВЫПАДАЮЩЕЕ МЕНЮ ЦИФРОВЫХ МОДУЛЕЙ -->
+          <div class="modules-dropdown" id="modulesDropdown">
+            <button class="btn-dropdown-toggle" id="btnDropdownToggle" type="button" aria-expanded="false" aria-controls="dropdownMenu">
+              <span>🏛 Модули</span>
+              <span class="arrow-icon" aria-hidden="true">▾</span>
+            </button>
+            <div class="dropdown-menu" id="dropdownMenu">
+              ${dropdownItems}
+            </div>
+          </div>
+
+          <!-- КНОПКА СЕРТИФИКАТА -->
+          <a href="certificate.html" class="btn-header-cert" title="Оформить наградной лист">
+            <span>📜</span> Сертификат
+          </a>
+
+          <!-- ПАСПОРТ И КАРТА ДОБЛЕСТИ -->
+          <button class="passport-btn" id="btnOpenPassport" type="button">Паспорт проекта</button>
+          <a href="https://карта-доблести.рф" target="_blank" rel="noopener noreferrer" class="contest-badge">Карта Доблести РФ</a>
+
+          <!-- КНОПКА МОБИЛЬНОГО МЕНЮ (БУРГЕР) -->
+          <button class="mobile-burger-btn" id="mobileBurgerBtn" aria-label="Открыть мобильное меню" aria-expanded="false" aria-controls="mobileDrawer" type="button">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ВЫДВИЖНАЯ МОБИЛЬНАЯ ПАНЕЛЬ МЕНЮ -->
+      <div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+        <div class="drawer-content">
+          <div class="drawer-section-label">Основные разделы</div>
+          ${mobileMainLinks}
+
+          <div class="drawer-section-label">Цифровые модули и сервисы</div>
+          ${mobileModuleLinks}
+          <a href="certificate.html" class="drawer-link highlight">📜 Оформить Сертификат участника</a>
+
+          <div class="drawer-buttons-row">
+            <button class="drawer-btn" id="drawerPassportBtn" type="button">Паспорт проекта</button>
+            <a href="https://карта-доблести.рф" target="_blank" rel="noopener noreferrer" class="drawer-btn gold">Карта Доблести РФ</a>
+          </div>
+        </div>
+      </div>
+    `;
+
+    Logger.info('Header rendered', { container: containerId, page: currentPageId });
+  }
+
+  /**
    * Подсветка активной страницы в навигации
    */
   function highlightActivePage() {
@@ -270,5 +398,38 @@
       }
     });
   }
+
+  /**
+   * Утилита для получения текущей страницы
+   * @returns {string} ID текущей страницы
+   */
+  function getCurrentPageId() {
+    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const pageName = currentPage.replace('.html', '');
+    
+    // Маппинг имен файлов на ID страниц
+    const pageMap = {
+      'index': 'home',
+      'about': 'about',
+      'heroes': 'heroes',
+      'memory-book': 'memory-book',
+      'guest-book': 'guest-book',
+      'quiz': 'quiz',
+      'sources': 'sources',
+      'contacts': 'contacts'
+    };
+    
+    return pageMap[pageName] || 'home';
+  }
+
+  /**
+   * Экспорт публичных методов компонента
+   */
+  window.NavigationComponent = {
+    getCurrentPageId: getCurrentPageId,
+    navItems: NAV_ITEMS,
+    renderHeader: renderHeader,
+    init: initNavigation
+  };
 
 })();

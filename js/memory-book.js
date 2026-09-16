@@ -7,6 +7,22 @@
 
 'use strict';
 
+// Logger для этого модуля
+const memoryLogger = {
+  level: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 3 : 1,
+  log(...args) { if (this.level >= 3) console.log('[memoryLogger]', ...args); },
+  warn(...args) { if (this.level >= 2) console.warn('[memoryLogger]', ...args); },
+  error(...args) { if (this.level >= 1) console.error('[memoryLogger]', ...args); }
+};
+
+// Функция для получения пути к изображению с поддержкой WebP
+function getHeroPhotoPath(filename) {
+  // Проверка поддержки WebP браузером
+  const supportsWebp = document.createElement('canvas').toDataURL('image/webp').indexOf('data:image/webp') === 0;
+  const ext = supportsWebp ? 'webp' : 'jpg';
+  return `assets/images/heroes/${ext === 'webp' ? 'webp/' : ''}${filename}.${ext}`;
+}
+
 // 20 ПОЛНЫХ ИСТОРИЧЕСКИХ ГЛАВ В ФОРМАТЕ MARKDOWN
 const MEMORY_BOOK_ARCHIVE = [
   MEMORY_BOOK_PROLOGUE,
@@ -24,7 +40,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно)",
     location: "Донецкое направление (ДНР)",
     audioFile: "assets/audio/guides/petukhov.mp3",
-    photo: "assets/images/heroes/petukhov.jpg",
+    photo: getHeroPhotoPath("petukhov"),
     shortSnippet: "Отражение контратаки превосходящих сил врага. Прикрыл собой эвакуацию группы раненых бойцов на Донецком рубеже.",
     markdown: `
 # Владислав Витальевич Петухов (1996 — 2022)
@@ -65,7 +81,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно), Медаль «За отвагу»",
     location: "Авдеевский укрепленный район",
     audioFile: "assets/audio/guides/yaryshev.mp3",
-    photo: "assets/images/heroes/yaryshev.jpg",
+    photo: getHeroPhotoPath("yaryshev"),
     shortSnippet: "Штурм авдеевских дотов и укреплений. Командир штурмового отделения, кавалер медали «За отвагу».",
     markdown: `
 # Максим Викторович Ярышев (1985 — 2024)
@@ -104,7 +120,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно)",
     location: "Запорожский рубеж / Орехов",
     audioFile: "assets/audio/guides/sopolev.mp3",
-    photo: "assets/images/heroes/sopolev.jpg",
+    photo: getHeroPhotoPath("sopolev"),
     shortSnippet: "Спасение жизней сослуживцев под непрерывным кассетным обстрелом на Ореховском направлении.",
     markdown: `
 # Николай Сергеевич Сополев (2000 — 2023)
@@ -138,7 +154,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно)",
     location: "Бахмутский рубеж",
     audioFile: "assets/audio/guides/belov.mp3",
-    photo: "assets/images/heroes/belov.jpg",
+    photo: getHeroPhotoPath("belov"),
     shortSnippet: "Отражение танкового флангового удара противника на Бахмутском рубеже. Обеспечил перегруппировку батальона.",
     markdown: `
 # Сергей Александрович Белов (1995 — 2023)
@@ -168,7 +184,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно)",
     location: "Марьинское направление",
     audioFile: "assets/audio/guides/shartov.mp3",
-    photo: "assets/images/heroes/shartov.jpg",
+    photo: getHeroPhotoPath("shartov"),
     shortSnippet: "Рейсы сквозь огонь: доставка боеприпасов на передний край Марьинки под прицельными ударами дронов.",
     markdown: `
 # Павел Николаевич Шартов (1998 — 2023)
@@ -198,7 +214,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно), Медаль «За храбрость» II степени",
     location: "Херсонская область, с. Гладковка",
     audioFile: "assets/audio/guides/nazyrov.mp3",
-    photo: "assets/images/heroes/nazyrov.jpg",
+    photo: getHeroPhotoPath("nazyrov"),
     shortSnippet: "Легендарный водитель «Машины жизни». Обеспечивал передовую питьевой водой под обстрелами. Погиб в с. Гладковка.",
     markdown: `
 # Шамиль Рустамович Назыров (2002 — 2023)
@@ -232,7 +248,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно)",
     location: "Донецкое направление",
     audioFile: "assets/audio/guides/lukyanenko.mp3",
-    photo: "assets/images/heroes/lukyanenko.jpg",
+    photo: getHeroPhotoPath("lukyanenko"),
     shortSnippet: "Прорыв эшелонированной обороны в ДНР. Сохранил маневренность танка под прямым артобстрелом.",
     markdown: `
 # Игорь Владимирович Лукьяненко (1997 — 2023)
@@ -260,7 +276,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно)",
     location: "Курское приграничье",
     audioFile: "assets/audio/guides/nazarenko.mp3",
-    photo: "assets/images/heroes/nazarenko.jpg",
+    photo: getHeroPhotoPath("nazarenko"),
     shortSnippet: "Самый юный герой мемориала (20 лет). Обеспечил боевую связь штабов в Курском приграничье 13 августа 2024 года.",
     markdown: `
 # Никита Сергеевич Назаренко (2004 — 2024)
@@ -290,7 +306,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно)",
     location: "Запорожская область",
     audioFile: "assets/audio/guides/lutsenko.mp3",
-    photo: "assets/images/heroes/lutsenko.jpg",
+    photo: getHeroPhotoPath("lutsenko"),
     shortSnippet: "Инженерная разведка и разминирование минных полей под прямым огнем на Запорожском фронте.",
     markdown: `
 # Константин Андреевич Луценко (2001 — 2023)
@@ -318,7 +334,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно)",
     location: "Ореховское направление",
     audioFile: "assets/audio/guides/ponomarchuk.mp3",
-    photo: "assets/images/heroes/ponomarchuk.jpg",
+    photo: getHeroPhotoPath("ponomarchuk"),
     shortSnippet: "Удержание стратегического рубежа в составе 247-го ДШП ВДВ под Ореховом в июле 2024 года.",
     markdown: `
 # Иван Сергеевич Пономарчук (2002 — 2024)
@@ -350,7 +366,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно)",
     location: "Угледарское направление",
     audioFile: "assets/audio/guides/martynov.mp3",
-    photo: "assets/images/heroes/martynov.jpg",
+    photo: getHeroPhotoPath("martynov"),
     shortSnippet: "Принял командование штурмовой группой после ранения офицера и взял опорный пункт под Угледаром.",
     markdown: `
 # Станислав Константинович Мартынов (2000 — 2023)
@@ -378,7 +394,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно, Указ № 406сс)",
     location: "Херсонское направление",
     audioFile: "assets/audio/guides/gorlov.mp3",
-    photo: "assets/images/heroes/gorlov.jpg",
+    photo: getHeroPhotoPath("gorlov"),
     shortSnippet: "Старший стрелок 247-го ДШП ВДВ. Освобождение населенных пунктов южного направления в мае 2022 года.",
     markdown: `
 # Никита Андреевич Горлов (1999 — 2022)
@@ -406,7 +422,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно)",
     location: "Антоновский мост, г. Херсон",
     audioFile: "assets/audio/guides/vecherka.mp3",
-    photo: "assets/images/heroes/vecherka.jpg",
+    photo: getHeroPhotoPath("vecherka"),
     shortSnippet: "Легендарный бой 26 февраля 2022 года у Антоновского моста. Спасал раненых десантников в полном окружении.",
     markdown: `
 # Николай Анатольевич Вечёрка (1996 — 2022)
@@ -434,7 +450,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества № 83029 (посмертно, Указ от 26.03.2022)",
     location: "Запорожский рубеж",
     audioFile: "assets/audio/guides/samokhin.mp3",
-    photo: "assets/images/heroes/samokhin.jpg",
+    photo: getHeroPhotoPath("samokhin"),
     shortSnippet: "Отражение танкового прорыва в первые недели СВО. Награжден Орденом Мужества № 83029.",
     markdown: `
 # Дмитрий Александрович Самохин (2000 — 2022)
@@ -462,7 +478,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно), Ветеран боевых действий",
     location: "Приграничная полоса",
     audioFile: "assets/audio/guides/butov.mp3",
-    photo: "assets/images/heroes/butov.jpg",
+    photo: getHeroPhotoPath("butov"),
     shortSnippet: "Офицер спецподразделения Пограничной службы ФСБ. Отражение нападения диверсионной группы.",
     markdown: `
 # Виктор Евгеньевич Бутов (1989 — 2022)
@@ -490,7 +506,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно)",
     location: "Херсонский плацдарм",
     audioFile: "assets/audio/guides/elagin.mp3",
-    photo: "assets/images/heroes/elagin.jpg",
+    photo: getHeroPhotoPath("elagin"),
     shortSnippet: "Встречный бой десанта 26 февраля 2022 года на южном рубеже. Держал оборону до конца.",
     markdown: `
 # Максим Николаевич Елагин (2000 — 2022)
@@ -518,7 +534,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно), Медаль Суворова",
     location: "Времевский выступ",
     audioFile: "assets/audio/guides/grigoriev.mp3",
-    photo: "assets/images/heroes/grigoriev.jpg",
+    photo: getHeroPhotoPath("grigoriev"),
     shortSnippet: "Отражение штурма на Времевском выступе. Награжден медалью Суворова при жизни.",
     markdown: `
 # Александр Николаевич Григорьев (1999 — 2023)
@@ -546,7 +562,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно)",
     location: "Донецкое направление",
     audioFile: "assets/audio/guides/brynza.mp3",
-    photo: "assets/images/heroes/brynza.jpg",
+    photo: getHeroPhotoPath("brynza"),
     shortSnippet: "Подавление вражеского пулеметного дзота в решающий момент штурма на Донецком рубеже.",
     markdown: `
 # Никита Дмитриевич Брынза (2000 — 2023)
@@ -574,7 +590,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно)",
     location: "Днепровский рубеж",
     audioFile: "assets/audio/guides/serbienko.mp3",
-    photo: "assets/images/heroes/serbienko.jpg",
+    photo: getHeroPhotoPath("serbienko"),
     shortSnippet: "Десантные операции морской пехоты на Днепре. Обеспечил эвакуацию группы под ударами дронов.",
     markdown: `
 # Иван Павлович Сербиенко (2002 — 2024)
@@ -602,7 +618,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно), Медаль «За отвагу»",
     location: "Покровское направление",
     audioFile: "assets/audio/guides/chupin.mp3",
-    photo: "assets/images/heroes/chupin.jpg",
+    photo: getHeroPhotoPath("chupin"),
     shortSnippet: "Оборона взводного опорного пункта на Покровском направлении. Сохранил жизни бойцов ценой своей.",
     markdown: `
 # Илья Валерьевич Чупин (1999 — 2024)
@@ -691,7 +707,7 @@ const MemoryBookApp = {
 
         <div class="chapter-hero-header">
           <div class="chapter-photo-wrap">
-            <img src="${hero.photo}" alt="${hero.name}" class="chapter-photo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'140\\' height=\\'185\\'%3E%3Crect width=\\'140\\' height=\\'185\\' fill=\\'%2312151d\\'/ %3E%3Ctext x=\\'50%25\\' y=\\'50%25\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' fill=\\'%23c5a059\\' font-size=\\'12\\'%3EСРМК%3C/text%3E%3C/svg%3E'">
+            <img src="${hero.photo}" alt="${hero.name}" class="chapter-photo" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'140\\' height=\\'185\\'%3E%3Crect width=\\'140\\' height=\\'185\\' fill=\\'%2312151d\\'/ %3E%3Ctext x=\\'50%25\\' y=\\'50%25\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' fill=\\'%23c5a059\\' font-size=\\'12\\'%3EСРМК%3C/text%3E%3C/svg%3E'">
           </div>
 
           <div class="chapter-hero-titles">

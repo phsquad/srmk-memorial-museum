@@ -11,6 +11,14 @@
 
 'use strict';
 
+// Logger для AdminCMS
+const adminLogger = {
+  level: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 3 : 1,
+  log(...args) { if (this.level >= 3) console.log('[AdminCMS]', ...args); },
+  warn(...args) { if (this.level >= 2) console.warn('[AdminCMS]', ...args); },
+  error(...args) { if (this.level >= 1) console.error('[AdminCMS]', ...args); }
+};
+
 const AdminCMS = {
   adminPassword: "2026",
   currentHeroId: null,
@@ -22,7 +30,7 @@ const AdminCMS = {
     this.createDashboardMarkup();
     this.bindEvents();
     this.applyLocalStorageOverrides();
-    console.log("[AdminCMS v3.0 Ultra] Панель управления готова. Вход: Ctrl+Shift+A");
+    adminLogger.log("Панель управления готова. Вход: Ctrl+Shift+A");
   },
 
   /**
@@ -580,7 +588,7 @@ const AdminCMS = {
           parsed.forEach(h => heroesDatabase.push(h));
         }
       } catch (e) {
-        console.error("[AdminCMS] Ошибка применения LocalStorage:", e);
+        adminLogger.error("Ошибка применения LocalStorage:", e);
       }
     }
   },

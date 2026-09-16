@@ -13,6 +13,14 @@
 
 'use strict';
 
+// Logger для этого модуля
+const readerLogger = {
+  level: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 3 : 1,
+  log(...args) { if (this.level >= 3) console.log('[readerLogger]', ...args); },
+  warn(...args) { if (this.level >= 2) console.warn('[readerLogger]', ...args); },
+  error(...args) { if (this.level >= 1) console.error('[readerLogger]', ...args); }
+};
+
 const FOLIO_LIBRARY = [
   // Базовая заглушка на случай отсутствия загруженных внешних томов
   {
@@ -34,7 +42,7 @@ const FOLIO_LIBRARY = [
         leftHtml: `
           <div class="page-header-meta"><span>ГБПОУ СРМК</span><span>ЭЛЕКТРОННАЯ КНИГА ПАМЯТИ</span></div>
           <div class="page-visual-frame" style="height: 380px;">
-            <img src="assets/images/cover-master.jpg" alt="Обложка Книги Памяти" style="object-fit: cover;">
+            <img src="assets/images/cover-master.webp" alt="Обложка Книги Памяти" loading="lazy" style="object-fit: cover;">
           </div>
           <div class="page-number-footer">Лицевая обложка</div>
         `,
@@ -80,7 +88,7 @@ const ReaderEngine = {
         leftHtml: `
           <div class="page-header-meta"><span>ГБПОУ СРМК</span><span>ЭЛЕКТРОННАЯ КНИГА ПАМЯТИ</span></div>
           <div class="page-visual-frame" style="height: 380px;">
-            <img src="assets/images/cover-master.jpg" alt="Обложка Книги Памяти" style="object-fit: cover;">
+            <img src="assets/images/cover-master.webp" alt="Обложка Книги Памяти" loading="lazy" style="object-fit: cover;">
           </div>
           <div class="page-quote-box">«Быть воином — жить вечно»</div>
           <div class="page-number-footer">Лицевая обложка</div>
@@ -164,7 +172,7 @@ const ReaderEngine = {
 
       noise.start();
     } catch (e) {
-      console.warn("[Web Audio] Звуковой движок временно недоступен:", e);
+      readerLogger.warn("Звуковой движок временно недоступен:", e);
     }
   },
 
@@ -198,6 +206,8 @@ const ReaderEngine = {
     grid.innerHTML = filtered.map((hero, idx) => {
       const volNum = hero.volNum || `Том ${idx + 1}`;
       const photoSrc = hero.media?.photo || hero.photo || 'assets/images/cover-master.jpg';
+      // 🔥 Оптимизация: используем thumbnail для обложек фолиантов
+      const thumbSrc = photoSrc.replace('assets/images/heroes/', 'assets/images/heroes/thumbs/');
       const specText = hero.education?.specialty || hero.specialty || 'Выпускник колледжа';
       const isMaster = hero.id === 'prologue-master-cover';
 
@@ -207,7 +217,7 @@ const ReaderEngine = {
                  onkeydown="if(event.key === 'Enter' || event.key === ' ') { event.preventDefault(); ReaderEngine.openBook('${hero.id}'); }">
           <div class="book-spine-vol">${volNum} • ${hero.plaque === 'left' ? 'Левая' : (hero.plaque === 'right' ? 'Правая' : 'ГБПОУ СРМК')}</div>
           <div class="book-spine-portrait">
-            <img src="${photoSrc}" alt="${hero.name}" onerror="this.src='assets/images/cover-master.jpg'">
+            <img src="${thumbSrc}" alt="${hero.name}" loading="lazy" onerror="this.src='${photoSrc}'">
           </div>
           <h4 class="book-spine-title">${hero.name}</h4>
           <p class="book-spine-spec">${specText}</p>
@@ -242,7 +252,7 @@ const ReaderEngine = {
               spreadNum: "Разворот I (Стр. 1–2)",
               leftHtml: `
                 <div class="page-header-meta"><span>ГБПОУ СРМК</span><span>АРХИВНЫЙ МЕДАЛЬОН</span></div>
-                <div class="page-visual-frame"><img src="${h.media?.photo || 'assets/images/cover-master.jpg'}" alt="${h.name}" onerror="this.src='assets/images/cover-master.jpg'"></div>
+                <div class="page-visual-frame"><img src="${h.media?.photo || 'assets/images/cover-master.webp'}" alt="${h.name}" loading="lazy" onerror="this.src='assets/images/cover-master.jpg'"></div>
                 <div class="page-quote-box">«${h.quote || 'Верность воинскому долгу и памяти студенческого братства.'}»</div>
                 <p style="font-size:0.85rem; color:#444;"><strong>Профессия:</strong> ${h.education?.specialty || 'Выпускник колледжа'}<br><strong>Звание:</strong> ${h.military?.rank || 'Воин ВС РФ'}<br><strong>Рубеж:</strong> ${h.mapCoords?.locationName || 'ТВД'}</p>
                 <div class="page-number-footer">Стр. 1</div>

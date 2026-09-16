@@ -14,6 +14,14 @@
 
 'use strict';
 
+// Logger для этого модуля
+const protectionLogger = {
+  level: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 3 : 1,
+  log(...args) { if (this.level >= 3) console.log('[protectionLogger]', ...args); },
+  warn(...args) { if (this.level >= 2) console.warn('[protectionLogger]', ...args); },
+  error(...args) { if (this.level >= 1) console.error('[protectionLogger]', ...args); }
+};
+
 const MasterProtection = {
   isActive: false,
   protectedElement: null,

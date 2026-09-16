@@ -7,6 +7,20 @@
 
 'use strict';
 
+// Подключаем модуль логирования
+const LogLevel = window.LogLevel || { NONE: 0, ERROR: 1, WARN: 2, INFO: 3, DEBUG: 4 };
+const Logger = window.Logger || class {
+  constructor(level = LogLevel.INFO) {
+    this.level = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? level : LogLevel.WARN;
+    this.prefix = '[App]';
+  }
+  debug(...args) { if (this.level >= LogLevel.DEBUG) console.log(`${this.prefix} [DEBUG]`, ...args); }
+  info(...args) { if (this.level >= LogLevel.INFO) console.info(`${this.prefix} [INFO]`, ...args); }
+  warn(...args) { if (this.level >= LogLevel.WARN) console.warn(`${this.prefix} [WARN]`, ...args); }
+  error(...args) { if (this.level >= LogLevel.ERROR) console.error(`${this.prefix} [ERROR]`, ...args); }
+};
+const logger = new Logger(LogLevel.INFO);
+
 /**
  * 1. ГЛОБАЛЬНОЕ СОСТОЯНИЕ ПРИЛОЖЕНИЯ (APP STATE)
  */
@@ -75,7 +89,7 @@ const App = {
       this.initAmbientParticles();
     }, 150);
 
-    console.log(`[Музей СРМК] Ядро экспозиции v11.0 запущено. Героев в строю: ${typeof heroesDatabase !== 'undefined' ? heroesDatabase.length : 0}`);
+    logger.info(`Ядро экспозиции v11.0 запущено. Героев в строю: ${typeof heroesDatabase !== 'undefined' ? heroesDatabase.length : 0}`);
   },
 
   cacheDOM() {
@@ -320,8 +334,11 @@ const App = {
 
     filtered.forEach(hero => {
       const photoSrc = (typeof ArchiveService !== 'undefined')
-        ? (hero.media?.photo || ArchiveService.generateFallbackAvatar(hero))
-        : (hero.media?.photo || FALLBACK_HERO_AVATAR);
+        ? (hero.media?.photo || hero.photo || ArchiveService.generateFallbackAvatar(hero))
+        : (hero.media?.photo || hero.photo || FALLBACK_HERO_AVATAR);
+      
+      // 🔥 Оптимизация: используем thumbnail для карточек героев
+      const thumbSrc = photoSrc.replace('assets/images/heroes/', 'assets/images/heroes/thumbs/');
 
       const yearsText = hero.dates?.years || `${hero.dates?.birth || ''} — ${hero.dates?.death || ''}`;
       const specialtyText = hero.education?.specialty || "Выпускник колледжа";
@@ -338,7 +355,7 @@ const App = {
               : null;
             const medalImg = awardVisual?.badge || this._getDefaultMedalIcon();
             const medalTitle = this.escapeHtml(awardTitle);
-            return `<span class="medal-icon" title="${medalTitle}"><img src="${medalImg}" alt="${medalTitle}" onerror="this.style.display='none'"></span>`;
+            return `<span class="medal-icon" title="${medalTitle}"><img src="${medalImg}" alt="${medalTitle}" loading="lazy" onerror="this.style.display='none'"></span>`;
           }).join('')}
           ${hero.awards.length > 4 ? `<span class="medal-more" title="Ещё ${hero.awards.length - 4} наград">+${hero.awards.length - 4}</span>` : ''}
         </div>`;
@@ -353,7 +370,7 @@ const App = {
       // 🔥 Наполнение строго изолированной HTML-структурой через DocumentFragment
       card.innerHTML = `
         <div class="hero-card-img-wrap">
-          <img src="${photoSrc}" alt="${this.escapeHtml(hero.name)}" class="hero-card-img" loading="lazy" onerror="this.src='${FALLBACK_HERO_AVATAR}'">
+          <img src="${thumbSrc}" alt="${this.escapeHtml(hero.name)}" class="hero-card-img" loading="lazy" onerror="this.src='${photoSrc}'">
           <span class="hero-card-badge">СВО</span>
           ${candleCount > 0 ? `<span class="hero-candle-badge" title="Зажжено свечей памяти">🕯 ${candleCount}</span>` : ''}
           ${medalsHTML ? `<div class="hero-card-medals-overlay">${medalsHTML}</div>` : ''}
@@ -410,7 +427,7 @@ const App = {
       const awardElements = await Promise.all(hero.awards.map(async (awardTitle) => {
         if (typeof HeraldryResolver !== 'undefined') {
           const awardData = await HeraldryResolver.resolveAwardImages(awardTitle);
-          const badgeHtml = awardData.badgeUrl ? `<img src="${awardData.badgeUrl}" alt="${this.escapeHtml(awardData.name)}" class="award-badge-hero" title="${awardData.established ? `Учреждена: ${awardData.established}` : ''}">` : '';
+          const badgeHtml = awardData.badgeUrl ? `<img src="${awardData.badgeUrl}" alt="${this.escapeHtml(awardData.name)}" class="award-badge-hero" loading="lazy" title="${awardData.established ? `Учреждена: ${awardData.established}` : ''}">` : '';
           return {
             name: awardData.name,
             badge: badgeHtml,
@@ -418,7 +435,7 @@ const App = {
           };
         } else if (typeof ArchiveService !== 'undefined') {
           const visual = ArchiveService.getAwardVisual(awardTitle);
-          const badgeHtml = visual.badge ? `<img src="${visual.badge}" alt="${this.escapeHtml(visual.name)}" class="award-badge-hero">` : '';
+          const badgeHtml = visual.badge ? `<img src="${visual.badge}" alt="${this.escapeHtml(visual.name)}" class="award-badge-hero" loading="lazy">` : '';
           return {
             name: visual.name,
             badge: badgeHtml,
@@ -457,7 +474,7 @@ const App = {
       <div class="dossier-layout">
         <div class="dossier-sidebar">
           <div class="dossier-gallery-main">
-            <img src="${mainPhoto}" alt="${this.escapeHtml(hero.name)}" id="dossierMainImage" class="dossier-img" onerror="this.src='${FALLBACK_HERO_AVATAR}'">
+            <img src="${mainPhoto}" alt="${this.escapeHtml(hero.name)}" id="dossierMainImage" class="dossier-img" loading="lazy" onerror="this.src='${FALLBACK_HERO_AVATAR}'">
             <div class="dossier-gallery-caption" id="dossierImageCaption">
               <strong>${this.escapeHtml(galleryItems[0].caption || '')}</strong>
               ${galleryItems[0].desc ? `<br><small style="opacity:0.8;">${this.escapeHtml(galleryItems[0].desc)}</small>` : ''}
@@ -473,7 +490,7 @@ const App = {
                         onclick="App.switchGalleryPhoto('${item.url}', '${item.caption.replace(/'/g, "\\'")}', '${(item.desc || '').replace(/'/g, "\\'")}', this)" 
                         type="button" 
                         title="${this.escapeHtml(item.caption)}">
-                  <img src="${item.url}" alt="" onerror="this.src='${FALLBACK_HERO_AVATAR}'">
+                  <img src="${item.url}" alt="" loading="lazy" onerror="this.src='${FALLBACK_HERO_AVATAR}'">
                 </button>
               `).join('')}
             </div>
@@ -508,7 +525,7 @@ const App = {
           </div>
 
           <div class="dossier-qr-box">
-            <img src="${qrUrl}" alt="QR" class="dossier-qr-img">
+            <img src="${qrUrl}" alt="QR" class="dossier-qr-img" loading="lazy">
             <span class="dossier-qr-label">QR для «Парты Героя»</span>
           </div>
         </div>
@@ -857,7 +874,7 @@ const App = {
         });
 
       } catch (err) {
-        console.warn("[Музей] Яндекс Карты API инициализирован в ограниченном режиме:", err);
+        logger.warn("Яндекс Карты API инициализирован в ограниченном режиме:", err);
       }
     });
   },

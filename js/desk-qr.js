@@ -7,6 +7,14 @@
 
 'use strict';
 
+// Logger для этого модуля
+const deskQRLogger = {
+  level: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? 3 : 1,
+  log(...args) { if (this.level >= 3) console.log('[deskQRLogger]', ...args); },
+  warn(...args) { if (this.level >= 2) console.warn('[deskQRLogger]', ...args); },
+  error(...args) { if (this.level >= 1) console.error('[deskQRLogger]', ...args); }
+};
+
 const DeskQREngine = {
   selectedHeroId: "nazyrov-sh-r",
   mode: "single",            // 'single' | 'all'
@@ -164,10 +172,10 @@ const DeskQREngine = {
         <!-- Левая колонка: Фото + QR -->
         <div class="plaque-left-col">
           <div class="plaque-photo-frame">
-            <img src="${photoSrc}" alt="${hero.name}" onerror="this.src='assets/images/memorial-bg.jpg'">
+            <img src="${photoSrc}" alt="${hero.name}" loading="lazy" onerror="this.src='assets/images/memorial-bg.jpg'">
           </div>
           <div class="plaque-qr-box">
-            <img src="${qrApiUrl}" alt="QR" class="plaque-qr-img">
+            <img src="${qrApiUrl}" alt="QR" class="plaque-qr-img" loading="lazy">
             <div class="plaque-qr-text">
               Наведите камеру<br>для перехода<br>в цифровой музей
             </div>
