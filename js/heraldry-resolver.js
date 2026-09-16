@@ -152,5 +152,16 @@ const HeraldryResolver = {
   }
 };
 
-window.HeraldryResolver = HeraldryResolver;
-document.addEventListener('DOMContentLoaded', () => HeraldryResolver.init());
+// ES6 экспорт для импорта в другие модули
+export { HeraldryResolver };
+
+// Для обратной совместимости с глобальной областью видимости
+if (typeof window !== 'undefined') {
+  window.HeraldryResolver = HeraldryResolver;
+}
+
+// Инициализация при загрузке DOM (только при прямом подключении)
+if (typeof document !== 'undefined' && !window.__heraldryInitialized) {
+  window.__heraldryInitialized = true;
+  document.addEventListener('DOMContentLoaded', () => HeraldryResolver.init());
+}

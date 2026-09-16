@@ -111,4 +111,9 @@ const GRAND_MEMORY_BOOK_PART_1 = [
   }))
 }));
 
+// ES6 модульный экспорт для сборщика Vite/Webpack
+export { GRAND_MEMORY_BOOK_PART_1 };
+
+// Обратная совместимость для глобального доступа
+if (typeof window !== 'undefined') window.GRAND_MEMORY_BOOK_PART_1 = GRAND_MEMORY_BOOK_PART_1;
 if (typeof module !== 'undefined' && module.exports) module.exports = { GRAND_MEMORY_BOOK_PART_1 };

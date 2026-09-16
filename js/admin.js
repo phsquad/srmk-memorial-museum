@@ -11,6 +11,10 @@
 
 'use strict';
 
+// Импорт общих утилит из core.js для устранения дублирования
+import { formatDate, Storage, CONFIG } from './core.js';
+import { CloudSync } from './cloud-sync.js';
+
 const AdminCMS = {
   adminPassword: "2026",
   currentHeroId: null,
@@ -753,5 +757,16 @@ if (typeof module !== 'undefined' && module.exports) {
   }
 };
 
-window.AdminCMS = AdminCMS;
-document.addEventListener('DOMContentLoaded', () => AdminCMS.init());
+// Экспорт для ES6 модулей и обратная совместимость
+export { AdminCMS };
+
+// Для обратной совместимости с глобальной областью видимости
+if (typeof window !== 'undefined') {
+  window.AdminCMS = AdminCMS;
+}
+
+// Инициализация при загрузке DOM (только при прямом подключении)
+if (typeof document !== 'undefined' && !window.__adminInitialized) {
+  window.__adminInitialized = true;
+  document.addEventListener('DOMContentLoaded', () => AdminCMS.init());
+}

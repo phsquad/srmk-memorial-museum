@@ -13,6 +13,9 @@
 
 'use strict';
 
+// Импорт общих утилит из core.js для устранения дублирования
+import { formatDate, Storage, CONFIG } from './core.js';
+
 const FOLIO_LIBRARY = [
   // Базовая заглушка на случай отсутствия загруженных внешних томов
   {
@@ -466,6 +469,16 @@ const ReaderEngine = {
     toast.classList.add('active');
     setTimeout(() => toast.classList.remove('active'), 2500);
   }
+
+// Экспорт для ES6 модулей и обратная совместимость
+export { ReaderEngine, FOLIO_LIBRARY };
+
+// Для обратной совместимости с глобальной областью видимости
+if (typeof window !== 'undefined') {
+  window.ReaderEngine = ReaderEngine;
+  window.FOLIO_LIBRARY = FOLIO_LIBRARY;
+}
+
 };
 
 window.ReaderEngine = ReaderEngine;

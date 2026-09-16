@@ -1,18 +1,33 @@
 /**
  * ============================================================================
- * ДВИЖОК ЭЛЕКТРОННОЙ КНИГИ ПАМЯТИ: js/memory-book.js (v11.0 Master)
+ * ДВИЖОК ЭЛЕКТРОННОЙ КНИГИ ПАМЯТИ: js/memory-book.js (v12.0 ES6 Module)
  * 20 подробных исторических очерков (Markdown), MP3-плеер и модальный ридер
  * ============================================================================
  */
 
 'use strict';
 
-// 20 ПОЛНЫХ ИСТОРИЧЕСКИХ ГЛАВ В ФОРМАТЕ MARKDOWN
-const MEMORY_BOOK_ARCHIVE = [
+// Импорт зависимостей из core.js
+import { CONFIG, Storage, formatDate, CloudSync } from './core.js';
+
+// Импорт данных из отдельных модулей
+import { MEMORY_BOOK_PROLOGUE } from './data.js';
+import { GRAND_MEMORY_BOOK_PART_1 } from './grand-memory-book-part-1.js';
+import { GRAND_MEMORY_BOOK_PART_2 } from './grand-memory-book-part-2.js';
+import { GRAND_MEMORY_BOOK_PART_3 } from './grand-memory-book-part-3.js';
+
+// Объединение всех частей книги памяти
+const GRAND_MEMORY_BOOK_ARCHIVE = [
   MEMORY_BOOK_PROLOGUE,
-  /* ==========================================================================
-     ЛЕВАЯ ПЛИТА МЕМОРИАЛА (10 ГЕРОЕВ)
-     ========================================================================== */
+  ...GRAND_MEMORY_BOOK_PART_1,
+  ...GRAND_MEMORY_BOOK_PART_2,
+  ...GRAND_MEMORY_BOOK_PART_3
+];
+
+/* ==========================================================================
+   ДОПОЛНИТЕЛЬНЫЕ ДАННЫЕ (если не входят в части)
+   ========================================================================== */
+const EXTRA_HEROES = [
   {
     id: "petukhov-v-v",
     plaque: "left",
@@ -621,6 +636,12 @@ const MEMORY_BOOK_ARCHIVE = [
   }
 ];
 
+// Объединение всех данных в единый архив
+const FULL_ARCHIVE = [
+  ...GRAND_MEMORY_BOOK_ARCHIVE,
+  ...EXTRA_HEROES
+];
+
 // УПРАВЛЯЮЩИЙ ОБЪЕКТ КНИГИ
 const MemoryBookApp = {
   currentFilter: 'all',
@@ -630,7 +651,7 @@ const MemoryBookApp = {
   lastFocusedElement: null,
 
   getArchive() {
-    return window.GRAND_MEMORY_BOOK_ARCHIVE || MEMORY_BOOK_ARCHIVE;
+    return FULL_ARCHIVE;
   },
 
   init() {
@@ -952,4 +973,8 @@ const MemoryBookApp = {
   }
 };
 
+// Экспорт для использования в других модулях
+export { MemoryBookApp, FULL_ARCHIVE as GRAND_MEMORY_BOOK_ARCHIVE };
+
+// Инициализация при загрузке DOM
 document.addEventListener('DOMContentLoaded', () => MemoryBookApp.init());

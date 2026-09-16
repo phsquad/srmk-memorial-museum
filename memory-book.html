@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- Content Security Policy (CSP) для защиты от XSS -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com; connect-src 'self' https://*.supabase.co https://cdn.jsdelivr.net; frame-ancestors 'none'; base-uri 'self'; form-action 'self'">
   <title>Электронная Книга Памяти | «Быть воином — жить вечно» ГБПОУ СРМК</title>
   <meta name="description" content="Электронная летопись и подробные архивные очерки о подвигах 20 героев-выпускников Ставропольского регионального многопрофильного колледжа.">
   <meta name="theme-color" content="#0a0c0f">
@@ -107,7 +110,7 @@
        МОДАЛЬНЫЙ МАРКДАУН-РИДЕР (ПОЛНОЭКРАННОЕ ЧТЕНИЕ)
        ========================================================================== -->
   <div class="reader-modal" id="readerModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="readerHeroTag">
-    <div class="reader-overlay" onclick="MemoryBookApp.closeReader()"></div>
+    <div class="reader-overlay" data-action="mbCloseReader"></div>
     <div class="reader-dialog">
       
       <!-- Панель управления ридером -->
@@ -115,8 +118,8 @@
         <div class="reader-hero-tag" id="readerHeroTag">Глава летописи</div>
         <div class="reader-actions">
           <button class="reader-btn" id="readerAudioBtn" type="button">🎧 Слушать аудиогид</button>
-          <button class="reader-btn" onclick="window.print()" type="button">🖨 Печать Справки</button>
-          <button class="reader-close" onclick="MemoryBookApp.closeReader()" type="button" aria-label="Закрыть">&times;</button>
+          <button class="reader-btn" id="btnPrintReader" type="button">🖨 Печать Справки</button>
+          <button class="reader-close" data-action="mbCloseReader" type="button" aria-label="Закрыть">&times;</button>
         </div>
       </div>
 
@@ -145,7 +148,7 @@
         <div class="audio-progress-fill" id="bookAudioProgressFill"></div>
       </div>
       <span class="audio-timer" id="bookAudioTimer">0:00 / 0:00</span>
-      <button class="audio-close-btn" onclick="MemoryBookApp.stopAudio()" type="button">&times;</button>
+      <button class="audio-close-btn" data-action="mbStopAudio" type="button">&times;</button>
     </div>
     <audio id="bookAudioPlayer" preload="metadata"></audio>
   </div>
@@ -174,19 +177,7 @@
   <!-- ==========================================================================
        ПОДКЛЮЧЕНИЕ СКРИПТОВ (СТРОГИЙ ПОРЯДОК ЗАГРУЗКИ)
        ========================================================================== -->
-  <!-- 1. Облачная база данных Supabase SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
-  <!-- 2. База данных мемориала и расширенные тома летописи -->
-  <script src="js/data.js"></script>
-  <script src="js/grand-memory-book-part-1.js"></script>
-  <script src="js/grand-memory-book-part-2.js"></script>
-  <script src="js/grand-memory-book-part-3.js"></script>
-  
-  <!-- 3. Облачный мост и защитный шлюз -->
-  <script src="js/cloud-sync.js"></script>
-  
-  <!-- 4. Управляющий движок страницы Книги Памяти -->
-  <script src="js/memory-book.js"></script>
+  <!-- ES6 Module: Главный движок Книги Памяти с импортами зависимостей -->
+  <script type="module" src="js/memory-book.js"></script>
 </body>
 </html>

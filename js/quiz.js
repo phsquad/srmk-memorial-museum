@@ -7,6 +7,10 @@
 
 'use strict';
 
+// Импорт общих утилит из core.js для устранения дублирования
+import { formatDate, Storage, CONFIG } from './core.js';
+import { CloudSync } from './cloud-sync.js';
+
 /**
  * МОДУЛЬ БЕЗОПАСНОГО ХРАНИЛИЩА
  */
@@ -523,6 +527,16 @@ const QuizEngine = {
   }
 };
 
+
+// Экспорт для ES6 модулей и обратная совместимость
+export { QuizEngine, SafeStorage, QUIZ_QUESTIONS };
+
+// Для обратной совместимости с глобальной областью видимости
+if (typeof window !== 'undefined') {
+  window.QuizEngine = QuizEngine;
+  window.SafeStorage = SafeStorage;
+  window.QUIZ_QUESTIONS = QUIZ_QUESTIONS;
+}
 document.addEventListener('DOMContentLoaded', () => {
   console.log("[QuizEngine] Исторический квест инициализирован.");
   

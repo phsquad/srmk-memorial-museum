@@ -6,13 +6,17 @@
 
 'use strict';
 
-const CloudConfig = {
+// Импорт конфигурации из core.js для устранения дублирования
+import { CONFIG as CoreConfig } from './core.js';
+
+// ES6 экспорт для импорта в другие модули
+export const CloudConfig = {
   // Реальные ключи проекта Supabase.
   SUPABASE_URL: "https://qtafcczydgyrganrpkof.supabase.co",
   SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0YWZjY3p5ZGd5cmdhbnJwa29mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwNTg5MDEsImV4cCI6MjEwNDYzNDkwMX0.i_hFegr6BHix6eFEasgyICDE6Lcy5wbwbU6dArG-wFg"
 };
 
-const CloudSync = {
+export const CloudSync = {
   client: null,
   isLive: false,
   channels: [],
@@ -204,9 +208,21 @@ const CloudSync = {
   }
 };
 
-window.CloudSync = CloudSync;
-document.addEventListener('DOMContentLoaded', () => CloudSync.init());
-window.addEventListener('online', () => CloudSync.reconnect());
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') CloudSync.reconnect();
-});
+// ES6 экспорт для импорта в другие модули
+export { CloudSync, CloudConfig };
+
+// Для обратной совместимости с глобальной областью видимости (при прямом подключении в браузере)
+if (typeof window !== 'undefined') {
+  window.CloudSync = CloudSync;
+  window.CloudConfig = CloudConfig;
+}
+
+// Инициализация при загрузке DOM (только при прямом подключении, не через import)
+if (typeof document !== 'undefined' && !window.__cloudSyncInitialized) {
+  window.__cloudSyncInitialized = true;
+  document.addEventListener('DOMContentLoaded', () => CloudSync.init());
+  window.addEventListener('online', () => CloudSync.reconnect());
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') CloudSync.reconnect();
+  });
+}

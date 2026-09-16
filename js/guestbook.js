@@ -8,6 +8,10 @@
 
 'use strict';
 
+// Импорт общих утилит из core.js для устранения дублирования
+import { formatDate, Storage, CONFIG } from './core.js';
+import { CloudSync, CloudConfig } from './cloud-sync.js';
+
 const GuestbookEngine = {
   tributes: [],
   userFlames: {},
@@ -427,7 +431,24 @@ const GuestbookEngine = {
   },
 
   bindDOMEvents() {
+    // Делегирование событий для кнопок с data-action атрибутами
+    document.addEventListener('click', (e) => {
+      const target = e.target.closest('[data-action]');
+      if (!target) return;
+
+      const action = target.dataset.action;
+      
+      if (action === 'gbCloseModal') {
+        this.closeModal();
+      }
+    });
+
     document.getElementById('btnOpenModalForm')?.addEventListener('click', () => this.openModal());
+    
+    // Обработчик для кнопки модерации
+    document.getElementById('btnModeratorPrompt')?.addEventListener('click', () => {
+      this.openModeratorPrompt();
+    });
     
     const searchInput = document.getElementById('gbSearchInput');
     if (searchInput) {
@@ -539,5 +560,16 @@ const GuestbookEngine = {
   }
 };
 
-window.GuestbookEngine = GuestbookEngine;
-document.addEventListener('DOMContentLoaded', () => GuestbookEngine.init());
+// Экспорт для ES6 модулей и обратная совместимость
+export { GuestbookEngine };
+
+// Для обратной совместимости с глобальной областью видимости
+if (typeof window !== 'undefined') {
+  window.GuestbookEngine = GuestbookEngine;
+}
+
+// Инициализация при загрузке DOM (только при прямом подключении)
+if (typeof document !== 'undefined' && !window.__guestbookInitialized) {
+  window.__guestbookInitialized = true;
+  document.addEventListener('DOMContentLoaded', () => GuestbookEngine.init());
+}

@@ -736,6 +736,13 @@ const MuseumAPI = {
   }
 };
 
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { MUSEUM_CONFIG, SPECIALTIES_TAXONOMY, heroesDatabase, MuseumAPI };
+// ES6 модульный экспорт для сборщика Vite/Webpack
+export { MUSEUM_CONFIG, SPECIALTIES_TAXONOMY, heroesDatabase, MuseumAPI };
+
+// Обратная совместимость для глобального доступа (при загрузке без сборщика)
+if (typeof window !== 'undefined') {
+  window.MUSEUM_CONFIG = MUSEUM_CONFIG;
+  window.SPECIALTIES_TAXONOMY = SPECIALTIES_TAXONOMY;
+  window.heroesDatabase = heroesDatabase;
+  window.MuseumAPI = MuseumAPI;
 }

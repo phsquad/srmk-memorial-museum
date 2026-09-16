@@ -7,6 +7,13 @@
 
 'use strict';
 
+// ES6 импорты зависимых модулей
+import { CONFIG, formatDate, Storage } from './core.js';
+import { CloudSync } from './cloud-sync.js';
+import { ArchiveService } from './sources.js';
+import { HeraldryResolver } from './heraldry-resolver.js';
+import { TechModules } from './tech-modules.js';
+
 /**
  * 1. ГЛОБАЛЬНОЕ СОСТОЯНИЕ ПРИЛОЖЕНИЯ (APP STATE)
  */
@@ -139,6 +146,37 @@ const App = {
   },
 
   bindEvents() {
+    // Делегирование событий для кнопок с data-action атрибутами
+    document.addEventListener('click', (e) => {
+      const target = e.target.closest('[data-action]');
+      if (!target) return;
+
+      const action = target.dataset.action;
+      
+      if (action === 'openModal') {
+        const heroId = target.dataset.heroId;
+        if (heroId) this.openModal(heroId);
+      } else if (action === 'focusMap') {
+        const coords = JSON.parse(target.dataset.coords || '[]');
+        const zoom = parseInt(target.dataset.zoom || '8', 10);
+        if (coords.length === 2) this.focusMap(coords, zoom);
+      }
+    });
+
+    // Обработчик для режима «Урок Мужества»
+    const btnPresentation = document.getElementById('btnStartPresentationMode');
+    if (btnPresentation) {
+      btnPresentation.addEventListener('click', () => this.startPresentationMode());
+    }
+
+    // Обработчик для панели администратора
+    const btnAdmin = document.getElementById('btnAdminPanel');
+    if (btnAdmin) {
+      btnAdmin.addEventListener('click', () => {
+        if (typeof AdminCMS !== 'undefined') AdminCMS.open();
+      });
+    }
+
     // Живой дебаунс-поиск (100 мс)
     if (this.dom.searchInput) {
       let debounceTimer;
@@ -1135,5 +1173,12 @@ const App = {
   }
 };
 
-window.AppState = AppState;
-window.App = App;
+// Экспорт для ES6 модулей и обратная совместимость
+export { AppState, App, FALLBACK_HERO_AVATAR };
+
+// Для обратной совместимости с глобальной областью видимости
+if (typeof window !== 'undefined') {
+  window.AppState = AppState;
+  window.App = App;
+  window.FALLBACK_HERO_AVATAR = FALLBACK_HERO_AVATAR;
+}
