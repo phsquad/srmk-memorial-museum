@@ -1,7 +1,7 @@
 /**
  * ============================================================================
  * ВИРТУАЛЬНЫЙ МЕМОРИАЛЬНЫЙ КОМПЛЕКС ГБПОУ СРМК: «БЫТЬ ВОИНОМ — ЖИТЬ ВЕЧНО»
- * Главный управляющий контроллер экспозиции (js/app.js v11.0 Ultra Enterprise)
+ * Главный управляющий контроллер экспозиции (js/app.js v12.0 Ultra Enterprise)
  * ============================================================================
  */
 
@@ -75,7 +75,7 @@ const App = {
       this.initAmbientParticles();
     }, 150);
 
-    console.log(`[Музей СРМК] Ядро экспозиции v11.0 запущено. Героев в строю: ${typeof heroesDatabase !== 'undefined' ? heroesDatabase.length : 0}`);
+    console.log(`[Музей СРМК v12.0] Ядро экспозиции запущено. Героев в строю: ${typeof heroesDatabase !== 'undefined' ? heroesDatabase.length : 0}`);
   },
 
   cacheDOM() {
@@ -95,6 +95,7 @@ const App = {
       // Счетчики
       totalCandlesDisplay: document.getElementById('totalCandlesCount'),
       statHeroCandles: document.getElementById('heroTotalCandlesStat'),
+      flowersDisplay: document.getElementById('flowersCountDisplay'),
 
       // Модальные окна
       heroModal: document.getElementById('heroModal'),
@@ -127,15 +128,20 @@ const App = {
 
   async loadCloudData() {
     if (!window.CloudSync?.isLive) return;
-    const cloudData = await CloudSync.fetchAllCounters();
-    if (!cloudData) return;
+    try {
+      const cloudData = await CloudSync.fetchAllCounters();
+      if (!cloudData) return;
 
-    AppState.candles = { ...AppState.candles, ...cloudData.candles };
-    AppState.flowersCount = cloudData.flowers;
-    localStorage.setItem('srmk_museum_candles_v3', JSON.stringify(AppState.candles));
-    this.updateMemorialStats();
-    this.renderCardsGrid();
-    this.renderMemorialPlaques();
+      AppState.candles = { ...AppState.candles, ...cloudData.candles };
+      AppState.flowersCount = cloudData.flowers || 0;
+      localStorage.setItem('srmk_museum_candles_v3', JSON.stringify(AppState.candles));
+      
+      this.updateMemorialStats();
+      this.renderCardsGrid();
+      this.renderMemorialPlaques();
+    } catch (e) {
+      console.warn("[App] Ошибка загрузки данных из облака:", e);
+    }
   },
 
   bindEvents() {
@@ -234,7 +240,7 @@ const App = {
   },
 
   /* ==========================================================================
-     4. ЗАЛ II: ФИЛЬТРЫ И БЕЗУПРЕЧНАЯ СЕТКА КАРТОЧЕК ГЕРОЕВ
+     4. ЗАЛ II: ФИЛЬТРЫ И СЕТКА КАРТОЧЕК ГЕРОЕВ
      ========================================================================== */
   renderSpecialtyFilters() {
     const container = this.dom.specialtyContainer;
@@ -276,7 +282,6 @@ const App = {
       return;
     }
 
-    // 🔥 Устранение утечки DOM-узлов (Мягкая полная очистка)
     while (container.firstChild) {
       container.removeChild(container.firstChild);
     }
@@ -327,16 +332,15 @@ const App = {
       const specialtyText = hero.education?.specialty || "Выпускник колледжа";
       const candleCount = AppState.candles[hero.id] || 0;
 
-      // 🔥 Генерация мини-медалей для карточки (максимум 4 для компактности)
       let medalsHTML = '';
       if (hero.awards && Array.isArray(hero.awards) && hero.awards.length > 0) {
-        const displayAwards = hero.awards.slice(0, 4); // Показываем до 4 медалей
+        const displayAwards = hero.awards.slice(0, 4);
         medalsHTML = `<div class="hero-card-medals">
           ${displayAwards.map(awardTitle => {
             const awardVisual = typeof ArchiveService !== 'undefined' 
               ? ArchiveService.getAwardVisual(awardTitle) 
               : null;
-            const medalImg = awardVisual?.badge || this._getDefaultMedalIcon();
+            const medalImg = awardVisual?.badge || "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Order_of_Courage_RF.png/300px-Order_of_Courage_RF.png";
             const medalTitle = this.escapeHtml(awardTitle);
             return `<span class="medal-icon" title="${medalTitle}"><img src="${medalImg}" alt="${medalTitle}" onerror="this.style.display='none'"></span>`;
           }).join('')}
@@ -344,13 +348,11 @@ const App = {
         </div>`;
       }
 
-      // 🔥 Создаем элемент через createElement для предотвращения утечки текстовых узлов
       const card = document.createElement('article');
       card.className = 'hero-card';
       card.setAttribute('role', 'article');
       card.setAttribute('aria-label', `Карточка героя: ${hero.name}`);
       
-      // 🔥 Наполнение строго изолированной HTML-структурой через DocumentFragment
       card.innerHTML = `
         <div class="hero-card-img-wrap">
           <img src="${photoSrc}" alt="${this.escapeHtml(hero.name)}" class="hero-card-img" loading="lazy" onerror="this.src='${FALLBACK_HERO_AVATAR}'">
@@ -373,7 +375,7 @@ const App = {
   },
 
   /* ==========================================================================
-     5. МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ С ПОЛНЫМ СТЕКОМ И ГАЛЕРЕЕЙ
+     5. МОДАЛЬНОЕ ОКНО ДОСЬЕ ГЕРОЯ
      ========================================================================== */
   async openModal(id) {
     const hero = heroesDatabase.find(h => h.id === id);
@@ -398,12 +400,10 @@ const App = {
     const deedText = hero.deed || "Сведения о боевом пути и ратном подвиге уточняются в архивах колледжа.";
     const candleCount = AppState.candles[hero.id] || 0;
 
-    // Сборка галереи
     const galleryItems = (typeof ArchiveService !== 'undefined')
       ? ArchiveService.buildDynamicGallery(hero)
       : [{ url: mainPhoto, caption: "Основной портрет", desc: "", type: "portrait" }];
 
-    // Асинхронная подгрузка знаков наград для отображения на карточке и в галерее
     let awardsHTML = '';
     let awardsGalleryHTML = '';
     if (hero.awards && Array.isArray(hero.awards)) {
@@ -432,10 +432,8 @@ const App = {
         };
       }));
       
-      // Отображение наград в виде иконок под фото
       awardsGalleryHTML = `<div class="hero-awards-gallery">${awardElements.map(a => `<div class="award-icon-wrapper" title="${a.name}${a.established ? ' • ' + a.established : ''}">${a.badge}<span class="award-name-tooltip">${a.name}</span></div>`).join('')}</div>`;
       
-      // Отображение наград списком с описанием
       awardsHTML = awardElements.map(a => `
         <div class="award-tag" title="${a.established}">
           ${a.badge.replace('award-badge-hero', 'award-badge-mini')}
@@ -592,7 +590,7 @@ const App = {
   },
 
   /* ==========================================================================
-     6. ОНЛАЙН-ДИКТОР TTS С КАРАОКЕ
+     6. ОНЛАЙН-ДИКТОР TTS
      ========================================================================== */
   toggleHeroTTS(heroId) {
     const hero = heroesDatabase.find(h => h.id === heroId);
@@ -615,7 +613,7 @@ const App = {
   },
 
   /* ==========================================================================
-     7. ЗАЩИЩЕННЫЕ ДЕЙСТВИЯ (СВЕЧИ И ЦВЕТЫ С КРИПТОГРАФИЕЙ)
+     7. ЗАЩИЩЕННЫЕ ДЕЙСТВИЯ (СВЕЧИ И ЦВЕТЫ)
      ========================================================================== */
   lightCandleSafe(heroId, event) {
     if (typeof TributeSecurity !== 'undefined') {
@@ -665,7 +663,14 @@ const App = {
     }
 
     if (type === 'flowers') {
-      if (window.CloudSync?.isLive) CloudSync.pushFlower(heroId);
+      if (window.CloudSync?.isLive) {
+        await CloudSync.pushFlower(heroId);
+        const counters = await CloudSync.fetchAllCounters();
+        if (counters) {
+          AppState.flowersCount = counters.flowers;
+          if (this.dom.flowersDisplay) this.dom.flowersDisplay.textContent = counters.flowers;
+        }
+      }
       this.playMemorialBellSynthesizer();
 
       const flower = document.createElement('div');
@@ -678,10 +683,23 @@ const App = {
     }
   },
 
+  /**
+   * Обновление отображения статистики мемориала
+   */
   updateMemorialStats() {
-    const total = Object.values(AppState.candles).reduce((a, b) => a + b, 0);
+    const total = Object.values(AppState.candles || {}).reduce((a, b) => a + b, 0);
     if (this.dom.totalCandlesDisplay) this.dom.totalCandlesDisplay.textContent = total;
     if (this.dom.statHeroCandles) this.dom.statHeroCandles.textContent = total;
+    if (this.dom.flowersDisplay && AppState.flowersCount) {
+      this.dom.flowersDisplay.textContent = AppState.flowersCount;
+    }
+  },
+
+  /**
+   * 🔥 АЛИАС ДЛЯ СОВМЕСТИМОСТИ С ВНЕШНИМИ СКРИПТАМИ (Устраняет TypeError)
+   */
+  updateCandlesStats() {
+    this.updateMemorialStats();
   },
 
   printHeroDossier() {
@@ -714,7 +732,7 @@ const App = {
   },
 
   /* ==========================================================================
-     8. СЕНСОРНЫЙ ДВИЖОК ЖЕСТОВ (TOUCH SWIPES ДЛЯ СМАРТФОНОВ)
+     8. СЕНСОРНЫЙ ДВИЖОК ЖЕСТОВ
      ========================================================================== */
   initTouchGestures() {
     const modal = this.dom.heroModal;
@@ -738,9 +756,9 @@ const App = {
 
     if (Math.abs(deltaX) > 70 && Math.abs(deltaY) < 60) {
       if (deltaX < 0) {
-        this.navigateHero(1);  // Свайп влево ➔ Вперед
+        this.navigateHero(1);
       } else {
-        this.navigateHero(-1); // Свайп вправо ➔ Назад
+        this.navigateHero(-1);
       }
     }
 
@@ -793,7 +811,6 @@ const App = {
 
         AppState.mapInstance.behaviors.disable('scrollZoom');
 
-        // Точка колледжа в Ставрополе (Альма-матер)
         const srmkCoords = typeof MUSEUM_CONFIG !== 'undefined' ? MUSEUM_CONFIG.coords : [45.0448, 41.9691];
         const srmkPlacemark = new ymaps.Placemark(srmkCoords, {
           balloonContentHeader: '<strong style="color:#8a1c22; font-size:14px;">ГБПОУ СРМК</strong>',
@@ -804,7 +821,6 @@ const App = {
         });
         AppState.mapInstance.geoObjects.add(srmkPlacemark);
 
-        // Метки героев
         if (typeof MuseumAPI !== 'undefined') {
           const markers = MuseumAPI.getMapMarkers();
           markers.forEach(m => {
@@ -825,7 +841,6 @@ const App = {
             AppState.mapInstance.geoObjects.add(heroPlacemark);
             AppState.mapMarkers[m.id] = heroPlacemark;
 
-            // Золотой пунктирный луч от колледжа к рубежу подвига
             const polyline = new ymaps.Polyline([srmkCoords, m.coords], {}, {
               strokeColor: '#c5a059',
               strokeWidth: 2,
@@ -837,7 +852,6 @@ const App = {
           });
         }
 
-        // Фильтры секторов боевых действий (ТВД)
         document.querySelectorAll('.theatre-btn').forEach(btn => {
           btn.addEventListener('click', () => {
             document.querySelectorAll('.theatre-btn').forEach(b => b.classList.remove('active'));
@@ -1070,10 +1084,6 @@ const App = {
     }[tag]));
   },
 
-  /**
-   * Простой Markdown-парсер для форматирования текста в карточках героев
-   * Поддерживает: **жирный**, *курсив*, заголовки #, ##, ###, цитаты >, списки -, *, разделители ---
-   */
   parseMarkdown(md) {
     if (!md) return '';
     
