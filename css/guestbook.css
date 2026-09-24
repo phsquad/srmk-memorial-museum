@@ -163,9 +163,9 @@ body {
 .gb-filter-bar {
   background: #080a0d;
   border-bottom: 1px solid var(--border-hairline);
-  padding: 14px 0;
+  padding: 10px 0;
   position: sticky;
-  top: 66px; /* Расположена прямо под site-header */
+  top: var(--header-height-desktop, 48px); /* Расположена прямо под site-header */
   z-index: 900;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
 }

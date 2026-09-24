@@ -144,7 +144,7 @@ body {
   background: #080a0d; 
   border-bottom: 1px solid var(--border-hairline); 
   position: sticky; 
-  top: 66px; 
+  top: var(--header-height-desktop, 48px); 
   z-index: 90; 
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }

@@ -6,8 +6,8 @@
    ========================================================================== */
 
 :root {
-  --header-height-desktop: 64px;
-  --header-height-mobile: 56px;
+  --header-height-desktop: 48px;
+  --header-height-mobile: 44px;
   --header-bg: rgba(10, 12, 16, 0.96);
   --header-border: rgba(197, 160, 89, 0.28);
   --header-text: #f1f3f7;
@@ -22,7 +22,7 @@
 }
 
 /* ==========================================================================
-   1. БАЗОВЫЙ КАРКАС ШАПКИ (64px)
+   1. БАЗОВЫЙ КАРКАС ШАПКИ (48px - компактная, эргономичная и эстетичная)
    ========================================================================== */
 .site-header {
   position: sticky;
@@ -30,6 +30,9 @@
   left: 0;
   width: 100%;
   height: var(--header-height-desktop);
+  min-height: var(--header-height-desktop);
+  max-height: var(--header-height-desktop);
+  padding: 0;
   background: var(--header-bg);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
@@ -38,7 +41,7 @@
   display: flex;
   align-items: center;
   box-sizing: border-box;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.55);
 }
 
 .site-header .header-container {
@@ -46,17 +49,18 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: 1320px;
+  max-width: 1220px;
   margin: 0 auto;
-  padding: 0 20px;
-  gap: 16px;
+  padding: 0 16px;
+  gap: 12px;
+  box-sizing: border-box;
 }
 
 /* Логотип */
 .site-header .logo-group {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 9px;
   text-decoration: none;
   flex-shrink: 0;
 }
@@ -65,15 +69,15 @@
   background: var(--header-granite);
   color: #ffffff;
   font-family: var(--font-serif);
-  font-weight: 900;
-  font-size: 0.88rem;
-  padding: 6px 12px;
-  border-radius: 2px;
+  font-weight: 800;
+  font-size: 0.76rem;
+  padding: 3px 8px;
+  border-radius: 3px;
   border: 1px solid rgba(255, 255, 255, 0.15);
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   transition: var(--header-transition);
   display: inline-block;
-  line-height: 1;
+  line-height: 1.1;
 }
 
 .site-header .logo-badge:hover {
@@ -84,27 +88,28 @@
 .site-header .logo-text {
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 
 .site-header .org-name {
   font-family: var(--font-sans);
-  font-size: 0.64rem;
+  font-size: 0.56rem;
   color: var(--header-text-muted);
   font-weight: 700;
-  letter-spacing: 1.5px;
+  letter-spacing: 0.8px;
   text-transform: uppercase;
   line-height: 1;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
   white-space: nowrap;
 }
 
 .site-header .site-title {
   font-family: var(--font-serif);
-  font-size: 0.96rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--header-text);
   white-space: nowrap;
-  line-height: 1.2;
+  line-height: 1.15;
 }
 
 /* ==========================================================================
@@ -113,7 +118,7 @@
 .site-header .main-nav {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 14px;
   flex-shrink: 0;
 }
 
@@ -121,11 +126,11 @@
   font-family: var(--font-sans);
   color: var(--header-text-muted);
   text-decoration: none;
-  font-size: 0.84rem;
+  font-size: 0.78rem;
   font-weight: 600;
   transition: color var(--header-transition);
   position: relative;
-  padding: 6px 0;
+  padding: 4px 2px;
   white-space: nowrap;
 }
 
@@ -156,7 +161,7 @@
 .site-header .header-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
@@ -165,18 +170,18 @@
 }
 
 .site-header .btn-dropdown-toggle {
-  background: rgba(24, 29, 38, 0.8);
+  background: rgba(24, 29, 38, 0.85);
   border: 1px solid var(--header-border);
   color: var(--header-text);
-  padding: 7px 12px;
-  border-radius: 2px;
+  padding: 5px 9px;
+  border-radius: 3px;
   font-family: var(--font-sans);
-  font-size: 0.78rem;
+  font-size: 0.73rem;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   transition: var(--header-transition);
 }
 
@@ -188,7 +193,7 @@
 }
 
 .site-header .arrow-icon {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   transition: transform var(--header-transition);
 }
 
@@ -198,20 +203,20 @@
 
 .site-header .dropdown-menu {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 5px);
   right: 0;
-  width: 270px;
-  background: rgba(18, 21, 29, 0.98);
+  width: 250px;
+  background: rgba(16, 19, 26, 0.98);
   border: 1px solid var(--header-border);
   border-radius: 4px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.88);
   backdrop-filter: blur(16px);
-  padding: 8px;
+  padding: 6px;
   display: none;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   z-index: 2000;
-  animation: headerDropdownFade 0.2s ease-out;
+  animation: headerDropdownFade 0.18s ease-out;
 }
 
 .site-header .modules-dropdown.active .dropdown-menu {
@@ -221,9 +226,9 @@
 .site-header .dropdown-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border-radius: 2px;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 3px;
   text-decoration: none;
   color: var(--header-text);
   transition: var(--header-transition);
@@ -232,23 +237,23 @@
 .site-header .dropdown-item:hover,
 .site-header .dropdown-item.active {
   background: rgba(197, 160, 89, 0.14);
-  transform: translateX(3px);
+  transform: translateX(2px);
 }
 
 .site-header .dropdown-item .item-icon {
-  font-size: 1.2rem;
+  font-size: 1.05rem;
   flex-shrink: 0;
 }
 
 .site-header .dropdown-item strong {
   display: block;
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   color: #ffffff;
   line-height: 1.2;
 }
 
 .site-header .dropdown-item small {
-  font-size: 0.7rem;
+  font-size: 0.66rem;
   color: var(--header-text-muted);
 }
 
@@ -257,15 +262,15 @@
   background: rgba(197, 160, 89, 0.12);
   color: var(--header-gold);
   border: 1px solid var(--header-border);
-  padding: 7px 12px;
-  border-radius: 2px;
+  padding: 5px 9px;
+  border-radius: 3px;
   font-family: var(--font-sans);
-  font-size: 0.78rem;
+  font-size: 0.73rem;
   font-weight: 700;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   white-space: nowrap;
   transition: var(--header-transition);
 }
@@ -273,18 +278,18 @@
 .site-header .btn-header-cert:hover {
   background: var(--header-gold);
   color: #000000;
-  box-shadow: 0 0 14px rgba(197, 160, 89, 0.4);
+  box-shadow: 0 0 12px rgba(197, 160, 89, 0.35);
   transform: translateY(-1px);
 }
 
 .site-header .passport-btn {
   background: transparent;
   color: var(--header-text-muted);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  padding: 7px 12px;
-  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 5px 9px;
+  border-radius: 3px;
   font-family: var(--font-sans);
-  font-size: 0.78rem;
+  font-size: 0.73rem;
   cursor: pointer;
   font-weight: 600;
   white-space: nowrap;
@@ -293,21 +298,21 @@
 
 .site-header .passport-btn:hover {
   color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .site-header .contest-badge {
   background: transparent;
   color: var(--header-gold);
   border: 1px solid var(--header-border);
-  padding: 7px 14px;
-  border-radius: 2px;
+  padding: 5px 10px;
+  border-radius: 3px;
   font-family: var(--font-sans);
-  font-size: 0.78rem;
+  font-size: 0.73rem;
   text-decoration: none;
   font-weight: 700;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.3px;
   white-space: nowrap;
   transition: var(--header-transition);
 }
@@ -315,7 +320,7 @@
 .site-header .contest-badge:hover {
   background: var(--header-gold);
   color: #000000;
-  box-shadow: 0 0 16px rgba(197, 160, 89, 0.4);
+  box-shadow: 0 0 14px rgba(197, 160, 89, 0.35);
 }
 
 /* ==========================================================================
@@ -481,7 +486,13 @@
 /* ==========================================================================
    6. АДАПТИВНОСТЬ
    ========================================================================== */
-@media (max-width: 1200px) {
+@media (max-width: 1120px) {
+  .site-header .contest-badge {
+    display: none;
+  }
+}
+
+@media (max-width: 980px) {
   .site-header .main-nav {
     display: none;
   }
@@ -490,6 +501,8 @@
 @media (max-width: 860px) {
   .site-header {
     height: var(--header-height-mobile);
+    min-height: var(--header-height-mobile);
+    max-height: var(--header-height-mobile);
   }
 
   .mobile-drawer {

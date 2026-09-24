@@ -138,63 +138,66 @@ body {
    2. КНИЖНАЯ ПОЛКА (BOOKSHELF)
    ========================================================================== */
 .shelf-view-section {
-  padding-bottom: 80px;
+  padding-bottom: 60px;
 }
 
 .shelf-hero-banner {
-  padding: 60px 0 40px;
+  padding: 22px 0 16px;
   text-align: center;
   background: radial-gradient(circle at 50% 20%, rgba(24, 29, 40, 0.8) 0%, var(--bg-main) 75%);
   border-bottom: 1px solid var(--border-hairline);
 }
 
-.hero-crest { font-size: 2rem; color: var(--accent-brass); margin-bottom: 8px; }
+.hero-crest { font-size: 1.25rem; color: var(--accent-brass); margin-bottom: 2px; }
 
 .hero-badge {
   display: inline-block;
   color: var(--accent-brass);
-  font-size: 0.72rem;
+  font-size: 0.64rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   border-bottom: 1px solid var(--border-accent);
-  padding-bottom: 3px;
-  margin-bottom: 14px;
+  padding-bottom: 2px;
+  margin-bottom: 8px;
 }
 
 .hero-title {
   font-family: var(--font-serif);
-  font-size: 2.4rem;
+  font-size: clamp(1.25rem, 2.2vw, 1.65rem);
   font-weight: 900;
   color: #ffffff;
-  margin-bottom: 12px;
+  margin-bottom: 6px;
+  line-height: 1.2;
 }
 
 .hero-desc {
-  max-width: 680px;
-  margin: 0 auto 28px;
+  max-width: 620px;
+  margin: 0 auto 16px;
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
 }
 
 .shelf-toolbar {
   display: flex;
   justify-content: center;
-  gap: 14px;
+  gap: 10px;
   flex-wrap: wrap;
-  max-width: 780px;
+  max-width: 700px;
   margin: 0 auto;
 }
 
 .shelf-search {
   position: relative;
   flex: 1;
-  min-width: 280px;
+  min-width: 250px;
 }
 
 .shelf-search span {
-  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
   color: var(--text-tertiary);
+  font-size: 0.85rem;
 }
 
 .shelf-search input {
@@ -202,22 +205,22 @@ body {
   background: var(--bg-shelf-wall);
   border: 1px solid var(--border-hairline);
   color: #fff;
-  padding: 10px 14px 10px 38px;
-  border-radius: 2px;
-  font-size: 0.86rem;
+  padding: 7px 12px 7px 32px;
+  border-radius: 3px;
+  font-size: 0.80rem;
   outline: none;
 }
 .shelf-search input:focus { border-color: var(--accent-brass); }
 
-.shelf-filters { display: flex; gap: 6px; }
+.shelf-filters { display: flex; gap: 5px; }
 
 .shelf-filter-btn {
   background: var(--bg-shelf-wall);
   border: 1px solid var(--border-hairline);
   color: var(--text-secondary);
-  padding: 8px 14px;
-  border-radius: 2px;
-  font-size: 0.78rem;
+  padding: 6px 11px;
+  border-radius: 3px;
+  font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
@@ -230,7 +233,7 @@ body {
 }
 
 .shelf-display-container {
-  margin-top: 40px;
+  margin-top: 22px;
 }
 
 .bookshelf-tier {
@@ -361,7 +364,7 @@ body {
 .reader-control-panel {
   background: rgba(14, 17, 23, 0.98);
   border-bottom: 1px solid var(--border-hairline);
-  padding: 8px 0;
+  padding: 5px 0;
   z-index: 10;
   backdrop-filter: blur(14px);
 }
@@ -370,28 +373,28 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .current-book-meta {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
 }
 .meta-vol {
   background: var(--accent-granite);
   color: #fff;
   font-family: var(--font-serif);
-  font-size: 0.72rem;
-  padding: 3px 8px;
+  font-size: 0.68rem;
+  padding: 2px 7px;
   border-radius: 3px;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
 }
 .meta-hero-name {
   font-family: var(--font-serif);
-  font-size: clamp(0.92rem, 1.2vw, 1.15rem);
+  font-size: clamp(0.86rem, 1.1vw, 1.05rem);
   color: var(--accent-brass);
   white-space: nowrap;
 }
@@ -401,7 +404,7 @@ body {
   display: flex;
   background: rgba(0, 0, 0, 0.45);
   border: 1px solid var(--border-hairline);
-  border-radius: 6px;
+  border-radius: 5px;
   padding: 2px;
   gap: 2px;
 }
@@ -410,15 +413,15 @@ body {
   border: none;
   color: var(--text-secondary);
   font-family: var(--font-sans);
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  padding: 5px 12px;
-  border-radius: 4px;
+  padding: 4px 10px;
+  border-radius: 3px;
   cursor: pointer;
   transition: var(--transition);
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
 }
 .mode-btn:hover {
   color: #fff;
@@ -433,7 +436,7 @@ body {
 .reader-tools {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 
@@ -444,16 +447,16 @@ body {
   background: rgba(0, 0, 0, 0.45);
   border: 1px solid var(--border-hairline);
   border-radius: 4px;
-  padding: 2px 4px;
+  padding: 2px 3px;
   gap: 2px;
 }
 .scale-btn {
   background: transparent;
   border: none;
   color: var(--text-secondary);
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 700;
-  padding: 2px 7px;
+  padding: 2px 6px;
   border-radius: 3px;
   cursor: pointer;
   transition: var(--transition);
@@ -463,10 +466,10 @@ body {
   color: #fff;
 }
 .scale-indicator {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: var(--accent-brass);
   font-weight: 700;
-  min-width: 38px;
+  min-width: 34px;
   text-align: center;
 }
 
@@ -474,9 +477,9 @@ body {
   background: var(--bg-shelf-wall);
   border: 1px solid var(--border-hairline);
   color: var(--text-primary);
-  padding: 6px 11px;
+  padding: 4px 9px;
   border-radius: 3px;
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
@@ -489,28 +492,28 @@ body {
 
 .theme-selector {
   display: flex;
-  gap: 6px;
+  gap: 5px;
   background: var(--bg-shelf-wall);
-  padding: 4px 8px;
-  border-radius: 20px;
+  padding: 3px 6px;
+  border-radius: 16px;
   border: 1px solid var(--border-hairline);
 }
 .theme-dot {
-  width: 16px; height: 16px; border-radius: 50%; border: 1px solid #fff; cursor: pointer;
+  width: 14px; height: 14px; border-radius: 50%; border: 1px solid #fff; cursor: pointer;
   transition: transform 0.15s;
 }
 .theme-dot[data-theme="theme-parchment"] { background: #fdfaf0; border-color: #c5a059; }
 .theme-dot[data-theme="theme-dark"] { background: #12151d; border-color: #444; }
 .theme-dot[data-theme="theme-archive"] { background: #ffffff; border-color: #8a1c22; }
-.theme-dot.active { transform: scale(1.25); box-shadow: 0 0 6px var(--accent-brass); }
+.theme-dot.active { transform: scale(1.2); box-shadow: 0 0 6px var(--accent-brass); }
 
-.btn-close-reader { font-size: 1.1rem; padding: 4px 10px; }
+.btn-close-reader { font-size: 0.95rem; padding: 4px 8px; }
 
 /* Закрепленное свидетельство (Telegram Pinned Message Bar) */
 .tg-pinned-banner {
   background: linear-gradient(90deg, rgba(138, 28, 34, 0.25) 0%, rgba(197, 160, 89, 0.18) 100%);
   border-bottom: 1px solid rgba(197, 160, 89, 0.3);
-  padding: 6px 0;
+  padding: 4px 0;
   cursor: pointer;
   transition: background 0.2s;
   user-select: none;

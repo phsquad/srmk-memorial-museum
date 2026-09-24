@@ -275,9 +275,9 @@ body {
 .book-controls-bar {
   background: #080a0d;
   border-bottom: 1px solid var(--border-hairline);
-  padding: 14px 0;
+  padding: 10px 0;
   position: sticky;
-  top: 61px;
+  top: var(--header-height-desktop, 48px);
   z-index: 900;
 }
 
