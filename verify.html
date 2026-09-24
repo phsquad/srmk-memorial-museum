@@ -356,62 +356,111 @@
         </div>
       </a>
 
-      <!-- ОСНОВНАЯ НАВИГАЦИЯ ПО 4 ЗАЛАМ ЭКСПОЗИЦИИ -->
-      <nav class="main-nav" id="desktopNav" aria-label="Навигация по залам">
-        <a href="index.html#memorial" class="nav-link">Мемориал</a>
-        <a href="index.html#heroes-grid" class="nav-link">За партой Героя</a>
-        <a href="index.html#battle-path" class="nav-link">Хроника и Карта</a>
-        <a href="index.html#memory-hall" class="nav-link">Эстафета</a>
-      </nav>
-
-      <!-- ПАНЕЛЬ ДЕЙСТВИЙ И ЦИФРОВЫХ МОДУЛЕЙ -->
+      <!-- КОМПАКТНЫЕ КНОПКИ НАВИГАЦИИ (МОДУЛИ, СТРАНИЦЫ И ЗАЛЫ СПРЯТАНЫ В ВЫПАДАЮЩИЕ МЕНЮ) -->
       <div class="header-actions">
-        <!-- ВЫПАДАЮЩЕЕ МЕНЮ ЦИФРОВЫХ МОДУЛЕЙ -->
-        <div class="modules-dropdown" id="modulesDropdown">
-          <button class="btn-dropdown-toggle" id="btnDropdownToggle" type="button" aria-expanded="false" aria-controls="dropdownMenu">
-            <span>🏛 Модули</span>
+        <!-- КНОПКА 1: ЗАЛЫ ЭКСПОЗИЦИИ -->
+        <div class="header-dropdown" id="dropdownHalls">
+          <button class="header-dropdown-btn" id="btnDropdownHalls" type="button" aria-expanded="false" aria-controls="menuHalls">
+            <span class="btn-icon">🏛</span>
+            <span class="btn-text">Залы</span>
             <span class="arrow-icon" aria-hidden="true">▾</span>
           </button>
-          <div class="dropdown-menu" id="dropdownMenu">
-            <a href="memory-book.html" class="dropdown-item">
-              <span class="item-icon">📖</span>
-              <div><strong>Книга Памяти</strong><small>Летопись 20 героев</small></div>
+          <div class="dropdown-menu dropdown-menu-left" id="menuHalls" role="menu">
+            <div class="dropdown-header">Экспозиция музея</div>
+            <a href="index.html#memorial" class="dropdown-item" role="menuitem">
+              <span class="item-icon">🏛</span>
+              <div><strong>Мемориал Славы</strong><small>Зал №1 • Стелы и 20 кавалеров</small></div>
             </a>
-            <a href="reader.html" class="dropdown-item">
-              <span class="item-icon">📚</span>
-              <div><strong>3D Фолиант</strong><small>Читалка с перелистыванием</small></div>
+            <a href="index.html#heroes-grid" class="dropdown-item" role="menuitem">
+              <span class="item-icon">🎓</span>
+              <div><strong>За партой Героя</strong><small>Зал №2 • 20 интерактивных парт</small></div>
             </a>
-            <a href="quiz.html" class="dropdown-item">
-              <span class="item-icon">⚔️</span>
-              <div><strong>Квест-викторина</strong><small>10 интерактивных вопросов</small></div>
+            <a href="index.html#battle-path" class="dropdown-item" role="menuitem">
+              <span class="item-icon">🗺</span>
+              <div><strong>Хроника и Карта</strong><small>Зал №3 • Боевой путь и инфографика</small></div>
             </a>
-            <a href="methodology.html" class="dropdown-item">
-              <span class="item-icon">📑</span>
-              <div><strong>Методкабинет</strong><small>Банк уроков для педагогов</small></div>
-            </a>
-            <a href="verify.html" class="dropdown-item active">
-              <span class="item-icon">🛡</span>
-              <div><strong>Реестр верификации</strong><small>Проверка сертификатов</small></div>
-            </a>
-            <a href="desk-qr.html" class="dropdown-item">
-              <span class="item-icon">🪑</span>
-              <div><strong>Парта Героя</strong><small>Конструктор табличек А4</small></div>
-            </a>
-            <a href="guestbook.html" class="dropdown-item">
+            <a href="index.html#memory-hall" class="dropdown-item" role="menuitem">
               <span class="item-icon">🕯</span>
-              <div><strong>Стена Памяти</strong><small>Послания и лампады</small></div>
+              <div><strong>Эстафета поколений</strong><small>Зал №4 • Клятва и хроника</small></div>
             </a>
           </div>
         </div>
 
-        <!-- КНОПКА СЕРТИФИКАТА -->
-        <a href="certificate.html" class="btn-header-cert" title="Оформить наградной лист">
-          <span>📜</span> Сертификат
-        </a>
+        <!-- КНОПКА 2: ЦИФРОВЫЕ МОДУЛИ -->
+        <div class="header-dropdown modules-dropdown" id="modulesDropdown">
+          <button class="header-dropdown-btn btn-dropdown-toggle" id="btnDropdownToggle" type="button" aria-expanded="false" aria-controls="dropdownMenu">
+            <span class="btn-icon">📖</span>
+            <span class="btn-text">Модули</span>
+            <span class="arrow-icon" aria-hidden="true">▾</span>
+          </button>
+          <div class="dropdown-menu" id="dropdownMenu" role="menu">
+            <div class="dropdown-header">Интерактивные модули</div>
+            <a href="memory-book.html" class="dropdown-item" role="menuitem">
+              <span class="item-icon">📖</span>
+              <div><strong>Книга Памяти</strong><small>Электронная летопись 20 героев</small></div>
+            </a>
+            <a href="reader.html" class="dropdown-item" role="menuitem">
+              <span class="item-icon">📚</span>
+              <div><strong>3D Фолиант</strong><small>Читалка книги с 3D перелистыванием</small></div>
+            </a>
+            <a href="quiz.html" class="dropdown-item" role="menuitem">
+              <span class="item-icon">⚔️</span>
+              <div><strong>Квест-викторина</strong><small>10 интерактивных вопросов</small></div>
+            </a>
+            <a href="desk-qr.html" class="dropdown-item" role="menuitem">
+              <span class="item-icon">🪑</span>
+              <div><strong>Парта Героя</strong><small>Конструктор табличек и QR-кодов</small></div>
+            </a>
+            <a href="guestbook.html" class="dropdown-item" role="menuitem">
+              <span class="item-icon">🕯</span>
+              <div><strong>Стена Памяти</strong><small>Поминальные лампады и отзывы</small></div>
+            </a>
+          </div>
+        </div>
 
-        <!-- ПАСПОРТ И КАРТА ДОБЛЕСТИ -->
-        <button class="passport-btn" id="btnOpenPassport" type="button">Паспорт проекта</button>
-        <a href="https://карта-доблести.рф" target="_blank" rel="noopener noreferrer" class="contest-badge">Карта Доблести РФ</a>
+        <!-- КНОПКА 3: СЕРВИСЫ И СЕРТИФИКАТЫ -->
+        <div class="header-dropdown" id="dropdownServices">
+          <button class="header-dropdown-btn" id="btnDropdownServices" type="button" aria-expanded="false" aria-controls="menuServices">
+            <span class="btn-icon">📜</span>
+            <span class="btn-text">Сервисы</span>
+            <span class="arrow-icon" aria-hidden="true">▾</span>
+          </button>
+          <div class="dropdown-menu" id="menuServices" role="menu">
+            <div class="dropdown-header">Документы и образование</div>
+            <a href="certificate.html" class="dropdown-item highlight-item" role="menuitem">
+              <span class="item-icon">📜</span>
+              <div><strong>Оформить Сертификат</strong><small>Именной наградной лист с печатью</small></div>
+            </a>
+            <a href="verify.html" class="dropdown-item active" role="menuitem">
+              <span class="item-icon">🛡</span>
+              <div><strong>Реестр верификации</strong><small>Проверка подлинности (SHA-256)</small></div>
+            </a>
+            <a href="methodology.html" class="dropdown-item" role="menuitem">
+              <span class="item-icon">📑</span>
+              <div><strong>Методкабинет</strong><small>Банк уроков Мужества для учителей</small></div>
+            </a>
+          </div>
+        </div>
+
+        <!-- КНОПКА 4: О ПРОЕКТЕ И ПАСПОРТ -->
+        <div class="header-dropdown" id="dropdownAbout">
+          <button class="header-dropdown-btn" id="btnDropdownAbout" type="button" aria-expanded="false" aria-controls="menuAbout">
+            <span class="btn-icon">ℹ️</span>
+            <span class="btn-text">О проекте</span>
+            <span class="arrow-icon" aria-hidden="true">▾</span>
+          </button>
+          <div class="dropdown-menu dropdown-menu-right" id="menuAbout" role="menu">
+            <div class="dropdown-header">Информация и статус</div>
+            <button type="button" class="dropdown-item btn-open-passport-item" id="btnOpenPassport" data-open-passport="true" role="menuitem">
+              <span class="item-icon">📋</span>
+              <div><strong>Паспорт проекта</strong><small>Официальный документ комплекса</small></div>
+            </button>
+            <a href="https://карта-доблести.рф" target="_blank" rel="noopener noreferrer" class="dropdown-item" role="menuitem">
+              <span class="item-icon">🇷🇺</span>
+              <div><strong>Карта Доблести РФ</strong><small>Всероссийский портал акции ↗</small></div>
+            </a>
+          </div>
+        </div>
 
         <!-- КНОПКА МОБИЛЬНОГО МЕНЮ (БУРГЕР) -->
         <button class="mobile-burger-btn" id="mobileBurgerBtn" aria-label="Открыть мобильное меню" aria-expanded="false" aria-controls="mobileDrawer" type="button">
@@ -429,15 +478,17 @@
         <a href="index.html#battle-path" class="drawer-link">🗺 Хроника и Карта</a>
         <a href="index.html#memory-hall" class="drawer-link">🕯 Эстафета памяти</a>
 
-        <div class="drawer-section-label">Цифровые модули и сервисы</div>
+        <div class="drawer-section-label">Цифровые модули</div>
         <a href="memory-book.html" class="drawer-link">📖 Электронная Книга Памяти</a>
         <a href="reader.html" class="drawer-link">📚 3D Фолиант-читалка</a>
         <a href="quiz.html" class="drawer-link">⚔️ Квест-викторина «Дорогами мужества»</a>
-        <a href="certificate.html" class="drawer-link highlight">📜 Оформить Сертификат участника</a>
-        <a href="methodology.html" class="drawer-link">📑 Методический кабинет педагога</a>
-        <a href="verify.html" class="drawer-link highlight">🛡 Реестр верификации</a>
         <a href="desk-qr.html" class="drawer-link">🪑 Конструктор «Парты Героя»</a>
         <a href="guestbook.html" class="drawer-link">🕯 Стена Памяти и отзывы</a>
+
+        <div class="drawer-section-label">Страницы и сервисы</div>
+        <a href="certificate.html" class="drawer-link highlight">📜 Оформить Сертификат участника</a>
+        <a href="verify.html" class="drawer-link highlight">🛡 Реестр верификации</a>
+        <a href="methodology.html" class="drawer-link">📑 Методический кабинет педагога</a>
 
         <div class="drawer-buttons-row">
           <button class="drawer-btn" id="drawerPassportBtn" type="button">Паспорт проекта</button>

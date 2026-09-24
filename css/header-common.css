@@ -113,50 +113,7 @@
 }
 
 /* ==========================================================================
-   2. ОСНОВНАЯ НАВИГАЦИЯ ПО ЗАЛАМ
-   ========================================================================== */
-.site-header .main-nav {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-shrink: 0;
-}
-
-.site-header .nav-link {
-  font-family: var(--font-sans);
-  color: var(--header-text-muted);
-  text-decoration: none;
-  font-size: 0.78rem;
-  font-weight: 600;
-  transition: color var(--header-transition);
-  position: relative;
-  padding: 4px 2px;
-  white-space: nowrap;
-}
-
-.site-header .nav-link::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--header-granite), var(--header-gold));
-  transition: width var(--header-transition);
-}
-
-.site-header .nav-link:hover,
-.site-header .nav-link.active {
-  color: #ffffff;
-}
-
-.site-header .nav-link:hover::after,
-.site-header .nav-link.active::after {
-  width: 100%;
-}
-
-/* ==========================================================================
-   3. ВЫПАДАЮЩИЙ СПИСОК МОДУЛЕЙ
+   2. КОМПАКТНЫЕ КНОПКИ НАВИГАЦИИ (МОДУЛИ, ЗАЛЫ, СЕРВИСЫ, О ПРОЕКТЕ)
    ========================================================================== */
 .site-header .header-actions {
   display: flex;
@@ -165,52 +122,81 @@
   flex-shrink: 0;
 }
 
+.site-header .header-dropdown,
 .site-header .modules-dropdown {
   position: relative;
 }
 
+.site-header .header-dropdown-btn,
 .site-header .btn-dropdown-toggle {
-  background: rgba(24, 29, 38, 0.85);
+  background: rgba(22, 26, 35, 0.88);
   border: 1px solid var(--header-border);
   color: var(--header-text);
   padding: 5px 9px;
   border-radius: 3px;
   font-family: var(--font-sans);
-  font-size: 0.73rem;
+  font-size: 0.74rem;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 5px;
   transition: var(--header-transition);
+  white-space: nowrap;
+  user-select: none;
 }
 
+.site-header .header-dropdown-btn .btn-icon,
+.site-header .btn-dropdown-toggle .btn-icon {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.site-header .header-dropdown-btn:hover,
+.site-header .header-dropdown.active .header-dropdown-btn,
 .site-header .btn-dropdown-toggle:hover,
 .site-header .modules-dropdown.active .btn-dropdown-toggle {
   border-color: var(--header-gold);
   color: var(--header-gold);
-  background: rgba(197, 160, 89, 0.12);
+  background: rgba(197, 160, 89, 0.14);
+}
+
+.site-header .header-dropdown-btn.child-active,
+.site-header .btn-dropdown-toggle.child-active {
+  border-color: rgba(197, 160, 89, 0.75);
+  color: #ffffff;
+  background: rgba(197, 160, 89, 0.18);
+  box-shadow: 0 0 10px rgba(197, 160, 89, 0.22);
+}
+
+/* Акцент на кнопке Сервисы/Сертификат */
+.site-header #dropdownServices .header-dropdown-btn {
+  border-color: rgba(197, 160, 89, 0.42);
 }
 
 .site-header .arrow-icon {
-  font-size: 0.65rem;
+  font-size: 0.62rem;
+  opacity: 0.8;
   transition: transform var(--header-transition);
 }
 
+.site-header .header-dropdown.active .arrow-icon,
 .site-header .modules-dropdown.active .arrow-icon {
   transform: rotate(180deg);
+  opacity: 1;
 }
 
 .site-header .dropdown-menu {
   position: absolute;
   top: calc(100% + 5px);
   right: 0;
-  width: 250px;
-  background: rgba(16, 19, 26, 0.98);
+  width: 260px;
+  background: rgba(14, 17, 23, 0.98);
   border: 1px solid var(--header-border);
   border-radius: 4px;
-  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.88);
-  backdrop-filter: blur(16px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.92), 0 0 1px rgba(197, 160, 89, 0.35);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   padding: 6px;
   display: none;
   flex-direction: column;
@@ -219,18 +205,43 @@
   animation: headerDropdownFade 0.18s ease-out;
 }
 
+.site-header .dropdown-menu.dropdown-menu-right {
+  right: 0;
+  left: auto;
+}
+
+.site-header .header-dropdown.active .dropdown-menu,
 .site-header .modules-dropdown.active .dropdown-menu {
   display: flex;
+}
+
+.site-header .dropdown-header {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--header-gold);
+  padding: 4px 8px 3px 8px;
+  font-weight: 800;
+  font-family: var(--font-sans);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 3px;
 }
 
 .site-header .dropdown-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   padding: 6px 8px;
   border-radius: 3px;
   text-decoration: none;
   color: var(--header-text);
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+  font-family: var(--font-sans);
   transition: var(--header-transition);
 }
 
@@ -240,21 +251,40 @@
   transform: translateX(2px);
 }
 
+.site-header .dropdown-item.active strong {
+  color: var(--header-gold);
+}
+
+.site-header .dropdown-item.highlight-item {
+  background: rgba(197, 160, 89, 0.08);
+  border: 1px solid rgba(197, 160, 89, 0.2);
+}
+
+.site-header .dropdown-item.highlight-item:hover {
+  background: rgba(197, 160, 89, 0.2);
+  border-color: var(--header-gold);
+}
+
 .site-header .dropdown-item .item-icon {
   font-size: 1.05rem;
   flex-shrink: 0;
+  width: 22px;
+  text-align: center;
 }
 
 .site-header .dropdown-item strong {
   display: block;
-  font-size: 0.76rem;
+  font-size: 0.77rem;
   color: #ffffff;
   line-height: 1.2;
 }
 
 .site-header .dropdown-item small {
-  font-size: 0.66rem;
+  display: block;
+  font-size: 0.64rem;
   color: var(--header-text-muted);
+  line-height: 1.15;
+  margin-top: 1px;
 }
 
 /* Кнопки действий */
@@ -511,10 +541,11 @@
   }
 
   .site-header .modules-dropdown,
+  .site-header .header-dropdown,
   .site-header .btn-header-cert,
   .site-header .passport-btn,
   .site-header .contest-badge {
-    display: none;
+    display: none !important;
   }
 
   .site-header .mobile-burger-btn {
