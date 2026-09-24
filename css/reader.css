@@ -22,8 +22,14 @@
 
   --font-serif: 'Cinzel', Georgia, serif;
   --font-book: 'Lora', 'Times New Roman', serif;
-  --font-sans: 'Montserrat', sans-serif;
+  --font-sans: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
   --transition: 0.25s cubic-bezier(0.2, 0, 0, 1);
+
+  /* Масштабирование и флюидные пропорции */
+  --reader-zoom: 1;
+  --reader-font-base: clamp(0.92rem, 0.35vw + 0.8rem, 1.15rem);
+  --book-width: min(95vw, 1260px);
+  --book-height: clamp(520px, calc(100vh - 180px), 760px);
 }
 
 *, *::before, *::after {
@@ -229,9 +235,9 @@ body {
 
 .bookshelf-tier {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 30px;
-  padding: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(clamp(240px, 22vw, 300px), 1fr));
+  gap: clamp(16px, 2.2vw, 32px);
+  padding: clamp(16px, 2.5vw, 32px);
   background: linear-gradient(180deg, #10141d 0%, #0c0e14 100%);
   border: 1px solid var(--border-hairline);
   border-bottom: 12px solid #2b1f17;
@@ -325,7 +331,7 @@ body {
 }
 
 /* ==========================================================================
-   3. 3D-ЧИТАЛКА (BOOK FLIPBOOK)
+   3. ИНТЕРАКТИВНАЯ ЧИТАЛКА (3D FOLIO & TELEGRAM RICH FEED)
    ========================================================================== */
 .book-reader-section {
   position: fixed;
@@ -336,57 +342,150 @@ body {
   flex-direction: column;
 }
 
+/* Индикатор прогресса чтения страницы */
+.reader-progress-track {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
+  position: relative;
+  z-index: 100;
+}
+.reader-progress-fill {
+  height: 100%;
+  width: 25%;
+  background: linear-gradient(90deg, var(--accent-granite), var(--accent-brass));
+  transition: width 0.3s var(--transition);
+  box-shadow: 0 0 8px var(--accent-brass-glow);
+}
+
 .reader-control-panel {
   background: rgba(14, 17, 23, 0.98);
   border-bottom: 1px solid var(--border-hairline);
-  padding: 10px 0;
+  padding: 8px 0;
   z-index: 10;
+  backdrop-filter: blur(14px);
 }
 
 .control-panel-inner {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .current-book-meta {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  flex-shrink: 0;
 }
 .meta-vol {
   background: var(--accent-granite);
   color: #fff;
   font-family: var(--font-serif);
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   padding: 3px 8px;
-  border-radius: 2px;
+  border-radius: 3px;
+  letter-spacing: 0.5px;
 }
 .meta-hero-name {
   font-family: var(--font-serif);
-  font-size: 1.1rem;
+  font-size: clamp(0.92rem, 1.2vw, 1.15rem);
   color: var(--accent-brass);
+  white-space: nowrap;
+}
+
+/* Переключатель режимов: 3D Фолиант vs Telegram Хроника */
+.reader-mode-toggle {
+  display: flex;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--border-hairline);
+  border-radius: 6px;
+  padding: 2px;
+  gap: 2px;
+}
+.mode-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.mode-btn:hover {
+  color: #fff;
+}
+.mode-btn.active {
+  background: var(--accent-brass);
+  color: #0b0d12;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 .reader-tools {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Контроллер масштабирования текста (Scale A- / 100% / A+) */
+.reader-scale-controls {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid var(--border-hairline);
+  border-radius: 4px;
+  padding: 2px 4px;
+  gap: 2px;
+}
+.scale-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.scale-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.scale-indicator {
+  font-size: 0.7rem;
+  color: var(--accent-brass);
+  font-weight: 700;
+  min-width: 38px;
+  text-align: center;
 }
 
 .tool-btn {
   background: var(--bg-shelf-wall);
   border: 1px solid var(--border-hairline);
   color: var(--text-primary);
-  padding: 7px 12px;
-  border-radius: 2px;
-  font-size: 0.78rem;
+  padding: 6px 11px;
+  border-radius: 3px;
+  font-size: 0.76rem;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 .tool-btn:hover { border-color: var(--accent-brass); color: var(--accent-brass); }
-.tool-btn.playing { background: var(--accent-brass); color: #000; }
+.tool-btn.playing { background: var(--accent-brass); color: #000; font-weight: 700; }
 
 .theme-selector {
   display: flex;
@@ -398,66 +497,127 @@ body {
 }
 .theme-dot {
   width: 16px; height: 16px; border-radius: 50%; border: 1px solid #fff; cursor: pointer;
+  transition: transform 0.15s;
 }
 .theme-dot[data-theme="theme-parchment"] { background: #fdfaf0; border-color: #c5a059; }
 .theme-dot[data-theme="theme-dark"] { background: #12151d; border-color: #444; }
 .theme-dot[data-theme="theme-archive"] { background: #ffffff; border-color: #8a1c22; }
-.theme-dot.active { transform: scale(1.2); }
+.theme-dot.active { transform: scale(1.25); box-shadow: 0 0 6px var(--accent-brass); }
 
 .btn-close-reader { font-size: 1.1rem; padding: 4px 10px; }
 
-/* 3D Сцена */
+/* Закрепленное свидетельство (Telegram Pinned Message Bar) */
+.tg-pinned-banner {
+  background: linear-gradient(90deg, rgba(138, 28, 34, 0.25) 0%, rgba(197, 160, 89, 0.18) 100%);
+  border-bottom: 1px solid rgba(197, 160, 89, 0.3);
+  padding: 6px 0;
+  cursor: pointer;
+  transition: background 0.2s;
+  user-select: none;
+}
+.tg-pinned-banner:hover {
+  background: linear-gradient(90deg, rgba(138, 28, 34, 0.35) 0%, rgba(197, 160, 89, 0.28) 100%);
+}
+.pinned-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.pinned-icon {
+  font-size: 1rem;
+  color: var(--accent-brass);
+  flex-shrink: 0;
+}
+.pinned-text-group {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 0.78rem;
+}
+.pinned-tag {
+  color: var(--accent-brass);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  font-size: 0.7rem;
+}
+.pinned-text {
+  color: #e5e9f0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pinned-action-btn {
+  background: transparent;
+  border: none;
+  color: var(--accent-brass);
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* 3D Сцена книги & Telegram Feed контейнер */
 .book-stage-wrapper {
   flex-grow: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: clamp(10px, 2vh, 24px) clamp(10px, 2vw, 24px);
   position: relative;
   perspective: 2500px;
+  overflow: hidden;
 }
 
 .flip-nav-btn {
-  background: rgba(18, 21, 29, 0.85);
+  background: rgba(18, 21, 29, 0.9);
   border: 1px solid var(--border-accent);
   color: var(--accent-brass);
-  width: 50px; height: 50px;
+  width: clamp(40px, 3.5vw, 52px);
+  height: clamp(40px, 3.5vw, 52px);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   cursor: pointer;
   z-index: 100;
-  transition: transform 0.2s, background 0.2s;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.8);
+  transition: transform 0.2s, background 0.2s, border-color 0.2s;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
 }
 .flip-nav-btn:hover { background: var(--accent-brass); color: #000; transform: scale(1.1); }
-.prev-btn { position: absolute; left: 30px; }
-.next-btn { position: absolute; right: 30px; }
+.prev-btn { position: absolute; left: clamp(8px, 2vw, 32px); }
+.next-btn { position: absolute; right: clamp(8px, 2vw, 32px); }
 
-/* 3D Книга на десктопе */
+/* Флюидная 3D Книга (Адаптивная под любые экраны и DPI) */
 .folio-book-3d {
-  width: 1000px;
-  height: 640px;
+  width: var(--book-width);
+  height: var(--book-height);
   display: grid;
   grid-template-columns: 1fr 1fr;
   position: relative;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95);
+  box-shadow: 0 25px 65px rgba(0, 0, 0, 0.95);
   border-radius: 4px;
-  transition: transform 0.4s ease;
+  transition: transform 0.4s ease, width 0.3s, height 0.3s;
+  font-size: calc(var(--reader-font-base) * var(--reader-zoom));
 }
 
 /* Темы разворотов */
-.folio-book-3d.theme-parchment .book-page {
-  background: radial-gradient(circle at 50% 50%, #fdfaf2 0%, #f3ebd4 100%);
+.folio-book-3d.theme-parchment .book-page,
+.tg-feed-container.theme-parchment {
+  background: radial-gradient(circle at 50% 50%, #fefcf7 0%, #f4ede0 100%);
   color: #1a1714;
 }
-.folio-book-3d.theme-dark .book-page {
-  background: #141720;
-  color: #d8deea;
+.folio-book-3d.theme-dark .book-page,
+.tg-feed-container.theme-dark {
+  background: radial-gradient(circle at 50% 50%, #171b26 0%, #10131c 100%);
+  color: #dbe2ef;
 }
-.folio-book-3d.theme-archive .book-page {
+.folio-book-3d.theme-archive .book-page,
+.tg-feed-container.theme-archive {
   background: #ffffff;
   color: #111111;
 }
@@ -607,7 +767,534 @@ body {
 .reader-toast.active { opacity: 1; transform: translateY(0); }
 
 /* ==========================================================================
-   4. ЧИСТАЯ ПЕЧАТЬ РАЗВОРОТА НА ПРИНТЕРЕ (@MEDIA PRINT)
+   4. ТЕЛЕГРАМ-ХРОНИКА (TELEGRAM RICH FEED & RICH MESSAGE STYLES)
+   ========================================================================== */
+.tg-feed-container {
+  width: min(94vw, 860px);
+  max-height: calc(100vh - 150px);
+  overflow-y: auto;
+  padding: clamp(16px, 2.5vw, 32px);
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  -webkit-overflow-scrolling: touch;
+  font-size: calc(var(--reader-font-base) * var(--reader-zoom));
+}
+
+.tg-feed-hero-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(197, 160, 89, 0.3);
+  margin-bottom: 10px;
+}
+.tg-channel-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-brass);
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+.tg-channel-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.tg-channel-title {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  color: var(--accent-brass);
+  font-weight: 700;
+  line-height: 1.2;
+}
+.tg-channel-meta {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* Telegram Карточка Сообщения / Публикации */
+.tg-message-card {
+  background: rgba(22, 27, 38, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px 12px 12px 4px;
+  padding: clamp(14px, 2vw, 22px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+  backdrop-filter: blur(10px);
+}
+.theme-parchment .tg-message-card {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  color: #1a1714;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+.theme-archive .tg-message-card {
+  background: #fdfdfd;
+  border: 1px solid #d1d5db;
+  color: #111;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Переслано из (Telegram Forwarded Banner) */
+.tg-forward-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  color: #60a5fa;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(96, 165, 250, 0.25);
+  font-weight: 600;
+}
+.theme-parchment .tg-forward-banner { color: #8a1c22; border-color: rgba(138, 28, 34, 0.25); }
+.tg-forward-arrow { font-size: 0.9rem; }
+
+/* Интерактивный Спойлер в стиле Telegram (Shimmering Noise Mask & Tap-to-Reveal) */
+.tg-spoiler {
+  background: rgba(120, 130, 150, 0.3);
+  color: transparent !important;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 1px 6px;
+  user-select: none;
+  position: relative;
+  display: inline;
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+.tg-spoiler::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.55) 1px, transparent 1px);
+  background-size: 5px 5px;
+  animation: tgShimmerParticles 2s infinite linear;
+  pointer-events: none;
+}
+@keyframes tgShimmerParticles {
+  0% { background-position: 0 0; opacity: 0.8; }
+  50% { background-position: 10px 5px; opacity: 0.5; }
+  100% { background-position: 20px 10px; opacity: 0.8; }
+}
+.tg-spoiler.revealed {
+  background: rgba(197, 160, 89, 0.12);
+  color: inherit !important;
+  text-shadow: none;
+  user-select: auto;
+  border-bottom: 1px dashed var(--accent-brass);
+}
+.tg-spoiler.revealed::before {
+  display: none;
+}
+
+/* Разворачивающаяся цитата (Telegram Expandable Blockquote) */
+.tg-quote-block {
+  border-left: 3.5px solid var(--accent-brass);
+  background: rgba(197, 160, 89, 0.08);
+  border-radius: 3px 8px 8px 3px;
+  padding: 10px 14px;
+  margin: 12px 0;
+  position: relative;
+  transition: max-height 0.3s ease;
+}
+.theme-parchment .tg-quote-block {
+  background: rgba(138, 28, 34, 0.05);
+  border-left-color: #8a1c22;
+}
+.tg-quote-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--accent-brass);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+}
+.theme-parchment .tg-quote-header { color: #8a1c22; }
+.tg-quote-body {
+  font-family: var(--font-book);
+  font-size: 0.94rem;
+  line-height: 1.6;
+  font-style: italic;
+}
+.tg-quote-toggle-btn {
+  background: transparent;
+  border: none;
+  color: var(--accent-brass);
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+}
+.theme-parchment .tg-quote-toggle-btn { color: #8a1c22; }
+
+/* Моноширинный реестровый штамп с копированием в 1 клик */
+.tg-mono-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.82rem;
+  color: #93c5fd;
+  user-select: all;
+  margin: 2px 0;
+}
+.theme-parchment .tg-mono-stamp {
+  background: #f1ebd8;
+  border-color: #d8ceb4;
+  color: #3b4252;
+}
+.tg-copy-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 1px 3px;
+  font-size: 0.8rem;
+  border-radius: 3px;
+  transition: color 0.15s, transform 0.15s;
+}
+.tg-copy-btn:hover {
+  color: #fff;
+  transform: scale(1.15);
+}
+.tg-copy-btn.copied {
+  color: #10b981;
+}
+
+/* Telegram Voice Note / Голосовой плеер с визуализацией волны */
+.tg-voice-note {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(14, 18, 27, 0.8);
+  border: 1px solid rgba(197, 160, 89, 0.25);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin: 14px 0;
+  backdrop-filter: blur(10px);
+}
+.theme-parchment .tg-voice-note {
+  background: rgba(245, 237, 224, 0.8);
+  border-color: rgba(138, 28, 34, 0.25);
+}
+.tg-voice-play-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--accent-brass);
+  color: #0b0d12;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.18s, background 0.18s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+.tg-voice-play-btn:hover {
+  transform: scale(1.08);
+  background: var(--accent-brass-hover);
+}
+.tg-voice-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tg-voice-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--accent-brass);
+  display: flex;
+  justify-content: space-between;
+}
+.theme-parchment .tg-voice-label { color: #8a1c22; }
+.tg-waveform-track {
+  display: flex;
+  align-items: center;
+  gap: 2.5px;
+  height: 24px;
+  cursor: pointer;
+}
+.tg-wave-bar {
+  width: 3px;
+  background: rgba(197, 160, 89, 0.35);
+  border-radius: 2px;
+  transition: background 0.15s, transform 0.15s;
+}
+.theme-parchment .tg-wave-bar { background: rgba(138, 28, 34, 0.35); }
+.tg-wave-bar.played {
+  background: var(--accent-brass);
+}
+.theme-parchment .tg-wave-bar.played { background: #8a1c22; }
+
+.tg-voice-controls-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  flex-shrink: 0;
+}
+.tg-speed-toggle-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-hairline);
+  color: var(--accent-brass);
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.tg-speed-toggle-btn:hover { background: rgba(255, 255, 255, 0.18); }
+.tg-voice-timer {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  font-family: monospace;
+}
+
+/* Фото-карточка в стиле Telegram */
+.tg-photo-card {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 12px 0;
+  border: 1px solid var(--border-hairline);
+  background: #000;
+  cursor: zoom-in;
+  max-height: 380px;
+}
+.tg-photo-card img {
+  width: 100%;
+  height: 100%;
+  max-height: 380px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s;
+}
+.tg-photo-card:hover img {
+  transform: scale(1.02);
+}
+.tg-photo-zoom-hint {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+
+/* Реакции эмодзи в стиле Telegram (Live Reactions Bar) */
+.tg-reactions-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.theme-parchment .tg-reactions-row {
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+.tg-reaction-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 4px 10px;
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.2, 0, 0, 1);
+  user-select: none;
+}
+.theme-parchment .tg-reaction-chip {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #333;
+}
+.tg-reaction-chip:hover {
+  background: rgba(255, 255, 255, 0.14);
+  transform: translateY(-2px);
+}
+.tg-reaction-chip.active {
+  background: rgba(197, 160, 89, 0.22);
+  border-color: var(--accent-brass);
+  color: var(--accent-brass);
+  font-weight: 700;
+}
+.theme-parchment .tg-reaction-chip.active {
+  background: rgba(138, 28, 34, 0.15);
+  border-color: #8a1c22;
+  color: #8a1c22;
+}
+
+/* Летающие эмодзи при нажатии реакции */
+.flying-reaction-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  font-size: 1.8rem;
+  animation: flyUpAndFade 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+@keyframes flyUpAndFade {
+  0% { opacity: 1; transform: translate(0, 0) scale(0.6); }
+  50% { transform: translate(var(--dx, 0px), -60px) scale(1.3); opacity: 1; }
+  100% { transform: translate(var(--dx, 0px), -120px) scale(0.9); opacity: 0; }
+}
+
+/* Нижний колонтитул сообщения Telegram: время и галочки ✓✓ */
+.tg-msg-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  color: var(--text-tertiary);
+  margin-top: 8px;
+}
+.tg-checks {
+  color: #60a5fa;
+  font-weight: bold;
+}
+.theme-parchment .tg-checks { color: #8a1c22; }
+
+/* Плавающая панель выделения текста (Selection Quick Menu) */
+.reader-selection-bar {
+  position: fixed;
+  display: none;
+  background: rgba(16, 20, 30, 0.96);
+  border: 1px solid var(--accent-brass);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+  border-radius: 6px;
+  padding: 4px;
+  gap: 4px;
+  z-index: 5000;
+  backdrop-filter: blur(12px);
+}
+.reader-selection-bar .sel-btn {
+  background: transparent;
+  border: none;
+  color: #e5e9f0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 9px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.reader-selection-bar .sel-btn:hover {
+  background: var(--accent-brass);
+  color: #0b0d12;
+}
+
+/* Модальное окно просмотра архивных фотографий с зумом (Photo Lightbox) */
+.reader-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 7, 10, 0.94);
+  backdrop-filter: blur(18px);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(12px, 2.5vw, 24px);
+}
+.reader-lightbox.active {
+  display: flex;
+}
+.lightbox-dialog {
+  max-width: min(92vw, 840px);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: #11141c;
+  border: 1px solid var(--accent-brass);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95);
+}
+.lightbox-close-btn {
+  position: absolute;
+  top: 12px; right: 12px;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: background 0.15s, transform 0.15s;
+}
+.lightbox-close-btn:hover { background: var(--accent-granite); transform: scale(1.1); }
+.lightbox-img-wrapper {
+  max-height: calc(90vh - 70px);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
+.lightbox-img-wrapper img {
+  max-width: 100%;
+  max-height: 75vh;
+  object-fit: contain;
+}
+.lightbox-footer {
+  padding: 12px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0c0e14;
+  border-top: 1px solid var(--border-hairline);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+.lightbox-badge {
+  color: var(--accent-brass);
+  font-weight: 700;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+}
+
+.read-speed-estimate {
+  font-size: 0.74rem;
+  color: var(--accent-brass);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   5. ЧИСТАЯ ПЕЧАТЬ РАЗВОРОТА НА ПРИНТЕРЕ (@MEDIA PRINT)
    ========================================================================== */
 @media print {
   body {

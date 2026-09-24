@@ -163,49 +163,86 @@
   </section>
 
   <!-- ==========================================================================
-       ВИД 2: 3D-ЧИТАЛКА РАЗВОРОТА КНИГИ (BOOK FLIPBOOK VIEW)
+       ВИД 2: 3D-ЧИТАЛКА И TELEGRAM-ХРОНИКА РАЗВОРОТА КНИГИ (BOOK FLIPBOOK & TG RICH FEED)
        ========================================================================== -->
   <section class="book-reader-section" id="bookReaderView" style="display:none;">
     
+    <!-- Индикатор прогресса прочтения (Reading Progress Indicator) -->
+    <div class="reader-progress-track" id="readerProgressTrack">
+      <div class="reader-progress-fill" id="readerProgressFill"></div>
+    </div>
+
     <!-- Панель управления чтением -->
     <div class="reader-control-panel">
       <div class="container control-panel-inner">
         
         <div class="current-book-meta">
-          <button id="btnReturnToShelf" class="header-btn" onclick="ReaderEngine.closeBook()" type="button" style="margin-right: 8px;">
-            📚 На книжную полку
+          <button id="btnReturnToShelf" class="header-btn" onclick="ReaderEngine.closeBook()" type="button" style="margin-right: 6px;">
+            📚 Полка
           </button>
           <span class="meta-vol" id="readerVolBadge">Том I</span>
           <strong class="meta-hero-name" id="readerHeroTitle">Владислав Петухов</strong>
         </div>
 
+        <!-- Переключатель режима: 3D Фолиант vs Telegram Хроника -->
+        <div class="reader-mode-toggle" id="readerModeToggle" role="group" aria-label="Режим чтения">
+          <button class="mode-btn active" id="btnModeFolio" onclick="ReaderEngine.setViewMode('folio')" type="button" title="Режим 3D книги с разворотом и перелистыванием">
+            <span>📖 Фолиант</span>
+          </button>
+          <button class="mode-btn" id="btnModeTelegram" onclick="ReaderEngine.setViewMode('telegram')" type="button" title="Режим Telegram-сводки с интерактивным rich-форматированием">
+            <span>💬 Telegram-лента</span>
+          </button>
+        </div>
+
+        <!-- Инструменты форматирования, масштабирования и звука -->
         <div class="reader-tools">
-          <button class="tool-btn" id="readerAudioToggleBtn" onclick="ReaderEngine.toggleHeroAudio()" type="button">
-            🎧 Слушать аудиогид (MP3)
+          
+          <!-- Масштабирование шрифта (Scale A- / 100% / A+) -->
+          <div class="reader-scale-controls" role="group" aria-label="Масштаб текста">
+            <button class="scale-btn" onclick="ReaderEngine.changeFontScale(-1)" title="Уменьшить масштаб текста (А-)" type="button">А−</button>
+            <span class="scale-indicator" id="scaleIndicator">100%</span>
+            <button class="scale-btn" onclick="ReaderEngine.changeFontScale(1)" title="Увеличить масштаб текста (А+)" type="button">А+</button>
+          </div>
+
+          <button class="tool-btn" id="readerAudioToggleBtn" onclick="ReaderEngine.toggleHeroAudio()" type="button" title="Слушать аудиогид">
+            🎧 Аудиогид
           </button>
           
-          <div class="theme-selector">
+          <div class="theme-selector" title="Цветовая палитра страницы">
             <button class="theme-dot active" data-theme="theme-parchment" title="Винтажный пергамент"></button>
-            <button class="theme-dot" data-theme="theme-dark" title="Ночной бархат"></button>
+            <button class="theme-dot" data-theme="theme-dark" title="Ночной обсидиан"></button>
             <button class="theme-dot" data-theme="theme-archive" title="Архивный бланк"></button>
           </div>
 
+          <button class="tool-btn" id="btnFullscreenToggle" onclick="ReaderEngine.toggleFullscreen()" title="Полноэкранный режим (⛶)" type="button">⛶</button>
           <button class="tool-btn" onclick="window.print()" title="Печать разворота" type="button">🖨</button>
-          <button class="tool-btn btn-close-reader" onclick="ReaderEngine.closeBook()" title="Закрыть книгу" type="button">✕</button>
+          <button class="tool-btn btn-close-reader" onclick="ReaderEngine.closeBook()" title="Закрыть книгу (Esc)" type="button">✕</button>
         </div>
 
       </div>
     </div>
 
-    <!-- 3D Сцена книги -->
-    <div class="book-stage-wrapper">
+    <!-- Закрепленная архивная сводка (Telegram Pinned Message) -->
+    <div class="tg-pinned-banner" id="readerPinnedBanner" onclick="ReaderEngine.scrollToPinned()" title="Нажмите, чтобы перейти к ключевой выписке">
+      <div class="container pinned-banner-inner">
+        <span class="pinned-icon" aria-hidden="true">📌</span>
+        <div class="pinned-text-group">
+          <span class="pinned-tag">Закрепленное свидетельство:</span>
+          <span class="pinned-text" id="pinnedBannerContent">Краткая выписка из наградного листа и личного дела</span>
+        </div>
+        <button class="pinned-action-btn" type="button" aria-label="Перейти к цитате">К выдержке ▾</button>
+      </div>
+    </div>
+
+    <!-- 3D Сцена книги & Telegram Feed контейнер -->
+    <div class="book-stage-wrapper" id="readerStageWrapper">
       
-      <!-- Стрелка влево -->
+      <!-- Стрелка влево (для режима фолианта) -->
       <button class="flip-nav-btn prev-btn" id="prevPageBtn" onclick="ReaderEngine.prevPage()" aria-label="Предыдущая страница">
         <span>❮</span>
       </button>
 
-      <!-- Разворот книги -->
+      <!-- 1. Разворот 3D-книги (Folio View) -->
       <div class="folio-book-3d theme-parchment" id="folioBookElement">
         
         <!-- Ляссе (Закладка) -->
@@ -213,7 +250,7 @@
 
         <!-- Левая страница -->
         <div class="book-page page-left" id="pageLeftContent">
-          <!-- Генерируется динамически -->
+          <!-- Генерируется динамически с Telegram-форматированием -->
         </div>
 
         <!-- Центральный корешок / Тень сгиба -->
@@ -221,12 +258,17 @@
 
         <!-- Правая страница -->
         <div class="book-page page-right" id="pageRightContent">
-          <!-- Генерируется динамически -->
+          <!-- Генерируется динамически с Telegram-форматированием -->
         </div>
 
       </div>
 
-      <!-- Стрелка вправо -->
+      <!-- 2. Стриминговая Telegram-лента хроники (Telegram Rich Feed View) -->
+      <div class="tg-feed-container theme-parchment" id="telegramFeedElement" style="display:none;">
+        <!-- Динамически наполняется Telegram rich messages через ReaderEngine.renderTelegramFeed() -->
+      </div>
+
+      <!-- Стрелка вправо (для режима фолианта) -->
       <button class="flip-nav-btn next-btn" id="nextPageBtn" onclick="ReaderEngine.nextPage()" aria-label="Следующая страница">
         <span>❯</span>
       </button>
@@ -238,11 +280,33 @@
       <div class="container bottom-bar-inner">
         <span class="pagination-info" id="paginationDisplay">Разворот: Стр. 1–2 из 4</span>
         <div class="page-dots-track" id="pageDotsTrack"></div>
-        <span class="shortcut-tip">Листайте стрелками [←] [→] клавиатуры или свайпом</span>
+        <span class="read-speed-estimate" id="readSpeedEstimate">⏱ Время чтения: ~3 мин</span>
+        <span class="shortcut-tip">Листайте стрелками [←] [→] или нажимайте Пробел для аудио</span>
       </div>
     </div>
 
   </section>
+
+  <!-- Плавающая панель контекстных действий при выделении текста (Text Selection Quick Bar) -->
+  <div class="reader-selection-bar" id="readerSelectionBar" role="toolbar" aria-label="Быстрые действия с текстом">
+    <button class="sel-btn" onclick="ReaderEngine.copySelectedText()" type="button">📋 Скопировать</button>
+    <button class="sel-btn" onclick="ReaderEngine.quoteSelectedText()" type="button">💬 В цитату</button>
+    <button class="sel-btn" onclick="ReaderEngine.speakSelectedText()" type="button">🔊 Озвучить</button>
+  </div>
+
+  <!-- Модальное окно просмотра архивных фотографий с зумом (Photo Lightbox Modal) -->
+  <div class="reader-lightbox" id="readerLightboxModal" onclick="ReaderEngine.closeLightbox(event)" role="dialog" aria-modal="true" aria-label="Просмотр фотографии">
+    <div class="lightbox-dialog" onclick="event.stopPropagation()">
+      <button class="lightbox-close-btn" onclick="ReaderEngine.closeLightbox()" title="Закрыть (Esc)" type="button">✕</button>
+      <div class="lightbox-img-wrapper">
+        <img id="lightboxImage" src="" alt="Архивная фотография героя в высоком разрешении">
+      </div>
+      <div class="lightbox-footer" id="lightboxFooter">
+        <div class="lightbox-caption-text" id="lightboxCaption">Владислав Петухов • Личное дело СРМК</div>
+        <div class="lightbox-badge">Архивный оригинал 2026</div>
+      </div>
+    </div>
+  </div>
 
   <!-- АУДИОПЛЕЕР ГЛАВЫ -->
   <audio id="readerAudioElement" preload="metadata"></audio>

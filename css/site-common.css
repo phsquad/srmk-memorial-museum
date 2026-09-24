@@ -1,5 +1,5 @@
 /* =========================================
-   ОБЩИЕ СТИЛИ (Site Common)
+   ОБЩИЕ СТИЛИ (Site Common v14.0 Proportional & Fluid Scaling)
    ========================================= */
 
 :root {
@@ -11,6 +11,39 @@
     --bg-cream: #fffbf0;
     --font-heading: 'Cinzel', serif;
     --font-body: 'Montserrat', sans-serif;
+
+    /* Флюидные пропорциональные токены */
+    --site-max-width: 1320px;
+    --container-width-pct: min(94vw, var(--site-max-width));
+    --fluid-gap: clamp(10px, 1.8vw, 24px);
+    --fluid-padding: clamp(12px, 2.2vw, 28px);
+    --radius-sm: clamp(3px, 0.25vw, 6px);
+    --radius-md: clamp(6px, 0.5vw, 12px);
+    --radius-lg: clamp(10px, 0.8vw, 18px);
+}
+
+/* Базовое флюидное масштабирование шрифтов и пропорций под разные разрешения и DPI */
+html {
+    font-size: clamp(14px, 0.78vw + 8.6px, 18.5px);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-behavior: smooth;
+}
+
+/* 4K, 5K и Ultra-Wide экраны (плавное увеличение без потери четкости) */
+@media (min-width: 2200px) {
+    html {
+        font-size: clamp(18px, 0.65vw + 6px, 22.5px);
+    }
+}
+
+/* Высокая плотность пикселей (Retina, 125%, 150%, 200% Windows Scaling) */
+@media (-webkit-min-device-pixel-ratio: 1.5), (min-resolution: 144dpi) {
+    html, body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
 }
 
 * {
@@ -29,12 +62,12 @@ body {
     min-height: 100vh;
 }
 
-/* Контейнер */
+/* Контейнер с процентным масштабированием */
 .container {
-    max-width: 1200px;
+    max-width: var(--site-max-width);
+    width: var(--container-width-pct);
     margin: 0 auto;
-    padding: 0 20px;
-    width: 100%;
+    padding: 0 clamp(10px, 2vw, 24px);
 }
 
 /* =========================================

@@ -113,14 +113,66 @@
     text-overflow: ellipsis;
   }
 
+  .reader-mode-toggle {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+  .reader-mode-toggle .mode-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 6px 8px;
+    font-size: 0.74rem;
+  }
+
+  .reader-tools {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .tg-pinned-banner {
+    padding: 6px 10px;
+  }
+  .pinned-banner-inner {
+    font-size: 0.74rem;
+  }
+
   .book-stage-wrapper {
-    padding: 10px 8px;
+    padding: 8px 6px;
+  }
+
+  /* Telegram-лента на мобильных устройствах */
+  .tg-feed-container {
+    width: 100%;
+    max-height: calc(100vh - 165px);
+    padding: 12px 8px;
+    gap: 14px;
+  }
+  .tg-message-card {
+    padding: 12px 10px;
+    border-radius: 8px;
+  }
+  .tg-voice-note {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  .tg-voice-play-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 0.95rem;
+  }
+  .tg-waveform-track {
+    gap: 1.5px;
+    height: 20px;
+  }
+  .tg-wave-bar {
+    width: 2px;
   }
 
   /* Книга становится адаптивным вертикальным свитком */
   .folio-book-3d {
     width: 100%;
-    height: calc(100vh - 145px);
+    height: calc(100vh - 165px);
     display: flex;
     flex-direction: column;
     overflow-y: auto;
