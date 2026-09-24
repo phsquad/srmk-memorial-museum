@@ -247,6 +247,10 @@ const GuestbookEngine = {
     this.userFlames[newTribute.id] = true;
     this.saveStorage();
 
+    if (window.AchievementsEngine) {
+      window.AchievementsEngine.trackTributeWritten();
+    }
+
     this.closeModal();
     this.currentPage = 1; // Сброс на первую страницу
     this.renderWall();
@@ -273,6 +277,9 @@ const GuestbookEngine = {
       tribute.flames = (tribute.flames || 0) + 1;
       this.userFlames[tributeId] = true;
       delta = 1;
+      if (window.AchievementsEngine) {
+        window.AchievementsEngine.trackCandleLit('wall_' + tributeId);
+      }
       this.playChime(784);
     } else {
       tribute.flames = Math.max(0, (tribute.flames || 1) - 1);

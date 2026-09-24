@@ -130,17 +130,93 @@
     <!-- 1. СТАРТОВЫЙ ЭКРАН -->
     <section id="startScreen" class="quiz-card">
       <div class="crest-icon" style="font-size: 2.8rem; margin-bottom: 8px;">⚔️</div>
-      <h1 style="color: var(--primary-gold); font-family: 'Cinzel', serif; font-size: clamp(1.6rem, 3.5vw, 2.4rem); margin-bottom: 12px;">
+      <h1 style="color: var(--primary-gold); font-family: 'Cinzel', serif; font-size: clamp(1.6rem, 3.5vw, 2.4rem); margin-bottom: 8px;">
         Исторический Квест «Дорогами мужества»
       </h1>
-      <p class="quiz-intro">
-        Проверьте свои знания о подвигах 20 героев-выпускников Ставропольского регионального многопрофильного колледжа. Вас ждут 10 вопросов по материалам Мемориала Славы и Книги Памяти.<br>
-        <strong>Наберите 8 или более баллов (80%), чтобы получить именной Сертификат Победителя!</strong>
+      <p class="quiz-intro" style="margin-bottom: 20px;">
+        Проверьте свои знания о бессмертном подвиге 20 героев-выпускников Ставропольского регионального многопрофильного колледжа.<br>
+        <strong>Наберите 8 или более баллов (80%), чтобы получить именной Сертификат Победителя и повысить свой воинский ранг!</strong>
       </p>
 
-      <div class="student-reg-form" style="max-width: 520px; margin: 0 auto 24px; text-align: left;">
+      <!-- Индикатор воинского чина и прогресса XP -->
+      <div class="quiz-rank-banner" id="userRankWidget">
+        <div class="quiz-rank-header">
+          <div class="quiz-rank-left">
+            <span class="quiz-rank-label">Ваш текущий статус:</span>
+            <span class="quiz-rank-title" id="userRankTitle">🎖 Рядовой</span>
+          </div>
+          <div class="quiz-rank-right">
+            <span class="quiz-rank-xp" id="userRankXP">0 XP</span>
+          </div>
+        </div>
+        <div class="quiz-rank-track">
+          <div class="quiz-rank-fill" id="userRankProgressBar" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- ВЫБОР РЕЖИМА КВЕСТА -->
+      <div class="quiz-setup-block" style="margin: 24px 0 16px; text-align: left;">
+        <label style="display:block; font-size: 0.85rem; font-weight: 700; color: #c5a059; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
+          1. Выберите боевое направление квеста:
+        </label>
+        <div class="quiz-modes-grid">
+          <button type="button" class="quiz-mode-btn active" data-mode="exam">
+            <span class="mode-icon">📜</span>
+            <span class="mode-name">Урок Мужества</span>
+            <span class="mode-meta">10 вопросов • Базовый зачет</span>
+          </button>
+          <button type="button" class="quiz-mode-btn" data-mode="front">
+            <span class="mode-icon">🗺</span>
+            <span class="mode-name">Боевые рубежи</span>
+            <span class="mode-meta">Днепр • Запорожье • Курск</span>
+          </button>
+          <button type="button" class="quiz-mode-btn" data-mode="skills">
+            <span class="mode-icon">🛠</span>
+            <span class="mode-name">Профессия как щит</span>
+            <span class="mode-meta">Сварка • IT • Спасатели • ТО</span>
+          </button>
+          <button type="button" class="quiz-mode-btn" data-mode="marathon">
+            <span class="mode-icon">⚔️</span>
+            <span class="mode-name">Марафон 20 героев</span>
+            <span class="mode-meta">Все 20 выпускников колледжа</span>
+          </button>
+        </div>
+        <div class="quiz-mode-desc-box" id="quizModeDescText">
+          Классический экзамен Всероссийского Урока Мужества: 10 сбалансированных вопросов. 8+ баллов дают допуск к именному Сертификату Победителя.
+        </div>
+      </div>
+
+      <!-- ВЫБОР УРОВНЯ СЛОЖНОСТИ -->
+      <div class="quiz-setup-block" style="margin: 16px 0 24px; text-align: left;">
+        <label style="display:block; font-size: 0.85rem; font-weight: 700; color: #c5a059; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
+          2. Уровень боевой готовности:
+        </label>
+        <div class="quiz-diff-grid">
+          <button type="button" class="quiz-diff-btn" data-diff="cadet">
+            <span class="diff-icon">🔰</span>
+            <span class="diff-name">Курсант</span>
+            <span class="diff-meta">Без таймера • 4 подсказки</span>
+          </button>
+          <button type="button" class="quiz-diff-btn active" data-diff="standard">
+            <span class="diff-icon">🛡</span>
+            <span class="diff-name">Воин</span>
+            <span class="diff-meta">30 секунд • 2 подсказки</span>
+          </button>
+          <button type="button" class="quiz-diff-btn" data-diff="expert">
+            <span class="diff-icon">⚡</span>
+            <span class="diff-name">Гвардеец</span>
+            <span class="diff-meta">15 секунд • Без подсказок (+бонус XP)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- АНКЕТА УЧАСТНИКА -->
+      <div class="student-reg-form" style="max-width: 540px; margin: 0 auto 24px; text-align: left;">
+        <label style="display:block; font-size: 0.85rem; font-weight: 700; color: #c5a059; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
+          3. Данные участника:
+        </label>
         <div class="input-group">
-          <label for="participantName">ФИО обучающегося (для сертификата):*</label>
+          <label for="participantName">ФИО обучающегося (для наградного листа):*</label>
           <input type="text" id="participantName" placeholder="например: Иванов Данила Денисович" required maxlength="60">
         </div>
 
@@ -152,7 +228,7 @@
 
           <div class="input-group">
             <label for="participantSpecialty">Специальность СПО:*</label>
-            <select id="participantSpecialty" style="width:100%; padding:1rem; border:2px solid var(--border-dark); border-radius:8px; background:rgba(0,0,0,0.2); color:var(--text-main); font-family:var(--font-body);">
+            <select id="participantSpecialty" style="width:100%; padding:1rem; border:2px solid var(--border-dark); border-radius:8px; background:rgba(0,0,0,0.3); color:var(--text-main); font-family:var(--font-body);">
               <option value="09.02.11 Разработка ПО" selected>09.02.11 Разработка ПО</option>
               <option value="15.02.19 Сварочное производство">15.02.19 Сварочное производство</option>
               <option value="20.02.04 Пожарная безопасность">20.02.04 Пожарная безопасность</option>
@@ -164,15 +240,15 @@
         </div>
       </div>
 
-      <button id="startQuestBtn" class="primary-btn btn-start-quest" type="button">
-        Начать испытание ➔
+      <button id="startQuestBtn" class="primary-btn btn-start-quest" type="button" style="font-size: 1.05rem; padding: 14px 32px;">
+        ⚔️ Начать боевое испытание ➔
       </button>
 
       <!-- Достижения игрока -->
       <div style="margin-top: 36px; border-top: 1px solid var(--border-dark); padding-top: 24px;">
-        <h3 class="badges-section-title" style="text-align: center;">Ваши боевые награды и бейджи</h3>
+        <h3 class="badges-section-title" style="text-align: center;">Ваши боевые награды и бейджи (16 испытаний)</h3>
         <div id="startBadges" class="badges-grid">
-          <!-- Загружается из JS -->
+          <!-- Загружается из JS через AchievementsEngine -->
         </div>
       </div>
     </section>
@@ -183,17 +259,39 @@
         <div class="progress-container" style="flex: 1; margin-right: 16px;">
           <div id="quizProgressBar" class="progress-bar"></div>
         </div>
-        <div style="display: flex; gap: 12px; align-items: center;">
+        <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+          <span id="streakBadge" class="streak-flame-badge" style="display: none;">🔥 Серия x2!</span>
           <span id="qNumberDisplay" style="font-weight: 700; color: var(--primary-gold); font-size: 0.9rem;">Вопрос 1 из 10</span>
           <span id="qScoreDisplay" style="font-size: 0.85rem; color: var(--text-muted);">Баллы: 0</span>
         </div>
       </div>
 
-      <div style="margin-bottom: 14px; text-align: left;">
+      <!-- Таймер вопроса -->
+      <div class="quiz-timer-container">
+        <div class="quiz-timer-track">
+          <div id="questionTimerBar" class="quiz-timer-bar"></div>
+        </div>
+        <span id="questionTimerText" class="quiz-timer-text">⏱ 30 сек</span>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 14px; flex-wrap:wrap; gap:8px;">
         <span id="qThemeBadge" style="background: rgba(197, 160, 89, 0.15); color: var(--primary-gold); font-size: 0.72rem; font-weight: 800; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; border: 1px solid rgba(197, 160, 89, 0.3);">
           Тема вопроса
         </span>
+
+        <!-- Панель подсказок -->
+        <div class="quiz-hints-panel">
+          <button type="button" id="btnHint5050" class="quiz-hint-btn" title="Исключить два неверных ответа">
+            💡 50/50 (1)
+          </button>
+          <button type="button" id="btnHintQuote" class="quiz-hint-btn" title="Открыть историческую подсказку из архива">
+            📜 Цитата героя (1)
+          </button>
+        </div>
       </div>
+
+      <!-- Окно отображения подсказки-цитаты -->
+      <div id="hintQuoteDisplay" class="hint-quote-box" style="display: none;"></div>
 
       <h2 id="questionTextDisplay" class="question-text">
         Загрузка вопроса...
@@ -225,14 +323,31 @@
       <p id="resultMessageText" style="font-size: 1.05rem; line-height: 1.6; color: var(--text-main); max-width: 620px; margin: 0 auto 24px;"></p>
 
       <!-- Блок победителя: Кнопка Сертификата -->
-      <div id="winnerBox" class="winner-actions-box" style="display: none; background: rgba(197, 160, 89, 0.1); border: 1px solid var(--primary-gold); padding: 24px; border-radius: 8px; margin-bottom: 28px;">
+      <div id="winnerBox" class="winner-actions-box" style="display: none; background: rgba(197, 160, 89, 0.1); border: 1px solid var(--primary-gold); padding: 24px; border-radius: 8px; margin-bottom: 24px;">
         <h3 style="color: #fff; font-size: 1.2rem; margin-bottom: 8px;">🎉 Поздравляем! Норматив сдан!</h3>
         <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 18px;">
           Ваш результат внесен в реестр Зала Славы. Вы можете сформировать официальный наградной сертификат с уникальным номером и QR-кодом.
         </p>
-        <button id="btnClaimCert" class="primary-btn btn-claim-cert" style="max-width: 380px;" type="button">
+        <button id="btnClaimCert" class="primary-btn btn-claim-cert" style="max-width: 380px; margin: 0 auto;" type="button">
           📜 Оформить именной Сертификат
         </button>
+      </div>
+
+      <!-- Кнопка разбора ответов («Работа над ошибками») -->
+      <div style="margin: 16px 0 24px;">
+        <button id="btnReviewAnswers" class="secondary-btn" style="max-width: 320px; margin: 0 auto; display: block;" type="button">
+          🔍 Работа над ошибками (разбор вопросов)
+        </button>
+      </div>
+
+      <!-- Блок детального разбора ответов -->
+      <div id="reviewSection" class="review-section" style="display: none; margin: 20px 0 28px; text-align: left; background: rgba(0,0,0,0.25); border-radius: 8px; padding: 20px; border: 1px solid var(--border-dark);">
+        <h3 style="color: var(--primary-gold); font-family: 'Cinzel', serif; font-size: 1.2rem; margin-bottom: 14px;">
+          📖 Исторический анализ ваших ответов
+        </h3>
+        <div id="reviewQuestionsList">
+          <!-- Заполняется динамически через QuizEngine.renderReviewBreakdown() -->
+        </div>
       </div>
 
       <!-- Блок пересдачи -->
@@ -300,6 +415,7 @@
 
   <!-- ПОДКЛЮЧЕНИЕ СКРИПТОВ -->
   <script src="js/memorial-toast.js"></script>
+  <script src="js/achievements-engine.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/data.js"></script>
   <script src="js/sources.js"></script>

@@ -70,7 +70,12 @@ const DeskQREngine = {
     document.getElementById('inputTeacher').addEventListener('input', () => this.renderPreview());
 
     // Печать
-    document.getElementById('btnPrintPlaque').addEventListener('click', () => window.print());
+    document.getElementById('btnPrintPlaque').addEventListener('click', () => {
+      if (window.AchievementsEngine) {
+        window.AchievementsEngine.trackDeskGenerated();
+      }
+      window.print();
+    });
 
     // Автоподбор кабинета
     document.getElementById('btnQuickFillAll').addEventListener('click', () => {

@@ -648,6 +648,9 @@ const App = {
       const textToRead = `${hero.name}. Годы жизни: ${hero.dates?.years || ''}. Специальность в колледже: ${hero.education?.specialty || ''}. Воинское подразделение: ${hero.military?.rank || ''} ${hero.military?.unit || ''}. Описание подвига: ${hero.deed}. ${hero.quote ? `Памятная цитата: ${hero.quote}` : ''}`;
       const deedElement = document.querySelector('.dossier-deed-text');
       TTSNarrator.speakText(textToRead, deedElement);
+      if (window.AchievementsEngine) {
+        window.AchievementsEngine.trackAudioListened();
+      }
     }
   },
 
@@ -684,6 +687,10 @@ const App = {
       AppState.candles[heroId] = newCount;
       localStorage.setItem('srmk_museum_candles_v3', JSON.stringify(AppState.candles));
 
+      if (window.AchievementsEngine) {
+        window.AchievementsEngine.trackCandleLit(heroId);
+      }
+
       if (window.CloudSync?.isLive) {
         const cloudCount = await CloudSync.pushCandle(heroId);
         if (Number.isFinite(cloudCount)) {
@@ -702,6 +709,10 @@ const App = {
     }
 
     if (type === 'flowers') {
+      if (window.AchievementsEngine) {
+        window.AchievementsEngine.trackFlowersLaid();
+      }
+
       if (window.CloudSync?.isLive) {
         await CloudSync.pushFlower(heroId);
         const counters = await CloudSync.fetchAllCounters();
@@ -1121,6 +1132,10 @@ const App = {
      ========================================================================== */
   startGeneralTour() {
     const audioPath = 'assets/audio/guides/general-tour.mp3';
+
+    if (window.AchievementsEngine) {
+      window.AchievementsEngine.trackAudioListened();
+    }
 
     // 1. Запуск аудиофайла записи через встроенный плеер
     this.playAudio(audioPath, 'Вводная экскурсия музея СРМК', 'Обзор экспозиции');

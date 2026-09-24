@@ -160,6 +160,10 @@ const ReaderEngine = {
     const archive = this.getArchive();
     let book = archive.find(b => b.id === heroId);
 
+    if (window.AchievementsEngine) {
+      window.AchievementsEngine.trackReaderOpened();
+    }
+
     // Поддержка старого алиаса хэша
     if (!book && heroId === 'prologue-master-cover') {
       book = archive.find(b => b.id === 'prologue-memorial-opening');
@@ -312,6 +316,9 @@ const ReaderEngine = {
       this.audioEl.src = this.currentBook.audioFile;
       this.audioEl.play().then(() => {
         this.isPlayingAudio = true;
+        if (window.AchievementsEngine) {
+          window.AchievementsEngine.trackAudioListened();
+        }
         if (btn) {
           btn.classList.add('playing');
           btn.textContent = '❚❚ Пауза аудиогида';

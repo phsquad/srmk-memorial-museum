@@ -839,6 +839,10 @@ const MemoryBookApp = {
     const hero = archive.find(h => h.id === heroId);
     if (!hero) return;
 
+    if (window.AchievementsEngine) {
+      window.AchievementsEngine.trackReaderOpened();
+    }
+
     this.currentHeroIndex = archive.findIndex(h => h.id === heroId);
     this.lastFocusedElement = document.activeElement;
 
@@ -881,6 +885,10 @@ const MemoryBookApp = {
   playHeroAudio(heroId) {
     const hero = this.getArchive().find(h => h.id === heroId);
     if (!hero || !this.audioEl) return;
+
+    if (window.AchievementsEngine) {
+      window.AchievementsEngine.trackAudioListened();
+    }
 
     this.currentPlayingId = heroId;
     this.audioEl.src = hero.audioFile;
