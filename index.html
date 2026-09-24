@@ -10,8 +10,12 @@
   <!-- УМНЫЙ ШЛЮЗ АВТООПРЕДЕЛЕНИЯ УСТРОЙСТВА (SMART REDIRECT) -->
   <script>
     (function() {
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-      if (isMobile && window.location.pathname.indexOf('mobile.html') === -1) {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('view') === 'desktop') {
+        sessionStorage.setItem('prefer_desktop', '1');
+      }
+      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      if (isMobileDevice && sessionStorage.getItem('prefer_desktop') !== '1' && window.location.pathname.indexOf('mobile.html') === -1) {
         window.location.replace('mobile.html' + window.location.hash);
       }
     })();
@@ -537,6 +541,7 @@
   <script src="js/sources.js"></script>
 
   <!-- 3. Облачная синхронизация, защита и синтез речи -->
+  <script src="js/memorial-toast.js"></script>
   <script src="js/cloud-sync.js"></script>
   <script src="js/tts-narrator.js"></script>
   <script src="js/anti-cheat-tribute.js"></script>

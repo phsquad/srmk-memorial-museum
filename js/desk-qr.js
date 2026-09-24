@@ -30,6 +30,11 @@ const DeskQREngine = {
     select.innerHTML = '';
     const list = (typeof heroesDatabase !== 'undefined') ? heroesDatabase : [];
 
+    const hashId = window.location.hash.replace(/^#hero-|^#/, '');
+    if (hashId && list.some(h => h.id === hashId)) {
+      this.selectedHeroId = hashId;
+    }
+
     list.forEach(hero => {
       const opt = document.createElement('option');
       opt.value = hero.id;
@@ -142,7 +147,9 @@ const DeskQREngine = {
 
     const photoSrc = hero.media?.photo || 'assets/images/memorial-bg.jpg';
     const qrTargetUrl = new URL(`index.html#hero-${encodeURIComponent(hero.id)}`, window.location.href).href;
-    const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(qrTargetUrl)}`;
+    const qrApiUrl = (typeof CertificateVerifier !== 'undefined' && CertificateVerifier.getQrCodeSrc)
+      ? CertificateVerifier.getQrCodeSrc(qrTargetUrl, 160)
+      : `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(qrTargetUrl)}`;
 
     sheet.innerHTML = `
       <div class="plaque-frame-outer"></div>

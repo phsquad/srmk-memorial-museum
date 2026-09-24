@@ -288,7 +288,7 @@ const AdminCMS = {
       document.body.style.overflow = 'hidden';
       this.showAdminToast("Панель управления CMS v3.0 активна", "info");
     } else if (entered !== null) {
-      alert("Отказ в доступе: Неверный пароль.");
+      (window.MemorialToast ? MemorialToast.show("Отказ в доступе: Неверный пароль.", "error") : this.showAdminToast("Отказ в доступе: Неверный пароль.", "error"));
     }
   },
 
@@ -492,12 +492,12 @@ const AdminCMS = {
     const nameInput = document.getElementById('admName').value.trim();
 
     if (!newIdInput) {
-      alert("Ошибка: ID героя не может быть пустым.");
+      this.showAdminToast("Ошибка: ID героя не может быть пустым.", "error");
       return;
     }
 
     if (!nameInput) {
-      alert("Ошибка: Укажите ФИО героя.");
+      this.showAdminToast("Ошибка: Укажите ФИО героя.", "error");
       return;
     }
 
@@ -712,12 +712,12 @@ if (typeof module !== 'undefined' && module.exports) {
           this.saveToLocalStorage();
           this.renderSidebarList();
           if (window.App && typeof App.renderCardsGrid === 'function') App.renderCardsGrid();
-          alert("Импорт завершен! Загружено героев: " + parsed.length);
+          this.showAdminToast("Импорт завершен! Загружено героев: " + parsed.length, "success");
         } else {
-          alert("Ошибка: Неверный формат JSON файла.");
+          this.showAdminToast("Ошибка: Неверный формат JSON файла.", "error");
         }
       } catch (err) {
-        alert("Ошибка чтения JSON файла: " + err.message);
+        this.showAdminToast("Ошибка чтения JSON файла: " + err.message, "error");
       }
     };
     reader.readAsText(file);

@@ -30,7 +30,7 @@ const TechModules = {
       ? heroesDatabase.find(h => h.id === heroId) 
       : null;
     if (!hero) {
-      alert("Ошибка: профиль героя не найден в базе данных.");
+      if (window.MemorialToast) MemorialToast.show("Ошибка: профиль героя не найден в базе данных.", "error");
       return;
     }
 
@@ -123,7 +123,7 @@ const TechModules = {
     };
 
     img.onerror = () => {
-      alert("Не удалось загрузить изображение для формирования постера.");
+      if (window.MemorialToast) MemorialToast.show("Не удалось загрузить изображение для формирования постера.", "warning");
     };
   },
 

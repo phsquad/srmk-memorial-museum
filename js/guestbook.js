@@ -59,7 +59,84 @@ const GuestbookEngine = {
     }
     // Fallback: Загрузка локальных данных
     const raw = localStorage.getItem('srmk_guestbook_entries_v3');
-    this.tributes = raw ? JSON.parse(raw).map(t => this.normalizeTributeFields(t)) : [];
+    if (raw) {
+      this.tributes = JSON.parse(raw).map(t => this.normalizeTributeFields(t));
+    } else {
+      // Инициализируем канонические послания открытия Мемориала
+      this.tributes = [
+        {
+          id: "tr-seed-1",
+          author: "Евгений Викторович Бледных",
+          role: "admin",
+          role_label: "Директор ГБПОУ СРМК, к.и.н.",
+          dedication_id: "general",
+          dedication_name: "Общему Мемориалу Славы",
+          message: "26 сентября 2025 года мы навечно увековечили подвиг 20 наших ребят. Каждый из них — часть славной истории нашего колледжа. Их мужество служит вечным нравственным ориентиром для каждого поколения студентов СРМК.",
+          theme: "theme-parchment",
+          flames: 24,
+          is_pinned: true,
+          is_verified: true,
+          date: "26 сентября 2025 г."
+        },
+        {
+          id: "tr-seed-2",
+          author: "Владимир Григорьев",
+          role: "student",
+          role_label: "Студент 3 курса СРМК, автор реквиема",
+          dedication_id: "general",
+          dedication_name: "Общему Мемориалу Славы",
+          message: "Тыл и фронт — един! И сколько б ни потребовалось зим — верим и знаем: мы победим! Вечная слава выпускникам нашего колледжа, шагнувшим в вечность.",
+          theme: "theme-clean",
+          flames: 19,
+          is_pinned: false,
+          is_verified: true,
+          date: "26 сентября 2025 г."
+        },
+        {
+          id: "tr-seed-3",
+          author: "Лариса Ивановна Вечёрка",
+          role: "guest",
+          role_label: "Мать кавалера Ордена Мужества",
+          dedication_id: "vecherka-n-a",
+          dedication_name: "Николаю Анатольевичу Вечёрке",
+          message: "Низкий материнский поклон руководству и студентам колледжа за священную память о Коле и его боевых товарищах. Память жива, пока мы помним!",
+          theme: "theme-parchment",
+          flames: 31,
+          is_pinned: false,
+          is_verified: true,
+          date: "15 октября 2025 г."
+        },
+        {
+          id: "tr-seed-4",
+          author: "Педагогический совет колледжа",
+          role: "teacher",
+          role_label: "Преподаватели СРМК",
+          dedication_id: "nazyrov-sh-r",
+          dedication_name: "Шамилю Рустамовичу Назырову",
+          message: "Помним Шамиля студентом — трудолюбивым, добрым, окончившим колледж с красным дипломом. Гордимся подвигом нашего выпускника, водителя «Машины жизни».",
+          theme: "theme-parchment",
+          flames: 16,
+          is_pinned: false,
+          is_verified: true,
+          date: "2 ноября 2025 г."
+        },
+        {
+          id: "tr-seed-5",
+          author: "Студенческий спасательный отряд",
+          role: "student",
+          role_label: "Студенты МЧС и спасатели",
+          dedication_id: "martynov-s-k",
+          dedication_name: "Станиславу Константиновичу Мартынову",
+          message: "Станислав был старостой нашей группы, примером несгибаемой воли. За партой Героя мы бережно храним память о его подвиге под Угледаром!",
+          theme: "theme-clean",
+          flames: 28,
+          is_pinned: false,
+          is_verified: true,
+          date: "9 декабря 2025 г."
+        }
+      ];
+      this.saveStorage();
+    }
     this.userFlames = JSON.parse(localStorage.getItem('srmk_user_flames_v3') || '{}');
   },
 
@@ -364,18 +441,18 @@ const GuestbookEngine = {
         this.tributes[0].is_pinned = !this.tributes[0].is_pinned;
         this.saveStorage();
         this.renderWall();
-        alert(`Послание от «${this.tributes[0].author}» ${this.tributes[0].is_pinned ? 'закреплено вверху' : 'откреплено'}.`);
+        (window.MemorialToast || this).showToast(`Послание от «${this.tributes[0].author}» ${this.tributes[0].is_pinned ? 'закреплено вверху' : 'откреплено'}.`, "success");
       } else if (choice === "2" && this.tributes.length > 0) {
         this.tributes[0].is_verified = !this.tributes[0].is_verified;
         this.saveStorage();
         this.renderWall();
-        alert(`Посланию от «${this.tributes[0].author}» ${this.tributes[0].is_verified ? 'присвоен знак верификации' : 'снят знак верификации'}.`);
+        (window.MemorialToast || this).showToast(`Посланию от «${this.tributes[0].author}» ${this.tributes[0].is_verified ? 'присвоен знак верификации' : 'снят знак верификации'}.`, "success");
       } else if (choice === "3" && this.tributes.length > 0) {
         const removed = this.tributes.shift();
         this.saveStorage();
         this.renderWall();
         this.updateStats();
-        alert(`Послание от «${removed.author}» удалено.`);
+        (window.MemorialToast || this).showToast(`Послание от «${removed.author}» удалено.`, "info");
       } else if (choice === "4") {
         localStorage.removeItem('srmk_guestbook_entries_v3');
         location.reload();
@@ -383,7 +460,7 @@ const GuestbookEngine = {
         this.exportTributesJSON();
       }
     } else if (pwd !== null) {
-      alert("Отказ в доступе: Неверный пароль модератора.");
+      (window.MemorialToast || this).showToast("Отказ в доступе: Неверный пароль модератора.", "error");
     }
   },
 

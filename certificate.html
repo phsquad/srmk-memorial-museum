@@ -648,6 +648,7 @@
   </main>
 
   <!-- СКРИПТЫ -->
+  <script src="js/memorial-toast.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/cloud-sync.js"></script>
   <script src="js/certificate-verifier.js"></script>
@@ -889,7 +890,9 @@
           name,
           date: dateStr
         });
-        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrVerificationUrl)}`;
+        const qrApiUrl = (typeof CertificateVerifier !== 'undefined' && CertificateVerifier.getQrCodeSrc)
+          ? CertificateVerifier.getQrCodeSrc(qrVerificationUrl, 150)
+          : `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrVerificationUrl)}`;
 
         sheet.innerHTML = `
           <div class="cert-frame-outer"></div>

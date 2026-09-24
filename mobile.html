@@ -9,9 +9,12 @@
 
   <!-- ОБРАТНЫЙ ШЛЮЗ ДЛЯ ПК-ПОЛЬЗОВАТЕЛЕЙ -->
   <script>
-    if (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && window.innerWidth > 768) {
-      window.location.replace('index.html' + window.location.hash);
-    }
+    (function() {
+      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      if (!isMobileDevice && window.innerWidth > 960 && window.location.pathname.indexOf('mobile.html') !== -1) {
+        window.location.replace('index.html' + window.location.hash);
+      }
+    })();
   </script>
 
   <!-- Шрифты -->
@@ -194,6 +197,7 @@
   <div id="memorialToast" class="memorial-toast"></div>
 
   <!-- ПОДКЛЮЧЕНИЕ СКРИПТОВ -->
+  <script src="js/memorial-toast.js"></script>
   <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
   <script src="js/data.js"></script>
   <script src="js/sources.js"></script>

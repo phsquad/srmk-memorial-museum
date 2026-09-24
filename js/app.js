@@ -286,21 +286,45 @@ const App = {
       { id: 'mech', label: 'Машиностроение' }
     ];
 
-    container.innerHTML = specialties.map(s => `
-      <button class="spec-filter-btn ${AppState.activeSpecialty === s.id ? 'active' : ''}" data-spec="${s.id}" type="button">
-        ${s.label}
-      </button>
-    `).join('');
+    container.innerHTML = `
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; width:100%; margin-bottom:14px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          ${specialties.map(s => `
+            <button class="spec-filter-btn ${AppState.activeSpecialty === s.id ? 'active' : ''}" data-spec="${s.id}" type="button">
+              ${s.label}
+            </button>
+          `).join('')}
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span id="heroFilterCount" style="font-size:0.78rem; color:var(--text-tertiary, #9da6b3); font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">20 героев</span>
+          <button id="btnRandomHero" type="button" class="spec-filter-btn" style="border-color:rgba(197,160,89,0.5); color:#c5a059;" title="Открыть случайную страницу памяти">
+            🎲 Случайный герой
+          </button>
+        </div>
+      </div>
+    `;
 
-    container.querySelectorAll('.spec-filter-btn').forEach(btn => {
+    container.querySelectorAll('.spec-filter-btn[data-spec]').forEach(btn => {
       btn.addEventListener('click', () => {
-        container.querySelectorAll('.spec-filter-btn').forEach(b => b.classList.remove('active'));
+        container.querySelectorAll('.spec-filter-btn[data-spec]').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         AppState.activeSpecialty = btn.dataset.spec;
         this.playChimeSound(560, 0.15);
         this.renderCardsGrid();
       });
     });
+
+    const randomBtn = document.getElementById('btnRandomHero');
+    if (randomBtn) {
+      randomBtn.addEventListener('click', () => {
+        if (typeof heroesDatabase !== 'undefined' && heroesDatabase.length > 0) {
+          const randomIndex = Math.floor(Math.random() * heroesDatabase.length);
+          const randomHero = heroesDatabase[randomIndex];
+          this.playChimeSound(680, 0.2);
+          this.openModal(randomHero.id);
+        }
+      });
+    }
   },
 
   renderCardsGrid() {
@@ -342,6 +366,11 @@ const App = {
 
       return matchesSearch && matchesSpec;
     });
+
+    const countEl = document.getElementById('heroFilterCount');
+    if (countEl) {
+      countEl.textContent = `Показано: ${filtered.length} из ${heroesDatabase.length}`;
+    }
 
     if (filtered.length === 0) {
       container.innerHTML = `
@@ -448,7 +477,9 @@ const App = {
     }).join('');
 
     const qrTargetUrl = `${window.location.origin}${window.location.pathname}#hero-${hero.id}`;
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(qrTargetUrl)}`;
+    const qrUrl = (typeof CertificateVerifier !== 'undefined' && CertificateVerifier.getQrCodeSrc)
+      ? CertificateVerifier.getQrCodeSrc(qrTargetUrl, 160)
+      : `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(qrTargetUrl)}`;
 
     this.dom.modalBody.innerHTML = `
       <div class="dossier-nav-bar">
@@ -506,6 +537,10 @@ const App = {
             <button class="dossier-action-btn" onclick="if(typeof TechModules !== 'undefined') TechModules.generateSocialPoster('${hero.id}')" type="button">
               📥 Скачать карточку для стенда
             </button>
+
+            <a href="desk-qr.html#${hero.id}" class="dossier-action-btn" style="text-decoration:none; text-align:center; display:block; color:#c5a059; border-color:rgba(197,160,89,0.4);" title="Открыть конструктор памятной таблички А4">
+              🪑 Создать «Парту Героя» А4
+            </a>
           </div>
 
           <div class="dossier-qr-box">
@@ -601,7 +636,7 @@ const App = {
     if (!hero) return;
 
     if (!window.TTSNarrator) {
-      alert("Модуль диктора не поддерживается вашим браузером или находится в режиме оффлайн.");
+      (window.MemorialToast || this).showToast("Модуль диктора не поддерживается вашим браузером или находится в режиме оффлайн.", "warning");
       return;
     }
 
@@ -788,96 +823,232 @@ const App = {
   },
 
   /* ==========================================================================
-     ИНТЕРАКТИВНАЯ КАРТА (ЯНДЕКС КАРТЫ API v2.1)
+     ИНТЕРАКТИВНАЯ КАРТА БОЕВОГО ПУТИ (ЯНДЕКС КАРТЫ + АВТОНОМНЫЙ ТАКТИЧЕСКИЙ ВЕКТОР)
      ========================================================================== */
   initInteractiveMapSafe() {
     const mapElement = document.getElementById('interactiveBattleMap');
-    if (!mapElement || typeof ymaps === 'undefined') return;
+    if (!mapElement) return;
 
-    ymaps.ready(() => {
+    this.bindTheatreControls();
+
+    // 1. Попытка инициализировать Яндекс Карты API
+    if (typeof ymaps !== 'undefined') {
       try {
-        AppState.mapInstance = new ymaps.Map('interactiveBattleMap', {
-          center: [47.5, 36.5],
-          zoom: 6,
-          controls: ['zoomControl', 'fullscreenControl']
-        }, {
-          suppressMapOpenBlock: true
-        });
-
-        AppState.mapInstance.behaviors.disable('scrollZoom');
-
-        const srmkCoords = typeof MUSEUM_CONFIG !== 'undefined' ? MUSEUM_CONFIG.coords : [45.0448, 41.9691];
-        const srmkPlacemark = new ymaps.Placemark(srmkCoords, {
-          balloonContentHeader: '<strong style="color:#8a1c22; font-size:14px;">ГБПОУ СРМК</strong>',
-          balloonContentBody: '<small>г. Ставрополь, пр. Юности, 3</small><br><span style="font-size:12px; color:#555;">Альма-матер всех героев</span>'
-        }, {
-          preset: 'islands#yellowDotIcon',
-          iconColor: '#c5a059'
-        });
-        AppState.mapInstance.geoObjects.add(srmkPlacemark);
-
-        if (typeof MuseumAPI !== 'undefined') {
-          const markers = MuseumAPI.getMapMarkers();
-          markers.forEach(m => {
-            const heroPlacemark = new ymaps.Placemark(m.coords, {
-              balloonContentHeader: `<strong style="color:#8a1c22; font-size:14px;">${m.name}</strong>`,
-              balloonContentBody: `
-                <small>${m.rank}</small><br>
-                <span>📍 ${m.location}</span><br>
-                <button onclick="App.openModal('${m.id}')" style="margin-top:8px; background:#8a1c22; color:#fff; border:none; padding:6px 10px; border-radius:2px; cursor:pointer; font-size:12px; width:100%;">
-                  Открыть архивное досье
-                </button>
-              `
+        ymaps.ready(() => {
+          try {
+            AppState.mapInstance = new ymaps.Map('interactiveBattleMap', {
+              center: [47.5, 36.5],
+              zoom: 6,
+              controls: ['zoomControl', 'fullscreenControl']
             }, {
-              preset: 'islands#redCircleDotIcon',
-              iconColor: '#8a1c22'
+              suppressMapOpenBlock: true
             });
 
-            AppState.mapInstance.geoObjects.add(heroPlacemark);
-            AppState.mapMarkers[m.id] = heroPlacemark;
+            AppState.mapInstance.behaviors.disable('scrollZoom');
 
-            const polyline = new ymaps.Polyline([srmkCoords, m.coords], {}, {
-              strokeColor: '#c5a059',
-              strokeWidth: 2,
-              strokeStyle: 'shortdash',
-              strokeOpacity: 0.55
+            const srmkCoords = typeof MUSEUM_CONFIG !== 'undefined' ? MUSEUM_CONFIG.coords : [45.0448, 41.9691];
+            const srmkPlacemark = new ymaps.Placemark(srmkCoords, {
+              balloonContentHeader: '<strong style="color:#8a1c22; font-size:14px;">ГБПОУ СРМК</strong>',
+              balloonContentBody: '<small>г. Ставрополь, пр. Юности, 3</small><br><span style="font-size:12px; color:#555;">Альма-матер всех 20 героев</span>'
+            }, {
+              preset: 'islands#yellowDotIcon',
+              iconColor: '#c5a059'
             });
-            AppState.mapInstance.geoObjects.add(polyline);
-            AppState.mapPolylines.push(polyline);
-          });
-        }
+            AppState.mapInstance.geoObjects.add(srmkPlacemark);
 
-        document.querySelectorAll('.theatre-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            document.querySelectorAll('.theatre-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const theatre = btn.dataset.theatre;
+            if (typeof MuseumAPI !== 'undefined') {
+              const markers = MuseumAPI.getMapMarkers();
+              markers.forEach(m => {
+                const heroPlacemark = new ymaps.Placemark(m.coords, {
+                  balloonContentHeader: `<strong style="color:#8a1c22; font-size:14px;">${m.name}</strong>`,
+                  balloonContentBody: `
+                    <small>${m.rank}</small><br>
+                    <span>📍 ${m.location}</span><br>
+                    <button onclick="App.openModal('${m.id}')" style="margin-top:8px; background:#8a1c22; color:#fff; border:none; padding:6px 10px; border-radius:2px; cursor:pointer; font-size:12px; width:100%;">
+                      Открыть архивное досье
+                    </button>
+                  `
+                }, {
+                  preset: 'islands#redCircleDotIcon',
+                  iconColor: '#8a1c22'
+                });
 
-            document.querySelectorAll('.timeline-theatre-card').forEach(card => {
-              card.style.display = (theatre === 'all' || card.dataset.theatreCard === theatre) ? 'flex' : 'none';
-            });
+                AppState.mapInstance.geoObjects.add(heroPlacemark);
+                AppState.mapMarkers[m.id] = heroPlacemark;
 
-            if (theatre === 'dnieper') App.focusMap([46.6, 32.7], 8);
-            if (theatre === 'zaporozhye') App.focusMap([47.45, 35.8], 8);
-            if (theatre === 'donbass') App.focusMap([48.1, 37.7], 8);
-            if (theatre === 'kursk') App.focusMap([51.3, 35.2], 9);
-            if (theatre === 'all') App.focusMap([47.5, 36.5], 6);
-          });
+                const polyline = new ymaps.Polyline([srmkCoords, m.coords], {}, {
+                  strokeColor: '#c5a059',
+                  strokeWidth: 2,
+                  strokeStyle: 'shortdash',
+                  strokeOpacity: 0.55
+                });
+                AppState.mapInstance.geoObjects.add(polyline);
+                AppState.mapPolylines.push(polyline);
+              });
+            }
+          } catch (innerErr) {
+            console.warn("[Музей] Яндекс Карты перешли в автономный тактический режим:", innerErr);
+            this.renderOfflineTacticalMap();
+          }
+        });
+      } catch (err) {
+        this.renderOfflineTacticalMap();
+      }
+    } else {
+      // Офлайн режим: отрисовка интерактивной тактической векторной карты
+      this.renderOfflineTacticalMap();
+    }
+  },
+
+  bindTheatreControls() {
+    document.querySelectorAll('.theatre-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.theatre-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const theatre = btn.dataset.theatre;
+
+        document.querySelectorAll('.timeline-theatre-card').forEach(card => {
+          card.style.display = (theatre === 'all' || card.dataset.theatreCard === theatre) ? 'flex' : 'none';
         });
 
-      } catch (err) {
-        console.warn("[Музей] Яндекс Карты API инициализирован в ограниченном режиме:", err);
-      }
+        if (theatre === 'dnieper') App.focusMap([46.6, 32.7], 8, 'dnieper');
+        if (theatre === 'zaporozhye') App.focusMap([47.45, 35.8], 8, 'zaporozhye');
+        if (theatre === 'donbass') App.focusMap([48.1, 37.7], 8, 'donbass');
+        if (theatre === 'kursk') App.focusMap([51.3, 35.2], 9, 'kursk');
+        if (theatre === 'all') App.focusMap([47.5, 36.5], 6, 'all');
+      });
     });
   },
 
-  focusMap(coords, zoom = 8) {
+  renderOfflineTacticalMap() {
+    const mapElement = document.getElementById('interactiveBattleMap');
+    if (!mapElement) return;
+
+    mapElement.innerHTML = `
+      <div class="tactical-svg-container" style="position:relative; width:100%; height:100%; background:#0a0c10; overflow:hidden; user-select:none;">
+        <svg viewBox="0 0 1000 500" style="width:100%; height:100%; display:block;" id="tacticalMapSvg">
+          <defs>
+            <radialGradient id="tacSrmkGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#c5a059" stop-opacity="0.4"/>
+              <stop offset="100%" stop-color="#c5a059" stop-opacity="0"/>
+            </radialGradient>
+            <radialGradient id="tacHeroGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#e11d48" stop-opacity="0.4"/>
+              <stop offset="100%" stop-color="#e11d48" stop-opacity="0"/>
+            </radialGradient>
+            <pattern id="tacGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(197, 160, 89, 0.08)" stroke-width="1"/>
+            </pattern>
+          </defs>
+
+          <!-- Тактическая координатная сетка -->
+          <rect width="1000" height="500" fill="url(#tacGrid)"/>
+
+          <!-- Концентрические радиолокационные круги от Ставрополя -->
+          <circle cx="830" cy="380" r="140" fill="none" stroke="rgba(197, 160, 89, 0.12)" stroke-width="1" stroke-dasharray="4,4"/>
+          <circle cx="830" cy="380" r="280" fill="none" stroke="rgba(197, 160, 89, 0.08)" stroke-width="1" stroke-dasharray="6,6"/>
+          <circle cx="830" cy="380" r="460" fill="none" stroke="rgba(197, 160, 89, 0.05)" stroke-width="1" stroke-dasharray="8,8"/>
+
+          <!-- Золотые пунктирные векторы боевого пути из Ставрополя -->
+          <line x1="830" y1="380" x2="220" y2="350" stroke="#c5a059" stroke-width="2" stroke-dasharray="6,4" stroke-opacity="0.7" id="ray-dnieper"/>
+          <line x1="830" y1="380" x2="380" y2="320" stroke="#c5a059" stroke-width="2" stroke-dasharray="6,4" stroke-opacity="0.7" id="ray-zaporozhye"/>
+          <line x1="830" y1="380" x2="520" y2="230" stroke="#c5a059" stroke-width="2" stroke-dasharray="6,4" stroke-opacity="0.7" id="ray-donbass"/>
+          <line x1="830" y1="380" x2="440" y2="100" stroke="#c5a059" stroke-width="2" stroke-dasharray="6,4" stroke-opacity="0.7" id="ray-kursk"/>
+
+          <!-- УЗЕЛ 1: СТАВРОПОЛЬ • ГБПОУ СРМК -->
+          <g transform="translate(830, 380)" style="cursor:pointer;" onclick="App.showTacticalInfo('srmk')">
+            <circle r="36" fill="url(#tacSrmkGlow)"/>
+            <circle r="14" fill="#141720" stroke="#c5a059" stroke-width="2.5"/>
+            <circle r="5" fill="#c5a059"/>
+            <text x="0" y="-22" text-anchor="middle" fill="#c5a059" font-family="'Cinzel', serif" font-weight="900" font-size="12" letter-spacing="1">СТАВРОПОЛЬ</text>
+            <text x="0" y="28" text-anchor="middle" fill="#f1f3f7" font-family="'Montserrat', sans-serif" font-weight="700" font-size="10">ГБПОУ СРМК (Альма-матер)</text>
+          </g>
+
+          <!-- УЗЕЛ 2: РУБЕЖ I • ДНЕПРОВСКИЙ ПЛАЦДАРМ -->
+          <g transform="translate(220, 350)" class="tac-node" id="tac-node-dnieper" style="cursor:pointer;" onclick="App.showTacticalInfo('dnieper')">
+            <circle r="32" fill="url(#tacHeroGlow)"/>
+            <circle r="12" fill="#141720" stroke="#8a1c22" stroke-width="2.5"/>
+            <circle r="4" fill="#8a1c22"/>
+            <text x="0" y="-18" text-anchor="middle" fill="#ffffff" font-family="'Cinzel', serif" font-weight="700" font-size="11">РУБЕЖ I • ДНЕПР</text>
+            <text x="0" y="24" text-anchor="middle" fill="#9da6b3" font-family="'Montserrat', sans-serif" font-size="9.5">Херсон • Антоновский мост (5 героев)</text>
+          </g>
+
+          <!-- УЗЕЛ 3: РУБЕЖ II • ЗАПОРОЖСКИЙ ЩИТ -->
+          <g transform="translate(380, 320)" class="tac-node" id="tac-node-zaporozhye" style="cursor:pointer;" onclick="App.showTacticalInfo('zaporozhye')">
+            <circle r="32" fill="url(#tacHeroGlow)"/>
+            <circle r="12" fill="#141720" stroke="#8a1c22" stroke-width="2.5"/>
+            <circle r="4" fill="#8a1c22"/>
+            <text x="0" y="-18" text-anchor="middle" fill="#ffffff" font-family="'Cinzel', serif" font-weight="700" font-size="11">РУБЕЖ II • ЗАПОРОЖЬЕ</text>
+            <text x="0" y="24" text-anchor="middle" fill="#9da6b3" font-family="'Montserrat', sans-serif" font-size="9.5">Орехов • Пологи • Токмак (4 героя)</text>
+          </g>
+
+          <!-- УЗЕЛ 4: РУБЕЖ III • ДУГА ДОНБАССА -->
+          <g transform="translate(520, 230)" class="tac-node" id="tac-node-donbass" style="cursor:pointer;" onclick="App.showTacticalInfo('donbass')">
+            <circle r="36" fill="url(#tacHeroGlow)"/>
+            <circle r="14" fill="#141720" stroke="#e11d48" stroke-width="2.5"/>
+            <circle r="5" fill="#e11d48"/>
+            <text x="0" y="-20" text-anchor="middle" fill="#ffffff" font-family="'Cinzel', serif" font-weight="700" font-size="12">РУБЕЖ III • ДОНБАСС</text>
+            <text x="0" y="26" text-anchor="middle" fill="#9da6b3" font-family="'Montserrat', sans-serif" font-size="9.5">Авдеевка • Угледар • Бахмут (10 героев)</text>
+          </g>
+
+          <!-- УЗЕЛ 5: РУБЕЖ IV • КУРСКОЕ ПРИГРАНИЧЬЕ -->
+          <g transform="translate(440, 100)" class="tac-node" id="tac-node-kursk" style="cursor:pointer;" onclick="App.showTacticalInfo('kursk')">
+            <circle r="30" fill="url(#tacHeroGlow)"/>
+            <circle r="11" fill="#141720" stroke="#8a1c22" stroke-width="2.5"/>
+            <circle r="4" fill="#8a1c22"/>
+            <text x="0" y="-16" text-anchor="middle" fill="#ffffff" font-family="'Cinzel', serif" font-weight="700" font-size="11">РУБЕЖ IV • КУРСК</text>
+            <text x="0" y="24" text-anchor="middle" fill="#9da6b3" font-family="'Montserrat', sans-serif" font-size="9.5">Приграничная полоса • Связь (Н. Назаренко)</text>
+          </g>
+        </svg>
+
+        <!-- Информационная плашка сектора -->
+        <div id="tacInfoBox" style="position:absolute; bottom:16px; left:20px; right:20px; background:rgba(20,23,32,0.95); border:1px solid rgba(197,160,89,0.35); padding:12px 18px; border-radius:4px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; backdrop-filter:blur(10px); box-shadow:0 8px 24px rgba(0,0,0,0.8);">
+          <div id="tacInfoText" style="font-size:0.86rem; color:#d8deea;">
+            <strong style="color:#c5a059;">Интерактивный план боевого пути:</strong> Выберите рубеж на карте или в кнопках выше, чтобы изучить подвиги выпускников СРМК.
+          </div>
+          <button type="button" class="spec-filter-btn" onclick="App.openModal('nazyrov-sh-r')" style="border-color:#c5a059; color:#c5a059; font-size:0.8rem; padding:6px 14px;">
+            Открыть досье героев →
+          </button>
+        </div>
+      </div>
+    `;
+  },
+
+  showTacticalInfo(sector) {
+    const box = document.getElementById('tacInfoText');
+    if (!box) return;
+
+    this.playChimeSound(640, 0.15);
+
+    if (sector === 'srmk') {
+      box.innerHTML = `<strong style="color:#c5a059;">ГБПОУ СРМК (г. Ставрополь, пр. Юности, 3):</strong> Альма-матер всех 20 выпускников-героев. Открытие архитектурного Мемориала Славы состоялось 26 сентября 2025 года.`;
+    } else if (sector === 'dnieper') {
+      box.innerHTML = `<strong style="color:#e11d48;">Днепровский рубеж (Херсон / Антоновский мост):</strong> 5 героев колледжа — Н. Вечёрка (разведчик-санитар ВДВ), М. Елагин, Н. Горлов, Ш. Назыров (водитель «Машины жизни»), И. Сербиенко.`;
+    } else if (sector === 'zaporozhye') {
+      box.innerHTML = `<strong style="color:#e11d48;">Запорожский щит (Орехов / Пологи / Токмак):</strong> 4 героя — Д. Самохин (Орден Мужества № 83029), Н. Сополев (спасатель МЧС), К. Луценко (сапер), И. Пономарчук.`;
+    } else if (sector === 'donbass') {
+      box.innerHTML = `<strong style="color:#e11d48;">Огненная дуга Донбасса:</strong> 10 героев — С. Мартынов (Угледар), М. Ярышев (Авдеевка), И. Чупин (Покровск), А. Григорьев, Н. Брынза, В. Петухов, С. Белов, П. Шартов, И. Лукьяненко, В. Бутов.`;
+    } else if (sector === 'kursk') {
+      box.innerHTML = `<strong style="color:#e11d48;">Курское приграничье:</strong> 20-летний связист Никита Назаренко, выпускник IT-кафедры 2024 года, восстановивший связь узлов управления ценой собственной жизни.`;
+    }
+  },
+
+  focusMap(coords, zoom = 8, theatreName = 'all') {
     if (AppState.mapInstance) {
       AppState.mapInstance.setCenter(coords, zoom, {
         checkZoomRange: true,
         duration: 700
       });
       this.playChimeSound(480, 0.2);
+    } else {
+      if (theatreName && theatreName !== 'all') {
+        this.showTacticalInfo(theatreName);
+        const node = document.getElementById(`tac-node-${theatreName}`);
+        if (node) {
+          node.style.transform = 'scale(1.2)';
+          setTimeout(() => { node.style.transform = 'none'; }, 600);
+        }
+      }
     }
   },
 

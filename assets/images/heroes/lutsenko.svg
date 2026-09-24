@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="800" viewBox="0 0 600 800">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#181c24"/>
+      <stop offset="50%" stop-color="#101319"/>
+      <stop offset="100%" stop-color="#080a0d"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fcedb3"/>
+      <stop offset="50%" stop-color="#c5a059"/>
+      <stop offset="100%" stop-color="#8f6f2d"/>
+    </linearGradient>
+    <linearGradient id="redGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#b91c1c"/>
+      <stop offset="100%" stop-color="#6b1115"/>
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.8"/>
+    </filter>
+  </defs>
+
+  <!-- Фон монумента -->
+  <rect width="600" height="800" fill="url(#bgGrad)"/>
+  
+  <!-- Текстурный орнамент -->
+  <g opacity="0.04" stroke="#ffffff" stroke-width="1">
+    <line x1="0" y1="0" x2="600" y2="800"/>
+    <line x1="600" y1="0" x2="0" y2="800"/>
+    <circle cx="300" cy="400" r="260" fill="none"/>
+    <circle cx="300" cy="400" r="320" fill="none"/>
+  </g>
+
+  <!-- Внешняя и внутренняя золотая рамка -->
+  <rect x="24" y="24" width="552" height="752" fill="none" stroke="url(#goldGrad)" stroke-width="3" rx="4"/>
+  <rect x="36" y="36" width="528" height="728" fill="none" stroke="url(#goldGrad)" stroke-width="1" stroke-opacity="0.4" rx="2"/>
+
+  <!-- Угловые орнаменты -->
+  <g stroke="url(#goldGrad)" stroke-width="2" fill="none">
+    <path d="M 44 64 L 44 44 L 64 44"/>
+    <path d="M 556 64 L 556 44 L 536 44"/>
+    <path d="M 44 736 L 44 756 L 64 756"/>
+    <path d="M 556 736 L 556 756 L 536 756"/>
+  </g>
+
+  <!-- Верхняя плашка колледжа -->
+  <rect x="170" y="54" width="260" height="28" fill="#141720" stroke="url(#goldGrad)" stroke-width="1" rx="2"/>
+  <text x="300" y="73" text-anchor="middle" fill="#c5a059" font-family="'Montserrat', sans-serif" font-weight="700" font-size="12" letter-spacing="2">ГБПОУ СРМК • СТАВРОПОЛЬ</text>
+
+  <!-- Центральный медальон воина -->
+  <g filter="url(#shadow)">
+    <circle cx="300" cy="270" r="145" fill="#12151c" stroke="url(#goldGrad)" stroke-width="4"/>
+    <circle cx="300" cy="270" r="137" fill="#1a1f29" stroke="url(#goldGrad)" stroke-width="1" stroke-dasharray="6,4"/>
+    
+    <!-- Стилизованный благородный силуэт сапера-инженера -->
+    <path d="M 240 370 C 240 310, 270 280, 300 280 C 330 280, 360 310, 360 370 Z" fill="#222834"/>
+    <circle cx="300" cy="225" r="54" fill="#2d3545"/>
+    <!-- Воинская эмблема в центре (Инженерные войска / сапер) -->
+    <path d="M 300 185 L 306 200 L 322 200 L 309 210 L 314 225 L 300 215 L 286 225 L 291 210 L 278 200 L 294 200 Z" fill="url(#goldGrad)"/>
+    <circle cx="300" cy="255" r="18" fill="url(#redGrad)" stroke="url(#goldGrad)" stroke-width="1.5"/>
+    <text x="300" y="261" text-anchor="middle" fill="#ffffff" font-family="'Cinzel', serif" font-weight="900" font-size="16">ЛК</text>
+  </g>
+
+  <!-- Лавровый венок почета вокруг медальона -->
+  <g stroke="url(#goldGrad)" stroke-width="1.5" fill="none" opacity="0.7">
+    <path d="M 175 320 C 150 250, 160 190, 205 155"/>
+    <path d="M 425 320 C 450 250, 440 190, 395 155"/>
+  </g>
+
+  <!-- Георгиевская лента славы -->
+  <g transform="translate(100, 440)">
+    <rect width="400" height="12" fill="#f97316"/>
+    <rect x="80" width="40" height="12" fill="#111111"/>
+    <rect x="200" width="40" height="12" fill="#111111"/>
+    <rect x="320" width="40" height="12" fill="#111111"/>
+  </g>
+
+  <!-- ФИО Героя -->
+  <text x="300" y="495" text-anchor="middle" fill="#ffffff" font-family="'Cinzel', Georgia, serif" font-weight="900" font-size="28" letter-spacing="1">ЛУЦЕНКО</text>
+  <text x="300" y="530" text-anchor="middle" fill="#e2e8f0" font-family="'Montserrat', sans-serif" font-weight="600" font-size="20">Константин Андреевич</text>
+  <text x="300" y="562" text-anchor="middle" fill="#c5a059" font-family="'Montserrat', sans-serif" font-weight="700" font-size="17" letter-spacing="2">2001 — 2023</text>
+
+  <!-- Воинское звание и подвиг -->
+  <text x="300" y="605" text-anchor="middle" fill="#9da6b3" font-family="'Montserrat', sans-serif" font-size="14">Рядовой ВС РФ • Инженерно-саперные подразделения • Сапер</text>
+  <text x="300" y="630" text-anchor="middle" fill="#cbd5e1" font-family="'Montserrat', sans-serif" font-size="13">Выпускник отделения «Сварочное производство» (2017–2021 гг.)</text>
+
+  <!-- Орденская плашка -->
+  <rect x="150" y="660" width="300" height="34" fill="url(#redGrad)" stroke="url(#goldGrad)" stroke-width="1.5" rx="3"/>
+  <text x="300" y="683" text-anchor="middle" fill="#ffffff" font-family="'Montserrat', sans-serif" font-weight="700" font-size="13.5" letter-spacing="0.5">⭐️ КАВАЛЕР ОРДЕНА МУЖЕСТВА</text>
+
+  <!-- Нижний девиз -->
+  <text x="300" y="740" text-anchor="middle" fill="#c5a059" font-family="'Cinzel', Georgia, serif" font-weight="700" font-size="14" letter-spacing="4">НАВЕЧНО В СТРОЮ</text>
+</svg>
