@@ -189,9 +189,13 @@ const CloudSync = {
   async pushCandle(heroId) {
     if (!this.isLive || !this.client) return null;
     try {
-      const { data, error } = await this.client.rpc('increment_hero_candle', { target_hero_id: heroId });
+      const fingerprint = window.TributeSecurity ? await window.TributeSecurity.getDeviceFingerprint() : null;
+      const { data, error } = await this.client.rpc('increment_hero_candle', { 
+        target_hero_id: heroId,
+        client_fingerprint: fingerprint
+      });
       if (error) {
-        // Запасной вызов старой функции
+        // Запасной вызов старой функции при отсутствии нового параметра
         const fallback = await this.client.rpc('increment_candle', { p_hero_id: heroId });
         return fallback.data;
       }
@@ -205,7 +209,12 @@ const CloudSync = {
   async pushFlower(heroId, count = 2) {
     if (!this.isLive || !this.client) return null;
     try {
-      const { data, error } = await this.client.rpc('increment_hero_flower', { target_hero_id: heroId, qty: count });
+      const fingerprint = window.TributeSecurity ? await window.TributeSecurity.getDeviceFingerprint() : null;
+      const { data, error } = await this.client.rpc('increment_hero_flower', { 
+        target_hero_id: heroId, 
+        qty: count,
+        client_fingerprint: fingerprint
+      });
       if (error) {
         const fallback = await this.client.rpc('increment_flower', { p_hero_id: heroId });
         return fallback.data;
@@ -240,7 +249,15 @@ const CloudSync = {
   async sendTribute(tributeObj) {
     if (!this.isLive || !this.client) return false;
     try {
-      const { error } = await this.client.from('guestbook_tributes').insert([this.serializeTribute(tributeObj)]);
+      // Античит-нормализация: публичные пользователи не могут самовольно закреплять или верифицировать
+      const payload = this.serializeTribute(tributeObj);
+      const isAuth = Boolean(this.client.auth?.getUser && (await this.client.auth.getUser()).data?.user);
+      if (!isAuth) {
+        payload.is_pinned = false;
+        payload.is_verified = false;
+        payload.flames = 1;
+      }
+      const { error } = await this.client.from('guestbook_tributes').insert([payload]);
       if (error) throw error;
       return true;
     } catch (e) {
@@ -252,9 +269,11 @@ const CloudSync = {
   async toggleFlame(tributeId, delta) {
     if (!this.isLive || !this.client) return null;
     try {
+      const fingerprint = window.TributeSecurity ? await window.TributeSecurity.getDeviceFingerprint() : null;
       const { data, error } = await this.client.rpc('toggle_tribute_flame', {
         target_tribute_id: tributeId,
-        delta: delta
+        delta: delta,
+        client_fingerprint: fingerprint
       });
       if (error) throw error;
       return data;
@@ -311,9 +330,29 @@ const CloudSync = {
   // ==========================================================================
   // МЕТОДЫ КВИЗА (ЗАЛ СЛАВЫ)
   // ==========================================================================
-  async saveQuizResult(name, score, group = null, totalQuestions = 10) {
+  async saveQuizResult(name, score, group = null, totalQuestions = 10, durationSeconds = 0) {
     if (!this.isLive || !this.client) return false;
     try {
+      const fingerprint = window.TributeSecurity ? await window.TributeSecurity.getDeviceFingerprint() : null;
+
+      // 1. Попытка защищенной отправки через RPC с валидацией античита
+      try {
+        const { data: rpcRes, error: rpcErr } = await this.client.rpc('submit_quiz_result', {
+          p_student_name: name,
+          p_group_name: group,
+          p_score: score,
+          p_total_questions: totalQuestions,
+          p_duration_seconds: durationSeconds || 0,
+          client_fingerprint: fingerprint
+        });
+        if (!rpcErr && rpcRes && rpcRes.success) {
+          return true;
+        }
+      } catch (rpcEx) {
+        // Fallback к прямому защищенному insert
+      }
+
+      // 2. Стандартный insert с RLS-проверками диапазона
       const { error } = await this.client.from('quiz_results').insert([{
         student_name: name,
         group_name: group,

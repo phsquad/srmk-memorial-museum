@@ -572,6 +572,7 @@ const QuizEngine = {
     this.maxStreak = 0;
     this.hintsUsedCount = 0;
     this.sessionAnswersLog = [];
+    this.quizSessionStartTime = Date.now();
 
     // Настройка подсказок в зависимости от сложности
     if (this.difficulty === 'cadet') {
@@ -642,7 +643,7 @@ const QuizEngine = {
         <span class="option-letter" style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:rgba(197,160,89,0.2); color:var(--primary-gold); font-weight:bold; margin-right:12px; flex-shrink:0;">${letters[idx]}</span>
         <span>${this.escapeHtml(optText)}</span>
       `;
-      btn.onclick = () => this.handleAnswer(idx, btn);
+      btn.onclick = (e) => this.handleAnswer(idx, btn, e);
       optionsContainer.appendChild(btn);
     });
 
@@ -755,7 +756,8 @@ const QuizEngine = {
   /**
    * 4. Обработка ответа
    */
-  handleAnswer(selectedIdx, btnElement) {
+  handleAnswer(selectedIdx, btnElement, event) {
+    if (event && event.isTrusted === false) return;
     if (this.isAnswerLocked) return;
     this.isAnswerLocked = true;
     clearInterval(this.timerInterval);
@@ -906,9 +908,10 @@ const QuizEngine = {
     });
     SafeStorage.set('quiz_history_records', JSON.stringify(localResults.slice(0, 20)));
 
-    // Отправка в облако Supabase
+    // Отправка в облако Supabase с античит-таймингом
     if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
-      await CloudSync.saveQuizResult(this.participant.name, this.score, this.participant.group, totalQuestions);
+      const durationSeconds = Math.max(1, Math.round((Date.now() - (this.quizSessionStartTime || Date.now())) / 1000));
+      await CloudSync.saveQuizResult(this.participant.name, this.score, this.participant.group, totalQuestions, durationSeconds);
       this.loadLeaderboard();
     }
 

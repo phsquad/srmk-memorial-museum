@@ -221,6 +221,12 @@ const GuestbookEngine = {
       return;
     }
 
+    // Античит-проверка на флуд и валидность данных
+    if (window.TributeSecurity && typeof window.TributeSecurity.verifyTributePost === 'function') {
+      const check = await window.TributeSecurity.verifyTributePost(author, message, e);
+      if (!check.allowed) return;
+    }
+
     const newTribute = {
       id: "tr-" + Date.now(),
       author: author,
@@ -268,7 +274,12 @@ const GuestbookEngine = {
   /**
    * 5. Зажжение / Гашение лампады (Лайки с синхронизацией)
    */
-  async toggleFlame(tributeId) {
+  async toggleFlame(tributeId, event) {
+    if (window.TributeSecurity && typeof window.TributeSecurity.verifyFlameToggle === 'function') {
+      const check = await window.TributeSecurity.verifyFlameToggle(tributeId, event);
+      if (!check.allowed) return;
+    }
+
     const tribute = this.tributes.find(t => t.id === tributeId);
     if (!tribute) return;
 
@@ -292,7 +303,12 @@ const GuestbookEngine = {
     this.renderWall();
 
     if (typeof CloudSync !== 'undefined' && CloudSync.isLive) {
-      await CloudSync.toggleFlame(tributeId, delta);
+      const updatedCount = await CloudSync.toggleFlame(tributeId, delta);
+      if (Number.isFinite(updatedCount)) {
+        tribute.flames = updatedCount;
+        this.saveStorage();
+        this.renderWall();
+      }
     }
   },
 
@@ -366,7 +382,7 @@ const GuestbookEngine = {
           </div>
 
           <div class="card-footer-row">
-            <button class="btn-flame-tribute ${isLit ? 'active' : ''}" onclick="GuestbookEngine.toggleFlame('${tribute.id}')" type="button" aria-label="Зажечь лампаду">
+            <button class="btn-flame-tribute ${isLit ? 'active' : ''}" onclick="GuestbookEngine.toggleFlame('${tribute.id}', event)" type="button" aria-label="Зажечь лампаду">
               <span>🕯</span> <span class="flame-count">${tribute.flames || 0}</span>
             </button>
             <span class="card-seal-icon">⭐️</span>
