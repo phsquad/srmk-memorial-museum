@@ -93,6 +93,11 @@ const App = {
     this.startSpotlightAutoPlay();
     this.updateMemorialStats();
 
+    // Первичная отрисовка виджета анонимной аналитики залов для преподавателя
+    if (window.HallAnalytics && typeof HallAnalytics.renderTeacherMonitor === 'function') {
+      HallAnalytics.renderTeacherMonitor();
+    }
+
     // Привязка событий, жесткого роутинга, скролл-шпиона и тач-жестов
     this.bindEvents();
     this.initTouchGestures();
@@ -476,6 +481,11 @@ const App = {
     AppState.currentHeroId = id;
     window.location.hash = `hero-${id}`;
 
+    // Анонимная аналитика интереса к экспозиции героя (ФЗ-152)
+    if (window.HallAnalytics && typeof HallAnalytics.trackHeroView === 'function') {
+      HallAnalytics.trackHeroView(id, hero.name);
+    }
+
     const currentIndex = heroesDatabase.findIndex(h => h.id === id);
     const prevHero = heroesDatabase[currentIndex - 1] || heroesDatabase[heroesDatabase.length - 1];
     const nextHero = heroesDatabase[currentIndex + 1] || heroesDatabase[0];
@@ -725,6 +735,10 @@ const App = {
 
       if (window.AchievementsEngine) {
         window.AchievementsEngine.trackCandleLit(heroId);
+      }
+
+      if (window.HallAnalytics && typeof HallAnalytics.trackCandleTribute === 'function') {
+        HallAnalytics.trackCandleTribute(heroId);
       }
 
       if (window.CloudSync?.isLive) {
@@ -1736,6 +1750,11 @@ const App = {
   playAudio(src, heroName, trackLabel = "Аудиоэкскурсия") {
     const { audioElement, audioTrackTitle, audioHeroName, audioPlayBtn, audioBar } = this.dom;
     if (!audioElement || !src) return;
+
+    // Анонимный учет прослушивания аудиоэкскурсии в зале
+    if (window.HallAnalytics && typeof HallAnalytics.trackAudioListen === 'function') {
+      HallAnalytics.trackAudioListen(AppState.currentHeroId, `${heroName} • ${trackLabel}`);
+    }
 
     audioElement.src = src;
     audioTrackTitle.textContent = trackLabel;

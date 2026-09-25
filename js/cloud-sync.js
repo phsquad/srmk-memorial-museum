@@ -152,6 +152,49 @@ const CloudSync = {
       })
       .subscribe();
     this.channels.push(guestbookChannel);
+
+    // 3. Слушатель Анонимной Аналитики Залов (Востребованность экспозиций в Realtime)
+    const analyticsChannel = this.client.channel('realtime_hall_analytics')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'hall_analytics_counters' }, (payload) => {
+        if (window.HallAnalytics && typeof HallAnalytics.handleRealtimePayload === 'function') {
+          HallAnalytics.handleRealtimePayload(payload);
+        }
+      })
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          console.log('[CloudSync] 📡 Realtime-канал аналитики залов и экспозиций активен.');
+        }
+      });
+    this.channels.push(analyticsChannel);
+
+    // 4. Realtime Presence-канал (Мгновенное отслеживание активных студентов в залах)
+    try {
+      const presenceKey = window.HallAnalytics ? HallAnalytics.getEphemeralSessionId() : `anon_${Math.random().toString(36).substring(2, 9)}`;
+      const presenceChannel = this.client.channel('hall_live_presence', {
+        config: { presence: { key: presenceKey } }
+      });
+
+      presenceChannel
+        .on('presence', { event: 'sync' }, () => {
+          const state = presenceChannel.presenceState();
+          if (window.HallAnalytics && typeof HallAnalytics.handlePresenceSync === 'function') {
+            HallAnalytics.handlePresenceSync(state);
+          }
+        })
+        .subscribe(async (status) => {
+          if (status === 'SUBSCRIBED') {
+            this.presenceChannel = presenceChannel;
+            if (window.HallAnalytics && typeof HallAnalytics.getCurrentHallId === 'function') {
+              const curHall = HallAnalytics.getCurrentHallId();
+              await presenceChannel.track({ hall_id: curHall, joined_at: Date.now() });
+            }
+          }
+        });
+      this.channels.push(presenceChannel);
+      this.presenceChannel = presenceChannel;
+    } catch (presErr) {
+      console.warn('[CloudSync] Ошибка настройки Presence канала:', presErr);
+    }
   },
 
   reconnect() {
@@ -382,6 +425,134 @@ const CloudSync = {
     } catch (e) {
       console.warn('[CloudSync] Ошибка загрузки Зала Славы:', e);
       return null;
+    }
+  },
+
+  // ==========================================================================
+  // МЕТОДЫ АНОНИМНОЙ АНАЛИТИКИ ЗАЛОВ И ЭКСПОЗИЦИЙ (ФЗ-152)
+  // ==========================================================================
+  async fetchHallAnalytics() {
+    if (!this.isLive || !this.client) return null;
+    try {
+      const { data, error } = await this.client
+        .from('hall_analytics_counters')
+        .select('*')
+        .order('total_visits', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (e) {
+      console.warn('[CloudSync] Ошибка загрузки аналитики залов:', e);
+      return null;
+    }
+  },
+
+  async recordAnonymousHallVisit(params) {
+    if (!this.isLive || !this.client) return null;
+    try {
+      const {
+        hallId,
+        hallTitle,
+        expositionId = null,
+        dwellSeconds = 0,
+        isInteraction = false,
+        anonHash = 'anon',
+        category = 'hall',
+        deviceType = 'desktop'
+      } = params;
+
+      // 1. Попытка вызова RPC
+      try {
+        const { data, error } = await this.client.rpc('record_anonymous_hall_visit', {
+          p_hall_id: hallId,
+          p_hall_title: hallTitle,
+          p_exposition_id: expositionId,
+          p_dwell_seconds: dwellSeconds,
+          p_is_interaction: isInteraction,
+          p_anon_hash: anonHash,
+          p_category: category,
+          p_device_type: deviceType
+        });
+        if (!error && data) return data;
+      } catch (rpcErr) {
+        // Fallback ниже
+      }
+
+      // 2. Fallback: прямой upsert в таблицу
+      const { data: selectRow } = await this.client
+        .from('hall_analytics_counters')
+        .select('total_visits, total_duration_seconds, interactions_count')
+        .eq('hall_id', hallId)
+        .maybeSingle();
+
+      const newVisits = (selectRow?.total_visits || 0) + 1;
+      const newDuration = (selectRow?.total_duration_seconds || 0) + dwellSeconds;
+      const newInteractions = (selectRow?.interactions_count || 0) + (isInteraction ? 1 : 0);
+
+      const { data: upsertData, error: upsertErr } = await this.client
+        .from('hall_analytics_counters')
+        .upsert([{
+          hall_id: hallId,
+          hall_title: hallTitle,
+          category: category,
+          total_visits: newVisits,
+          total_duration_seconds: newDuration,
+          interactions_count: newInteractions,
+          last_activity: new Date().toISOString()
+        }]);
+
+      if (upsertErr) throw upsertErr;
+      return upsertData;
+    } catch (e) {
+      console.warn('[CloudSync] Ошибка отправки визита зала:', e);
+      return null;
+    }
+  },
+
+  async updateHallDwellTime(hallId, addedDwellSeconds, anonHash = 'anon') {
+    if (!this.isLive || !this.client) return null;
+    try {
+      try {
+        const { data, error } = await this.client.rpc('update_hall_dwell_time', {
+          p_hall_id: hallId,
+          p_added_dwell_seconds: addedDwellSeconds,
+          p_anon_hash: anonHash
+        });
+        if (!error) return data;
+      } catch (rpcErr) {}
+
+      // Fallback
+      const { data: cur } = await this.client
+        .from('hall_analytics_counters')
+        .select('total_duration_seconds')
+        .eq('hall_id', hallId)
+        .maybeSingle();
+
+      if (cur) {
+        await this.client
+          .from('hall_analytics_counters')
+          .update({
+            total_duration_seconds: (cur.total_duration_seconds || 0) + addedDwellSeconds,
+            last_activity: new Date().toISOString()
+          })
+          .eq('hall_id', hallId);
+      }
+      return true;
+    } catch (e) {
+      console.warn('[CloudSync] Ошибка обновления времени в зале:', e);
+      return null;
+    }
+  },
+
+  async updatePresenceHall(hallId) {
+    if (!this.presenceChannel) return;
+    try {
+      await this.presenceChannel.track({
+        hall_id: hallId,
+        updated_at: Date.now()
+      });
+    } catch (e) {
+      // Игнорируем фоновые задержки presence
     }
   }
 };

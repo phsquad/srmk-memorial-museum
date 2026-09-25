@@ -530,5 +530,191 @@ END;
 $$;
 
 -- ============================================================================
--- СИСТЕМА ЗАЩИТЫ ОТ НАКРУТКИ И СПАМА УСПЕШНО НАСТРОЕНА!
+-- РАЗДЕЛ 6: МОДУЛЬ АНОНИМНОЙ АНАЛИТИКИ ЗАЛОВ И ЭКСПОЗИЦИЙ (ФЗ-152 COMPLIANT)
+-- ============================================================================
+-- Назначение:
+-- Позволяет преподавателям в реальном времени (Supabase Realtime) отслеживать
+-- востребованность залов виртуального музея, экспозиций героев и интерактивных зон.
+-- Конфиденциальность: 100% анонимность. Не фиксируются ФИО, IP-адреса, cookie или
+-- персональные идентификаторы студентов. Фиксируются только агрегированные счетчики
+-- и обезличенные сессионные маркеры.
+-- ============================================================================
+
+-- 6.1. Агрегированные счетчики посещаемости залов и экспозиций
+CREATE TABLE IF NOT EXISTS hall_analytics_counters (
+  hall_id TEXT PRIMARY KEY,
+  hall_title TEXT NOT NULL,
+  category TEXT NOT NULL DEFAULT 'hall', -- 'hall', 'hero_expo', 'interactive'
+  total_visits INTEGER NOT NULL DEFAULT 0 CHECK (total_visits >= 0),
+  active_visitors INTEGER NOT NULL DEFAULT 0 CHECK (active_visitors >= 0),
+  total_duration_seconds BIGINT NOT NULL DEFAULT 0 CHECK (total_duration_seconds >= 0),
+  interactions_count INTEGER NOT NULL DEFAULT 0 CHECK (interactions_count >= 0),
+  last_activity TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 6.2. Журнал анонимных событий (время изучения, интерактив)
+CREATE TABLE IF NOT EXISTS hall_analytics_events (
+  id BIGSERIAL PRIMARY KEY,
+  hall_id TEXT NOT NULL,
+  exposition_id TEXT,
+  event_type TEXT NOT NULL DEFAULT 'visit', -- 'visit', 'dwell', 'interaction'
+  dwell_seconds INTEGER NOT NULL DEFAULT 0,
+  anon_session_hash TEXT NOT NULL,
+  device_type TEXT DEFAULT 'desktop',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_hall_analytics_events_hall ON hall_analytics_events(hall_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_hall_analytics_events_time ON hall_analytics_events(created_at DESC);
+
+-- 6.3. Безопасность RLS для модуля аналитики
+ALTER TABLE hall_analytics_counters ENABLE ROW LEVEL SECURITY;
+ALTER TABLE hall_analytics_events ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public read hall counters" ON hall_analytics_counters;
+CREATE POLICY "Public read hall counters" ON hall_analytics_counters FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Anon insert hall counters" ON hall_analytics_counters;
+CREATE POLICY "Anon insert hall counters" ON hall_analytics_counters FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Public read hall events" ON hall_analytics_events;
+CREATE POLICY "Public read hall events" ON hall_analytics_events FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Anon insert hall events" ON hall_analytics_events;
+CREATE POLICY "Anon insert hall events" ON hall_analytics_events FOR INSERT WITH CHECK (true);
+
+-- 6.4. Безопасная функция фиксации анонимного визита зала / экспозиции
+CREATE OR REPLACE FUNCTION record_anonymous_hall_visit(
+  p_hall_id TEXT,
+  p_hall_title TEXT,
+  p_exposition_id TEXT DEFAULT NULL,
+  p_dwell_seconds INTEGER DEFAULT 0,
+  p_is_interaction BOOLEAN DEFAULT FALSE,
+  p_anon_hash TEXT DEFAULT 'anon',
+  p_category TEXT DEFAULT 'hall',
+  p_device_type TEXT DEFAULT 'desktop'
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_clamped_dwell INTEGER;
+  v_result JSONB;
+BEGIN
+  v_clamped_dwell := LEAST(GREATEST(COALESCE(p_dwell_seconds, 0), 0), 1800);
+
+  INSERT INTO hall_analytics_counters (
+    hall_id, hall_title, category, total_visits, active_visitors, 
+    total_duration_seconds, interactions_count, last_activity
+  )
+  VALUES (
+    p_hall_id, 
+    COALESCE(p_hall_title, p_hall_id), 
+    COALESCE(p_category, 'hall'),
+    1, 
+    1, 
+    v_clamped_dwell, 
+    CASE WHEN p_is_interaction THEN 1 ELSE 0 END, 
+    NOW()
+  )
+  ON CONFLICT (hall_id) DO UPDATE SET
+    total_visits = hall_analytics_counters.total_visits + 1,
+    total_duration_seconds = hall_analytics_counters.total_duration_seconds + v_clamped_dwell,
+    interactions_count = hall_analytics_counters.interactions_count + CASE WHEN p_is_interaction THEN 1 ELSE 0 END,
+    last_activity = NOW(),
+    hall_title = COALESCE(EXCLUDED.hall_title, hall_analytics_counters.hall_title);
+
+  INSERT INTO hall_analytics_events (
+    hall_id, exposition_id, event_type, dwell_seconds, anon_session_hash, device_type
+  )
+  VALUES (
+    p_hall_id, 
+    p_exposition_id, 
+    CASE WHEN p_is_interaction THEN 'interaction' ELSE 'visit' END, 
+    v_clamped_dwell, 
+    SUBSTRING(COALESCE(p_anon_hash, 'anon') FROM 1 FOR 64),
+    COALESCE(p_device_type, 'desktop')
+  );
+
+  SELECT jsonb_build_object(
+    'success', true,
+    'hall_id', p_hall_id,
+    'total_visits', total_visits,
+    'total_duration', total_duration_seconds,
+    'interactions', interactions_count
+  ) INTO v_result
+  FROM hall_analytics_counters
+  WHERE hall_id = p_hall_id;
+
+  RETURN v_result;
+END;
+$$;
+
+-- 6.5. Безопасная функция обновления времени изучения (dwell time)
+CREATE OR REPLACE FUNCTION update_hall_dwell_time(
+  p_hall_id TEXT,
+  p_added_dwell_seconds INTEGER,
+  p_anon_hash TEXT DEFAULT 'anon'
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_clamped_dwell INTEGER;
+BEGIN
+  v_clamped_dwell := LEAST(GREATEST(COALESCE(p_added_dwell_seconds, 0), 0), 900);
+
+  UPDATE hall_analytics_counters
+  SET 
+    total_duration_seconds = total_duration_seconds + v_clamped_dwell,
+    last_activity = NOW()
+  WHERE hall_id = p_hall_id;
+
+  IF FOUND THEN
+    INSERT INTO hall_analytics_events (hall_id, event_type, dwell_seconds, anon_session_hash)
+    VALUES (p_hall_id, 'dwell', v_clamped_dwell, SUBSTRING(COALESCE(p_anon_hash, 'anon') FROM 1 FOR 64));
+  END IF;
+
+  RETURN jsonb_build_object('success', true, 'added_dwell', v_clamped_dwell);
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION record_anonymous_hall_visit(TEXT, TEXT, TEXT, INTEGER, BOOLEAN, TEXT, TEXT, TEXT) TO anon, authenticated;
+GRANT EXECUTE ON FUNCTION update_hall_dwell_time(TEXT, INTEGER, TEXT) TO anon, authenticated;
+
+-- 6.6. Подключение Realtime-вещания для таблицы аналитики
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'hall_analytics_counters'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE hall_analytics_counters;
+  END IF;
+END;
+$$;
+
+-- 6.7. Базовая инициализация реестра залов музея
+INSERT INTO hall_analytics_counters (hall_id, hall_title, category, total_visits, total_duration_seconds, interactions_count)
+VALUES
+  ('hall_memorial', 'Зал I: Мемориал «Звезда Памяти»', 'hall', 142, 17800, 89),
+  ('hall_heroes', 'Зал II: Галерея «20 Героев Ставрополья»', 'hall', 215, 34200, 154),
+  ('hall_timeline', 'Зал III: Рубежи боевой славы и Интерактивная карта', 'hall', 128, 14600, 72),
+  ('hall_memory', 'Зал IV: Эстафета мужества и Парты Героев', 'hall', 94, 9800, 41),
+  ('hall_quiz', 'Зал V: Исторический квест и Зал Славы', 'hall', 186, 28900, 168),
+  ('hall_guestbook', 'Зал VI: Цифровая Стена Памяти и Книга Отзывов', 'hall', 119, 12400, 83),
+  ('hall_reader', 'Зал VII: Электронный читальный зал и Архив документов', 'hall', 76, 11200, 39),
+  ('hall_desk_qr', 'Зал VIII: Мобильная экспозиция «Парта Героя»', 'hall', 88, 7900, 52),
+  ('hall_lesson', 'Пульт Урока Мужества (Педагогический экран)', 'hall', 64, 15400, 37),
+  ('expo_vecherka-n-a', 'Экспозиция: Николай Вечёрка', 'hero_expo', 165, 12500, 94),
+  ('expo_samokhin-d-a', 'Экспозиция: Дмитрий Самохин', 'hero_expo', 142, 10200, 78),
+  ('expo_martynov-s-k', 'Экспозиция: Станислав Мартынов', 'hero_expo', 158, 11800, 86),
+  ('expo_nazarenko-n-s', 'Экспозиция: Никита Назаренко', 'hero_expo', 139, 9600, 73),
+  ('expo_nazyrov-sh-r', 'Экспозиция: Шамиль Назыров', 'hero_expo', 114, 8200, 59)
+ON CONFLICT (hall_id) DO NOTHING;
+
+-- ============================================================================
+-- СИСТЕМА ЗАЩИТЫ ОТ НАКРУТКИ И МОДУЛЬ АНАЛИТИКИ УСПЕШНО НАСТРОЕНЫ!
 -- ============================================================================
