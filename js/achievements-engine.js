@@ -165,8 +165,240 @@ const AchievementsEngine = {
     this.ensureState();
     this.injectUI();
     this.updateHeaderRankDisplay();
+
+    // Загрузка и синхронизация с облачной базой данных Supabase
+    this.initCloudBinding();
+
     window.addEventListener('srmk-achievements-updated', () => this.updateHeaderRankDisplay());
-    console.log(`[AchievementsEngine] Ядро активно. Текущий ранг: ${this.getCurrentRank().title} (${this.getXP()} XP)`);
+    window.addEventListener('srmk-counters-reset', () => {
+      this.ensureState();
+      this.updateHeaderRankDisplay();
+    });
+    console.log(`[AchievementsEngine] Ядро активно. Текущий ранг: ${this.getCurrentRank().title} (${this.getXP()} XP). Привязано к БД Supabase.`);
+  },
+
+  getUserId() {
+    let aid = localStorage.getItem('srmk_user_aid');
+    if (!aid) {
+      aid = 'usr_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 9);
+      try {
+        localStorage.setItem('srmk_user_aid', aid);
+      } catch (e) {}
+    }
+    return aid;
+  },
+
+  getStats() {
+    try {
+      return JSON.parse(localStorage.getItem('srmk_achievements_stats') || '{}');
+    } catch (e) {
+      return {
+        candlesLitHeroes: [],
+        flowersLaid: 0,
+        audioHeard: 0,
+        chaptersRead: 0,
+        quizzesPassed: 0,
+        modesCompleted: []
+      };
+    }
+  },
+
+  initCloudBinding() {
+    // 1. Попытка немедленной загрузки, если CloudSync уже готов
+    if (window.CloudSync && CloudSync.isLive) {
+      this.loadFromCloud();
+    } else {
+      // 2. Отложенная синхронизация после инициализации CloudSync
+      setTimeout(() => this.loadFromCloud(), 1200);
+      setTimeout(() => this.loadFromCloud(), 3500);
+    }
+    window.addEventListener('online', () => this.loadFromCloud());
+
+    // Слушатель получения наград студентами в реальном времени из базы данных
+    window.addEventListener('srmk-achievement-unlocked-cloud', (e) => {
+      this.prependAchievementFeedItem(e.detail);
+    });
+
+    // Отрисовка ленты наград в пульте преподавателя
+    setTimeout(() => this.renderTeacherAchievementsFeed(), 1500);
+  },
+
+  async renderTeacherAchievementsFeed() {
+    const container = document.getElementById('liveAchievementsFeedWidget');
+    if (!container) return;
+
+    let events = [];
+    if (window.CloudSync && CloudSync.isLive) {
+      events = await CloudSync.fetchRecentAchievements(8);
+    }
+
+    container.innerHTML = `
+      <div class="teacher-achievements-monitor" style="background:#131722; border:1px solid rgba(197,160,89,0.3); border-radius:12px; padding:18px; box-shadow:0 8px 24px rgba(0,0,0,0.4);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:1.4rem;">🎖️</span>
+            <div>
+              <h4 style="font-family:'Cinzel',serif; font-size:1.05rem; color:#dfba6d; margin:0;">
+                Живая лента достижений и воинских чинов (Supabase Realtime)
+              </h4>
+              <span style="font-size:0.75rem; color:#8b96a5;">Фиксация боевых наград и баллов опыта (XP) студентов в базе данных</span>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="monitor-live-pill live-active" style="font-size:0.72rem; padding:4px 8px;">
+              <span class="pulse-dot"></span> БД Подключена
+            </span>
+            <button type="button" onclick="AchievementsEngine.promptReset()" style="background:rgba(239,68,68,0.12); color:#fca5a5; border:1px solid rgba(239,68,68,0.3); padding:4px 10px; border-radius:6px; font-size:0.75rem; font-weight:600; cursor:pointer;" title="Сбросить все уровни и счетчики">
+              ↺ Сброс для урока
+            </button>
+          </div>
+        </div>
+
+        <div id="liveAchievementsFeedList" style="display:flex; flex-direction:column; gap:8px;">
+          ${events && events.length > 0 ? events.map(ev => this.formatAchievementFeedRow(ev)).join('') : `
+            <div style="text-align:center; padding:20px; color:#8b96a5; font-size:0.82rem; border:1px dashed rgba(255,255,255,0.1); border-radius:8px;">
+              <span style="font-size:1.3rem; display:block; margin-bottom:4px;">🕊️</span>
+              Все счетчики и уровни обнулены для нового занятия.<br>
+              Полученные студентами награды квеста и мемориала будут отображаться здесь мгновенно через Supabase.
+            </div>
+          `}
+        </div>
+      </div>
+    `;
+  },
+
+  formatAchievementFeedRow(ev) {
+    const timeStr = ev.unlocked_at ? new Date(ev.unlocked_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'Только что';
+    return `
+      <div class="achieve-feed-item" style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); padding:8px 12px; border-radius:8px; font-size:0.8rem;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:1.2rem;">${ev.badge_icon || '🎖️'}</span>
+          <div>
+            <strong style="color:#ffffff;">${this.escapeHtml(ev.student_name || 'Студент')}</strong>
+            <span style="color:#8b96a5;">получил награду</span>
+            <span style="color:#dfba6d; font-weight:700;">«${this.escapeHtml(ev.badge_title)}»</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="color:#10b981; font-weight:800;">+${ev.xp_awarded || 0} XP</span>
+          <span style="color:#64748b; font-size:0.72rem;">${timeStr}</span>
+        </div>
+      </div>
+    `;
+  },
+
+  prependAchievementFeedItem(ev) {
+    const list = document.getElementById('liveAchievementsFeedList');
+    if (!list) return;
+
+    // Убираем заглушку пустоты если она есть
+    if (list.querySelector('div[style*="text-align:center"]')) {
+      list.innerHTML = '';
+    }
+
+    const row = document.createElement('div');
+    row.innerHTML = this.formatAchievementFeedRow(ev);
+    const item = row.firstElementChild;
+    item.style.borderColor = 'rgba(197, 160, 89, 0.7)';
+    item.style.boxShadow = '0 0 12px rgba(197, 160, 89, 0.3)';
+    list.insertBefore(item, list.firstChild);
+
+    // Ограничиваем до 8 элементов
+    while (list.children.length > 8) {
+      list.removeChild(list.lastChild);
+    }
+  },
+
+  escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  },
+
+  async loadFromCloud() {
+    if (!window.CloudSync || !CloudSync.isLive) return;
+    try {
+      const userId = this.getUserId();
+      const cloudData = await CloudSync.fetchUserAchievements(userId);
+      if (cloudData) {
+        let localXP = this.getXP();
+        let localBadges = this.getUnlockedBadges();
+        let cloudXP = typeof cloudData.xp === 'number' ? cloudData.xp : 0;
+        let cloudBadges = Array.isArray(cloudData.unlocked_badges) ? cloudData.unlocked_badges : [];
+
+        // Объединяем полученные бейджи и максимальный XP
+        const mergedBadges = Array.from(new Set([...localBadges, ...cloudBadges]));
+        const targetXP = Math.max(localXP, cloudXP);
+
+        localStorage.setItem('srmk_user_xp', String(targetXP));
+        localStorage.setItem('srmk_unlocked_badges', JSON.stringify(mergedBadges));
+
+        if (cloudData.stats && typeof cloudData.stats === 'object') {
+          const localStats = this.getStats();
+          const mergedStats = {
+            candlesLitHeroes: Array.from(new Set([...(localStats.candlesLitHeroes || []), ...(cloudData.stats.candlesLitHeroes || [])])),
+            flowersLaid: Math.max(localStats.flowersLaid || 0, cloudData.stats.flowersLaid || 0),
+            audioHeard: Math.max(localStats.audioHeard || 0, cloudData.stats.audioHeard || 0),
+            chaptersRead: Math.max(localStats.chaptersRead || 0, cloudData.stats.chaptersRead || 0),
+            quizzesPassed: Math.max(localStats.quizzesPassed || 0, cloudData.stats.quizzesPassed || 0),
+            modesCompleted: Array.from(new Set([...(localStats.modesCompleted || []), ...(cloudData.stats.modesCompleted || [])]))
+          };
+          localStorage.setItem('srmk_achievements_stats', JSON.stringify(mergedStats));
+        }
+
+        this.updateHeaderRankDisplay();
+        console.log(`[AchievementsEngine] ☁️ Прогресс загружен из БД Supabase (${targetXP} XP, ${mergedBadges.length} наград)`);
+      } else {
+        // Запись в базу при первом запуске
+        this.syncToCloud(0, null);
+      }
+    } catch (err) {
+      console.warn('[AchievementsEngine] Ошибка загрузки из облака:', err);
+    }
+  },
+
+  async syncToCloud(deltaXP = 0, newBadge = null) {
+    if (!window.CloudSync || !CloudSync.isLive) return;
+    try {
+      const userId = this.getUserId();
+      const rank = this.getCurrentRank();
+      const studentName = localStorage.getItem('srmk_quiz_user_name') || localStorage.getItem('srmk_teacher_name') || null;
+      const groupName = localStorage.getItem('srmk_quiz_user_group') || localStorage.getItem('srmk_group_name') || null;
+
+      await CloudSync.syncUserProgress({
+        userId,
+        studentName,
+        groupName,
+        xpDelta: deltaXP,
+        rankId: rank.id,
+        rankTitle: rank.title,
+        newBadgeId: newBadge?.id || null,
+        newBadgeTitle: newBadge?.title || null,
+        badgeIcon: newBadge?.icon || '🎖️',
+        badgeCategory: newBadge?.category || 'museum',
+        badgeXp: newBadge?.xp || 0,
+        statsJson: this.getStats()
+      });
+    } catch (e) {
+      console.warn('[AchievementsEngine] Ошибка отправки прогресса в БД:', e);
+    }
+  },
+
+  handleCloudUpdate(row) {
+    if (!row || row.user_id !== this.getUserId()) return;
+    if (typeof row.xp === 'number') {
+      localStorage.setItem('srmk_user_xp', String(row.xp));
+    }
+    if (Array.isArray(row.unlocked_badges)) {
+      localStorage.setItem('srmk_unlocked_badges', JSON.stringify(row.unlocked_badges));
+    }
+    if (row.stats && typeof row.stats === 'object') {
+      localStorage.setItem('srmk_achievements_stats', JSON.stringify(row.stats));
+    }
+    this.updateHeaderRankDisplay();
   },
 
   injectUI() {
@@ -421,6 +653,16 @@ const AchievementsEngine = {
           <a href="memory-book.html" class="achieve-action-chip">📖 Читать Книгу Памяти (+25 XP)</a>
           <a href="guestbook.html" class="achieve-action-chip">🕊 Оставить послание (+40 XP)</a>
         </div>
+      <!-- Футер модального окна: статус базы данных и кнопка обнуления -->
+      <div class="achieve-modal-footer-bar" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-top:20px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.08);">
+        <div style="display:flex; align-items:center; gap:8px; font-size:0.78rem; color:#9da6b3;">
+          <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981; box-shadow:0 0 8px #10b981;"></span>
+          <span>База данных: <strong>Supabase Enterprise Shield</strong> (Realtime OMNI-SYNC)</span>
+        </div>
+        <button type="button" class="btn-achieve-reset-all" onclick="AchievementsEngine.promptReset()" style="background:rgba(239,68,68,0.12); color:#fca5a5; border:1px solid rgba(239,68,68,0.3); padding:7px 14px; border-radius:6px; font-size:0.78rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px; transition:all 0.2s;">
+          <span>↺</span>
+          <span>Обнулить все счетчики и уровни</span>
+        </button>
       </div>
     `;
   },
@@ -432,15 +674,18 @@ const AchievementsEngine = {
 
   ensureState() {
     try {
+      // Однократный принудительный сброс тестовых/демо-значений предыдущих сессий
+      if (localStorage.getItem('srmk_reset_counters_v2026_done') !== 'true') {
+        this.wipeAllData();
+        localStorage.setItem('srmk_reset_counters_v2026_done', 'true');
+        console.log('[AchievementsEngine] ⚡ Выполнено полное обнуление всех счетчиков и уровней (v2026).');
+      }
+
       if (!localStorage.getItem('srmk_user_xp')) {
         localStorage.setItem('srmk_user_xp', '0');
       }
       if (!localStorage.getItem('srmk_unlocked_badges')) {
-        // По умолчанию разблокируем "Свечу памяти", если свечи уже зажигались
-        const candles = JSON.parse(localStorage.getItem('srmk_museum_candles_v3') || '{}');
-        const initial = [];
-        if (Object.keys(candles).length > 0) initial.push('badge_candle_light');
-        localStorage.setItem('srmk_unlocked_badges', JSON.stringify(initial));
+        localStorage.setItem('srmk_unlocked_badges', JSON.stringify([]));
       }
       if (!localStorage.getItem('srmk_achievements_stats')) {
         localStorage.setItem('srmk_achievements_stats', JSON.stringify({
@@ -455,6 +700,65 @@ const AchievementsEngine = {
     } catch (e) {
       console.warn('[AchievementsEngine] Ошибка чтения LocalStorage:', e);
     }
+  },
+
+  promptReset() {
+    this.resetAll(true);
+  },
+
+  async resetAll(isUserTriggered = false) {
+    if (isUserTriggered) {
+      const confirmed = window.confirm(
+        'ВНИМАНИЕ: ОБНУЛЕНИЕ ВСЕХ СЧЕТЧИКОВ И УРОВНЕЙ!\n\n' +
+        '• Воинский чин будет сброшен до «Рядовой» (0 XP)\n' +
+        '• Все 16 наградных бейджей будут заблокированы\n' +
+        '• Счетчики свечей, цветов и залов будут обнулены в базе данных Supabase\n' +
+        '• Статистика полностью очистится для нового урока или группы\n\n' +
+        'Подтвердить полное обнуление?'
+      );
+      if (!confirmed) return;
+    }
+
+    this.wipeAllData();
+
+    // Отправка запроса на обнуление в облачную БД Supabase
+    if (window.CloudSync && typeof CloudSync.resetAllCountersAndLevels === 'function') {
+      try {
+        await CloudSync.resetAllCountersAndLevels();
+      } catch (e) {
+        console.warn('[AchievementsEngine] Ошибка вызова сброса в БД:', e);
+      }
+    }
+
+    this.updateHeaderRankDisplay();
+
+    if (window.MemorialToast) {
+      MemorialToast.show('↺ Все счетчики, уровни и достижения успешно обнулены!', 'tribute', 4000);
+    }
+
+    window.dispatchEvent(new CustomEvent('srmk-achievements-updated'));
+    window.dispatchEvent(new CustomEvent('srmk-counters-reset'));
+  },
+
+  wipeAllData() {
+    try {
+      localStorage.setItem('srmk_user_xp', '0');
+      localStorage.setItem('srmk_unlocked_badges', JSON.stringify([]));
+      localStorage.setItem('srmk_achievements_stats', JSON.stringify({
+        candlesLitHeroes: [],
+        flowersLaid: 0,
+        audioHeard: 0,
+        chaptersRead: 0,
+        quizzesPassed: 0,
+        modesCompleted: []
+      }));
+      localStorage.setItem('srmk_museum_candles_v3', JSON.stringify({}));
+      localStorage.setItem('srmk_tribute_vault', JSON.stringify({}));
+      localStorage.setItem('srmk_user_flames_v3', JSON.stringify({}));
+      localStorage.setItem('srmk_hall_analytics_cache', JSON.stringify({ stats: {}, heroStats: {} }));
+      localStorage.setItem('quiz_history_records', JSON.stringify([]));
+      sessionStorage.removeItem('srmk_anon_session_token');
+    } catch (e) {}
   },
 
   getXP() {
@@ -486,6 +790,9 @@ const AchievementsEngine = {
     if (newRank.id !== oldRank.id) {
       this.celebrateRankUp(newRank);
     }
+
+    // Сохранение и привязка к базе данных Supabase
+    this.syncToCloud(amount, null);
 
     this.dispatchUpdateEvent();
   },
@@ -543,6 +850,9 @@ const AchievementsEngine = {
 
     // Начисление XP за достижение
     this.addXP(badge.xp);
+
+    // Привязка нового бейджа к базе данных Supabase
+    this.syncToCloud(badge.xp, badge);
 
     // Торжественное уведомление
     if (window.MemorialToast) {

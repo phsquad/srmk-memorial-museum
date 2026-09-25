@@ -256,6 +256,19 @@ const App = {
     }
 
     window.addEventListener('hashchange', () => this.checkDeepLink());
+
+    // Глобальное обнуление счетчиков мемориала
+    window.addEventListener('srmk-counters-reset', () => {
+      AppState.candles = {};
+      AppState.flowersCount = 0;
+      this.updateMemorialStats();
+      this.renderCardsGrid();
+      this.renderMemorialPlaques();
+      const flowersDisplay = document.getElementById('flowersCountDisplay');
+      if (flowersDisplay) flowersDisplay.textContent = '0';
+      const candleDisplay = document.getElementById('candleCountDisplay');
+      if (candleDisplay) candleDisplay.textContent = '0';
+    });
   },
 
   /* ==========================================================================

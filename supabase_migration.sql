@@ -696,25 +696,251 @@ BEGIN
 END;
 $$;
 
--- 6.7. Базовая инициализация реестра залов музея
-INSERT INTO hall_analytics_counters (hall_id, hall_title, category, total_visits, total_duration_seconds, interactions_count)
+-- 6.7. Базовая инициализация реестра залов музея (Все счетчики обнулены: 0 посещений, 0 секунд)
+INSERT INTO hall_analytics_counters (hall_id, hall_title, category, total_visits, active_visitors, total_duration_seconds, interactions_count)
 VALUES
-  ('hall_memorial', 'Зал I: Мемориал «Звезда Памяти»', 'hall', 142, 17800, 89),
-  ('hall_heroes', 'Зал II: Галерея «20 Героев Ставрополья»', 'hall', 215, 34200, 154),
-  ('hall_timeline', 'Зал III: Рубежи боевой славы и Интерактивная карта', 'hall', 128, 14600, 72),
-  ('hall_memory', 'Зал IV: Эстафета мужества и Парты Героев', 'hall', 94, 9800, 41),
-  ('hall_quiz', 'Зал V: Исторический квест и Зал Славы', 'hall', 186, 28900, 168),
-  ('hall_guestbook', 'Зал VI: Цифровая Стена Памяти и Книга Отзывов', 'hall', 119, 12400, 83),
-  ('hall_reader', 'Зал VII: Электронный читальный зал и Архив документов', 'hall', 76, 11200, 39),
-  ('hall_desk_qr', 'Зал VIII: Мобильная экспозиция «Парта Героя»', 'hall', 88, 7900, 52),
-  ('hall_lesson', 'Пульт Урока Мужества (Педагогический экран)', 'hall', 64, 15400, 37),
-  ('expo_vecherka-n-a', 'Экспозиция: Николай Вечёрка', 'hero_expo', 165, 12500, 94),
-  ('expo_samokhin-d-a', 'Экспозиция: Дмитрий Самохин', 'hero_expo', 142, 10200, 78),
-  ('expo_martynov-s-k', 'Экспозиция: Станислав Мартынов', 'hero_expo', 158, 11800, 86),
-  ('expo_nazarenko-n-s', 'Экспозиция: Никита Назаренко', 'hero_expo', 139, 9600, 73),
-  ('expo_nazyrov-sh-r', 'Экспозиция: Шамиль Назыров', 'hero_expo', 114, 8200, 59)
-ON CONFLICT (hall_id) DO NOTHING;
+  ('hall_memorial', 'Зал I: Мемориал «Звезда Памяти»', 'hall', 0, 0, 0, 0),
+  ('hall_heroes', 'Зал II: Галерея «20 Героев Ставрополья»', 'hall', 0, 0, 0, 0),
+  ('hall_timeline', 'Зал III: Рубежи боевой славы и Интерактивная карта', 'hall', 0, 0, 0, 0),
+  ('hall_memory', 'Зал IV: Эстафета мужества и Парты Героев', 'hall', 0, 0, 0, 0),
+  ('hall_quiz', 'Зал V: Исторический квест и Зал Славы', 'hall', 0, 0, 0, 0),
+  ('hall_guestbook', 'Зал VI: Цифровая Стена Памяти и Книга Отзывов', 'hall', 0, 0, 0, 0),
+  ('hall_reader', 'Зал VII: Электронный читальный зал и Архив документов', 'hall', 0, 0, 0, 0),
+  ('hall_desk_qr', 'Зал VIII: Мобильная экспозиция «Парта Героя»', 'hall', 0, 0, 0, 0),
+  ('hall_lesson', 'Пульт Урока Мужества (Педагогический экран)', 'hall', 0, 0, 0, 0),
+  ('expo_vecherka-n-a', 'Экспозиция: Николай Вечёрка', 'hero_expo', 0, 0, 0, 0),
+  ('expo_samokhin-d-a', 'Экспозиция: Дмитрий Самохин', 'hero_expo', 0, 0, 0, 0),
+  ('expo_martynov-s-k', 'Экспозиция: Станислав Мартынов', 'hero_expo', 0, 0, 0, 0),
+  ('expo_nazarenko-n-s', 'Экспозиция: Никита Назаренко', 'hero_expo', 0, 0, 0, 0),
+  ('expo_nazyrov-sh-r', 'Экспозиция: Шамиль Назыров', 'hero_expo', 0, 0, 0, 0)
+ON CONFLICT (hall_id) DO UPDATE SET
+  total_visits = 0,
+  active_visitors = 0,
+  total_duration_seconds = 0,
+  interactions_count = 0,
+  last_activity = NOW();
 
 -- ============================================================================
--- СИСТЕМА ЗАЩИТЫ ОТ НАКРУТКИ И МОДУЛЬ АНАЛИТИКИ УСПЕШНО НАСТРОЕНЫ!
+-- РАЗДЕЛ 7: СИСТЕМА ДОСТИЖЕНИЙ И ВОИНСКИХ ЗВАНИЙ (ПОЛНАЯ ПРИВЯЗКА К БАЗЕ ДАННЫХ)
+-- ============================================================================
+
+-- 7.1. Таблица прогресса пользователей и воинских званий
+CREATE TABLE IF NOT EXISTS user_achievements (
+  user_id TEXT PRIMARY KEY,               -- Уникальный идентификатор устройства / студента
+  student_name TEXT,                      -- ФИО студента (если введено)
+  group_name TEXT,                        -- Учебная группа (напр., ИСП-21)
+  xp INTEGER NOT NULL DEFAULT 0 CHECK (xp >= 0),
+  rank_id TEXT NOT NULL DEFAULT 'private',
+  rank_title TEXT NOT NULL DEFAULT 'Рядовой',
+  unlocked_badges TEXT[] NOT NULL DEFAULT '{}',
+  stats JSONB NOT NULL DEFAULT '{"candlesLitHeroes":[], "flowersLaid":0, "audioHeard":0, "chaptersRead":0, "quizzesPassed":0, "modesCompleted":[]}'::jsonb,
+  last_active TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_achievements_xp ON user_achievements(xp DESC);
+CREATE INDEX IF NOT EXISTS idx_user_achievements_rank ON user_achievements(rank_id);
+CREATE INDEX IF NOT EXISTS idx_user_achievements_active ON user_achievements(last_active DESC);
+
+-- 7.2. Журнал событий получения боевых наград (Realtime-лента для преподавателя)
+CREATE TABLE IF NOT EXISTS achievement_unlock_events (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  student_name TEXT,
+  badge_id TEXT NOT NULL,
+  badge_title TEXT NOT NULL,
+  badge_icon TEXT DEFAULT '🎖️',
+  category TEXT NOT NULL DEFAULT 'museum',
+  xp_awarded INTEGER NOT NULL DEFAULT 0,
+  unlocked_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_unlock_events_badge ON achievement_unlock_events(badge_id);
+CREATE INDEX IF NOT EXISTS idx_unlock_events_user ON achievement_unlock_events(user_id);
+CREATE INDEX IF NOT EXISTS idx_unlock_events_feed ON achievement_unlock_events(unlocked_at DESC);
+
+-- 7.3. Row Level Security для достижений
+ALTER TABLE user_achievements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE achievement_unlock_events ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public read user_achievements" ON user_achievements;
+DROP POLICY IF EXISTS "Public upsert user_achievements" ON user_achievements;
+CREATE POLICY "Public read user_achievements" ON user_achievements FOR SELECT USING (true);
+CREATE POLICY "Public upsert user_achievements" ON user_achievements FOR ALL USING (true);
+
+DROP POLICY IF EXISTS "Public read achievement_events" ON achievement_unlock_events;
+DROP POLICY IF EXISTS "Public insert achievement_events" ON achievement_unlock_events;
+CREATE POLICY "Public read achievement_events" ON achievement_unlock_events FOR SELECT USING (true);
+CREATE POLICY "Public insert achievement_events" ON achievement_unlock_events FOR INSERT WITH CHECK (true);
+
+-- 7.4. Подключение Realtime-вещания для достижений
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'user_achievements'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE user_achievements;
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'achievement_unlock_events'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE achievement_unlock_events;
+  END IF;
+END;
+$$;
+
+-- 7.5. RPC-функция надежной синхронизации наград и уровней в базе данных
+CREATE OR REPLACE FUNCTION sync_user_achievement_progress(
+  p_user_id TEXT,
+  p_student_name TEXT DEFAULT NULL,
+  p_group_name TEXT DEFAULT NULL,
+  p_xp_delta INTEGER DEFAULT 0,
+  p_rank_id TEXT DEFAULT NULL,
+  p_rank_title TEXT DEFAULT NULL,
+  p_new_badge_id TEXT DEFAULT NULL,
+  p_new_badge_title TEXT DEFAULT NULL,
+  p_badge_icon TEXT DEFAULT '🎖️',
+  p_badge_category TEXT DEFAULT 'museum',
+  p_badge_xp INTEGER DEFAULT 0,
+  p_stats_json JSONB DEFAULT NULL
+)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_rec RECORD;
+  v_new_xp INTEGER;
+  v_badges TEXT[];
+  v_stats JSONB;
+BEGIN
+  SELECT * INTO v_rec FROM user_achievements WHERE user_id = p_user_id;
+
+  IF NOT FOUND THEN
+    v_new_xp := GREATEST(0, COALESCE(p_xp_delta, 0));
+    v_badges := CASE WHEN p_new_badge_id IS NOT NULL THEN ARRAY[p_new_badge_id] ELSE '{}'::TEXT[] END;
+    v_stats := COALESCE(p_stats_json, '{"candlesLitHeroes":[], "flowersLaid":0, "audioHeard":0, "chaptersRead":0, "quizzesPassed":0, "modesCompleted":[]}'::jsonb);
+
+    INSERT INTO user_achievements (
+      user_id, student_name, group_name, xp, rank_id, rank_title, unlocked_badges, stats, last_active, updated_at
+    )
+    VALUES (
+      p_user_id,
+      p_student_name,
+      p_group_name,
+      v_new_xp,
+      COALESCE(p_rank_id, 'private'),
+      COALESCE(p_rank_title, 'Рядовой'),
+      v_badges,
+      v_stats,
+      NOW(),
+      NOW()
+    );
+  ELSE
+    v_new_xp := GREATEST(0, v_rec.xp + COALESCE(p_xp_delta, 0));
+    v_badges := v_rec.unlocked_badges;
+    IF p_new_badge_id IS NOT NULL AND NOT (p_new_badge_id = ANY(v_badges)) THEN
+      v_badges := array_append(v_badges, p_new_badge_id);
+    END IF;
+    v_stats := COALESCE(p_stats_json, v_rec.stats);
+
+    UPDATE user_achievements
+    SET
+      xp = v_new_xp,
+      rank_id = COALESCE(p_rank_id, v_rec.rank_id),
+      rank_title = COALESCE(p_rank_title, v_rec.rank_title),
+      unlocked_badges = v_badges,
+      stats = v_stats,
+      student_name = COALESCE(p_student_name, v_rec.student_name),
+      group_name = COALESCE(p_group_name, v_rec.group_name),
+      last_active = NOW(),
+      updated_at = NOW()
+    WHERE user_id = p_user_id;
+  END IF;
+
+  -- Логируем событие получения награды для ленты преподавателя
+  IF p_new_badge_id IS NOT NULL THEN
+    INSERT INTO achievement_unlock_events (user_id, student_name, badge_id, badge_title, badge_icon, category, xp_awarded)
+    VALUES (
+      p_user_id, 
+      COALESCE(p_student_name, 'Студент'), 
+      p_new_badge_id, 
+      COALESCE(p_new_badge_title, p_new_badge_id), 
+      COALESCE(p_badge_icon, '🎖️'),
+      p_badge_category, 
+      COALESCE(p_badge_xp, 0)
+    );
+  END IF;
+
+  RETURN jsonb_build_object(
+    'success', true,
+    'user_id', p_user_id,
+    'xp', v_new_xp,
+    'badges_count', cardinality(v_badges)
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION sync_user_achievement_progress(TEXT, TEXT, TEXT, INTEGER, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, INTEGER, JSONB) TO anon, authenticated;
+
+-- 7.6. Процедура ПОЛНОГО ОБНУЛЕНИЯ ВСЕХ СЧЕТЧИКОВ И УРОВНЕЙ
+CREATE OR REPLACE FUNCTION reset_all_memorial_counters_and_levels()
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  -- 1. Обнуляем счетчики свечей и цветов мемориала
+  UPDATE memorial_counters SET candles = 0, flowers = 0, last_updated = NOW();
+
+  -- 2. Обнуляем посещаемость и счетчики всех залов
+  UPDATE hall_analytics_counters SET 
+    total_visits = 0, 
+    active_visitors = 0, 
+    total_duration_seconds = 0, 
+    interactions_count = 0, 
+    last_activity = NOW();
+
+  -- 3. Очищаем журнал аналитических событий
+  DELETE FROM hall_analytics_events;
+
+  -- 4. Очищаем антиспам-журналы для нового занятия
+  DELETE FROM anti_abuse_actions_log;
+  DELETE FROM tribute_flames_votes;
+
+  -- 5. Обнуляем уровни, ранги и достижения всех пользователей
+  UPDATE user_achievements SET
+    xp = 0,
+    rank_id = 'private',
+    rank_title = 'Рядовой',
+    unlocked_badges = '{}',
+    stats = '{"candlesLitHeroes":[], "flowersLaid":0, "audioHeard":0, "chaptersRead":0, "quizzesPassed":0, "modesCompleted":[]}'::jsonb,
+    updated_at = NOW();
+
+  -- 6. Очищаем ленту наград
+  DELETE FROM achievement_unlock_events;
+
+  RETURN jsonb_build_object(
+    'success', true, 
+    'message', 'Все счетчики, уровни и достижения успешно обнулены'
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION reset_all_memorial_counters_and_levels() TO anon, authenticated;
+
+-- 7.7. ОДНОКРАТНОЕ ОБНУЛЕНИЕ СЧЕТЧИКОВ И УРОВНЕЙ ПРИ ПРИМЕНЕНИИ МИГРАЦИИ
+UPDATE memorial_counters SET candles = 0, flowers = 0;
+UPDATE hall_analytics_counters SET total_visits = 0, active_visitors = 0, total_duration_seconds = 0, interactions_count = 0;
+DELETE FROM hall_analytics_events;
+DELETE FROM anti_abuse_actions_log;
+DELETE FROM tribute_flames_votes;
+UPDATE user_achievements SET xp = 0, rank_id = 'private', rank_title = 'Рядовой', unlocked_badges = '{}';
+DELETE FROM achievement_unlock_events;
+
+-- ============================================================================
+-- БАЗА ДАННЫХ И СИСТЕМА ДОСТИЖЕНИЙ ПОЛНОСТЬЮ НАСТРОЕНЫ И ОБНУЛЕНЫ!
 -- ============================================================================

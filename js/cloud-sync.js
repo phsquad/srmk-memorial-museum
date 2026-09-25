@@ -195,6 +195,38 @@ const CloudSync = {
     } catch (presErr) {
       console.warn('[CloudSync] Ошибка настройки Presence канала:', presErr);
     }
+
+    // 5. Слушатель достижений и званий (user_achievements)
+    try {
+      const achieveChannel = this.client.channel('realtime_user_achievements')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'user_achievements' }, (payload) => {
+          if (window.AchievementsEngine && typeof AchievementsEngine.handleCloudUpdate === 'function') {
+            AchievementsEngine.handleCloudUpdate(payload.new || payload.old);
+          }
+        })
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            console.log('[CloudSync] 🎖️ Realtime-канал наград и воинских званий подключен к БД.');
+          }
+        });
+      this.channels.push(achieveChannel);
+    } catch (achieveErr) {
+      console.warn('[CloudSync] Ошибка подключения канала достижений:', achieveErr);
+    }
+
+    // 6. Слушатель живой ленты получения наград студентами (achievement_unlock_events)
+    try {
+      const eventsChannel = this.client.channel('realtime_achievement_events')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'achievement_unlock_events' }, (payload) => {
+          if (payload.new) {
+            window.dispatchEvent(new CustomEvent('srmk-achievement-unlocked-cloud', { detail: payload.new }));
+          }
+        })
+        .subscribe();
+      this.channels.push(eventsChannel);
+    } catch (eventsErr) {
+      console.warn('[CloudSync] Ошибка подключения ленты наград:', eventsErr);
+    }
   },
 
   reconnect() {
@@ -554,6 +586,207 @@ const CloudSync = {
     } catch (e) {
       // Игнорируем фоновые задержки presence
     }
+  },
+
+  // ==========================================================================
+  // МЕТОДЫ ДОСТИЖЕНИЙ И ВОИНСКИХ ЗВАНИЙ (СИНХРОНИЗАЦИЯ С БАЗОЙ ДАННЫХ SUPABASE)
+  // ==========================================================================
+  async fetchUserAchievements(userId) {
+    if (!this.isLive || !this.client || !userId) return null;
+    try {
+      const { data, error } = await this.client
+        .from('user_achievements')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    } catch (e) {
+      console.warn('[CloudSync] Ошибка загрузки достижений из БД:', e);
+      return null;
+    }
+  },
+
+  async syncUserProgress(params) {
+    if (!this.isLive || !this.client) return null;
+    try {
+      const {
+        userId,
+        studentName = null,
+        groupName = null,
+        xpDelta = 0,
+        rankId = null,
+        rankTitle = null,
+        newBadgeId = null,
+        newBadgeTitle = null,
+        badgeIcon = '🎖️',
+        badgeCategory = 'museum',
+        badgeXp = 0,
+        statsJson = null
+      } = params;
+
+      if (!userId) return null;
+
+      // 1. Попытка вызова RPC-процедуры в базе
+      try {
+        const { data, error } = await this.client.rpc('sync_user_achievement_progress', {
+          p_user_id: userId,
+          p_student_name: studentName,
+          p_group_name: groupName,
+          p_xp_delta: xpDelta,
+          p_rank_id: rankId,
+          p_rank_title: rankTitle,
+          p_new_badge_id: newBadgeId,
+          p_new_badge_title: newBadgeTitle,
+          p_badge_icon: badgeIcon,
+          p_badge_category: badgeCategory,
+          p_badge_xp: badgeXp,
+          p_stats_json: statsJson
+        });
+        if (!error && data) return data;
+      } catch (rpcErr) {
+        // Fallback ниже
+      }
+
+      // 2. Fallback: прямой upsert в таблицу user_achievements
+      const { data: cur } = await this.client
+        .from('user_achievements')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      const existingBadges = Array.isArray(cur?.unlocked_badges) ? cur.unlocked_badges : [];
+      let updatedBadges = [...existingBadges];
+      if (newBadgeId && !updatedBadges.includes(newBadgeId)) {
+        updatedBadges.push(newBadgeId);
+      }
+
+      const newXP = Math.max(0, (cur?.xp || 0) + xpDelta);
+
+      const payload = {
+        user_id: userId,
+        student_name: studentName || cur?.student_name,
+        group_name: groupName || cur?.group_name,
+        xp: newXP,
+        rank_id: rankId || cur?.rank_id || 'private',
+        rank_title: rankTitle || cur?.rank_title || 'Рядовой',
+        unlocked_badges: updatedBadges,
+        stats: statsJson || cur?.stats || {},
+        last_active: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      const { data: upsertRes, error: upsertErr } = await this.client
+        .from('user_achievements')
+        .upsert([payload]);
+
+      if (upsertErr) throw upsertErr;
+
+      // Логируем событие получения награды
+      if (newBadgeId) {
+        try {
+          await this.client.from('achievement_unlock_events').insert([{
+            user_id: userId,
+            student_name: studentName || 'Студент',
+            badge_id: newBadgeId,
+            badge_title: newBadgeTitle || newBadgeId,
+            badge_icon: badgeIcon,
+            category: badgeCategory,
+            xp_awarded: badgeXp
+          }]);
+        } catch (evErr) {}
+      }
+
+      return { success: true, xp: newXP, badges_count: updatedBadges.length };
+    } catch (e) {
+      console.warn('[CloudSync] Ошибка синхронизации прогресса достижений с БД:', e);
+      return null;
+    }
+  },
+
+  async fetchRecentAchievements(limit = 10) {
+    if (!this.isLive || !this.client) return [];
+    try {
+      const { data, error } = await this.client
+        .from('achievement_unlock_events')
+        .select('*')
+        .order('unlocked_at', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      return data || [];
+    } catch (e) {
+      console.warn('[CloudSync] Ошибка загрузки ленты наград из БД:', e);
+      return [];
+    }
+  },
+
+  // ==========================================================================
+  // ПОЛНОЕ ОБНУЛЕНИЕ ВСЕХ СЧЕТЧИКОВ И УРОВНЕЙ В БАЗЕ ДАННЫХ
+  // ==========================================================================
+  async resetAllCountersAndLevels() {
+    console.log('[CloudSync] 🔄 Запрос на полное обнуление всех счетчиков и уровней...');
+    let dbSuccess = false;
+
+    if (this.isLive && this.client) {
+      try {
+        // 1. Попытка вызова RPC-процедуры
+        const { data, error } = await this.client.rpc('reset_all_memorial_counters_and_levels');
+        if (!error && data) {
+          dbSuccess = true;
+          console.log('[CloudSync] ✅ RPC обнуления успешно выполнен в Supabase.');
+        } else {
+          throw error || new Error('RPC error');
+        }
+      } catch (rpcErr) {
+        // Fallback: прямые обновления через клиент Supabase
+        try {
+          await this.client.from('memorial_counters').update({ candles: 0, flowers: 0 }).neq('hero_id', '');
+          await this.client.from('hall_analytics_counters').update({
+            total_visits: 0,
+            active_visitors: 0,
+            total_duration_seconds: 0,
+            interactions_count: 0
+          }).neq('hall_id', '');
+          await this.client.from('user_achievements').update({
+            xp: 0,
+            rank_id: 'private',
+            rank_title: 'Рядовой',
+            unlocked_badges: []
+          }).neq('user_id', '');
+          dbSuccess = true;
+          console.log('[CloudSync] ✅ Прямое обнуление счетчиков в БД выполнено.');
+        } catch (directErr) {
+          console.warn('[CloudSync] Ошибка обнуления в облаке:', directErr);
+        }
+      }
+    }
+
+    // 2. Локальное обнуление в кэше браузера
+    try {
+      localStorage.setItem('srmk_user_xp', '0');
+      localStorage.setItem('srmk_unlocked_badges', JSON.stringify([]));
+      localStorage.setItem('srmk_achievements_stats', JSON.stringify({
+        candlesLitHeroes: [],
+        flowersLaid: 0,
+        audioHeard: 0,
+        chaptersRead: 0,
+        quizzesPassed: 0,
+        modesCompleted: []
+      }));
+      localStorage.setItem('srmk_museum_candles_v3', JSON.stringify({}));
+      localStorage.setItem('srmk_tribute_vault', JSON.stringify({}));
+      localStorage.setItem('srmk_user_flames_v3', JSON.stringify({}));
+      localStorage.setItem('srmk_hall_analytics_cache', JSON.stringify({ stats: {}, heroStats: {} }));
+      localStorage.setItem('quiz_history_records', JSON.stringify([]));
+      sessionStorage.removeItem('srmk_anon_session_token');
+    } catch (locErr) {}
+
+    // 3. Уведомление всех модулей об обнулении
+    window.dispatchEvent(new CustomEvent('srmk-counters-reset', { detail: { dbSuccess } }));
+
+    return { success: true, dbSuccess };
   }
 };
 

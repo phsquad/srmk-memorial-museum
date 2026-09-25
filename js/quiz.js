@@ -500,6 +500,13 @@ const QuizEngine = {
       this.updateRankDisplay();
       this.loadBadges();
     });
+
+    // Слушатель полного обнуления счетчиков и уровней
+    window.addEventListener('srmk-counters-reset', () => {
+      this.updateRankDisplay();
+      this.loadBadges();
+      this.loadLeaderboard();
+    });
   },
 
   updateModeIntro() {

@@ -25,8 +25,8 @@ const HallAnalytics = {
       icon: '🕯️',
       category: 'hall',
       elementId: 'memorial',
-      baseVisits: 142,
-      baseDuration: 17800
+      baseVisits: 0,
+      baseDuration: 0
     },
     hall_heroes: {
       id: 'hall_heroes',
@@ -35,8 +35,8 @@ const HallAnalytics = {
       icon: '⭐',
       category: 'hall',
       elementId: 'heroes-grid',
-      baseVisits: 215,
-      baseDuration: 34200
+      baseVisits: 0,
+      baseDuration: 0
     },
     hall_timeline: {
       id: 'hall_timeline',
@@ -45,8 +45,8 @@ const HallAnalytics = {
       icon: '🗺️',
       category: 'hall',
       elementId: 'battle-timeline',
-      baseVisits: 128,
-      baseDuration: 14600
+      baseVisits: 0,
+      baseDuration: 0
     },
     hall_memory: {
       id: 'hall_memory',
@@ -55,8 +55,8 @@ const HallAnalytics = {
       icon: '🎓',
       category: 'hall',
       elementId: 'memory-hall',
-      baseVisits: 94,
-      baseDuration: 9800
+      baseVisits: 0,
+      baseDuration: 0
     },
     hall_quiz: {
       id: 'hall_quiz',
@@ -66,8 +66,8 @@ const HallAnalytics = {
       category: 'hall',
       elementId: null,
       page: 'quiz.html',
-      baseVisits: 186,
-      baseDuration: 28900
+      baseVisits: 0,
+      baseDuration: 0
     },
     hall_guestbook: {
       id: 'hall_guestbook',
@@ -77,8 +77,8 @@ const HallAnalytics = {
       category: 'hall',
       elementId: null,
       page: 'guestbook.html',
-      baseVisits: 119,
-      baseDuration: 12400
+      baseVisits: 0,
+      baseDuration: 0
     },
     hall_reader: {
       id: 'hall_reader',
@@ -88,8 +88,8 @@ const HallAnalytics = {
       category: 'hall',
       elementId: null,
       page: 'reader.html',
-      baseVisits: 76,
-      baseDuration: 11200
+      baseVisits: 0,
+      baseDuration: 0
     },
     hall_desk_qr: {
       id: 'hall_desk_qr',
@@ -99,8 +99,8 @@ const HallAnalytics = {
       category: 'hall',
       elementId: null,
       page: 'desk-qr.html',
-      baseVisits: 88,
-      baseDuration: 7900
+      baseVisits: 0,
+      baseDuration: 0
     },
     hall_lesson: {
       id: 'hall_lesson',
@@ -109,8 +109,8 @@ const HallAnalytics = {
       icon: '⏱️',
       category: 'hall',
       elementId: 'teacherConsole',
-      baseVisits: 64,
-      baseDuration: 15400
+      baseVisits: 0,
+      baseDuration: 0
     }
   },
 
@@ -167,6 +167,9 @@ const HallAnalytics = {
 
     // 6. Подписка на события ухода со страницы (сброс dwell time)
     this.bindLifecycleEvents();
+
+    // 7. Подписка на глобальное обнуление счетчиков
+    window.addEventListener('srmk-counters-reset', () => this.resetLocalStats());
 
     console.log('[HallAnalytics] 🛡️ Анонимный модуль аналитики посещаемости залов активирован (ФЗ-152 compliant).');
   },
@@ -508,31 +511,41 @@ const HallAnalytics = {
       }
     } catch (e) {}
 
-    // Гарантируем наличие базовых залов
+    // Гарантируем наличие базовых залов (с чистым нулем)
     for (const hallId in this.HALLS_CATALOG) {
       if (!this.state.stats[hallId]) {
         const def = this.HALLS_CATALOG[hallId];
         this.state.stats[hallId] = {
-          total_visits: def.baseVisits,
-          total_duration_seconds: def.baseDuration,
-          interactions_count: Math.floor(def.baseVisits * 0.65),
+          total_visits: 0,
+          total_duration_seconds: 0,
+          interactions_count: 0,
           hall_title: def.title,
           category: 'hall'
         };
       }
     }
 
-    // Базовые данные героев
-    if (Object.keys(this.state.heroStats).length === 0) {
-      this.state.heroStats = {
-        'vecherka-n-a': { views: 165, audio: 48, candles: 62, name: 'Николай Вечёрка' },
-        'samokhin-d-a': { views: 142, audio: 39, candles: 51, name: 'Дмитрий Самохин' },
-        'martynov-s-k': { views: 158, audio: 42, candles: 57, name: 'Станислав Мартынов' },
-        'nazarenko-n-s': { views: 139, audio: 35, candles: 49, name: 'Никита Назаренко' },
-        'nazyrov-sh-r': { views: 114, audio: 28, candles: 41, name: 'Шамиль Назыров' },
-        'yaryshev-m-v': { views: 108, audio: 24, candles: 38, name: 'Максим Ярышев' }
+    if (!this.state.heroStats) {
+      this.state.heroStats = {};
+    }
+  },
+
+  resetLocalStats() {
+    this.state.stats = {};
+    this.state.heroStats = {};
+    for (const hallId in this.HALLS_CATALOG) {
+      const def = this.HALLS_CATALOG[hallId];
+      this.state.stats[hallId] = {
+        total_visits: 0,
+        total_duration_seconds: 0,
+        interactions_count: 0,
+        hall_title: def.title,
+        category: 'hall'
       };
     }
+    this.saveCachedStats();
+    this.renderTeacherMonitor();
+    console.log('[HallAnalytics] 🔄 Статистика залов локально обнулена.');
   },
 
   saveCachedStats() {
@@ -583,9 +596,9 @@ const HallAnalytics = {
     for (const hallId in this.HALLS_CATALOG) {
       const meta = this.HALLS_CATALOG[hallId];
       const data = this.state.stats[hallId] || {
-        total_visits: meta.baseVisits,
-        total_duration_seconds: meta.baseDuration,
-        interactions_count: Math.floor(meta.baseVisits * 0.5)
+        total_visits: 0,
+        total_duration_seconds: 0,
+        interactions_count: 0
       };
 
       // Корректировка по фильтру периода
@@ -594,14 +607,13 @@ const HallAnalytics = {
       let interactions = data.interactions_count || 0;
 
       if (this.state.filterPeriod === 'lesson') {
-        // Пропорциональный срез за текущий 45-минутный урок
-        visits = Math.max(Math.round(visits * 0.22), 3);
-        duration = Math.max(Math.round(duration * 0.22), 90);
-        interactions = Math.max(Math.round(interactions * 0.22), 2);
+        visits = Math.round(visits * 0.25);
+        duration = Math.round(duration * 0.25);
+        interactions = Math.round(interactions * 0.25);
       } else if (this.state.filterPeriod === 'today') {
-        visits = Math.max(Math.round(visits * 0.55), 8);
-        duration = Math.max(Math.round(duration * 0.55), 240);
-        interactions = Math.max(Math.round(interactions * 0.55), 5);
+        visits = Math.round(visits * 0.6);
+        duration = Math.round(duration * 0.6);
+        interactions = Math.round(interactions * 0.6);
       }
 
       totalVisits += visits;
@@ -627,15 +639,15 @@ const HallAnalytics = {
     const avgDwellSeconds = totalVisits > 0 ? Math.round(totalDuration / totalVisits) : 0;
     const avgDwellMinutes = Math.floor(avgDwellSeconds / 60);
     const avgDwellRestSec = avgDwellSeconds % 60;
-    const avgDwellStr = `${avgDwellMinutes} мин ${avgDwellRestSec} с`;
+    const avgDwellStr = totalVisits > 0 ? `${avgDwellMinutes} мин ${avgDwellRestSec} с` : '0 с';
 
-    const topHall = hallRows[0] ? hallRows[0].meta.shortTitle : '20 Героев';
+    const topHall = totalVisits > 0 && hallRows[0] ? hallRows[0].meta.shortTitle : 'Ожидание посещений';
 
     // Формируем список топ-экспозиций героев
-    const heroesList = Object.entries(this.state.heroStats).map(([id, info]) => ({
+    const heroesList = Object.entries(this.state.heroStats || {}).map(([id, info]) => ({
       id,
       name: info.name || id,
-      views: this.state.filterPeriod === 'lesson' ? Math.max(Math.round(info.views * 0.25), 2) : info.views,
+      views: this.state.filterPeriod === 'lesson' ? Math.round((info.views || 0) * 0.25) : (info.views || 0),
       candles: info.candles || 0,
       audio: info.audio || 0
     })).sort((a, b) => b.views - a.views).slice(0, 5);
@@ -680,6 +692,11 @@ const HallAnalytics = {
             <!-- КНОПКА ПЕЧАТИ ОТЧЕТА -->
             <button type="button" class="btn-print-report" onclick="HallAnalytics.printAnalyticsReport()" title="Печать официальной аналитической справки">
               <span>🖨️ Справка для завуча</span>
+            </button>
+
+            <!-- КНОПКА ОБНУЛЕНИЯ СЧЕТЧИКОВ И УРОВНЕЙ ДЛЯ ПЕДАГОГА -->
+            <button type="button" class="btn-print-report" onclick="AchievementsEngine.promptReset()" style="background: rgba(239,68,68,0.12); color:#fca5a5; border-color: rgba(239,68,68,0.35);" title="Обнулить все счетчики, уровни и статистику в базе данных Supabase">
+              <span>↺ Обнулить все счетчики</span>
             </button>
           </div>
         </div>
@@ -776,7 +793,7 @@ const HallAnalytics = {
             </div>
 
             <div class="heroes-stat-list">
-              ${heroesList.map((h, idx) => `
+              ${heroesList.length > 0 ? heroesList.map((h, idx) => `
                 <div class="hero-interest-item">
                   <div class="hero-rank-num">${idx + 1}</div>
                   <div class="hero-interest-info">
@@ -791,7 +808,13 @@ const HallAnalytics = {
                     Досье →
                   </button>
                 </div>
-              `).join('')}
+              `).join('') : `
+                <div style="padding: 24px 16px; text-align: center; color: #8b96a5; font-size: 0.82rem; border: 1px dashed rgba(255,255,255,0.1); border-radius: 8px;">
+                  <span style="font-size: 1.4rem; display: block; margin-bottom: 6px;">🕊️</span>
+                  Счетчики обнулены для нового урока.<br>
+                  Интерес к досье 20 героев отобразится по мере исследования зала студентами.
+                </div>
+              `}
             </div>
 
             <!-- БЛОК ГАРАНТИИ ПРИВАТНОСТИ (ФЗ-152) -->

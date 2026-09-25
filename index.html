@@ -439,10 +439,21 @@
                 <small>Конструктор технологических карт ФГОС</small>
               </span>
             </a>
+
+            <button class="teacher-tool-btn" onclick="AchievementsEngine.promptReset()" type="button" style="border-color: rgba(239,68,68,0.35);">
+              <span class="btn-tool-icon" style="color: #fca5a5;">↺</span>
+              <span class="btn-tool-text">
+                <strong style="color: #fca5a5;">Обнулить счетчики для урока</strong>
+                <small>Сброс уровней и статистики в базе данных</small>
+              </span>
+            </button>
           </div>
 
           <!-- МОДУЛЬ АНОНИМНОЙ АНАЛИТИКИ ВОСТРЕБОВАННОСТИ ЗАЛОВ (SUPABASE REALTIME • ФЗ-152) -->
           <div id="hallAnalyticsWidget" class="hall-analytics-wrapper"></div>
+
+          <!-- ЖИВАЯ ЛЕНТА ДОСТИЖЕНИЙ СТУДЕНТОВ (SUPABASE REALTIME) -->
+          <div id="liveAchievementsFeedWidget" class="live-achievements-feed-wrapper" style="margin-top: 16px;"></div>
 
         </div>
       </div>
