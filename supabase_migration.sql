@@ -923,6 +923,18 @@ BEGIN
   -- 6. Очищаем ленту наград
   DELETE FROM achievement_unlock_events;
 
+  -- 7. Обнуляем новую таблицу реальных метрик museum_realtime_metrics
+  UPDATE museum_realtime_metrics SET
+    visits_count = 0,
+    dwell_seconds = 0,
+    candles_count = 0,
+    flowers_count = 0,
+    audio_listens = 0,
+    interactions = 0,
+    active_now = 0,
+    metadata = '{"reset": true}'::jsonb,
+    last_updated = NOW();
+
   RETURN jsonb_build_object(
     'success', true, 
     'message', 'Все счетчики, уровни и достижения успешно обнулены'
@@ -932,15 +944,144 @@ $$;
 
 GRANT EXECUTE ON FUNCTION reset_all_memorial_counters_and_levels() TO anon, authenticated;
 
--- 7.7. ОДНОКРАТНОЕ ОБНУЛЕНИЕ СЧЕТЧИКОВ И УРОВНЕЙ ПРИ ПРИМЕНЕНИИ МИГРАЦИИ
-UPDATE memorial_counters SET candles = 0, flowers = 0;
-UPDATE hall_analytics_counters SET total_visits = 0, active_visitors = 0, total_duration_seconds = 0, interactions_count = 0;
-DELETE FROM hall_analytics_events;
-DELETE FROM anti_abuse_actions_log;
-DELETE FROM tribute_flames_votes;
-UPDATE user_achievements SET xp = 0, rank_id = 'private', rank_title = 'Рядовой', unlocked_badges = '{}';
-DELETE FROM achievement_unlock_events;
+-- 7.7. Процедура сброса (по требованию администратора)
+-- По умолчанию реальные исторические данные сохраняются
 
 -- ============================================================================
--- БАЗА ДАННЫХ И СИСТЕМА ДОСТИЖЕНИЙ ПОЛНОСТЬЮ НАСТРОЕНЫ И ОБНУЛЕНЫ!
+-- РАЗДЕЛ 8: НОВАЯ ТАБЛИЦА РЕАЛЬНЫХ ДАННЫХ И СИНХРОНИЗАЦИИ В РЕАЛЬНОМ ВРЕМЕНИ
+-- Таблица: museum_realtime_metrics (Realtime OMNI-HUB)
+-- ============================================================================
+
+-- 8.1. Создание новой таблицы реальных показателей и метрик музея
+CREATE TABLE IF NOT EXISTS museum_realtime_metrics (
+  metric_id TEXT PRIMARY KEY,               -- Идентификатор сущности ('summary', 'hall_memorial', 'hero_petukhov-v-v' и т.д.)
+  category TEXT NOT NULL,                   -- 'summary', 'hall', 'hero', 'quiz', 'system'
+  title TEXT NOT NULL,                      -- Название сущности на русском языке
+  visits_count INTEGER NOT NULL DEFAULT 0,  -- Реальное число посещений
+  dwell_seconds INTEGER NOT NULL DEFAULT 0, -- Реальное время изучения (в секундах)
+  candles_count INTEGER NOT NULL DEFAULT 0, -- Реальные зажженные лампады из БД
+  flowers_count INTEGER NOT NULL DEFAULT 0, -- Реальные возложенные гвоздики из БД
+  audio_listens INTEGER NOT NULL DEFAULT 0, -- Реальные прослушивания аудиогида
+  interactions INTEGER NOT NULL DEFAULT 0,  -- Суммарное реальное число взаимодействий
+  active_now INTEGER NOT NULL DEFAULT 0,    -- Активные студенты прямо сейчас
+  metadata JSONB DEFAULT '{}'::jsonb,       -- Детали, звания, награды, даты
+  last_updated TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_museum_metrics_cat ON museum_realtime_metrics(category);
+CREATE INDEX IF NOT EXISTS idx_museum_metrics_inter ON museum_realtime_metrics(interactions DESC);
+CREATE INDEX IF NOT EXISTS idx_museum_metrics_candles ON museum_realtime_metrics(candles_count DESC);
+
+-- 8.2. Политики безопасности RLS для новой таблицы
+ALTER TABLE museum_realtime_metrics ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public read museum_metrics" ON museum_realtime_metrics;
+DROP POLICY IF EXISTS "Public write museum_metrics" ON museum_realtime_metrics;
+CREATE POLICY "Public read museum_metrics" ON museum_realtime_metrics FOR SELECT USING (true);
+CREATE POLICY "Public write museum_metrics" ON museum_realtime_metrics FOR ALL USING (true);
+
+-- 8.3. Подключение к каналу Realtime-вещания Supabase
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'museum_realtime_metrics'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE museum_realtime_metrics;
+  END IF;
+END;
+$$;
+
+-- 8.4. Инициализация залов музея в новой таблице
+INSERT INTO museum_realtime_metrics (metric_id, category, title, visits_count, dwell_seconds, interactions, last_updated)
+VALUES
+  ('global_summary', 'summary', 'Сводная статистика Мемориального комплекса', 0, 0, 0, NOW()),
+  ('hall_memorial', 'hall', 'Зал I: Мемориал «Звезда Памяти»', 0, 0, 0, NOW()),
+  ('hall_heroes', 'hall', 'Зал II: Галерея «20 Героев Ставрополья»', 0, 0, 0, NOW()),
+  ('hall_timeline', 'hall', 'Зал III: Рубежи боевой славы и Карта ТВД', 0, 0, 0, NOW()),
+  ('hall_memory', 'hall', 'Зал IV: Эстафета мужества и Парты Героев', 0, 0, 0, NOW()),
+  ('hall_quiz', 'hall', 'Зал V: Исторический квест и Зал Славы', 0, 0, 0, NOW()),
+  ('hall_guestbook', 'hall', 'Зал VI: Стена Памяти и Книга Отзывов', 0, 0, 0, NOW()),
+  ('hall_reader', 'hall', 'Зал VII: Читальный зал и Архив документов', 0, 0, 0, NOW()),
+  ('hall_desk_qr', 'hall', 'Зал VIII: Мобильная экспозиция «Парта Героя»', 0, 0, 0, NOW()),
+  ('hall_lesson', 'hall', 'Пульт Всероссийского «Урока Мужества»', 0, 0, 0, NOW())
+ON CONFLICT (metric_id) DO NOTHING;
+
+-- 8.5. ПРИВЯЗКА РЕАЛЬНЫХ ДАННЫХ ИЗ СУЩЕСТВУЮЩИХ ТАБЛИЦ БЕЗ ВЫДУМЫВАНИЯ:
+-- Переносим реальные свечи и цветы из memorial_counters в museum_realtime_metrics
+INSERT INTO museum_realtime_metrics (metric_id, category, title, candles_count, flowers_count, interactions, last_updated)
+SELECT 
+  'hero_' || mc.hero_id, 
+  'hero', 
+  COALESCE(hd.name, mc.hero_id), 
+  mc.candles, 
+  mc.flowers, 
+  (mc.candles + mc.flowers),
+  mc.updated_at
+FROM memorial_counters mc
+LEFT JOIN heroes_database hd ON hd.id = mc.hero_id
+ON CONFLICT (metric_id) DO UPDATE SET
+  candles_count = EXCLUDED.candles_count,
+  flowers_count = EXCLUDED.flowers_count,
+  interactions = EXCLUDED.interactions,
+  last_updated = EXCLUDED.last_updated;
+
+-- 8.6. Автоматический пересчет сводных реальных чисел в реальном времени
+CREATE OR REPLACE FUNCTION refresh_museum_realtime_summary()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_tot_candles INTEGER;
+  v_tot_flowers INTEGER;
+  v_tot_tributes INTEGER;
+  v_tot_quizzes INTEGER;
+  v_tot_certs INTEGER;
+BEGIN
+  SELECT COALESCE(SUM(candles), 0), COALESCE(SUM(flowers), 0) 
+  INTO v_tot_candles, v_tot_flowers 
+  FROM memorial_counters;
+
+  SELECT COUNT(*) INTO v_tot_tributes FROM guestbook_tributes;
+  SELECT COUNT(*) INTO v_tot_quizzes FROM quiz_results;
+  SELECT COUNT(*) INTO v_tot_certs FROM certificates_registry;
+
+  UPDATE museum_realtime_metrics
+  SET
+    candles_count = v_tot_candles,
+    flowers_count = v_tot_flowers,
+    interactions = v_tot_candles + v_tot_flowers + v_tot_tributes + v_tot_quizzes + v_tot_certs,
+    metadata = jsonb_build_object(
+      'total_candles', v_tot_candles,
+      'total_flowers', v_tot_flowers,
+      'total_tributes', v_tot_tributes,
+      'total_quizzes', v_tot_quizzes,
+      'total_certificates', v_tot_certs,
+      'sync_type', 'real_database_counters'
+    ),
+    last_updated = NOW()
+  WHERE metric_id = 'global_summary';
+
+  RETURN NULL;
+END;
+$$;
+
+-- Триггер автоматической синхронизации при любых изменениях свечей и цветов
+DROP TRIGGER IF EXISTS trg_sync_memorial_to_metrics ON memorial_counters;
+CREATE TRIGGER trg_sync_memorial_to_metrics
+AFTER INSERT OR UPDATE ON memorial_counters
+FOR EACH ROW EXECUTE FUNCTION refresh_museum_realtime_summary();
+
+-- Первичный запуск подсчета сводной строки реальных данных
+DO $$
+BEGIN
+  PERFORM refresh_museum_realtime_summary();
+EXCEPTION WHEN OTHERS THEN
+  NULL;
+END;
+$$;
+
+-- ============================================================================
+-- НОВАЯ ТАБЛИЦА РЕАЛЬНЫХ ДАННЫХ И СИНХРОНИЗАЦИИ УСПЕШНО СОЗДАНА!
 -- ============================================================================

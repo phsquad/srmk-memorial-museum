@@ -171,6 +171,16 @@ const HallAnalytics = {
     // 7. Подписка на глобальное обнуление счетчиков
     window.addEventListener('srmk-counters-reset', () => this.resetLocalStats());
 
+    // 8. Подписка на обновление новой таблицы реальных метрик (museum_realtime_metrics)
+    window.addEventListener('srmk-realtime-metrics-updated', (e) => {
+      this.handleRealtimeMetricsUpdate(e.detail);
+    });
+
+    // 9. Подписка на изменение счетчиков памяти (свечи и цветы)
+    window.addEventListener('srmk-memorial-counters-updated', () => {
+      this.fetchCloudStats();
+    });
+
     console.log('[HallAnalytics] 🛡️ Анонимный модуль аналитики посещаемости залов активирован (ФЗ-152 compliant).');
   },
 
@@ -401,7 +411,7 @@ const HallAnalytics = {
   },
 
   // --------------------------------------------------------------------------
-  // ОБРАБОТКА ДАННЫХ ИЗ ОБЛАКА И REALTIME WEBSOCKETS
+  // ОБРАБОТКА ДАННЫХ ИЗ ОБЛАКА И REALTIME WEBSOCKETS (100% РЕАЛЬНЫЕ ДАННЫЕ)
   // --------------------------------------------------------------------------
   async fetchCloudStats() {
     if (!window.CloudSync || !CloudSync.isLive) {
@@ -410,34 +420,107 @@ const HallAnalytics = {
     }
 
     try {
-      const rows = await CloudSync.fetchHallAnalytics();
-      if (rows && Array.isArray(rows) && rows.length > 0) {
-        rows.forEach(row => {
-          this.state.stats[row.hall_id] = {
-            total_visits: row.total_visits || 0,
-            active_visitors: row.active_visitors || 0,
-            total_duration_seconds: row.total_duration_seconds || 0,
-            interactions_count: row.interactions_count || 0,
-            hall_title: row.hall_title || row.hall_id,
-            category: row.category || 'hall',
-            last_activity: row.last_activity
-          };
+      // 1. Чтение РЕАЛЬНЫХ агрегированных данных из таблиц Supabase (memorial_counters, guestbook, quiz)
+      const realMetrics = await CloudSync.aggregateRealDatabaseMetrics();
+      if (realMetrics && realMetrics.heroesMap) {
+        this.state.realMetricsSummary = realMetrics;
 
-          // Если это экспозиция конкретного героя
-          if (row.category === 'hero_expo' && row.hall_id.startsWith('expo_')) {
-            const heroId = row.hall_id.replace('expo_', '');
-            if (!this.state.heroStats[heroId]) {
-              this.state.heroStats[heroId] = { views: 0, audio: 0, candles: 0, name: row.hall_title };
-            }
-            this.state.heroStats[heroId].views = Math.max(this.state.heroStats[heroId].views, row.total_visits || 0);
+        // Связываем реальные показатели каждого героя из базы данных
+        Object.entries(realMetrics.heroesMap).forEach(([heroId, data]) => {
+          let heroName = heroId;
+          if (typeof heroesDatabase !== 'undefined' && Array.isArray(heroesDatabase)) {
+            const h = heroesDatabase.find(item => item.id === heroId);
+            if (h) heroName = h.name;
+          }
+
+          const existing = this.state.heroStats[heroId] || {};
+          this.state.heroStats[heroId] = {
+            views: existing.views || 0,
+            audio: existing.audio || 0,
+            candles: data.candles || 0,
+            flowers: data.flowers || 0,
+            interactions: data.interactions || 0,
+            name: heroName
+          };
+        });
+      }
+
+      // 2. Чтение из новой таблицы museum_realtime_metrics
+      const metricRows = await CloudSync.fetchRealtimeMetrics();
+      if (metricRows && Array.isArray(metricRows) && metricRows.length > 0) {
+        metricRows.forEach(row => {
+          if (row.category === 'hall') {
+            this.state.stats[row.metric_id] = {
+              total_visits: row.visits_count || 0,
+              total_duration_seconds: row.dwell_seconds || 0,
+              interactions_count: row.interactions || 0,
+              hall_title: row.title || row.metric_id,
+              category: 'hall'
+            };
           }
         });
-        this.saveCachedStats();
-        this.renderTeacherMonitor();
+      } else {
+        // Fallback к старой таблице hall_analytics_counters, если она есть
+        const rows = await CloudSync.fetchHallAnalytics();
+        if (rows && Array.isArray(rows) && rows.length > 0) {
+          rows.forEach(row => {
+            this.state.stats[row.hall_id] = {
+              total_visits: row.total_visits || 0,
+              active_visitors: row.active_visitors || 0,
+              total_duration_seconds: row.total_duration_seconds || 0,
+              interactions_count: row.interactions_count || 0,
+              hall_title: row.hall_title || row.hall_id,
+              category: row.category || 'hall',
+              last_activity: row.last_activity
+            };
+          });
+        }
       }
+
+      this.saveCachedStats();
+      this.renderTeacherMonitor();
     } catch (e) {
       console.warn('[HallAnalytics] Фоновое чтение аналитики из Supabase:', e);
     }
+  },
+
+  handleRealtimeMetricsUpdate(row) {
+    if (!row) return;
+
+    if (row.category === 'hall' && row.metric_id) {
+      this.state.stats[row.metric_id] = {
+        total_visits: row.visits_count || 0,
+        total_duration_seconds: row.dwell_seconds || 0,
+        interactions_count: row.interactions || 0,
+        hall_title: row.title || row.metric_id,
+        category: 'hall'
+      };
+    } else if (row.category === 'hero' && row.metric_id?.startsWith('hero_')) {
+      const heroId = row.metric_id.replace('hero_', '');
+      let heroName = row.title || heroId;
+      if (typeof heroesDatabase !== 'undefined' && Array.isArray(heroesDatabase)) {
+        const h = heroesDatabase.find(item => item.id === heroId);
+        if (h) heroName = h.name;
+      }
+      const existing = this.state.heroStats[heroId] || {};
+      this.state.heroStats[heroId] = {
+        ...existing,
+        candles: row.candles_count ?? existing.candles ?? 0,
+        flowers: row.flowers_count ?? existing.flowers ?? 0,
+        interactions: row.interactions ?? existing.interactions ?? 0,
+        name: heroName
+      };
+    } else if (row.metric_id === 'global_summary') {
+      if (this.state.realMetricsSummary) {
+        this.state.realMetricsSummary.totalCandles = row.candles_count || 0;
+        this.state.realMetricsSummary.totalFlowers = row.flowers_count || 0;
+        this.state.realMetricsSummary.totalInteractions = row.interactions || 0;
+      }
+    }
+
+    this.saveCachedStats();
+    this.renderTeacherMonitor();
+    this.pulseLiveIndicator();
   },
 
   handleRealtimePayload(payload) {
@@ -455,14 +538,6 @@ const HallAnalytics = {
       category: row.category || 'hall',
       last_activity: row.last_activity
     };
-
-    if (row.category === 'hero_expo' && hallId.startsWith('expo_')) {
-      const heroId = hallId.replace('expo_', '');
-      if (!this.state.heroStats[heroId]) {
-        this.state.heroStats[heroId] = { views: 0, audio: 0, candles: 0, name: row.hall_title };
-      }
-      this.state.heroStats[heroId].views = row.total_visits || 0;
-    }
 
     this.saveCachedStats();
     this.renderTeacherMonitor();
@@ -641,16 +716,39 @@ const HallAnalytics = {
     const avgDwellRestSec = avgDwellSeconds % 60;
     const avgDwellStr = totalVisits > 0 ? `${avgDwellMinutes} мин ${avgDwellRestSec} с` : '0 с';
 
-    const topHall = totalVisits > 0 && hallRows[0] ? hallRows[0].meta.shortTitle : 'Ожидание посещений';
+    // РЕАЛЬНЫЕ ДАННЫЕ ИЗ БАЗЫ ДАННЫХ
+    const realSummary = this.state.realMetricsSummary;
+    const realCandles = realSummary?.totalCandles || 0;
+    const realFlowers = realSummary?.totalFlowers || 0;
+    const realTributesCount = realCandles + realFlowers;
+    const realInteractions = (realSummary?.totalInteractions || 0) + totalVisits;
 
-    // Формируем список топ-экспозиций героев
-    const heroesList = Object.entries(this.state.heroStats || {}).map(([id, info]) => ({
-      id,
-      name: info.name || id,
-      views: this.state.filterPeriod === 'lesson' ? Math.round((info.views || 0) * 0.25) : (info.views || 0),
-      candles: info.candles || 0,
-      audio: info.audio || 0
-    })).sort((a, b) => b.views - a.views).slice(0, 5);
+    // Формируем список топ-экспозиций героев ПО РЕАЛЬНЫМ ПОКАЗАТЕЛЯМ ИЗ БАЗЫ ДАННЫХ
+    const heroesList = Object.entries(this.state.heroStats || {}).map(([id, info]) => {
+      const heroCandles = info.candles || 0;
+      const heroFlowers = info.flowers || 0;
+      const heroTributes = heroCandles + heroFlowers;
+      const heroViews = info.views || 0;
+      const heroAudio = info.audio || 0;
+      const totalScore = heroTributes * 3 + heroViews + heroAudio;
+      return {
+        id,
+        name: info.name || id,
+        candles: heroCandles,
+        flowers: heroFlowers,
+        tributes: heroTributes,
+        views: heroViews,
+        audio: heroAudio,
+        totalScore
+      };
+    })
+    .filter(h => h.totalScore > 0 || h.tributes > 0)
+    .sort((a, b) => b.totalScore - a.totalScore)
+    .slice(0, 5);
+
+    const topHall = hallRows.length > 0 && hallRows[0].visits > 0 ? (hallRows[0].meta?.shortTitle || hallRows[0].meta?.title || hallRows[0].id) : 'Ожидание посещений';
+    const topHero = heroesList[0];
+    const topHeroLabel = topHero ? `${topHero.name} (${topHero.tributes} почестей)` : (topHall !== 'Ожидание посещений' ? topHall : 'Мемориал Славы СРМК');
 
     const isLive = window.CloudSync && CloudSync.isLive;
 
@@ -671,7 +769,7 @@ const HallAnalytics = {
             </div>
             <h3 class="monitor-title">Востребованность залов и экспозиций в реальном времени</h3>
             <p class="monitor-subtitle">
-              Педагогический мониторинг вовлеченности студенческой аудитории по стандартам ФГОС СПО.
+              Педагогический мониторинг вовлеченности студенческой аудитории по стандартам ФГОС СПО на основе <strong>реальных данных из базы</strong>.
             </p>
           </div>
 
@@ -713,11 +811,11 @@ const HallAnalytics = {
           </div>
 
           <div class="analytics-kpi-box">
-            <div class="kpi-icon-wrap">🏛️</div>
+            <div class="kpi-icon-wrap">🕯️</div>
             <div class="kpi-content">
-              <span class="kpi-number">${totalVisits}</span>
-              <span class="kpi-label">Изучений залов и экспозиций</span>
-              <span class="kpi-subtext">Суммарный интерес группы</span>
+              <span class="kpi-number">${realCandles} 🕯️ • ${realFlowers} 💐</span>
+              <span class="kpi-label">Реальных почестей в базе данных</span>
+              <span class="kpi-subtext">Всего откликов: ${realTributesCount}</span>
             </div>
           </div>
 
@@ -733,9 +831,9 @@ const HallAnalytics = {
           <div class="analytics-kpi-box">
             <div class="kpi-icon-wrap">⭐</div>
             <div class="kpi-content">
-              <span class="kpi-number" style="font-size: 1.15rem; color: #dfba6d;">${this.escapeHtml(topHall)}</span>
-              <span class="kpi-label">Лидер внимания занятия</span>
-              <span class="kpi-subtext">Максимум откликов и свечей</span>
+              <span class="kpi-number" style="font-size: 1.05rem; color: #dfba6d;">${this.escapeHtml(topHeroLabel)}</span>
+              <span class="kpi-label">Лидер народной памяти в БД</span>
+              <span class="kpi-subtext">Максимум свечей и цветов</span>
             </div>
           </div>
         </div>
@@ -788,8 +886,8 @@ const HallAnalytics = {
           <!-- ПРАВАЯ КОЛОНКА: ТОП ЭКСПОЗИЦИЙ ВЫПУСКНИКОВ И ИНТЕРАКТИВ -->
           <div class="heroes-interest-panel">
             <div class="panel-section-title">
-              <span>🎖️ Востребованность досье выпускников</span>
-              <span class="panel-counter-badge">Топ-5 интереса</span>
+              <span>🎖️ Реальный отклик и почести героям (БД)</span>
+              <span class="panel-counter-badge">${heroesList.length} в лидерах</span>
             </div>
 
             <div class="heroes-stat-list">
@@ -799,9 +897,10 @@ const HallAnalytics = {
                   <div class="hero-interest-info">
                     <h4 class="hero-interest-name">${this.escapeHtml(h.name)}</h4>
                     <div class="hero-interest-tags">
-                      <span>👁️ ${h.views} просмотров</span>
+                      <span>🕯️ ${h.candles} свечей</span>
+                      <span>💐 ${h.flowers} возложений</span>
+                      ${h.views > 0 ? `<span>👁️ ${h.views} просмотров</span>` : ''}
                       ${h.audio > 0 ? `<span>🎧 ${h.audio} аудио</span>` : ''}
-                      ${h.candles > 0 ? `<span>🕯️ ${h.candles} свечей</span>` : ''}
                     </div>
                   </div>
                   <button type="button" class="btn-inspect-expo" onclick="App.openModal('${h.id}')" title="Открыть досье героя">

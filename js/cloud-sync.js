@@ -227,6 +227,24 @@ const CloudSync = {
     } catch (eventsErr) {
       console.warn('[CloudSync] Ошибка подключения ленты наград:', eventsErr);
     }
+
+    // 7. Слушатель НОВОЙ таблицы реальных метрик музея (museum_realtime_metrics)
+    try {
+      const metricsChannel = this.client.channel('realtime_museum_metrics_hub')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'museum_realtime_metrics' }, (payload) => {
+          if (payload.new) {
+            window.dispatchEvent(new CustomEvent('srmk-realtime-metrics-updated', { detail: payload.new }));
+          }
+        })
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            console.log('[CloudSync] 🌐 Realtime-вещание таблицы museum_realtime_metrics активно.');
+          }
+        });
+      this.channels.push(metricsChannel);
+    } catch (metricErr) {
+      console.warn('[CloudSync] Ошибка подключения канала museum_realtime_metrics:', metricErr);
+    }
   },
 
   reconnect() {
@@ -755,6 +773,15 @@ const CloudSync = {
             rank_title: 'Рядовой',
             unlocked_badges: []
           }).neq('user_id', '');
+          await this.client.from('museum_realtime_metrics').update({
+            visits_count: 0,
+            dwell_seconds: 0,
+            candles_count: 0,
+            flowers_count: 0,
+            audio_listens: 0,
+            interactions: 0,
+            active_now: 0
+          }).neq('metric_id', '');
           dbSuccess = true;
           console.log('[CloudSync] ✅ Прямое обнуление счетчиков в БД выполнено.');
         } catch (directErr) {
@@ -787,6 +814,166 @@ const CloudSync = {
     window.dispatchEvent(new CustomEvent('srmk-counters-reset', { detail: { dbSuccess } }));
 
     return { success: true, dbSuccess };
+  },
+
+  // ==========================================================================
+  // МЕТОДЫ НОВОЙ ТАБЛИЦЫ РЕАЛЬНЫХ ДАННЫХ (museum_realtime_metrics)
+  // ==========================================================================
+  async fetchRealtimeMetrics() {
+    if (!this.isLive || !this.client) return null;
+    try {
+      const { data, error } = await this.client
+        .from('museum_realtime_metrics')
+        .select('*');
+      if (error) throw error;
+      return data;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  /**
+   * Сбор и привязка 100% РЕАЛЬНЫХ ДАННЫХ из базы данных Supabase
+   * (без выдуманных и искусственных цифр, все берется прямо из реальных таблиц)
+   */
+  async aggregateRealDatabaseMetrics() {
+    if (!this.isLive || !this.client) return null;
+    try {
+      // 1. Читаем реальные свечи и цветы каждого героя
+      const { data: memorialRows } = await this.client
+        .from('memorial_counters')
+        .select('hero_id, candles, flowers, updated_at');
+
+      let realCandlesTotal = 0;
+      let realFlowersTotal = 0;
+      const heroesMap = {};
+
+      if (Array.isArray(memorialRows)) {
+        memorialRows.forEach(r => {
+          const c = r.candles || 0;
+          const f = r.flowers || 0;
+          realCandlesTotal += c;
+          realFlowersTotal += f;
+          heroesMap[r.hero_id] = {
+            heroId: r.hero_id,
+            candles: c,
+            flowers: f,
+            interactions: c + f,
+            updatedAt: r.updated_at
+          };
+        });
+      }
+
+      // 2. Читаем реальные послания и лампады Стены Памяти
+      let realTributesCount = 0;
+      try {
+        const { count } = await this.client
+          .from('guestbook_tributes')
+          .select('*', { count: 'exact', head: true });
+        realTributesCount = count || 0;
+      } catch (e) {}
+
+      // 3. Читаем реальные сдачи квеста
+      let realQuizCount = 0;
+      try {
+        const { count } = await this.client
+          .from('quiz_results')
+          .select('*', { count: 'exact', head: true });
+        realQuizCount = count || 0;
+      } catch (e) {}
+
+      // 4. Читаем реальные выданные сертификаты
+      let realCertsCount = 0;
+      try {
+        const { count } = await this.client
+          .from('certificates_registry')
+          .select('*', { count: 'exact', head: true });
+        realCertsCount = count || 0;
+      } catch (e) {}
+
+      const totalInteractions = realCandlesTotal + realFlowersTotal + realTributesCount + realQuizCount + realCertsCount;
+
+      const result = {
+        totalCandles: realCandlesTotal,
+        totalFlowers: realFlowersTotal,
+        totalTributes: realTributesCount,
+        totalQuizzes: realQuizCount,
+        totalCertificates: realCertsCount,
+        totalInteractions: totalInteractions,
+        heroesMap: heroesMap,
+        heroesRanking: Object.values(heroesMap).sort((a, b) => b.interactions - a.interactions)
+      };
+
+      // 5. Синхронизируем эти реальные данные в новую таблицу museum_realtime_metrics
+      try {
+        await this.client.from('museum_realtime_metrics').upsert([{
+          metric_id: 'global_summary',
+          category: 'summary',
+          title: 'Сводная статистика Мемориального комплекса',
+          candles_count: realCandlesTotal,
+          flowers_count: realFlowersTotal,
+          interactions: totalInteractions,
+          metadata: {
+            total_tributes: realTributesCount,
+            total_quizzes: realQuizCount,
+            total_certificates: realCertsCount,
+            sync_source: 'live_database_tables'
+          },
+          last_updated: new Date().toISOString()
+        }]);
+
+        const heroUpserts = Object.values(heroesMap).map(h => ({
+          metric_id: `hero_${h.heroId}`,
+          category: 'hero',
+          title: h.heroId,
+          candles_count: h.candles,
+          flowers_count: h.flowers,
+          interactions: h.interactions,
+          last_updated: h.updatedAt || new Date().toISOString()
+        }));
+
+        if (heroUpserts.length > 0) {
+          await this.client.from('museum_realtime_metrics').upsert(heroUpserts);
+        }
+      } catch (upsertErr) {
+        // Фоллбек: таблица будет наполнена при выполнении скрипта миграции
+      }
+
+      return result;
+    } catch (err) {
+      console.warn('[CloudSync] Ошибка агрегации реальных данных из базы:', err);
+      return null;
+    }
+  },
+
+  async recordRealtimeInteraction(metricId, category, title, deltaInteractions = 1, deltaVisits = 0, deltaDwell = 0) {
+    if (!this.isLive || !this.client) return false;
+    try {
+      const { data: cur } = await this.client
+        .from('museum_realtime_metrics')
+        .select('*')
+        .eq('metric_id', metricId)
+        .maybeSingle();
+
+      const newVisits = (cur?.visits_count || 0) + deltaVisits;
+      const newDwell = (cur?.dwell_seconds || 0) + deltaDwell;
+      const newInter = (cur?.interactions || 0) + deltaInteractions;
+
+      await this.client
+        .from('museum_realtime_metrics')
+        .upsert([{
+          metric_id: metricId,
+          category: category,
+          title: title || cur?.title || metricId,
+          visits_count: newVisits,
+          dwell_seconds: newDwell,
+          interactions: newInter,
+          last_updated: new Date().toISOString()
+        }]);
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 };
 
