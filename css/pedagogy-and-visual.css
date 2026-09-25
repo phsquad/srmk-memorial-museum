@@ -1,0 +1,788 @@
+/**
+ * ============================================================================
+ * css/pedagogy-and-visual.css
+ * ПУЛЬТ ПРЕПОДАВАТЕЛЯ, РЕЖИМ ПРОЕКТОРА И НОВЫЙ МЕМОРИАЛЬНЫЙ ВИЗУАЛ v17.0
+ * ============================================================================
+ */
+
+/* ----------------------------------------------------------------------------
+   1. ПЕРЕКЛЮЧАТЕЛЬ РЕЖИМОВ УСТРОЙСТВ И ПРЕЗЕНТАЦИИ (DEVICE & VIEWPORT BAR)
+   ---------------------------------------------------------------------------- */
+.device-viewport-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: rgba(18, 22, 30, 0.85);
+  border: 1px solid rgba(197, 160, 89, 0.25);
+  border-radius: 8px;
+  padding: 10px 18px;
+  margin: 20px 0 30px;
+  backdrop-filter: blur(10px);
+}
+
+.viewport-bar-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  color: var(--accent-brass, #c5a059);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.viewport-bar-title .icon {
+  font-size: 1.1rem;
+}
+
+.viewport-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.viewport-mode-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cfd6e4;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.viewport-mode-btn:hover {
+  background: rgba(197, 160, 89, 0.15);
+  border-color: rgba(197, 160, 89, 0.4);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.viewport-mode-btn.active {
+  background: #c5a059;
+  border-color: #dfba6d;
+  color: #0c0e12;
+  box-shadow: 0 4px 15px rgba(197, 160, 89, 0.35);
+}
+
+.viewport-mode-btn.highlight {
+  background: rgba(138, 28, 34, 0.25);
+  border-color: rgba(138, 28, 34, 0.55);
+  color: #ff9da4;
+}
+
+.viewport-mode-btn.highlight:hover {
+  background: #8a1c22;
+  color: #fff;
+  border-color: #b82730;
+}
+
+/* ----------------------------------------------------------------------------
+   2. РЕЖИМ ПРОЕКТОРА И ИНТЕРАКТИВНОЙ ДОСКИ (BODY.PROJECTOR-BOARD-MODE)
+   ---------------------------------------------------------------------------- */
+body.projector-board-mode {
+  font-size: 18px !important;
+}
+
+body.projector-board-mode .site-header {
+  border-bottom: 2px solid rgba(197, 160, 89, 0.45);
+}
+
+body.projector-board-mode .hero-title {
+  font-size: clamp(2rem, 4vw, 3.4rem) !important;
+}
+
+body.projector-board-mode .hero-subtitle {
+  font-size: 1.18rem !important;
+  max-width: 900px !important;
+}
+
+body.projector-board-mode .hero-card-name {
+  font-size: 1.25rem !important;
+}
+
+body.projector-board-mode .hero-card-specialty {
+  font-size: 0.95rem !important;
+  min-height: auto !important;
+}
+
+body.projector-board-mode .hero-card-btn,
+body.projector-board-mode .btn,
+body.projector-board-mode .spec-filter-btn {
+  padding: 14px 22px !important;
+  font-size: 0.95rem !important;
+  min-height: 48px !important;
+}
+
+body.projector-board-mode .plaque-name-link {
+  font-size: 1.15rem !important;
+  padding: 10px 14px !important;
+}
+
+/* Индикатор активного режима проектора */
+.projector-active-banner {
+  display: none;
+  background: #8a1c22;
+  color: #fff;
+  text-align: center;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #b82730;
+}
+
+body.projector-board-mode .projector-active-banner {
+  display: block;
+}
+
+/* ----------------------------------------------------------------------------
+   3. ПУЛЬТ ПРЕПОДАВАТЕЛЯ: СЕКЦИЯ «УРОК МУЖЕСТВА» (TEACHER'S CONSOLE)
+   ---------------------------------------------------------------------------- */
+.teacher-console-section {
+  padding: 60px 0 40px;
+  background: linear-gradient(180deg, rgba(14, 18, 25, 0.95) 0%, rgba(10, 12, 16, 0.98) 100%);
+  border-top: 1px solid rgba(197, 160, 89, 0.2);
+  border-bottom: 1px solid rgba(197, 160, 89, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.teacher-console-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 280px;
+  background: radial-gradient(ellipse at top, rgba(197, 160, 89, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.teacher-card-panel {
+  background: #131721;
+  border: 1px solid rgba(197, 160, 89, 0.28);
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  position: relative;
+}
+
+.teacher-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 26px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.teacher-header-left {
+  max-width: 680px;
+}
+
+.teacher-kicker {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--accent-brass, #c5a059);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.teacher-title {
+  font-family: var(--font-serif, 'Cinzel', serif);
+  font-size: clamp(1.4rem, 2.4vw, 1.85rem);
+  color: #f1f3f7;
+  line-height: 1.25;
+  margin-bottom: 8px;
+}
+
+.teacher-desc {
+  font-size: 0.9rem;
+  color: #9da6b3;
+  line-height: 1.55;
+}
+
+.teacher-timer-box {
+  background: rgba(10, 12, 16, 0.85);
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  border-radius: 8px;
+  padding: 12px 20px;
+  text-align: center;
+  min-width: 220px;
+}
+
+.timer-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #8b96a5;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.timer-clock {
+  font-family: 'Cinzel', monospace;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #dfba6d;
+  letter-spacing: 2px;
+  display: block;
+  text-shadow: 0 0 15px rgba(223, 186, 109, 0.4);
+}
+
+.timer-controls {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.btn-timer-ctrl {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #f1f3f7;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-timer-ctrl:hover {
+  background: #c5a059;
+  color: #0c0e12;
+}
+
+/* ИНТЕРАКТИВНЫЙ ТАЙМЛАЙН 45-МИНУТНОГО УРОКА */
+.lesson-timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.lesson-step-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.lesson-step-card:hover {
+  background: rgba(197, 160, 89, 0.06);
+  border-color: rgba(197, 160, 89, 0.35);
+  transform: translateY(-2px);
+}
+
+.lesson-step-card.active {
+  background: rgba(197, 160, 89, 0.12);
+  border-color: #c5a059;
+  box-shadow: 0 4px 20px rgba(197, 160, 89, 0.2);
+}
+
+.step-card-timing {
+  font-size: 0.72rem;
+  color: #c5a059;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.step-card-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(197, 160, 89, 0.2);
+  color: #dfba6d;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.step-card-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #f1f3f7;
+  line-height: 1.35;
+  margin-bottom: 6px;
+}
+
+.step-card-desc {
+  font-size: 0.78rem;
+  color: #8b96a5;
+  line-height: 1.45;
+  margin-bottom: 10px;
+  flex-grow: 1;
+}
+
+.step-card-action {
+  font-size: 0.75rem;
+  color: #c5a059;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ПАНЕЛЬ БЫСТРЫХ ИНСТРУМЕНТОВ УЧИТЕЛЯ */
+.teacher-tools-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.teacher-tool-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 12px 14px;
+  color: #e2e8f0;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.teacher-tool-btn:hover {
+  background: rgba(197, 160, 89, 0.15);
+  border-color: rgba(197, 160, 89, 0.45);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.teacher-tool-btn .btn-tool-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.teacher-tool-btn .btn-tool-text {
+  text-align: left;
+}
+
+.teacher-tool-btn .btn-tool-text strong {
+  display: block;
+  font-size: 0.84rem;
+  color: #f1f3f7;
+}
+
+.teacher-tool-btn .btn-tool-text small {
+  display: block;
+  font-size: 0.72rem;
+  color: #9da6b3;
+}
+
+/* ----------------------------------------------------------------------------
+   4. ИНТЕРАКТИВНЫЙ МОДУЛЬ «ВСЕРОССИЙСКАЯ МИНУТА МОЛЧАНИЯ» (OVERLAY)
+   ---------------------------------------------------------------------------- */
+.silence-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: radial-gradient(circle at center, rgba(16, 20, 28, 0.98) 0%, rgba(4, 5, 8, 0.99) 100%);
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  text-align: center;
+  backdrop-filter: blur(20px);
+  animation: silenceFadeIn 0.5s ease;
+}
+
+.silence-overlay.active {
+  display: flex;
+}
+
+@keyframes silenceFadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.silence-container {
+  max-width: 680px;
+  position: relative;
+}
+
+.silence-close-btn {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.silence-close-btn:hover {
+  background: #8a1c22;
+  border-color: #b82730;
+}
+
+.silence-flame-wrapper {
+  margin: 0 auto 20px;
+  width: 90px;
+  height: 120px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.silence-candle-flame {
+  width: 32px;
+  height: 60px;
+  background: radial-gradient(ellipse at bottom, #fff 0%, #fef08a 25%, #f59e0b 60%, #b45309 85%, transparent 100%);
+  border-radius: 50% 50% 35% 35% / 80% 80% 20% 20%;
+  filter: drop-shadow(0 0 25px rgba(245, 158, 11, 0.8)) drop-shadow(0 0 50px rgba(245, 158, 11, 0.4));
+  animation: flameFlicker 1.8s infinite ease-in-out alternate;
+}
+
+@keyframes flameFlicker {
+  0% { transform: scale(1) rotate(-1deg); filter: drop-shadow(0 0 25px rgba(245, 158, 11, 0.8)); }
+  50% { transform: scale(1.06, 0.95) rotate(1deg); filter: drop-shadow(0 0 35px rgba(245, 158, 11, 0.95)); }
+  100% { transform: scale(0.96, 1.04) rotate(-0.5deg); filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.7)); }
+}
+
+.silence-kicker {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--accent-brass, #c5a059);
+  margin-bottom: 12px;
+}
+
+.silence-countdown {
+  font-family: 'Cinzel', monospace;
+  font-size: clamp(3.5rem, 8vw, 5.5rem);
+  font-weight: 900;
+  color: #dfba6d;
+  line-height: 1;
+  margin-bottom: 14px;
+  text-shadow: 0 0 30px rgba(223, 186, 109, 0.5);
+}
+
+.silence-quote {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  color: #f1f3f7;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.silence-author {
+  font-size: 0.88rem;
+  color: #9da6b3;
+  margin-bottom: 24px;
+}
+
+.silence-metronome-pulse {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: #c5a059;
+  background: rgba(197, 160, 89, 0.1);
+  border: 1px solid rgba(197, 160, 89, 0.25);
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+.metronome-dot {
+  width: 8px;
+  height: 8px;
+  background: #f59e0b;
+  border-radius: 50%;
+  animation: pulseMetronome 1s infinite ease;
+}
+
+@keyframes pulseMetronome {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.6); opacity: 1; }
+}
+
+/* ----------------------------------------------------------------------------
+   5. МОДАЛЬНОЕ ОКНО ОФИЦИАЛЬНОГО ОТЧЁТА/СПРАВКИ ОБ УРОКЕ МУЖЕСТВА
+   ---------------------------------------------------------------------------- */
+.lesson-report-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  background: rgba(8, 10, 14, 0.85);
+  backdrop-filter: blur(12px);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.lesson-report-modal.active {
+  display: flex;
+}
+
+.report-modal-content {
+  background: #141822;
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  border-radius: 10px;
+  max-width: 650px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 28px;
+  position: relative;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.8);
+}
+
+.report-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.report-title {
+  font-family: var(--font-serif, 'Cinzel', serif);
+  font-size: 1.25rem;
+  color: #dfba6d;
+  margin-bottom: 4px;
+}
+
+.report-subtitle {
+  font-size: 0.82rem;
+  color: #9da6b3;
+}
+
+.report-form-group {
+  margin-bottom: 14px;
+}
+
+.report-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #cfd6e4;
+  margin-bottom: 6px;
+}
+
+.report-input {
+  width: 100%;
+  background: #0d1016;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  padding: 9px 12px;
+  color: #f1f3f7;
+  font-size: 0.88rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.report-input:focus {
+  border-color: #c5a059;
+}
+
+.report-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ----------------------------------------------------------------------------
+   6. ПЛАВАЮЩАЯ МОБИЛЬНАЯ ПАНЕЛЬ БЫСТРЫХ ДЕЙСТВИЙ (SMARTPHONE QUICK ACTION BAR)
+   ---------------------------------------------------------------------------- */
+.mobile-sticky-memorial-bar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: rgba(14, 17, 24, 0.95);
+  border-top: 1px solid rgba(197, 160, 89, 0.3);
+  padding: 8px 12px;
+  backdrop-filter: blur(16px);
+  justify-content: space-around;
+  align-items: center;
+}
+
+.mobile-bar-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  color: #9da6b3;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 8px;
+  transition: color 0.2s;
+}
+
+.mobile-bar-btn .icon {
+  font-size: 1.25rem;
+}
+
+.mobile-bar-btn:hover,
+.mobile-bar-btn.active {
+  color: #dfba6d;
+}
+
+.mobile-bar-btn.primary {
+  color: #c5a059;
+}
+
+@media (max-width: 768px) {
+  .mobile-sticky-memorial-bar {
+    display: flex;
+  }
+  body {
+    padding-bottom: 60px; /* Отступ под нижнюю панель */
+  }
+}
+
+/* ----------------------------------------------------------------------------
+   7. ВИДЖЕТ «ГЕРОЙ ДНЯ / ВСПОМНИМ ВЫПУСКНИКА» (FEATURED HERO SPOTLIGHT)
+   ---------------------------------------------------------------------------- */
+.hero-spotlight-card {
+  background: linear-gradient(135deg, rgba(20, 25, 36, 0.9) 0%, rgba(13, 16, 23, 0.95) 100%);
+  border: 1px solid rgba(197, 160, 89, 0.3);
+  border-radius: 10px;
+  padding: 22px 26px;
+  margin: 30px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-spotlight-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #dfba6d 0%, #8a1c22 100%);
+}
+
+.spotlight-avatar-wrap {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(197, 160, 89, 0.5);
+  flex-shrink: 0;
+}
+
+.spotlight-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.spotlight-info {
+  flex-grow: 1;
+  min-width: 240px;
+}
+
+.spotlight-kicker {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent-brass, #c5a059);
+  margin-bottom: 4px;
+}
+
+.spotlight-name {
+  font-family: var(--font-serif, 'Cinzel', serif);
+  font-size: 1.25rem;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.spotlight-meta {
+  font-size: 0.82rem;
+  color: #9da6b3;
+  margin-bottom: 8px;
+}
+
+.spotlight-quote {
+  font-style: italic;
+  font-size: 0.86rem;
+  color: #cfd6e4;
+  line-height: 1.45;
+}
+
+.spotlight-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* ----------------------------------------------------------------------------
+   8. ПЕЧАТНЫЙ СТИЛЬ ДЛЯ СПРАВКИ И РАЗДАТОЧНЫХ МАТЕРИАЛОВ
+   ---------------------------------------------------------------------------- */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .printable-lesson-report,
+  .printable-lesson-report * {
+    visibility: visible;
+  }
+  .printable-lesson-report {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    color: #000;
+    background: #fff;
+    padding: 20mm;
+    font-family: 'Times New Roman', serif;
+  }
+}

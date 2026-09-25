@@ -32,9 +32,16 @@ const AppState = {
   isTTSPlaying: false,
   audioContext: null,
 
-  // Интерактивный режим «Урок Мужества» (Автопилот-презентация)
+  // Интерактивный режим «Урок Мужества» и презентация
   isPresentationRunning: false,
   presentationTimer: null,
+  isProjectorMode: false,
+  silenceTimer: null,
+  silenceSecondsLeft: 60,
+  lessonTimer: null,
+  lessonSecondsLeft: 45 * 60,
+  isLessonTimerRunning: false,
+  activeLessonPhase: 0,
 
   // Яндекс Карты v2.1
   mapInstance: null,
@@ -74,6 +81,7 @@ const App = {
     this.renderMemorialPlaques();
     this.renderSpecialtyFilters();
     this.renderCardsGrid();
+    this.renderFeaturedHero();
     this.updateMemorialStats();
 
     // Привязка событий, жесткого роутинга и тач-жестов
@@ -809,23 +817,443 @@ const App = {
   },
 
   /* ==========================================================================
-     РЕЖИМ ПРЕЗЕНТАЦИИ «УРОК МУЖЕСТВА»
+     РЕЖИМЫ УСТРОЙСТВ, ПРОЕКТОР И ИНТЕРАКТИВНАЯ ДОСКА
      ========================================================================== */
-  startPresentationMode() {
-    if (AppState.isPresentationRunning) {
-      this.stopPresentationMode();
+  setDeviceMode(mode) {
+    const desktopBtn = document.getElementById('btnModeDesktop');
+    const projectorBtn = document.getElementById('btnModeProjector');
+
+    if (mode === 'projector') {
+      document.body.classList.add('projector-board-mode');
+      AppState.isProjectorMode = true;
+      if (desktopBtn) desktopBtn.classList.remove('active');
+      if (projectorBtn) projectorBtn.classList.add('active');
+      this.showToast("Режим интерактивной доски / проектора активирован: увеличенный шрифт 18px и сенсорные зоны.", "info");
+    } else {
+      document.body.classList.remove('projector-board-mode');
+      AppState.isProjectorMode = false;
+      if (desktopBtn) desktopBtn.classList.add('active');
+      if (projectorBtn) projectorBtn.classList.remove('active');
+      this.showToast("Стандартный режим рабочего стола активирован.", "info");
+    }
+  },
+
+  toggleProjectorMode() {
+    this.setDeviceMode(AppState.isProjectorMode ? 'desktop' : 'projector');
+  },
+
+  /* ==========================================================================
+     ВСЕРОССИЙСКАЯ МИНУТА МОЛЧАНИЯ (ИНТЕРАКТИВНЫЙ МЕТРОНОМ И ВЕЧНЫЙ ОГОНЬ)
+     ========================================================================== */
+  startMinuteOfSilence() {
+    const overlay = document.getElementById('silenceOverlay');
+    if (!overlay) return;
+
+    AppState.silenceSecondsLeft = 60;
+    overlay.classList.add('active');
+
+    const clock = document.getElementById('silenceCountdownClock');
+    const statusText = document.getElementById('silenceStatusText');
+    if (clock) clock.textContent = '60';
+    if (statusText) statusText.textContent = 'Звучит мемориальный метроном (60 уд/мин)';
+
+    // Запуск метронома (1 удар в секунду)
+    this.playMetronomeTick();
+    clearInterval(AppState.silenceTimer);
+
+    AppState.silenceTimer = setInterval(() => {
+      AppState.silenceSecondsLeft--;
+      if (clock) clock.textContent = AppState.silenceSecondsLeft;
+
+      if (AppState.silenceSecondsLeft > 0) {
+        this.playMetronomeTick();
+      } else {
+        // Завершение минуты молчания
+        this.stopMinuteOfSilence(true);
+      }
+    }, 1000);
+  },
+
+  stopMinuteOfSilence(isFinished = false) {
+    clearInterval(AppState.silenceTimer);
+    AppState.silenceTimer = null;
+    const overlay = document.getElementById('silenceOverlay');
+
+    if (isFinished) {
+      this.playBellChimeSound();
+      this.lightCandleSafe('general', null);
+      if (window.AchievementsEngine) {
+        window.AchievementsEngine.trackCandleLit('minute_of_silence');
+      }
+
+      const clock = document.getElementById('silenceCountdownClock');
+      const statusText = document.getElementById('silenceStatusText');
+      if (clock) clock.textContent = '🕊';
+      if (statusText) statusText.textContent = 'Минута молчания завершена. Свеча памяти зажжена!';
+
+      setTimeout(() => {
+        if (overlay) overlay.classList.remove('active');
+        this.showToast("Вечная слава павшим героям Отечества! Ваша Свеча Памяти зажжена.", "info");
+      }, 2600);
+    } else {
+      if (overlay) overlay.classList.remove('active');
+    }
+  },
+
+  playMetronomeTick() {
+    try {
+      const ctx = this.getAudioContext();
+      if (!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(140, ctx.currentTime + 0.035);
+      gain.gain.setValueAtTime(0.35, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.035);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.04);
+    } catch (e) {}
+  },
+
+  playBellChimeSound() {
+    try {
+      const ctx = this.getAudioContext();
+      if (!ctx) return;
+      [220, 440, 660].forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.25 / (idx + 1), ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 3.5);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 3.6);
+      });
+    } catch (e) {}
+  },
+
+  /* ==========================================================================
+     ПУЛЬТ ПРЕПОДАВАТЕЛЯ: СЦЕНАРИЙ УРОКА МУЖЕСТВА И ТАЙМЕР ЗАНЯТИЯ
+     ========================================================================== */
+  selectLessonPhase(phaseIndex) {
+    AppState.activeLessonPhase = phaseIndex;
+    const cards = document.querySelectorAll('.lesson-step-card');
+    cards.forEach((card, idx) => {
+      card.classList.toggle('active', idx === phaseIndex);
+    });
+
+    if (phaseIndex === 0) {
+      const memorial = document.getElementById('memorial');
+      if (memorial) memorial.scrollIntoView({ behavior: 'smooth' });
+      this.playChimeSound(660, 0.2);
+      this.showToast("Этап 1: Вводное слово, Гимн РФ и миссия Урока Мужества.", "info");
+    } else if (phaseIndex === 1) {
+      const heroes = document.getElementById('heroes-grid');
+      if (heroes) heroes.scrollIntoView({ behavior: 'smooth' });
+      this.playChimeSound(784, 0.2);
+      this.showToast("Этап 2: 20 Героев СРМК — связь гражданской специальности и ратного подвига.", "info");
+    } else if (phaseIndex === 2) {
+      this.startMinuteOfSilence();
+    } else if (phaseIndex === 3) {
+      this.showToast("Этап 4: Интерактивный блиц-квест. Переход в квест...", "info");
+      setTimeout(() => { window.location.href = 'quiz.html'; }, 1000);
+    } else if (phaseIndex === 4) {
+      this.openLessonReportModal();
+    }
+  },
+
+  toggleLessonTimer() {
+    const clock = document.getElementById('lessonTimerClock');
+    const toggleBtn = document.getElementById('btnLessonTimerToggle');
+
+    if (AppState.isLessonTimerRunning) {
+      clearInterval(AppState.lessonTimer);
+      AppState.isLessonTimerRunning = false;
+      if (toggleBtn) toggleBtn.textContent = '▶ Старт';
+    } else {
+      AppState.isLessonTimerRunning = true;
+      if (toggleBtn) toggleBtn.textContent = '⏸ Пауза';
+
+      AppState.lessonTimer = setInterval(() => {
+        if (AppState.lessonSecondsLeft > 0) {
+          AppState.lessonSecondsLeft--;
+          const mins = Math.floor(AppState.lessonSecondsLeft / 60).toString().padStart(2, '0');
+          const secs = (AppState.lessonSecondsLeft % 60).toString().padStart(2, '0');
+          if (clock) clock.textContent = `${mins}:${secs}`;
+        } else {
+          clearInterval(AppState.lessonTimer);
+          AppState.isLessonTimerRunning = false;
+          if (toggleBtn) toggleBtn.textContent = '▶ Старт';
+          this.playBellChimeSound();
+          this.showToast("45 минут занятия завершены. Время подведения итогов и рефлексии!", "info");
+        }
+      }, 1000);
+    }
+  },
+
+  resetLessonTimer() {
+    clearInterval(AppState.lessonTimer);
+    AppState.isLessonTimerRunning = false;
+    AppState.lessonSecondsLeft = 45 * 60;
+    const clock = document.getElementById('lessonTimerClock');
+    const toggleBtn = document.getElementById('btnLessonTimerToggle');
+    if (clock) clock.textContent = '45:00';
+    if (toggleBtn) toggleBtn.textContent = '▶ Старт';
+  },
+
+  /* ==========================================================================
+     РАЗДАТОЧНЫЕ МАТЕРИАЛЫ И ОТЧЕТНЫЙ АКТ-ПРОТОКОЛ ДЛЯ ПЕДАГОГА
+     ========================================================================== */
+  openLessonReportModal() {
+    const modal = document.getElementById('lessonReportModal');
+    if (!modal) return;
+    const dateInput = document.getElementById('reportLessonDate');
+    if (dateInput && !dateInput.value) {
+      dateInput.value = new Date().toISOString().split('T')[0];
+    }
+    modal.classList.add('active');
+  },
+
+  closeLessonReportModal() {
+    const modal = document.getElementById('lessonReportModal');
+    if (modal) modal.classList.remove('active');
+  },
+
+  printLessonReport() {
+    const teacher = document.getElementById('reportTeacherName')?.value || 'Гента А. В.';
+    const group = document.getElementById('reportGroupName')?.value || 'ИСиП-242';
+    const students = document.getElementById('reportStudentsCount')?.value || '25';
+    const topic = document.getElementById('reportLessonTopic')?.value || '«Быть воином — жить вечно»';
+    const date = document.getElementById('reportLessonDate')?.value || new Date().toLocaleDateString('ru-RU');
+
+    this.closeLessonReportModal();
+
+    const printWin = window.open('', '_blank');
+    if (!printWin) {
+      window.print();
       return;
     }
 
-    AppState.isPresentationRunning = true;
-    let index = 0;
-    this.openModal(heroesDatabase[index].id);
-    this.playChimeSound(520, 0.4);
+    printWin.document.write(`
+      <!DOCTYPE html>
+      <html lang="ru">
+      <head>
+        <meta charset="UTF-8">
+        <title>Акт проведения Урока Мужества — ГБПОУ СРМК</title>
+        <style>
+          body { font-family: 'Times New Roman', serif; padding: 25mm 20mm; color: #000; line-height: 1.5; }
+          .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 24px; }
+          .header h3 { margin: 0 0 6px; text-transform: uppercase; font-size: 13pt; }
+          .header p { margin: 0; font-size: 11pt; }
+          .act-title { text-align: center; font-size: 16pt; font-weight: bold; margin: 30px 0 20px; text-transform: uppercase; }
+          .content-table { width: 100%; border-collapse: collapse; margin: 24px 0; }
+          .content-table td { padding: 8px 12px; border: 1px solid #333; font-size: 12pt; }
+          .content-table td:first-child { font-weight: bold; width: 35%; background: #f5f5f5; }
+          .signatures { display: flex; justify-content: space-between; margin-top: 50px; font-size: 12pt; }
+          .sig-line { width: 220px; border-bottom: 1px solid #000; display: inline-block; }
+          @media print { @page { margin: 15mm; } }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h3>Министерство образования Ставропольского края</h3>
+          <p>ГБПОУ «Ставропольский региональный многопрофильный колледж»</p>
+          <p>Мемориально-образовательный комплекс «Быть воином — жить вечно»</p>
+        </div>
 
-    AppState.presentationTimer = setInterval(() => {
-      index = (index + 1) % heroesDatabase.length;
-      this.openModal(heroesDatabase[index].id);
-    }, 12000);
+        <div class="act-title">АКТ-ПРОТОКОЛ<br><span style="font-size:12pt; font-weight:normal;">о проведении Всероссийского Урока Мужества</span></div>
+
+        <p style="text-indent: 25px; text-align: justify; font-size: 12pt;">
+          Настоящим подтверждается, что на базе ГБПОУ «Ставропольский региональный многопрофильный колледж» 
+          с использованием цифрового мемориального комплекса было проведено патриотическо-воспитательное занятие 
+          в рамках Всероссийской акции «Карта доблести: хранители подвигов».
+        </p>
+
+        <table class="content-table">
+          <tr>
+            <td>Тема занятия:</td>
+            <td>${topic}</td>
+          </tr>
+          <tr>
+            <td>Учебная группа:</td>
+            <td>${group}</td>
+          </tr>
+          <tr>
+            <td>Количество обучающихся:</td>
+            <td>${students} чел.</td>
+          </tr>
+          <tr>
+            <td>Преподаватель / Разработчик:</td>
+            <td>${teacher}</td>
+          </tr>
+          <tr>
+            <td>Дата проведения:</td>
+            <td>${date}</td>
+          </tr>
+          <tr>
+            <td>Использованные модули:</td>
+            <td>Интерактивный Мемориал Славы, Книга Памяти 20 героев, Всероссийская минута молчания, квест-викторина</td>
+          </tr>
+        </table>
+
+        <div class="signatures">
+          <div>
+            Преподаватель: <span class="sig-line"></span> (${teacher})
+          </div>
+          <div>
+            Зам. директора по ВР: <span class="sig-line"></span> / Смирнова Е. В. /
+          </div>
+        </div>
+
+        <div style="margin-top: 40px; text-align: right; font-size: 10pt; color: #555;">
+          М.П. ГБПОУ СРМК • г. Ставрополь, ${date} г.
+        </div>
+
+        <script>
+          window.onload = function() { window.print(); };
+        </script>
+      </body>
+      </html>
+    `);
+    printWin.document.close();
+  },
+
+  printLessonHandouts() {
+    if (typeof heroesDatabase === 'undefined' || heroesDatabase.length === 0) return;
+    const heroesSample = heroesDatabase.slice(0, 4);
+
+    const printWin = window.open('', '_blank');
+    if (!printWin) return;
+
+    printWin.document.write(`
+      <!DOCTYPE html>
+      <html lang="ru">
+      <head>
+        <meta charset="UTF-8">
+        <title>Раздаточные карточки парт — ГБПОУ СРМК</title>
+        <style>
+          body { font-family: 'Times New Roman', serif; padding: 15mm; color: #000; }
+          .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20mm; }
+          .card { border: 2px solid #8a1c22; padding: 14px; page-break-inside: avoid; border-radius: 4px; }
+          .title { font-weight: bold; font-size: 13pt; color: #8a1c22; text-align: center; margin-bottom: 6px; }
+          .meta { font-size: 10pt; text-align: center; color: #333; margin-bottom: 8px; }
+          .quote { font-style: italic; font-size: 9pt; border-left: 2px solid #c5a059; padding-left: 8px; margin: 8px 0; }
+          .qr { text-align: center; margin-top: 10px; font-size: 9pt; }
+          @media print { body { padding: 0; } }
+        </style>
+      </head>
+      <body>
+        <h3 style="text-align:center; margin-bottom:18px;">РАЗДАТОЧНЫЙ МАТЕРИАЛ ДЛЯ ПАРТ: 20 ГЕРОЕВ СРМК</h3>
+        <div class="grid">
+          ${heroesSample.map(h => `
+            <div class="card">
+              <div class="title">${h.name}</div>
+              <div class="meta">${h.education?.specialty || 'Выпускник СРМК'} • ${h.dates?.years || ''}</div>
+              <p style="font-size:10pt; line-height:1.4;">${h.deed ? h.deed.substring(0, 180) + '...' : ''}</p>
+              ${h.quote ? `<div class="quote">«${h.quote}»</div>` : ''}
+              <div class="qr">
+                <strong>QR-код досье:</strong> отсканируйте камерой на сайте музея
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <script>window.onload = function() { window.print(); };</script>
+      </body>
+      </html>
+    `);
+    printWin.document.close();
+  },
+
+  printGroupQuizSheet() {
+    const printWin = window.open('', '_blank');
+    if (!printWin) return;
+
+    printWin.document.write(`
+      <!DOCTYPE html>
+      <html lang="ru">
+      <head>
+        <meta charset="UTF-8">
+        <title>Бланк тестирования Урока Мужества — ГБПОУ СРМК</title>
+        <style>
+          body { font-family: 'Times New Roman', serif; padding: 15mm 20mm; color: #000; font-size: 11pt; }
+          .header { text-align: center; border-bottom: 1px solid #000; padding-bottom: 8px; margin-bottom: 16px; }
+          .student-fields { display: flex; justify-content: space-between; margin-bottom: 18px; font-weight: bold; }
+          .question { margin-bottom: 12px; }
+          .options { margin-left: 20px; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <strong>ГБПОУ «Ставропольский региональный многопрофильный колледж»</strong><br>
+          Бланк экспресс-тестирования «Дорогами мужества 20 героев»
+        </div>
+        <div class="student-fields">
+          <span>ФИО студента: ____________________________________</span>
+          <span>Группа: ________</span>
+          <span>Оценка: _____</span>
+        </div>
+        <div class="question">1. Сколько выпускников колледжа увековечено на Мемориале Славы во дворе СРМК? (Варианты: А) 12; Б) 20; В) 15; Г) 25)</div>
+        <div class="question">2. В каком знаменитом полку ВДВ служил разведчик-санитар Николай Вечёрка? (Варианты: А) 247-й ДШП; Б) 104-й ДШП; В) 76-я дивизия; Г) 45-й полк СпН)</div>
+        <div class="question">3. Какую гражданскую специальность получил в колледже кавалер Ордена Мужества Дмитрий Самохин? (Варианты: А) Сварщик; Б) Электромеханик; В) Пожарный; Г) Программист)</div>
+        <div class="question">4. Какой номер носил экипаж машины огневой поддержки сержанта Шамиля Назырова? (Варианты: А) «Машина Жизни»; Б) «Гром-1»; В) «Буран»; Г) «Звезда»)</div>
+        <div class="question">5. В каком городе расположен Мемориальный комплекс выпускников колледжа? (Варианты: А) Невинномысск; Б) Ставрополь; В) Пятигорск; Г) Кисловодск)</div>
+        <div style="margin-top: 30px; font-style: italic; color: #444;">Ответы сдаются преподавателю для проверки и внесения в Зал Славы.</div>
+        <script>window.onload = function() { window.print(); };</script>
+      </body>
+      </html>
+    `);
+    printWin.document.close();
+  },
+
+  /* ==========================================================================
+     ВИДЖЕТ «ГЕРОЙ ДНЯ / ВСПОМНИМ ВЫПУСКНИКА»
+     ========================================================================== */
+  renderFeaturedHero() {
+    const card = document.getElementById('featuredHeroCard');
+    if (!card || typeof heroesDatabase === 'undefined' || heroesDatabase.length === 0) return;
+
+    // Выбор героя по дню месяца или псевдослучайно
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+    const heroIndex = dayOfYear % heroesDatabase.length;
+    const hero = heroesDatabase[heroIndex];
+
+    const fallbackAvatar = (typeof ArchiveService !== 'undefined') ? ArchiveService.generateFallbackAvatar(hero) : FALLBACK_HERO_AVATAR;
+    const photo = hero.media?.photo || fallbackAvatar;
+
+    card.innerHTML = `
+      <div class="spotlight-avatar-wrap">
+        <img src="${photo}" alt="${this.escapeHtml(hero.name)}" class="spotlight-avatar" onerror="this.onerror=null; this.src='${fallbackAvatar}';">
+      </div>
+      <div class="spotlight-info">
+        <div class="spotlight-kicker">Герой дня • Навечно в строю</div>
+        <h3 class="spotlight-name">${this.escapeHtml(hero.name)}</h3>
+        <div class="spotlight-meta">
+          ${this.escapeHtml(hero.education?.specialty || 'Выпускник СРМК')} • ${this.escapeHtml(hero.dates?.years || '')}
+        </div>
+        ${hero.quote ? `<p class="spotlight-quote">«${this.escapeHtml(hero.quote)}»</p>` : ''}
+      </div>
+      <div class="spotlight-actions">
+        <button class="btn btn-secondary" onclick="App.openModal('${hero.id}')" type="button" style="padding:8px 14px; font-size:0.8rem;">
+          Архивное досье →
+        </button>
+        <button class="btn btn-secondary" onclick="App.lightCandleSafe('${hero.id}', event)" type="button" style="padding:8px 12px; font-size:0.8rem; border-color:#c5a059; color:#dfba6d;">
+          🕯 Свеча
+        </button>
+      </div>
+    `;
+  },
+
+  /* ==========================================================================
+     РЕЖИМ ПРЕЗЕНТАЦИИ «УРОК МУЖЕСТВА» (ОБНОВЛЕННЫЙ АВТОПИЛОТ)
+     ========================================================================== */
+  startPresentationMode() {
+    this.selectLessonPhase(0);
+    this.toggleProjectorMode();
   },
 
   stopPresentationMode() {

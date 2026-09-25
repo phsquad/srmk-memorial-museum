@@ -37,8 +37,14 @@
   <link rel="stylesheet" href="css/site-common.css">
   <link rel="stylesheet" href="css/header-common.css">
   <link rel="stylesheet" href="css/desktop.css">
+  <link rel="stylesheet" href="css/pedagogy-and-visual.css">
 </head>
 <body class="dark-theme">
+
+  <!-- ИНДИКАТОР РЕЖИМА ИНТЕРАКТИВНОЙ ДОСКИ / ПРОЕКТОРА -->
+  <div class="projector-active-banner" id="projectorBanner">
+    📽 РЕЖИМ ПРОЕКТОРА И ИНТЕРАКТИВНОЙ ДОСКИ АКТИВЕН • Увеличенный шрифт 18px для аудитории • <a href="javascript:void(0)" onclick="App.toggleProjectorMode()" style="color:#fff; text-decoration:underline;">Вернуть обычный вид</a>
+  </div>
 
   <!-- ==========================================================================
        1. ПАНЕЛЬ ДОСТУПНОСТИ И ГОСУДАРСТВЕННОГО СТАТУСА (ГОСТ РФ)
@@ -142,6 +148,14 @@
           </button>
           <div class="dropdown-menu" id="menuServices" role="menu">
             <div class="dropdown-header">Документы и образование</div>
+            <a href="#teacherConsole" class="dropdown-item" role="menuitem">
+              <span class="item-icon">⚡</span>
+              <div><strong>Пульт Урока Мужества</strong><small>Таймлайн 45 мин, доска, справки</small></div>
+            </a>
+            <a href="javascript:void(0)" onclick="App.startMinuteOfSilence()" class="dropdown-item" role="menuitem">
+              <span class="item-icon">🕯</span>
+              <div><strong>Минута молчания</strong><small>Всероссийский метроном и огонь</small></div>
+            </a>
             <a href="certificate.html" class="dropdown-item highlight-item" role="menuitem">
               <span class="item-icon">📜</span>
               <div><strong>Оформить Сертификат</strong><small>Именной наградной лист с печатью</small></div>
@@ -187,6 +201,11 @@
     <!-- ВЫДВИЖНАЯ МОБИЛЬНАЯ ПАНЕЛЬ МЕНЮ (DRAWER) -->
     <div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
       <div class="drawer-content">
+        <div class="drawer-section-label">Для преподавателей</div>
+        <a href="#teacherConsole" class="drawer-link highlight" style="color: #dfba6d; font-weight: 700;">⚡ Пульт Урока Мужества (45 мин)</a>
+        <a href="javascript:void(0)" onclick="App.startMinuteOfSilence()" class="drawer-link">🕯 Минута молчания (Метроном)</a>
+        <a href="javascript:void(0)" onclick="App.toggleProjectorMode()" class="drawer-link">📽 Режим проектора / доски</a>
+
         <div class="drawer-section-label">Залы экспозиции</div>
         <a href="#memorial" class="drawer-link">🏛 Мемориал Славы</a>
         <a href="#heroes-grid" class="drawer-link">🎓 За партой Героя</a>
@@ -228,6 +247,28 @@
         <p class="hero-subtitle">
           Интерактивная мемориальная экспозиция памяти 20 выпускников Ставропольского регионального многопрофильного колледжа, совершивших бессмертный ратный подвиг при защите Отечества.
         </p>
+
+        <!-- ПАНЕЛЬ АДАПТИВНОГО ОБОРУДОВАНИЯ (МОНИТОР / ПРОЕКТОР / СМАРТФОН) -->
+        <div class="device-viewport-bar" role="toolbar" aria-label="Режимы отображения и адаптивности">
+          <div class="viewport-bar-title">
+            <span class="icon">🖥</span>
+            <span>Режим экрана:</span>
+          </div>
+          <div class="viewport-controls-group">
+            <button class="viewport-mode-btn active" id="btnModeDesktop" onclick="App.setDeviceMode('desktop')" type="button" title="Стандартный режим рабочего стола">
+              💻 Монитор
+            </button>
+            <button class="viewport-mode-btn" id="btnModeProjector" onclick="App.setDeviceMode('projector')" type="button" title="Крупный шрифт для интерактивных досок и проекторов в аудитории">
+              📽 Интерактивная доска / Проектор
+            </button>
+            <a href="mobile.html" class="viewport-mode-btn" title="Специальная мобильная версия PWA">
+              📱 Смартфон
+            </a>
+            <button class="viewport-mode-btn highlight" onclick="App.startMinuteOfSilence()" type="button" title="Всероссийская минута молчания с метрономом">
+              🕯 Минута молчания
+            </button>
+          </div>
+        </div>
         
         <!-- СТАТИСТИКА ФОНДА В РЕАЛЬНОМ ВРЕМЕНИ -->
         <div class="hero-stats" role="region" aria-label="Мемориальные счетчики памяти">
@@ -246,10 +287,145 @@
         </div>
 
         <div class="hero-actions">
-          <a href="#memorial" class="btn btn-primary">К Мемориалу Памяти</a>
-          <button class="btn btn-secondary" id="btnOpenGeneralTour" type="button">🎧 Аудиоэкскурсия музея</button>
-          <button class="btn btn-secondary" onclick="App.startPresentationMode()" type="button">⚡ Режим «Урок Мужества»</button>
-          <a href="certificate.html" class="btn btn-secondary">📜 Оформить Сертификат участника</a>
+          <a href="#memorial" class="btn btn-primary">🏛 К Мемориалу Памяти</a>
+          <a href="#teacherConsole" class="btn btn-secondary" style="border-color:#c5a059; color:#dfba6d;">⚡ Пульт Урока Мужества</a>
+          <button class="btn btn-secondary" onclick="App.startMinuteOfSilence()" type="button">🕯 Минута молчания</button>
+          <button class="btn btn-secondary" id="btnOpenGeneralTour" type="button">🎧 Аудиоэкскурсия</button>
+          <a href="certificate.html" class="btn btn-secondary">📜 Сертификат участника</a>
+        </div>
+
+        <!-- КАРТОЧКА ГЕРОЙ ДНЯ (ВСПРОМНИМ ВЫПУСКНИКА) -->
+        <div class="hero-spotlight-card" id="featuredHeroCard">
+          <!-- Заполняется динамически App.renderFeaturedHero() -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         ПУЛЬТ ПРЕПОДАВАТЕЛЯ: ИНТЕРАКТИВНЫЙ «УРОК МУЖЕСТВА» (45 МИНУТ)
+         ========================================================================== -->
+    <section class="teacher-console-section" id="teacherConsole" aria-label="Пульт преподавателя и сценарий Урока Мужества">
+      <div class="container">
+        <div class="teacher-card-panel">
+          
+          <div class="teacher-panel-header">
+            <div class="teacher-header-left">
+              <span class="teacher-kicker">ФГОС СПО • Воспитательная работа • Интерактивный пульт</span>
+              <h2 class="teacher-title">Пульт преподавателя: Всероссийский «Урок Мужества»</h2>
+              <p class="teacher-desc">
+                Пошаговый интерактивный таймлайн 45-минутного занятия, раздаточные материалы для студентов, демонстрация на проекторе и официальный генератор отчетного акта.
+              </p>
+            </div>
+            
+            <!-- ТАЙМЕР ЗАНЯТИЯ 45:00 -->
+            <div class="teacher-timer-box">
+              <span class="timer-label">Таймер занятия (45 мин)</span>
+              <span class="timer-clock" id="lessonTimerClock">45:00</span>
+              <div class="timer-controls">
+                <button class="btn-timer-ctrl" id="btnLessonTimerToggle" onclick="App.toggleLessonTimer()" type="button">▶ Старт</button>
+                <button class="btn-timer-ctrl" onclick="App.resetLessonTimer()" type="button">↺ Сброс</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ТАЙМЛАЙН 5 ЭТАПОВ УРОКА -->
+          <div class="lesson-timeline-grid">
+            
+            <div class="lesson-step-card active" onclick="App.selectLessonPhase(0)">
+              <div class="step-card-timing">
+                <span>00:00 – 05:00</span>
+                <span class="step-card-num">1</span>
+              </div>
+              <h3 class="step-card-title">Вводное слово и Гимн</h3>
+              <p class="step-card-desc">Постановка целей занятия, актуализация темы ратного долга и гражданской ответственности.</p>
+              <span class="step-card-action">Активировать этап →</span>
+            </div>
+
+            <div class="lesson-step-card" onclick="App.selectLessonPhase(1)">
+              <div class="step-card-timing">
+                <span>05:00 – 20:00</span>
+                <span class="step-card-num">2</span>
+              </div>
+              <h3 class="step-card-title">20 Героев колледжа</h3>
+              <p class="step-card-desc">Архивные фотографии, связь рабочей профессии (сварка, ТО, МЧС, IT) и подвига выпускников.</p>
+              <span class="step-card-action">Показать стенд →</span>
+            </div>
+
+            <div class="lesson-step-card" onclick="App.selectLessonPhase(2)">
+              <div class="step-card-timing">
+                <span>20:00 – 21:00</span>
+                <span class="step-card-num">3</span>
+              </div>
+              <h3 class="step-card-title">Минута молчания</h3>
+              <p class="step-card-desc">Всероссийская минута молчания: мемориальный метроном (60 сек) и живое пламя Вечного Огня.</p>
+              <span class="step-card-action">Запустить метроном →</span>
+            </div>
+
+            <div class="lesson-step-card" onclick="App.selectLessonPhase(3)">
+              <div class="step-card-timing">
+                <span>21:00 – 35:00</span>
+                <span class="step-card-num">4</span>
+              </div>
+              <h3 class="step-card-title">Квест-викторина</h3>
+              <p class="step-card-desc">Закрепление материала: 10 интерактивных вопросов по подвигам выпускников СРМК.</p>
+              <span class="step-card-action">Открыть квест →</span>
+            </div>
+
+            <div class="lesson-step-card" onclick="App.selectLessonPhase(4)">
+              <div class="step-card-timing">
+                <span>35:00 – 45:00</span>
+                <span class="step-card-num">5</span>
+              </div>
+              <h3 class="step-card-title">Итоги и Награждение</h3>
+              <p class="step-card-desc">Рефлексия, оформление памятных Сертификатов Победителя и формирование акта урока.</p>
+              <span class="step-card-action">Оформить итоги →</span>
+            </div>
+
+          </div>
+
+          <!-- ПАНЕЛЬ БЫСТРЫХ ИНСТРУМЕНТОВ ПЕДАГОГА -->
+          <div class="teacher-tools-bar">
+            <button class="teacher-tool-btn" onclick="App.toggleProjectorMode()" type="button">
+              <span class="btn-tool-icon">📽</span>
+              <span class="btn-tool-text">
+                <strong>Режим SmartBoard / Проектор</strong>
+                <small>Крупный шрифт 18px для аудитории</small>
+              </span>
+            </button>
+
+            <button class="teacher-tool-btn" onclick="App.openLessonReportModal()" type="button">
+              <span class="btn-tool-icon">📋</span>
+              <span class="btn-tool-text">
+                <strong>Справка / Акт о проведении</strong>
+                <small>Официальный протокол для колледжа</small>
+              </span>
+            </button>
+
+            <button class="teacher-tool-btn" onclick="App.printGroupQuizSheet()" type="button">
+              <span class="btn-tool-icon">📝</span>
+              <span class="btn-tool-text">
+                <strong>Печать бланков теста</strong>
+                <small>Раздаточный опросник на 10 вопросов</small>
+              </span>
+            </button>
+
+            <button class="teacher-tool-btn" onclick="App.printLessonHandouts()" type="button">
+              <span class="btn-tool-icon">🖨</span>
+              <span class="btn-tool-text">
+                <strong>Раздаточные карточки парт</strong>
+                <small>Формат А5 с QR-кодами для смартфонов</small>
+              </span>
+            </button>
+
+            <a href="methodology.html" class="teacher-tool-btn">
+              <span class="btn-tool-icon">📑</span>
+              <span class="btn-tool-text">
+                <strong>Методический кабинет</strong>
+                <small>Конструктор технологических карт ФГОС</small>
+              </span>
+            </a>
+          </div>
+
         </div>
       </div>
     </section>
@@ -576,6 +752,87 @@
       </div>
     </div>
   </footer>
+
+  <!-- ВСЕРОССИЙСКАЯ МИНУТА МОЛЧАНИЯ (OVERLAY C МЕТРОНОМОМ И ПЛАМЕНЕМ) -->
+  <div class="silence-overlay" id="silenceOverlay" role="dialog" aria-modal="true" aria-label="Всероссийская минута молчания">
+    <div class="silence-container">
+      <button class="silence-close-btn" onclick="App.stopMinuteOfSilence()" type="button" aria-label="Закрыть минуту молчания">&times;</button>
+      <div class="silence-flame-wrapper">
+        <div class="silence-candle-flame"></div>
+      </div>
+      <div class="silence-kicker">Всероссийская акция памяти</div>
+      <div class="silence-countdown" id="silenceCountdownClock">60</div>
+      <p class="silence-quote">
+        «Помните! Через века, через года, — помните!<br>
+        О тех, кто уже не придет никогда, — помните!»
+      </p>
+      <div class="silence-author">Роберт Рождественский • Поэма «Реквием»</div>
+      <div class="silence-metronome-pulse">
+        <span class="metronome-dot"></span>
+        <span id="silenceStatusText">Звучит мемориальный метроном (60 уд/мин)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ОФИЦИАЛЬНЫЙ АКТ-ПРОТОКОЛ ПРОВЕДЕНИЯ УРОКА МУЖЕСТВА (ДЛЯ ВОСПИТАТЕЛЬНОГО ОТДЕЛА) -->
+  <div class="lesson-report-modal" id="lessonReportModal" role="dialog" aria-modal="true" aria-label="Формирование отчета об Уроке Мужества">
+    <div class="report-modal-content">
+      <div class="report-header">
+        <h3 class="report-title">Акт-протокол проведения Всероссийского Урока Мужества</h3>
+        <p class="report-subtitle">ГБПОУ «Ставропольский региональный многопрофильный колледж»</p>
+      </div>
+      <form id="lessonReportForm" onsubmit="event.preventDefault(); App.printLessonReport();">
+        <div class="report-form-group">
+          <label class="report-label" for="reportTeacherName">ФИО Преподавателя / Классного руководителя:*</label>
+          <input type="text" id="reportTeacherName" class="report-input" value="Гента Александра Владимировна" required>
+        </div>
+        <div class="report-form-group">
+          <label class="report-label" for="reportGroupName">Учебная группа:*</label>
+          <input type="text" id="reportGroupName" class="report-input" value="ИСиП-242" placeholder="например: ИСиП-242, ТО-191" required>
+        </div>
+        <div class="report-form-group">
+          <label class="report-label" for="reportStudentsCount">Количество присутствовавших студентов:*</label>
+          <input type="number" id="reportStudentsCount" class="report-input" value="25" min="1" max="100" required>
+        </div>
+        <div class="report-form-group">
+          <label class="report-label" for="reportLessonTopic">Тема проведенного занятия:*</label>
+          <input type="text" id="reportLessonTopic" class="report-input" value="«Быть воином — жить вечно»: подвиги 20 выпускников СРМК" required>
+        </div>
+        <div class="report-form-group">
+          <label class="report-label" for="reportLessonDate">Дата проведения:*</label>
+          <input type="date" id="reportLessonDate" class="report-input" required>
+        </div>
+        <div class="report-actions">
+          <button type="button" class="btn btn-secondary" onclick="App.closeLessonReportModal()">Отмена</button>
+          <button type="submit" class="btn btn-primary" style="background:#c5a059; color:#0c0e12;">🖨 Распечатать официальный Акт (PDF)</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ПЛАВАЮЩАЯ МОБИЛЬНАЯ ПАНЕЛЬ БЫСТРЫХ ДЕЙСТВИЙ (ДЛЯ СМАРТФОНОВ И ПЛАНШЕТОВ) -->
+  <nav class="mobile-sticky-memorial-bar" aria-label="Быстрые действия на мобильном устройстве">
+    <button class="mobile-bar-btn primary" onclick="App.lightCandleSafe('general', event)" type="button">
+      <span class="icon">🕯</span>
+      <span>Свеча</span>
+    </button>
+    <a href="#heroes-grid" class="mobile-bar-btn">
+      <span class="icon">🎓</span>
+      <span>20 Героев</span>
+    </a>
+    <button class="mobile-bar-btn" onclick="App.startMinuteOfSilence()" type="button">
+      <span class="icon">⏳</span>
+      <span>Память</span>
+    </button>
+    <a href="#teacherConsole" class="mobile-bar-btn">
+      <span class="icon">⚡</span>
+      <span>Урок</span>
+    </a>
+    <a href="certificate.html" class="mobile-bar-btn">
+      <span class="icon">📜</span>
+      <span>Грамота</span>
+    </a>
+  </nav>
 
   <div id="memorialToast" class="memorial-toast"></div>
 
