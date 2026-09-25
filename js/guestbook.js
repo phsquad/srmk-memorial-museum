@@ -221,10 +221,14 @@ const GuestbookEngine = {
       return;
     }
 
-    // Античит-проверка на флуд и валидность данных
+    // Античит-проверка на флуд и валидность данных с клиентским UUID сессии визита
+    let sessionVisitId = null;
+    let attemptId = null;
     if (window.TributeSecurity && typeof window.TributeSecurity.verifyTributePost === 'function') {
       const check = await window.TributeSecurity.verifyTributePost(author, message, e);
       if (!check.allowed) return;
+      sessionVisitId = check.sessionVisitId || check.visitId;
+      attemptId = check.attemptId;
     }
 
     const newTribute = {
@@ -239,7 +243,9 @@ const GuestbookEngine = {
       flames: 1,
       is_pinned: false,
       is_verified: (role === 'teacher' || role === 'family'),
-      date: new Date().toLocaleDateString('ru-RU')
+      date: new Date().toLocaleDateString('ru-RU'),
+      visit_id: sessionVisitId,
+      attempt_id: attemptId
     };
 
     // А) Публикация в облако Supabase

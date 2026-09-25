@@ -659,8 +659,8 @@ const App = {
      ========================================================================== */
   lightCandleSafe(heroId, event) {
     if (typeof TributeSecurity !== 'undefined') {
-      TributeSecurity.verifyAndExecuteTribute('candle', heroId, event, (newCount) => {
-        this.onTributeSuccess('candle', heroId, newCount);
+      TributeSecurity.verifyAndExecuteTribute('candle', heroId, event, (newCount, meta) => {
+        this.onTributeSuccess('candle', heroId, newCount, meta);
       });
     } else {
       if (event && !event.isTrusted) return;
@@ -672,8 +672,8 @@ const App = {
 
   layFlowerSafe(heroId, event) {
     if (typeof TributeSecurity !== 'undefined') {
-      TributeSecurity.verifyAndExecuteTribute('flowers', heroId, event, (newCount) => {
-        this.onTributeSuccess('flowers', heroId, newCount);
+      TributeSecurity.verifyAndExecuteTribute('flowers', heroId, event, (newCount, meta) => {
+        this.onTributeSuccess('flowers', heroId, newCount, meta);
       });
     } else {
       if (typeof TechModules !== 'undefined') {
@@ -682,7 +682,7 @@ const App = {
     }
   },
 
-  async onTributeSuccess(type, heroId, newCount) {
+  async onTributeSuccess(type, heroId, newCount, meta) {
     if (type === 'candle') {
       AppState.candles[heroId] = newCount;
       localStorage.setItem('srmk_museum_candles_v3', JSON.stringify(AppState.candles));

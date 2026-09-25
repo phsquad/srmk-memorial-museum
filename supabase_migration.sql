@@ -62,8 +62,11 @@ CREATE TABLE IF NOT EXISTS guestbook_tributes (
   flames INTEGER NOT NULL DEFAULT 0 CHECK (flames >= 0),
   is_pinned BOOLEAN NOT NULL DEFAULT FALSE,
   is_verified BOOLEAN NOT NULL DEFAULT FALSE,
+  visit_id TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE guestbook_tributes ADD COLUMN IF NOT EXISTS visit_id TEXT;
 
 CREATE INDEX IF NOT EXISTS idx_tributes_feed ON guestbook_tributes(is_pinned DESC, created_at DESC);
 
