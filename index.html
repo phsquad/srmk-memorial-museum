@@ -326,6 +326,20 @@
                 <button class="btn-timer-ctrl" onclick="App.resetLessonTimer()" type="button">↺ Сброс</button>
               </div>
             </div>
+
+            <!-- ИНТЕРАКТИВНЫЙ ПРОГРЕСС-БАР 45-МИНУТНОГО ЗАНЯТИЯ -->
+            <div class="lesson-progress-container" style="width: 100%; margin-top: 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.76rem; color: #8b96a5; margin-bottom: 6px;">
+                <span>Хронометраж занятия (ФГОС СПО)</span>
+                <div style="display: flex; gap: 6px;">
+                  <button onclick="App.prevLessonPhase()" class="btn-timer-ctrl" type="button" title="Предыдущий этап">◀ Пред. этап</button>
+                  <button onclick="App.nextLessonPhase()" class="btn-timer-ctrl" type="button" title="Следующий этап">След. этап ▶</button>
+                </div>
+              </div>
+              <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden;">
+                <div id="lessonProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #c5a059, #8a1c22); transition: width 0.3s ease;"></div>
+              </div>
+            </div>
           </div>
 
           <!-- ТАЙМЛАЙН 5 ЭТАПОВ УРОКА -->
@@ -816,15 +830,15 @@
       <span class="icon">🕯</span>
       <span>Свеча</span>
     </button>
-    <a href="#heroes-grid" class="mobile-bar-btn">
+    <a href="#heroes-grid" class="mobile-bar-btn" id="mobileBarHeroes">
       <span class="icon">🎓</span>
       <span>20 Героев</span>
     </a>
-    <button class="mobile-bar-btn" onclick="App.startMinuteOfSilence()" type="button">
+    <button class="mobile-bar-btn" onclick="App.startMinuteOfSilence()" type="button" id="mobileBarSilence">
       <span class="icon">⏳</span>
       <span>Память</span>
     </button>
-    <a href="#teacherConsole" class="mobile-bar-btn">
+    <a href="#teacherConsole" class="mobile-bar-btn" id="mobileBarLesson">
       <span class="icon">⚡</span>
       <span>Урок</span>
     </a>
