@@ -31,7 +31,10 @@
       // 3. Единый модуль паспорта проекта
       this.initPassportTriggers();
 
-      // 4. Подсветка активной страницы
+      // 4. Центр управления базой данных Supabase (GitHub Pages)
+      this.initSupabaseControlCenter();
+
+      // 5. Подсветка активной страницы
       this.highlightActivePage();
 
       console.log("[NavigationEngine v7.0 Master] Навигация и единый паспорт музея активны.");
@@ -448,6 +451,316 @@
           link.classList.add('highlight');
         }
       });
+    },
+
+    /**
+     * ========================================================================
+     * 8. ЦЕНТР УПРАВЛЕНИЯ И СТАТУС SUPABASE (GITHUB PAGES OMNI-SYNC)
+     * ========================================================================
+     */
+    initSupabaseControlCenter() {
+      // 1. Вставка кнопки статуса в шапку (если её нет)
+      const headerActions = document.querySelector('.site-header .header-actions');
+      if (headerActions && !document.getElementById('btnSupabaseStatus')) {
+        const statusBtn = document.createElement('button');
+        statusBtn.id = 'btnSupabaseStatus';
+        statusBtn.className = 'supabase-status-pill';
+        statusBtn.type = 'button';
+        statusBtn.title = 'Статус базы данных Supabase (Нажмите для настройки)';
+        statusBtn.innerHTML = `
+          <span class="status-dot dot-connecting" id="spbStatusDot"></span>
+          <span class="status-label" id="spbStatusLabel">Supabase</span>
+        `;
+        const burger = headerActions.querySelector('.mobile-burger-btn');
+        if (burger) {
+          headerActions.insertBefore(statusBtn, burger);
+        } else {
+          headerActions.appendChild(statusBtn);
+        }
+
+        statusBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.openSupabaseModal();
+        });
+      }
+
+      // Добавляем пункт в мобильное меню Drawer
+      const drawerButtonsRow = document.querySelector('.mobile-drawer .drawer-buttons-row');
+      if (drawerButtonsRow && !document.getElementById('drawerSupabaseBtn')) {
+        const spbDrawerBtn = document.createElement('button');
+        spbDrawerBtn.id = 'drawerSupabaseBtn';
+        spbDrawerBtn.type = 'button';
+        spbDrawerBtn.className = 'drawer-btn';
+        spbDrawerBtn.style.borderColor = '#c5a059';
+        spbDrawerBtn.style.color = '#dfba6d';
+        spbDrawerBtn.textContent = '⚡ База Supabase';
+        drawerButtonsRow.insertBefore(spbDrawerBtn, drawerButtonsRow.firstChild);
+      }
+
+      // Слушатель кликов по кнопкам вызова
+      document.addEventListener('click', (e) => {
+        const target = e.target.closest('#btnSupabaseStatus, #drawerSupabaseBtn, [data-open-supabase]');
+        if (target) {
+          e.preventDefault();
+          this.openSupabaseModal();
+        }
+      });
+
+      // Горячие клавиши: Ctrl+Shift+S / Ctrl+Shift+Ы
+      document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's' || e.key === 'Ы' || e.key === 'ы')) {
+          e.preventDefault();
+          this.openSupabaseModal();
+        }
+      });
+
+      // Слушатель изменения статуса от CloudSync
+      window.addEventListener('srmk-supabase-status', (e) => {
+        const detail = e.detail || {};
+        this.updateSupabaseBadge(detail.status, detail.message, detail.isLive);
+      });
+
+      // Если CloudSync уже инициализировался
+      if (window.CloudSync) {
+        this.updateSupabaseBadge(window.CloudSync.status || 'offline', window.CloudSync.statusMessage || '', window.CloudSync.isLive);
+      }
+    },
+
+    updateSupabaseBadge(status, message, isLive) {
+      const dot = document.getElementById('spbStatusDot');
+      const label = document.getElementById('spbStatusLabel');
+      const btn = document.getElementById('btnSupabaseStatus');
+
+      if (!dot || !label) return;
+
+      dot.className = 'status-dot';
+      if (isLive || status === 'online') {
+        dot.classList.add('dot-online');
+        label.textContent = 'Supabase Онлайн';
+        if (btn) btn.title = `Supabase Realtime: Подключено (${message || 'Все сервисы активны'})`;
+      } else if (status === 'connecting') {
+        dot.classList.add('dot-connecting');
+        label.textContent = 'Подключение...';
+        if (btn) btn.title = 'Подключение к Supabase...';
+      } else if (status === 'error') {
+        dot.classList.add('dot-error');
+        label.textContent = 'Ошибка БД';
+        if (btn) btn.title = `Ошибка связи с Supabase: ${message}. Нажмите для настройки.`;
+      } else {
+        dot.classList.add('dot-offline');
+        label.textContent = 'Офлайн (Локально)';
+        if (btn) btn.title = 'Офлайн-режим (LocalStorage). Нажмите для подключения Supabase.';
+      }
+
+      const modalStatusBox = document.getElementById('spbModalStatusText');
+      if (modalStatusBox) {
+        modalStatusBox.textContent = message || (isLive ? 'Подключено к Supabase' : 'Офлайн-режим');
+      }
+    },
+
+    getOrCreateSupabaseModal() {
+      let modal = document.getElementById('supabaseConfigModal');
+      if (modal) return modal;
+
+      modal = document.createElement('div');
+      modal.id = 'supabaseConfigModal';
+      modal.className = 'modal supabase-modal-wrapper';
+      modal.setAttribute('role', 'dialog');
+      modal.setAttribute('aria-modal', 'true');
+      modal.setAttribute('aria-hidden', 'true');
+
+      const curUrl = (window.SRMK_CONFIG?.SUPABASE_URL || 'https://qtafcczydgyrganrpkof.supabase.co');
+      const curKey = (window.SRMK_CONFIG?.SUPABASE_ANON_KEY || '');
+
+      modal.innerHTML = `
+        <div class="modal-overlay" id="supabaseModalOverlay"></div>
+        <div class="modal-dialog supabase-dialog">
+          <button class="modal-close" id="supabaseModalCloseBtn" type="button" aria-label="Закрыть настройки">&times;</button>
+          
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+            <span style="font-size:0.7rem; color:#c5a059; text-transform:uppercase; font-weight:800; letter-spacing:1.5px; border:1px solid rgba(197,160,89,0.3); padding:2px 8px; border-radius:2px;">Supabase Omni-Sync</span>
+            <span style="font-size:0.72rem; color:#9da6b3;">Статический сайт GitHub Pages</span>
+          </div>
+
+          <h2 style="font-family:'Cinzel', Georgia, serif; font-size:1.35rem; color:#ffffff; margin:0 0 16px; border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:10px;">
+            Центр управления базой данных Supabase
+          </h2>
+
+          <div class="supabase-status-box" id="spbModalStatusBox">
+            <div>
+              <strong style="color:#ffffff;">Текущий статус:</strong>
+              <span id="spbModalStatusText" style="color:#d8deea; margin-left:6px;">Проверка связи...</span>
+            </div>
+            <span id="spbModalStatusBadge" style="font-size:0.74rem; padding:3px 8px; border-radius:3px; background:rgba(255,255,255,0.1); color:#fff;">
+              ${window.CloudSync?.isLive ? '🟢 Онлайн' : '🟡 Офлайн'}
+            </span>
+          </div>
+
+          <div class="supabase-field-group">
+            <label for="cfgInputUrl">URL проекта Supabase (Project URL):</label>
+            <input type="url" id="cfgInputUrl" value="${curUrl}" placeholder="https://xxxxxxxxxxxxxxxxxxxx.supabase.co" autocomplete="off" spellcheck="false">
+            <small style="font-size:0.74rem; color:#9da6b3; display:block; margin-top:4px;">
+              Скопируйте из панели Supabase Dashboard ➔ Project Settings ➔ API ➔ Project URL
+            </small>
+          </div>
+
+          <div class="supabase-field-group">
+            <label for="cfgInputKey">Публичный анонимный ключ (Anon / Public API Key):</label>
+            <input type="text" id="cfgInputKey" value="${curKey}" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6..." autocomplete="off" spellcheck="false">
+            <small style="font-size:0.74rem; color:#9da6b3; display:block; margin-top:4px;">
+              Публичный безопасный ключ из Project Settings ➔ API ➔ Project API keys (anon public)
+            </small>
+          </div>
+
+          <div id="spbTestResultBox" style="display:none; padding:10px 14px; border-radius:4px; font-size:0.82rem; margin-bottom:14px;"></div>
+
+          <div class="supabase-actions-row">
+            <button type="button" class="btn-supabase-action btn-supabase-secondary" id="btnTestSupabaseConn">
+              🔍 Проверить связь
+            </button>
+            <button type="button" class="btn-supabase-action btn-supabase-primary" id="btnSaveSupabaseConn">
+              💾 Сохранить и подключить
+            </button>
+            <button type="button" class="btn-supabase-action btn-supabase-seed" id="btnSeedSupabaseData" title="Заполнить пустые таблицы 20 героями колледжа">
+              🌱 Заполнить базу (20 героев)
+            </button>
+            <button type="button" class="btn-supabase-action" id="btnResetSupabaseConn" style="background:transparent; color:#9da6b3; border-color:rgba(255,255,255,0.15);" title="Сбросить к исходным настройкам">
+              ↺ Сбросить
+            </button>
+          </div>
+
+          <div style="margin-top:20px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.08); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <span style="font-size:0.75rem; color:#64748b;">
+              💡 Изменения сохраняются в браузере. Сайт продолжит работать на GitHub Pages даже в офлайн-режиме.
+            </span>
+            <a href="javascript:void(0)" id="linkShowSqlHelp" style="font-size:0.78rem; color:#c5a059; text-decoration:underline;">
+              Инструкция по миграции SQL ↗
+            </a>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+
+      const closeBtn = modal.querySelector('#supabaseModalCloseBtn');
+      const overlay = modal.querySelector('#supabaseModalOverlay');
+      closeBtn?.addEventListener('click', () => this.closeSupabaseModal());
+      overlay?.addEventListener('click', () => this.closeSupabaseModal());
+
+      // 1. Проверить связь
+      modal.querySelector('#btnTestSupabaseConn')?.addEventListener('click', async () => {
+        const url = modal.querySelector('#cfgInputUrl').value.trim();
+        const key = modal.querySelector('#cfgInputKey').value.trim();
+        const resultBox = modal.querySelector('#spbTestResultBox');
+        
+        resultBox.style.display = 'block';
+        resultBox.style.background = 'rgba(59, 130, 246, 0.15)';
+        resultBox.style.color = '#93c5fd';
+        resultBox.textContent = '⏳ Выполняется тестовый запрос к Supabase...';
+
+        if (window.CloudSync && typeof window.CloudSync.testConnection === 'function') {
+          const res = await window.CloudSync.testConnection(url, key);
+          if (res.success) {
+            resultBox.style.background = 'rgba(16, 185, 129, 0.18)';
+            resultBox.style.color = '#34d399';
+            resultBox.innerHTML = `✓ <strong>Успешно!</strong> ${res.message}`;
+          } else {
+            resultBox.style.background = 'rgba(239, 68, 68, 0.18)';
+            resultBox.style.color = '#fca5a5';
+            resultBox.innerHTML = `✗ <strong>Ошибка связи:</strong> ${res.message}`;
+          }
+        }
+      });
+
+      // 2. Сохранить и подключить
+      modal.querySelector('#btnSaveSupabaseConn')?.addEventListener('click', () => {
+        const url = modal.querySelector('#cfgInputUrl').value.trim();
+        const key = modal.querySelector('#cfgInputKey').value.trim();
+        if (window.SRMK_CONFIG && typeof window.SRMK_CONFIG.saveCustomConfig === 'function') {
+          window.SRMK_CONFIG.saveCustomConfig(url, key);
+        }
+        if (window.MemorialToast) {
+          MemorialToast.show('Настройки Supabase сохранены. Подключение...', 'info');
+        }
+        setTimeout(() => this.closeSupabaseModal(), 700);
+      });
+
+      // 3. Заполнить базу (20 героев)
+      modal.querySelector('#btnSeedSupabaseData')?.addEventListener('click', async () => {
+        const resultBox = modal.querySelector('#spbTestResultBox');
+        resultBox.style.display = 'block';
+        resultBox.style.background = 'rgba(59, 130, 246, 0.15)';
+        resultBox.style.color = '#93c5fd';
+        resultBox.textContent = '🌱 Синхронизация 20 героев с базой данных Supabase...';
+
+        if (window.CloudSync && typeof window.CloudSync.seedDatabase === 'function') {
+          const res = await window.CloudSync.seedDatabase();
+          if (res.success) {
+            resultBox.style.background = 'rgba(16, 185, 129, 0.18)';
+            resultBox.style.color = '#34d399';
+            resultBox.innerHTML = `✓ <strong>Синхронизировано!</strong> ${res.message}`;
+          } else {
+            resultBox.style.background = 'rgba(239, 68, 68, 0.18)';
+            resultBox.style.color = '#fca5a5';
+            resultBox.innerHTML = `✗ ${res.message}`;
+          }
+        }
+      });
+
+      // 4. Сбросить
+      modal.querySelector('#btnResetSupabaseConn')?.addEventListener('click', () => {
+        if (confirm('Сбросить настройки подключения к исходным значениям?')) {
+          if (window.SRMK_CONFIG && typeof window.SRMK_CONFIG.resetToDefault === 'function') {
+            window.SRMK_CONFIG.resetToDefault();
+          }
+          modal.querySelector('#cfgInputUrl').value = window.DEFAULT_CONFIG?.SUPABASE_URL || '';
+          modal.querySelector('#cfgInputKey').value = window.DEFAULT_CONFIG?.SUPABASE_ANON_KEY || '';
+          if (window.MemorialToast) {
+            MemorialToast.show('Настройки сброшены к значениям по умолчанию.', 'info');
+          }
+        }
+      });
+
+      // 5. Ссылка на SQL помощь
+      modal.querySelector('#linkShowSqlHelp')?.addEventListener('click', () => {
+        alert(
+          'ИНСТРУКЦИЯ ПО НАСТРОЙКЕ SUPABASE:\n\n' +
+          '1. Откройте ваш проект на https://supabase.com/dashboard\n' +
+          '2. Перейдите в раздел "SQL Editor" -> "New Query"\n' +
+          '3. Скопируйте и вставьте всё содержимое файла supabase_migration.sql из корня проекта\n' +
+          '4. Нажмите кнопку "Run" для создания всех 13 таблиц, индексов и RLS-политик\n' +
+          '5. Вставьте URL и Anon Key в это окно и нажмите "Заполнить базу (20 героев)"!'
+        );
+      });
+
+      return modal;
+    },
+
+    openSupabaseModal() {
+      const modal = this.getOrCreateSupabaseModal();
+      modal.classList.add('active');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+
+      const isLive = Boolean(window.CloudSync?.isLive);
+      const statusMsg = window.CloudSync?.statusMessage || (isLive ? 'Supabase Realtime Онлайн' : 'Офлайн (Локальный режим)');
+      const statusBox = modal.querySelector('#spbModalStatusText');
+      const badge = modal.querySelector('#spbModalStatusBadge');
+      if (statusBox) statusBox.textContent = statusMsg;
+      if (badge) {
+        badge.textContent = isLive ? '🟢 Онлайн' : '🟡 Офлайн';
+        badge.style.background = isLive ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)';
+        badge.style.color = isLive ? '#34d399' : '#fbbf24';
+      }
+    },
+
+    closeSupabaseModal() {
+      const modal = document.getElementById('supabaseConfigModal');
+      if (modal) {
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+      document.body.style.overflow = 'auto';
     }
   };
 

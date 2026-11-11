@@ -117,6 +117,12 @@
         </div>
       </div>
 
+      <!-- КНОПКА СТАТУСА SUPABASE (ДЛЯ GITHUB PAGES) -->
+      <button class="supabase-status-pill" id="btnSupabaseStatus" type="button" title="Статус базы данных Supabase (Нажмите для настройки)">
+        <span class="status-dot dot-connecting" id="spbStatusDot"></span>
+        <span class="status-label" id="spbStatusLabel">Supabase</span>
+      </button>
+
       <!-- КНОПКА МОБИЛЬНОГО МЕНЮ (БУРГЕР) -->
       <button class="mobile-burger-btn" id="mobileBurgerBtn" aria-label="Открыть мобильное меню" aria-expanded="false" aria-controls="mobileDrawer" type="button">
         <span></span><span></span><span></span>
@@ -146,6 +152,7 @@
       <a href="methodology.html" class="drawer-link">📑 Методический кабинет педагога</a>
 
       <div class="drawer-buttons-row">
+        <button class="drawer-btn" id="drawerSupabaseBtn" type="button" style="border-color:#c5a059; color:#dfba6d;">⚡ Supabase</button>
         <button class="drawer-btn" id="drawerPassportBtn" type="button">Паспорт проекта</button>
         <a href="https://карта-доблести.рф" target="_blank" rel="noopener noreferrer" class="drawer-btn gold">Карта Доблести РФ</a>
       </div>

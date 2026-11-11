@@ -66,7 +66,7 @@ const GRAND_MEMORY_BOOK_PART_1 = [
     id: 'shartov-p-n', volNum: 'Том V', chapterNum: 'Глава V', plaque: 'left',
     name: 'Шартов Павел Николаевич', years: '1998 — 2023', specialty: 'ТО и ремонт автотранспорта (выпуск 2018 г.)',
     military: 'Рядовой, водитель подвоза боеприпасов МТО', awards: 'Орден Мужества (посмертно)', location: 'Марьинское направление',
-    photo: 'assets/images/heroes/shartov.jpg', audioFile: 'assets/audio/guides/shartov.mp3',
+    photo: 'assets/images/heroes/shartov.svg', audioFile: 'assets/audio/guides/shartov.mp3',
     shortSnippet: 'Водитель МТО совершал рейсы на передний край под ударами артиллерии и дронов.',
     pages: [
       ['Автомобильная лаборатория', 'Павел окончил автотранспортное отделение в 2018 году и виртуозно владел диагностикой тяжелых армейских грузовиков.', 'АВТООТДЕЛЕНИЕ'],

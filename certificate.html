@@ -702,7 +702,9 @@
   <script src="js/memorial-toast.js"></script>
   <script src="js/achievements-engine.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
   <script src="js/cloud-sync.js"></script>
+  <script src="js/qr-code.js"></script>
   <script src="js/certificate-verifier.js"></script>
   <script src="js/navigation.js"></script>
 
@@ -813,7 +815,8 @@
             const dateText = sheet.querySelector('.cert-sign-col.right div:last-child')?.textContent
               .replace('Дата: ', '').trim() || '';
 
-            const hashHex = await CertificateVerifier.computeHash(serial + name + dateText);
+            const verifier = window.CertificateVerifier || (typeof CertificateVerifier !== 'undefined' ? CertificateVerifier : null);
+            const hashHex = verifier ? await verifier.computeHash(serial + name + dateText) : 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855';
 
             certsToRegister.push({
               serial,
@@ -940,14 +943,16 @@
         sheet.className = `certificate-sheet ${this.theme}`;
 
         const serialFormatted = `СРМК-УМ-2026-${String(serialNumber).padStart(4, '0')}`;
-        const qrVerificationUrl = CertificateVerifier.buildVerificationUrl({
-          serial: serialFormatted,
-          name,
-          date: dateStr
-        });
-        const qrApiUrl = (typeof CertificateVerifier !== 'undefined' && CertificateVerifier.getQrCodeSrc)
-          ? CertificateVerifier.getQrCodeSrc(qrVerificationUrl, 150)
-          : `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrVerificationUrl)}`;
+        const verifier = window.CertificateVerifier || (typeof CertificateVerifier !== 'undefined' ? CertificateVerifier : null);
+        const qrVerificationUrl = verifier
+          ? verifier.buildVerificationUrl({ serial: serialFormatted, name, date: dateStr })
+          : new URL(`verify.html?cert=${encodeURIComponent(serialFormatted)}&name=${encodeURIComponent(name)}&date=${encodeURIComponent(dateStr)}`, window.location.href).href;
+
+        const qrApiUrl = (verifier && typeof verifier.getQrCodeSrc === 'function')
+          ? verifier.getQrCodeSrc(qrVerificationUrl, 150)
+          : ((typeof QRCode !== 'undefined' && typeof QRCode.generateDataUri === 'function')
+            ? QRCode.generateDataUri(qrVerificationUrl, { size: 150, margin: 2, logo: true })
+            : `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrVerificationUrl)}`);
 
         sheet.innerHTML = `
           <div class="cert-frame-outer"></div>

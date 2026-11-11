@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Страница не найдена (404) | Виртуальный музей ГБПОУ СРМК</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/site-common.css">
+  <link rel="stylesheet" href="css/header-common.css">
+  
+  <!-- УМНЫЙ СТАТИЧЕСКИЙ МАРШРУТИЗАТОР ДЛЯ GITHUB PAGES -->
+  <script>
+    (function() {
+      // Автоматическое исправление "чистых" ссылок без расширения .html
+      const path = window.location.pathname;
+      const cleanPath = path.replace(/\/$/, '');
+      const segments = cleanPath.split('/');
+      const lastSegment = segments[segments.length - 1];
+
+      const KNOWN_PAGES = [
+        'certificate', 'desk-qr', 'guestbook', 'index',
+        'memory-book', 'methodology', 'mobile', 'quiz', 'reader', 'verify'
+      ];
+
+      if (lastSegment && KNOWN_PAGES.includes(lastSegment)) {
+        // Заменяем сегмент на .html с сохранением параметров и хэша
+        const newUrl = cleanPath + '.html' + window.location.search + window.location.hash;
+        window.location.replace(newUrl);
+        return;
+      }
+    })();
+  </script>
+
+  <style>
+    body {
+      background: #0a0c0f;
+      color: #f1f3f7;
+      font-family: 'Montserrat', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      margin: 0;
+    }
+    .error-container {
+      max-width: 580px;
+      background: #12151c;
+      border: 1px solid rgba(197, 160, 89, 0.35);
+      border-radius: 8px;
+      padding: 48px 32px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+    }
+    .error-badge {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #c5a059;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .error-code {
+      font-family: 'Cinzel', serif;
+      font-size: 5rem;
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1;
+      margin: 0 0 16px;
+      text-shadow: 0 0 24px rgba(197, 160, 89, 0.4);
+    }
+    .error-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.4rem;
+      color: #dfba6d;
+      margin: 0 0 16px;
+    }
+    .error-desc {
+      font-size: 0.94rem;
+      color: #9da6b3;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+    .error-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn-return {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #8a1c22;
+      color: #ffffff;
+      border: 1px solid #c5a059;
+      padding: 12px 24px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: 0.2s ease;
+    }
+    .btn-return:hover {
+      background: #a8232b;
+      transform: translateY(-1px);
+    }
+    .btn-modules {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      color: #c5a059;
+      border: 1px solid rgba(197, 160, 89, 0.4);
+      padding: 12px 20px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: 0.2s ease;
+    }
+    .btn-modules:hover {
+      background: rgba(197, 160, 89, 0.1);
+      border-color: #c5a059;
+    }
+    .auto-redirect-info {
+      font-size: 0.78rem;
+      color: #64748b;
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="error-container">
+    <div class="error-badge">ГБПОУ СРМК • Цифровой Мемориал</div>
+    <div class="error-code">404</div>
+    <h1 class="error-title">Зал или документ не найден</h1>
+    <p class="error-desc">
+      Запрошенная страница виртуального мемориала была перемещена, либо ссылка устарела.
+      Вы можете перейти на главную страницу экспозиции или в Книгу Памяти 20 героев.
+    </p>
+
+    <div class="error-actions">
+      <a href="index.html" class="btn-return">🏛 На главную в Мемориал</a>
+      <a href="memory-book.html" class="btn-modules">📖 Книга Памяти</a>
+      <a href="quiz.html" class="btn-modules">⚔️ Квест-викторина</a>
+    </div>
+
+    <div class="auto-redirect-info">
+      Автоматический переход на главную страницу через <span id="countdown">8</span> сек...
+    </div>
+  </div>
+
+  <script>
+    let secondsLeft = 8;
+    const cdEl = document.getElementById('countdown');
+    const timer = setInterval(() => {
+      secondsLeft--;
+      if (cdEl) cdEl.textContent = secondsLeft;
+      if (secondsLeft <= 0) {
+        clearInterval(timer);
+        window.location.replace('index.html');
+      }
+    }, 1000);
+  </script>
+
+</body>
+</html>

@@ -9,7 +9,22 @@
 
 // 20 ПОЛНЫХ ИСТОРИЧЕСКИХ ГЛАВ В ФОРМАТЕ MARKDOWN
 const MEMORY_BOOK_ARCHIVE = [
-  MEMORY_BOOK_PROLOGUE,
+  (typeof MEMORY_BOOK_PROLOGUE !== 'undefined' ? MEMORY_BOOK_PROLOGUE : (window.MEMORY_BOOK_PROLOGUE || {
+    id: "prologue-memorial-opening",
+    plaque: "general",
+    volNum: "ПРОЛОГ",
+    chapterNum: "Вводная глава",
+    name: "Открытие Мемориала Славы СРМК",
+    years: "26 сентября 2025 года",
+    specialty: "Все специальности и отделения колледжа",
+    military: "20 павших героев СВО • Выпускники ГБПОУ СРМК",
+    awards: ["Орден Мужества", "Медаль «За отвагу»", "Медаль Суворова"],
+    location: "Двор ГБПОУ СРМК (г. Ставрополь, пр. Юности, 3)",
+    photo: "assets/images/cover-master.jpg",
+    audioFile: "assets/audio/guides/general-tour.mp3",
+    shortSnippet: "26 сентября 2025 года на территории колледжа торжественно открыт Мемориальный комплекс.",
+    markdown: "# Открытие Мемориала Славы СРМК\n> *«Быть воином — жить вечно»*\n\n26 сентября 2025 года в Ставропольском региональном многопрофильном колледже состоялась торжественная церемония открытия Мемориального комплекса в честь 20 выпускников, совершивших бессмертный подвиг."
+  })),
   /* ==========================================================================
      ЛЕВАЯ ПЛИТА МЕМОРИАЛА (10 ГЕРОЕВ)
      ========================================================================== */
@@ -168,7 +183,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно)",
     location: "Марьинское направление",
     audioFile: "assets/audio/guides/shartov.mp3",
-    photo: "assets/images/heroes/shartov.jpg",
+    photo: "assets/images/heroes/shartov.svg",
     shortSnippet: "Рейсы сквозь огонь: доставка боеприпасов на передний край Марьинки под прицельными ударами дронов.",
     markdown: `
 # Павел Николаевич Шартов (1998 — 2023)
@@ -290,7 +305,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно)",
     location: "Запорожская область",
     audioFile: "assets/audio/guides/lutsenko.mp3",
-    photo: "assets/images/heroes/lutsenko.jpg",
+    photo: "assets/images/heroes/lutsenko.svg",
     shortSnippet: "Инженерная разведка и разминирование минных полей под прямым огнем на Запорожском фронте.",
     markdown: `
 # Константин Андреевич Луценко (2001 — 2023)
@@ -602,7 +617,7 @@ const MEMORY_BOOK_ARCHIVE = [
     awards: "Орден Мужества (посмертно), Медаль «За отвагу»",
     location: "Покровское направление",
     audioFile: "assets/audio/guides/chupin.mp3",
-    photo: "assets/images/heroes/chupin.jpg",
+    photo: "assets/images/heroes/chupin.svg",
     shortSnippet: "Оборона взводного опорного пункта на Покровском направлении. Сохранил жизни бойцов ценой своей.",
     markdown: `
 # Илья Валерьевич Чупин (1999 — 2024)

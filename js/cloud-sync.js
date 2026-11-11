@@ -14,62 +14,115 @@
 'use strict';
 
 const CloudConfig = {
-  // Публичный защищенный шлюз Supabase
-  SUPABASE_URL: "https://qtafcczydgyrganrpkof.supabase.co",
-  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0YWZjY3p5ZGd5cmdhbnJwa29mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwNTg5MDEsImV4cCI6MjEwNDYzNDkwMX0.i_hFegr6BHix6eFEasgyICDE6Lcy5wbwbU6dArG-wFg"
+  get SUPABASE_URL() {
+    if (typeof window !== 'undefined' && window.SRMK_CONFIG && window.SRMK_CONFIG.SUPABASE_URL) {
+      return window.SRMK_CONFIG.SUPABASE_URL;
+    }
+    return "https://qtafcczydgyrganrpkof.supabase.co";
+  },
+  get SUPABASE_ANON_KEY() {
+    if (typeof window !== 'undefined' && window.SRMK_CONFIG && window.SRMK_CONFIG.SUPABASE_ANON_KEY) {
+      return window.SRMK_CONFIG.SUPABASE_ANON_KEY;
+    }
+    return "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0YWZjY3p5ZGd5cmdhbnJwa29mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwNTg5MDEsImV4cCI6MjEwNDYzNDkwMX0.i_hFegr6BHix6eFEasgyICDE6Lcy5wbwbU6dArG-wFg";
+  }
 };
 
 const CloudSync = {
   client: null,
   isLive: false,
+  status: 'offline', // 'offline' | 'connecting' | 'online' | 'error'
+  statusMessage: 'Инициализация...',
   channels: [],
 
-  normalizeTribute(row) {
-    if (!row) return null;
-    return {
-      ...row,
-      roleLabel: row.roleLabel ?? row.role_label,
-      dedicationId: row.dedicationId ?? row.dedication_id,
-      dedicationName: row.dedicationName ?? row.dedication_name,
-      isPinned: Boolean(row.isPinned ?? row.is_pinned ?? false),
-      isVerified: Boolean(row.isVerified ?? row.is_verified ?? false)
-    };
+  setStatus(status, message = '') {
+    this.status = status;
+    this.statusMessage = message;
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('srmk-supabase-status', {
+        detail: { status, message, isLive: this.isLive, url: CloudConfig.SUPABASE_URL }
+      }));
+    }
   },
 
-  serializeTribute(tribute) {
-    return {
-      id: tribute.id,
-      author: tribute.author,
-      role: tribute.role,
-      role_label: tribute.roleLabel ?? tribute.role_label,
-      dedication_id: tribute.dedicationId ?? tribute.dedication_id,
-      dedication_name: tribute.dedicationName ?? tribute.dedication_name,
-      message: tribute.message,
-      theme: tribute.theme,
-      date: tribute.date,
-      flames: tribute.flames || 0,
-      is_pinned: Boolean(tribute.isPinned ?? tribute.is_pinned),
-      is_verified: Boolean(tribute.isVerified ?? tribute.is_verified)
-    };
-  },
+  async testConnection(url, key) {
+    if (typeof supabase === 'undefined') {
+      return { success: false, message: 'Библиотека supabase-js не подключена' };
+    }
+    const testUrl = (url || CloudConfig.SUPABASE_URL).trim();
+    const testKey = (key || CloudConfig.SUPABASE_ANON_KEY).trim();
+    if (!testUrl || testUrl.includes('ВАШ_PROJECT_ID')) {
+      return { success: false, message: 'Не указан корректный URL проекта Supabase' };
+    }
+    try {
+      const testClient = supabase.createClient(testUrl, testKey);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
 
-  init() {
-    if (this.isLive) return;
-    if (typeof supabase !== 'undefined' && CloudConfig.SUPABASE_URL && !CloudConfig.SUPABASE_URL.includes('ВАШ_PROJECT_ID')) {
-      try {
-        this.client = supabase.createClient(CloudConfig.SUPABASE_URL, CloudConfig.SUPABASE_ANON_KEY, {
-          realtime: {
-            params: {
-              eventsPerSecond: 10
-            }
-          }
-        });
-        this.isLive = true;
-        this.subscribeRealtime();
-        console.log("[CloudSync v5.0] 🌐 OMNI-SYNC онлайн. Realtime-каналы активированы.");
-      } catch (err) {
-        console.warn("[CloudSync] Ошибка инициализации Supabase клиента:", err);
+      const { data, error } = await testClient
+        .from('memorial_counters')
+        .select('hero_id', { count: 'exact', head: true })
+        .abortSignal(controller.signal);
+
+      clearTimeout(timeoutId);
+
+      if (error) {
+        if (error.code === 'PGRST116' || error.message?.includes('relation') || error.code === '42P01') {
+          return {
+            success: true,
+            needsMigration: true,
+            message: 'Связь есть! Выполните supabase_migration.sql'
+          };
+        }
+        return { success: false, message: error.message || 'Ошибка ответа Supabase' };
       }
+      return { success: true, message: 'Подключение активно. База данных доступна.' };
+    } catch (err) {
+      return { success: false, message: err.name === 'AbortError' ? 'Таймаут соединения (проект недоступен)' : err.message };
+    }
+  },
+
+  async init() {
+    if (this.isLive) return;
+    const url = CloudConfig.SUPABASE_URL;
+    const key = CloudConfig.SUPABASE_ANON_KEY;
+
+    if (typeof supabase === 'undefined') {
+      this.setStatus('offline', 'Автономный режим (библиотека Supabase не загружена)');
+      return;
+    }
+
+    if (!url || url.includes('ВАШ_PROJECT_ID')) {
+      this.setStatus('offline', 'Автономный режим (укажите параметры Supabase)');
+      return;
+    }
+
+    this.setStatus('connecting', 'Проверка связи с базой данных Supabase...');
+
+    try {
+      this.client = supabase.createClient(url, key, {
+        realtime: {
+          params: {
+            eventsPerSecond: 10
+          }
+        }
+      });
+
+      const check = await this.testConnection(url, key);
+      if (check.success) {
+        this.isLive = true;
+        this.setStatus('online', check.needsMigration ? 'Онлайн (требуется SQL миграция)' : 'Supabase Realtime Онлайн');
+        this.subscribeRealtime();
+        console.log(`[CloudSync v5.5] 🌐 OMNI-SYNC онлайн (${url}). Realtime-каналы активированы.`);
+      } else {
+        this.isLive = false;
+        this.setStatus('offline', `Офлайн-режим: ${check.message}`);
+        console.warn(`[CloudSync] ⚠️ Supabase недоступен (${check.message}). Включен автономный режим LocalStorage.`);
+      }
+    } catch (err) {
+      this.isLive = false;
+      this.setStatus('error', `Ошибка: ${err.message}`);
+      console.warn("[CloudSync] Ошибка инициализации Supabase клиента:", err);
     }
   },
 
@@ -248,10 +301,149 @@ const CloudSync = {
   },
 
   reconnect() {
+    this.isLive = false;
+    if (this.client) {
+      this.channels.forEach(channel => {
+        try { this.client.removeChannel(channel); } catch (e) {}
+      });
+      this.channels = [];
+    }
+    this.init();
+  },
+
+  // ==========================================================================
+  // СИНХРОНИЗАЦИЯ БАЗЫ ГЕРОЕВ (HEROES DATABASE & SEEDER)
+  // ==========================================================================
+  async fetchHeroes() {
+    if (!this.isLive || !this.client) return null;
+    try {
+      const { data, error } = await this.client.from('heroes_database').select('*');
+      if (error) throw error;
+      if (data && Array.isArray(data) && data.length > 0) {
+        console.log(`[CloudSync] ☁️ Загружено ${data.length} героев из базы Supabase`);
+        return data;
+      }
+      return null;
+    } catch (e) {
+      console.warn('[CloudSync] Не удалось загрузить героев из базы:', e);
+      return null;
+    }
+  },
+
+  async seedDatabase() {
     if (!this.client) {
-      this.init();
-    } else {
-      this.subscribeRealtime();
+      return { success: false, message: 'Supabase клиент не инициализирован' };
+    }
+    try {
+      const heroes = (typeof window.heroesDatabase !== 'undefined' && Array.isArray(window.heroesDatabase))
+        ? window.heroesDatabase
+        : ((typeof heroesDatabase !== 'undefined' && Array.isArray(heroesDatabase)) ? heroesDatabase : []);
+
+      if (heroes.length === 0) {
+        return { success: false, message: 'Локальная база героев (data.js) пуста' };
+      }
+
+      // 1. Наполняем heroes_database
+      const { data: existingHeroes, error: checkErr } = await this.client
+        .from('heroes_database')
+        .select('id');
+
+      let insertedCount = 0;
+      if (!checkErr) {
+        const existingIds = new Set((existingHeroes || []).map(h => h.id));
+        const toInsert = heroes.filter(h => !existingIds.has(h.id)).map(h => ({
+          id: h.id,
+          name: h.name,
+          plaque: h.plaque || 'general',
+          spec_tag: h.specTag || h.category || h.id,
+          dates: h.dates || {},
+          education: h.education || {},
+          military: h.military || {},
+          awards: h.awards || [],
+          deed: h.deed || '',
+          quote: h.quote || '',
+          media: h.media || { photo: h.photo || '', audio: h.audioGuide || '' },
+          map_coords: h.mapCoords || {}
+        }));
+
+        if (toInsert.length > 0) {
+          const { error: insErr } = await this.client.from('heroes_database').upsert(toInsert);
+          if (insErr) throw insErr;
+          insertedCount = toInsert.length;
+        }
+      }
+
+      // 2. Инициализируем memorial_counters
+      const { data: existingCounters } = await this.client.from('memorial_counters').select('hero_id');
+      const counterIds = new Set((existingCounters || []).map(c => c.hero_id));
+      const countersToInsert = heroes.filter(h => !counterIds.has(h.id)).map(h => ({
+        hero_id: h.id,
+        candles: 0,
+        flowers: 0,
+        last_updated: new Date().toISOString()
+      }));
+
+      if (countersToInsert.length > 0) {
+        await this.client.from('memorial_counters').upsert(countersToInsert);
+      }
+
+      // 3. Заполняем канонические послания на Стене Памяти (если пусто)
+      const { data: existingTributes } = await this.client.from('guestbook_tributes').select('id').limit(1);
+      if (!existingTributes || existingTributes.length === 0) {
+        const seedTributes = [
+          {
+            id: "tr-seed-1",
+            author: "Евгений Викторович Бледных",
+            role: "admin",
+            role_label: "Директор ГБПОУ СРМК, к.и.н.",
+            dedication_id: "general",
+            dedication_name: "Общему Мемориалу Славы",
+            message: "26 сентября 2025 года мы навечно увековечили подвиг 20 наших ребят. Каждый из них — часть славной истории нашего колледжа. Их мужество служит вечным нравственным ориентиром для каждого поколения студентов СРМК.",
+            theme: "theme-parchment",
+            flames: 24,
+            is_pinned: true,
+            is_verified: true,
+            date: "26 сентября 2025 г."
+          },
+          {
+            id: "tr-seed-2",
+            author: "Владимир Григорьев",
+            role: "student",
+            role_label: "Студент 3 курса СРМК, автор реквиема",
+            dedication_id: "general",
+            dedication_name: "Общему Мемориалу Славы",
+            message: "Тыл и фронт — един! И сколько б ни потребовалось зим — верим и знаем: мы победим! Вечная слава выпускникам нашего колледжа, шагнувшим в вечность.",
+            theme: "theme-clean",
+            flames: 19,
+            is_pinned: false,
+            is_verified: true,
+            date: "26 сентября 2025 г."
+          },
+          {
+            id: "tr-seed-3",
+            author: "Лариса Ивановна Вечёрка",
+            role: "guest",
+            role_label: "Мать кавалера Ордена Мужества",
+            dedication_id: "vecherka-n-a",
+            dedication_name: "Вечёрка Николай Александрович",
+            message: "Коленька навсегда останется живым в наших сердцах. Спасибо дирекции колледжа, преподавателям и сокурсникам за сохранение священной памяти.",
+            theme: "theme-parchment",
+            flames: 31,
+            is_pinned: true,
+            is_verified: true,
+            date: "28 сентября 2025 г."
+          }
+        ];
+        await this.client.from('guestbook_tributes').upsert(seedTributes);
+      }
+
+      return {
+        success: true,
+        message: `База данных синхронизирована! Героев в базе: ${heroes.length} (новых внесено: ${insertedCount}).`
+      };
+    } catch (e) {
+      console.error('[CloudSync] Ошибка наполнения базы:', e);
+      return { success: false, message: e.message || 'Ошибка заполнения' };
     }
   },
 
@@ -980,6 +1172,7 @@ const CloudSync = {
 window.CloudSync = CloudSync;
 document.addEventListener('DOMContentLoaded', () => CloudSync.init());
 window.addEventListener('online', () => CloudSync.reconnect());
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') CloudSync.reconnect();
+window.addEventListener('srmk-config-updated', () => {
+  console.log('[CloudSync] Настройки Supabase обновлены, переподключение...');
+  CloudSync.reconnect();
 });

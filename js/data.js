@@ -348,7 +348,7 @@ const heroesDatabase = [
 `,
     quote: "Каждый рейс на передовую — это спасенные жизни пехоты.",
     media: {
-      photo: "assets/images/heroes/shartov.jpg",
+      photo: "assets/images/heroes/shartov.svg",
       audioGuide: "assets/audio/guides/shartov.mp3",
       documents: ["Сводная ведомость производственной практики"]
     },
@@ -486,7 +486,7 @@ const heroesDatabase = [
 `,
     quote: "Труд сапера спасает сотни жизней.",
     media: {
-      photo: "assets/images/heroes/lutsenko.jpg",
+      photo: "assets/images/heroes/lutsenko.svg",
       audioGuide: "assets/audio/guides/lutsenko.mp3",
       documents: ["Журнал производственного обучения"]
     },
@@ -864,7 +864,7 @@ const heroesDatabase = [
 `,
     quote: "Верность присяге до последнего дыхания.",
     media: {
-      photo: "assets/images/heroes/chupin.jpg",
+      photo: "assets/images/heroes/chupin.svg",
       audioGuide: "assets/audio/guides/chupin.mp3",
       documents: ["Студенческая зачетная книжка выпуска 2019 г."]
     },
@@ -889,6 +889,14 @@ const MuseumAPI = {
     badgeColor: "#8a1c22"
   }))
 };
+
+if (typeof window !== 'undefined') {
+  window.MUSEUM_CONFIG = MUSEUM_CONFIG;
+  window.SPECIALTIES_TAXONOMY = SPECIALTIES_TAXONOMY;
+  window.MEMORY_BOOK_PROLOGUE = MEMORY_BOOK_PROLOGUE;
+  window.heroesDatabase = heroesDatabase;
+  window.MuseumAPI = MuseumAPI;
+}
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { MUSEUM_CONFIG, SPECIALTIES_TAXONOMY, MEMORY_BOOK_PROLOGUE, heroesDatabase, MuseumAPI };

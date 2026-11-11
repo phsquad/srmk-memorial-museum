@@ -55,6 +55,13 @@ const CertificateVerifier = {
    * Работает полностью офлайн без обращения к внешним серверам
    */
   buildQrSvgDataUri(text, size = 160) {
+    if (typeof QRCode !== 'undefined' && typeof QRCode.generateDataUri === 'function') {
+      try {
+        return QRCode.generateDataUri(text, { size, margin: 2, logo: true });
+      } catch (err) {
+        console.warn("[CertificateVerifier] Ошибка генерации QRCode:", err);
+      }
+    }
     const matrixSize = 25; // QR Model Version 2 (25x25)
     const matrix = Array.from({ length: matrixSize }, () => Array(matrixSize).fill(0));
 
@@ -144,3 +151,7 @@ const CertificateVerifier = {
     return this.buildQrSvgDataUri(targetUrl, size);
   }
 };
+
+if (typeof window !== 'undefined') {
+  window.CertificateVerifier = CertificateVerifier;
+}

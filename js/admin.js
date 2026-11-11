@@ -56,6 +56,7 @@ const AdminCMS = {
 
         <div class="admin-sidebar-footer">
           <button id="adminExportBtn" class="admin-btn-export">📥 Скачать data.js</button>
+          <button id="adminSupabaseBtn" class="admin-btn-small" style="width:100%; margin-top:8px; background:rgba(197,160,89,0.18); color:#dfba6d; border:1px solid rgba(197,160,89,0.45); font-weight:700;">⚡ База данных Supabase</button>
           <div style="display:flex; gap:6px; margin-top:8px;">
             <button id="adminExportJsonBtn" class="admin-btn-small" style="flex:1; padding:8px 4px;">JSON Экспорт</button>
 
@@ -253,6 +254,11 @@ const AdminCMS = {
     document.getElementById('adminAddNewBtn')?.addEventListener('click', () => this.createNewHero());
     document.getElementById('adminSaveBtn')?.addEventListener('click', () => this.saveCurrentHero());
     document.getElementById('adminExportBtn')?.addEventListener('click', () => this.exportDataJSFile());
+    document.getElementById('adminSupabaseBtn')?.addEventListener('click', () => {
+      if (window.NavigationEngine && typeof window.NavigationEngine.openSupabaseModal === 'function') {
+        window.NavigationEngine.openSupabaseModal();
+      }
+    });
     document.getElementById('adminExportJsonBtn')?.addEventListener('click', () => this.exportJSONFile());
     document.getElementById('adminResetBtn')?.addEventListener('click', () => this.resetAllChanges());
     document.getElementById('adminDeleteBtn')?.addEventListener('click', () => this.deleteCurrentHero());
@@ -544,6 +550,27 @@ const AdminCMS = {
 
     this.saveToLocalStorage();
     this.renderSidebarList();
+
+    // Синхронизация с облаком Supabase при наличии подключения
+    if (window.CloudSync && window.CloudSync.isLive && window.CloudSync.client) {
+      const h = this.tempHeroData;
+      window.CloudSync.client.from('heroes_database').upsert([{
+        id: h.id,
+        name: h.name,
+        plaque: h.plaque || 'general',
+        spec_tag: h.specTag || h.category || h.id,
+        dates: h.dates || {},
+        education: h.education || {},
+        military: h.military || {},
+        awards: h.awards || [],
+        deed: h.deed || '',
+        quote: h.quote || '',
+        media: h.media || { photo: h.photo || '', audio: h.audioGuide || '' },
+        map_coords: h.mapCoords || {}
+      }]).then(({ error }) => {
+        if (!error) console.log('[AdminCMS] Герой успешно синхронизирован с базой Supabase!');
+      });
+    }
 
     // Синхронизация всех залов музея
     if (window.App) {
