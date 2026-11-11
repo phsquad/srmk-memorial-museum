@@ -11,10 +11,10 @@ permissions:
   pages: write
   id-token: write
 
-# Запрещаем параллельные деплои одной и той же ветки
+# Если запущен новый коммит, немедленно отменяем предыдущий зависший деплой
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy:
