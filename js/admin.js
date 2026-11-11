@@ -256,7 +256,7 @@ const AdminCMS = {
     document.getElementById('adminExportBtn')?.addEventListener('click', () => this.exportDataJSFile());
     document.getElementById('adminSupabaseBtn')?.addEventListener('click', () => {
       if (window.NavigationEngine && typeof window.NavigationEngine.openSupabaseModal === 'function') {
-        window.NavigationEngine.openSupabaseModal();
+        window.NavigationEngine.openSupabaseModal(true);
       }
     });
     document.getElementById('adminExportJsonBtn')?.addEventListener('click', () => this.exportJSONFile());
@@ -289,6 +289,7 @@ const AdminCMS = {
   open() {
     const entered = prompt("Введите пароль администратора СРМК (2026):", "");
     if (entered === this.adminPassword) {
+      window._srmkAdminAuthenticated = true;
       this.renderSidebarList();
       document.getElementById('adminDashboard')?.classList.add('active');
       document.body.style.overflow = 'hidden';

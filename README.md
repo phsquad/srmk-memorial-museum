@@ -81,7 +81,7 @@
    В боковом меню Supabase откройте **SQL Editor** ➔ **New query**, скопируйте файл [supabase_migration.sql](file:///c:/Users/Alexander%20Talents/Downloads/srmk-memorial-museum/supabase_migration.sql) и нажмите **Run**.
 3. **Подключите сайт**:
    - Вставьте ваш **Project URL** и **Anon API Key** в файл [js/config.js](file:///c:/Users/Alexander%20Talents/Downloads/srmk-memorial-museum/js/config.js).
-   - **ИЛИ** нажмите на индикатор **Supabase** в шапке любого зала (или горячие клавиши `Ctrl + Shift + S`), вставьте реквизиты, нажмите **«Проверить связь»** и **«Заполнить базу (20 героев)»**.
+   - **ИЛИ** откройте закрытую консоль управления базой данных через CMS (`Ctrl + Shift + A` ➔ пароль `2026` ➔ «⚡ База данных Supabase») либо через защищенное сочетание клавиш `Ctrl + Shift + S` (с вводом пароля `2026`). Панель скрыта от обычных посетителей музея.
 
 ---
 

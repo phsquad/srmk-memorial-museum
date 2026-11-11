@@ -458,55 +458,25 @@
      * 8. ЦЕНТР УПРАВЛЕНИЯ И СТАТУС SUPABASE (GITHUB PAGES OMNI-SYNC)
      * ========================================================================
      */
+    /**
+     * ========================================================================
+     * 4. ЗАКРЫТЫЙ ЦЕНТР УПРАВЛЕНИЯ SUPABASE (ДЛЯ АДМИНИСТРАТОРОВ СРМК)
+     * Доступ: только через CMS (Ctrl+Shift+A) или закрытое сочетание Ctrl+Shift+S с паролем (2026).
+     * Полностью исключен из публичного интерфейса для обычных посетителей музея.
+     * ========================================================================
+     */
     initSupabaseControlCenter() {
-      // 1. Вставка кнопки статуса в шапку (если её нет)
-      const headerActions = document.querySelector('.site-header .header-actions');
-      if (headerActions && !document.getElementById('btnSupabaseStatus')) {
-        const statusBtn = document.createElement('button');
-        statusBtn.id = 'btnSupabaseStatus';
-        statusBtn.className = 'supabase-status-pill';
-        statusBtn.type = 'button';
-        statusBtn.title = 'Статус базы данных Supabase (Нажмите для настройки)';
-        statusBtn.innerHTML = `
-          <span class="status-dot dot-connecting" id="spbStatusDot"></span>
-          <span class="status-label" id="spbStatusLabel">Supabase</span>
-        `;
-        const burger = headerActions.querySelector('.mobile-burger-btn');
-        if (burger) {
-          headerActions.insertBefore(statusBtn, burger);
-        } else {
-          headerActions.appendChild(statusBtn);
-        }
-
-        statusBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          this.openSupabaseModal();
-        });
-      }
-
-      // Добавляем пункт в мобильное меню Drawer
-      const drawerButtonsRow = document.querySelector('.mobile-drawer .drawer-buttons-row');
-      if (drawerButtonsRow && !document.getElementById('drawerSupabaseBtn')) {
-        const spbDrawerBtn = document.createElement('button');
-        spbDrawerBtn.id = 'drawerSupabaseBtn';
-        spbDrawerBtn.type = 'button';
-        spbDrawerBtn.className = 'drawer-btn';
-        spbDrawerBtn.style.borderColor = '#c5a059';
-        spbDrawerBtn.style.color = '#dfba6d';
-        spbDrawerBtn.textContent = '⚡ База Supabase';
-        drawerButtonsRow.insertBefore(spbDrawerBtn, drawerButtonsRow.firstChild);
-      }
-
-      // Слушатель кликов по кнопкам вызова
+      // Публичные кнопки статуса и меню удалены.
+      // Слушатель кликов по элементам с data-open-supabase (например, в закрытой админке)
       document.addEventListener('click', (e) => {
-        const target = e.target.closest('#btnSupabaseStatus, #drawerSupabaseBtn, [data-open-supabase]');
+        const target = e.target.closest('[data-open-supabase]');
         if (target) {
           e.preventDefault();
           this.openSupabaseModal();
         }
       });
 
-      // Горячие клавиши: Ctrl+Shift+S / Ctrl+Shift+Ы
+      // Скрытые горячие клавиши администратора: Ctrl+Shift+S / Ctrl+Shift+Ы (с проверкой пароля)
       document.addEventListener('keydown', (e) => {
         if (e.ctrlKey && e.shiftKey && (e.key === 'S' || e.key === 's' || e.key === 'Ы' || e.key === 'ы')) {
           e.preventDefault();
@@ -527,34 +497,15 @@
     },
 
     updateSupabaseBadge(status, message, isLive) {
-      const dot = document.getElementById('spbStatusDot');
-      const label = document.getElementById('spbStatusLabel');
-      const btn = document.getElementById('btnSupabaseStatus');
-
-      if (!dot || !label) return;
-
-      dot.className = 'status-dot';
-      if (isLive || status === 'online') {
-        dot.classList.add('dot-online');
-        label.textContent = 'Supabase Онлайн';
-        if (btn) btn.title = `Supabase Realtime: Подключено (${message || 'Все сервисы активны'})`;
-      } else if (status === 'connecting') {
-        dot.classList.add('dot-connecting');
-        label.textContent = 'Подключение...';
-        if (btn) btn.title = 'Подключение к Supabase...';
-      } else if (status === 'error') {
-        dot.classList.add('dot-error');
-        label.textContent = 'Ошибка БД';
-        if (btn) btn.title = `Ошибка связи с Supabase: ${message}. Нажмите для настройки.`;
-      } else {
-        dot.classList.add('dot-offline');
-        label.textContent = 'Офлайн (Локально)';
-        if (btn) btn.title = 'Офлайн-режим (LocalStorage). Нажмите для подключения Supabase.';
-      }
-
       const modalStatusBox = document.getElementById('spbModalStatusText');
       if (modalStatusBox) {
         modalStatusBox.textContent = message || (isLive ? 'Подключено к Supabase' : 'Офлайн-режим');
+      }
+      const badge = document.getElementById('spbModalStatusBadge');
+      if (badge) {
+        badge.textContent = isLive ? '🟢 Онлайн' : '🟡 Офлайн';
+        badge.style.background = isLive ? 'rgba(16,185,129,0.2)' : 'rgba(245,158,11,0.2)';
+        badge.style.color = isLive ? '#34d399' : '#fbbf24';
       }
     },
 
@@ -736,7 +687,27 @@
       return modal;
     },
 
-    openSupabaseModal() {
+    openSupabaseModal(skipAuth = false) {
+      // Защита от несанкционированного доступа:
+      // Доступ разрешен только если открыта CMS или введен пароль администратора СРМК (2026)
+      const isAdminOpen = document.getElementById('adminDashboard')?.classList.contains('active');
+      const isAlreadyAuthed = Boolean(window._srmkAdminAuthenticated || isAdminOpen);
+
+      if (!skipAuth && !isAlreadyAuthed) {
+        const entered = prompt("Доступ к управлению базой данных защищен.\nВведите пароль администратора СРМК (2026):", "");
+        if (entered !== "2026") {
+          if (entered !== null) {
+            if (window.MemorialToast) {
+              MemorialToast.show("Отказ в доступе: Неверный пароль администратора.", "error");
+            } else {
+              alert("Отказ в доступе: Неверный пароль.");
+            }
+          }
+          return;
+        }
+        window._srmkAdminAuthenticated = true;
+      }
+
       const modal = this.getOrCreateSupabaseModal();
       modal.classList.add('active');
       modal.setAttribute('aria-hidden', 'false');
